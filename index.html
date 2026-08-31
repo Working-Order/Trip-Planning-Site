@@ -1516,6 +1516,71 @@ input[type="file"]:focus-visible::file-selector-button {
   pointer-events: none;
 }
 
+/* ══ PHOTOS — real images over the plates (src/css/12-photos.css) ════════
+   The photo never replaces the plate in the DOM — it layers over it, so
+   offline, a dead link, or no match falls back by simply not painting.
+   Grain and scrim stay printed ABOVE the photo: the page keeps its plate
+   language even when the image is real. */
+.photo {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--dur-3) var(--ease-out);
+}
+.photo.is-loaded { opacity: 1; }
+.artframe--grain::after { z-index: 2; }
+.artframe__scrim { z-index: 2; }
+.card__overlay { z-index: 3; }
+.detail__fav, .detail__seal { z-index: 3; }
+
+/* Set/change control + credit, as plaques on the hero plate. */
+.detail__photobtn {
+  position: absolute; right: var(--s2); bottom: var(--s2); z-index: 3;
+  gap: var(--s1);
+  border: 0; cursor: pointer;
+  color: var(--ink);
+  opacity: 0.9;
+}
+.detail__photobtn:hover { opacity: 1; }
+.detail__photobtn .icon { width: 0.9em; height: 0.9em; }
+
+.detail__photocredit {
+  position: absolute; left: var(--s2); bottom: var(--s2); z-index: 3;
+  margin: 0;
+  display: inline-flex; align-items: center; gap: var(--s1);
+  max-width: min(68%, 34rem);
+  height: 24px; padding: 0 var(--s2);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--text-xs); color: var(--ink-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.detail__photocredit a { color: var(--ink); }
+.detail__photonote { color: var(--ink-faint); }
+
+/* Look-it-up links in the hero utility row. */
+.detail__lookup { gap: var(--s1); }
+.detail__lookup .icon { width: 0.95em; height: 0.95em; }
+
+/* The paste-an-address form (popover). */
+.photoform { display: grid; gap: var(--s3); min-width: min(340px, 78vw); }
+.photoform__input {
+  width: 100%; box-sizing: border-box;
+  font: inherit; color: var(--ink);
+  background: var(--bg-sunken);
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: var(--s2) var(--s3);
+}
+.photoform__find {
+  margin: 0; font-size: var(--text-sm);
+  display: flex; flex-wrap: wrap; gap: var(--s2); align-items: baseline;
+}
+.photoform__findword { color: var(--ink-muted); }
+.photoform__actions { display: flex; gap: var(--s2); justify-content: flex-end; }
+
 /* ══ CARD — the visual (gallery) mode ════════════════════════════════════ */
 .card {
   position: relative;
@@ -4004,7 +4069,7 @@ details[open] > .orphan__setasidesum::after,
   display: grid;
   grid-template-columns: auto 1fr auto auto auto;
   align-items: center;
-  gap: var(--s4);
+  gap: var(--s5); /* de-cramp 2026-08-31: s4 → s5; ≤1199 query still tightens to s3 */
   min-height: var(--masthead-h);
 }
 
@@ -4116,7 +4181,7 @@ details[open] > .orphan__setasidesum::after,
   pointer-events: none;
 }
 .masthead__searchfield {
-  width: 16rem;
+  width: 11rem;
   min-height: var(--tap-min);
   padding: var(--s2) var(--s3) var(--s2) var(--s6);
   background: var(--surface);
@@ -4124,6 +4189,16 @@ details[open] > .orphan__setasidesum::after,
   border-radius: var(--radius-md);
   color: var(--ink);
   font-size: var(--text-sm);
+  transition: width var(--dur-3) var(--ease-out);
+}
+/* De-cramp (2026-08-31): the field idles narrow and buys its full measure only
+   while the traveler is typing — always-open 16rem put the row over the 1280
+   budget. Desktop only: below 1200 the magnifier flow owns the field. */
+@media (min-width: 1200px) {
+  .masthead__search:focus-within .masthead__searchfield { width: 15rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .masthead__searchfield { transition: none; }
 }
 .masthead__magnifier {
   display: none;
@@ -6375,13 +6450,31 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .sync__when { color: var(--ink-faint); flex: 0 0 auto; min-width: 6rem; font-variant-numeric: tabular-nums; }
 .sync__what { overflow-wrap: anywhere; }
 
-/* Masthead chips share one grid cell (see 50-shell.js buildMasthead). */
-.masthead__chips { display: inline-flex; align-items: center; gap: var(--s2); min-width: 0; }
-.masthead__chips .masthead__chip { flex: 0 1 auto; min-width: 0; }
-/* The page is capped at --page-max, so the chip budget is the same at 1280 and
-   at 1440: one cap for every desktop width, tuned so More▾ never meets search. */
-.masthead__chips .masthead__chip:not(.masthead__chip--sync) .masthead__chiptext { max-width: min(9rem, 13vw); }
-.masthead__chip--sync .masthead__chiptext { max-width: 6rem; }
+/* Masthead chips share one grid cell (see 50-shell.js buildMasthead).
+   De-cramp (2026-08-31): the two pills fused into ONE quiet status group —
+   one border, an interior hairline, still two link targets (workbook → Data,
+   sharing → Stay in sync). Workbook side is count-only (see paintWorkbookChip);
+   at ≤1023 the chiptexts hide and this reads as two glyph squares in a pill. */
+.masthead__chips {
+  display: inline-flex;
+  align-items: stretch;
+  min-width: 0;
+  border: var(--hair) solid var(--line-hair);
+  border-radius: var(--radius-round);
+}
+.masthead__chips:hover { border-color: var(--line-strong); }
+.masthead__chips .masthead__chip {
+  flex: 0 1 auto;
+  min-width: 0;
+  border: 0;
+  border-radius: var(--radius-round) 0 0 var(--radius-round);
+}
+.masthead__chips .masthead__chip--sync {
+  border-left: var(--hair) solid var(--line-hair);
+  border-radius: 0 var(--radius-round) var(--radius-round) 0;
+}
+.masthead__chips .masthead__chip:hover { color: var(--ink); background: var(--surface-alt); }
+.masthead__chip--sync .masthead__chiptext { max-width: 7rem; }
 /* The glyph carries the state, colour only reinforces it. */
 .masthead__chip[data-sync="ok"] .masthead__chipdot      { color: var(--ok); }
 .masthead__chip[data-sync="syncing"] .masthead__chipdot,
@@ -6944,7 +7037,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.2.0-sync';
+  T.version = '0.3.0-photos';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -8168,7 +8261,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
        cross-device import: without them a merged rejection restores to
        "not reviewed" instead of back to where it actually was. */
     ['reviewed', 'favorite', 'status', 'readiness', 'rejectionReasons',
-      'statusBeforeReject', 'rejectedAt'].forEach(pick);
+      'statusBeforeReject', 'rejectedAt', 'photo'].forEach(pick);
 
     /* reactions: owner authority, else newest-wins per traveler */
     var reactions = {};
@@ -11455,7 +11548,8 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     box:       'M4.5 4.5h11v11h-11z',
     map:       'M7.4 4.2 3.2 5.8v10l4.2-1.6 5.2 1.6 4.2-1.6v-10l-4.2 1.6zM7.4 4.2v10.6M12.6 5.8v10.6',
     book:      'M10 6.2C8.6 4.9 6.6 4.3 3.6 4.4v10c3-.1 5 .5 6.4 1.8 1.4-1.3 3.4-1.9 6.4-1.8v-10c-3-.1-5 .5-6.4 1.8zM10 6.2v10',
-    clock:     'M10 3.4a6.6 6.6 0 1 0 0 13.2 6.6 6.6 0 0 0 0-13.2zM10 6.6V10l2.4 1.6'
+    clock:     'M10 3.4a6.6 6.6 0 1 0 0 13.2 6.6 6.6 0 0 0 0-13.2zM10 6.6V10l2.4 1.6',
+    photo:     'M3.4 5.2h13.2a1 1 0 0 1 1 1v7.6a1 1 0 0 1-1 1H3.4a1 1 0 0 1-1-1V6.2a1 1 0 0 1 1-1zM7 9.2a1.3 1.3 0 1 0 0-2.6 1.3 1.3 0 0 0 0 2.6zM4.4 14.4l3.6-3.9 2.6 2.8 2.1-2.2 2.9 3.3'
   };
 
   I.has = function (name) { return Object.prototype.hasOwnProperty.call(PATHS, name); };
@@ -11550,6 +11644,275 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     );
   };
 })(window.TRIP);
+/* ==== src/js/12-photos.js ==== */
+/* 12-photos.js — real images over the plates. OWNER: photos wave (2026-08-31).
+ *
+ * Three layers, strict precedence, each honest about what it shows:
+ *   1. MANUAL — an image address pasted on the trip page. Planning state
+ *      (scalar `photo` on the record, per-field clock), so it merges and
+ *      syncs to the other laptop like any reaction. null clears it.
+ *   2. AUTO — the destination's lead image from Wikipedia (keyless,
+ *      CORS-open MediaWiki API), fetched once per unique destination and
+ *      cached in localStorage `trip26:photos`. It shows the PLACE, not the
+ *      hotel — the credit line says so. The cache is disposable and is
+ *      never part of sync (each browser resolves its own).
+ *   3. PLATE — the generative SVG stays in the DOM underneath. Offline, a
+ *      dead link, a miss, or a suspicious match (maps, flags, coats of
+ *      arms) simply leaves the plate showing. Nothing else changes.
+ *
+ * The queue is polite: 3 requests in flight, at most 3 attempts per
+ * destination (narrowing "town, region, country" → "region, country" →
+ * "town, country" — deliberately never country alone: a stock photo of a
+ * whole country pretending to be the place is worse than the plate). After
+ * 3 consecutive network failures it suspends itself for the session and
+ * resumes on the browser's `online` event. Suspension is SILENT by design —
+ * offline photos are not an error, so nothing lands in T.diag (the e2e
+ * suite runs with en.wikipedia.org blackholed to hold this true).
+ */
+(function (T) {
+  'use strict';
+  var U = T.util;
+  var P = T.photos = {};
+
+  var LS = 'trip26:photos';
+  var VERSION = 1;
+  var MAX_ENTRIES = 700;
+  var MISS_TTL = 14 * 24 * 3600 * 1000;   /* re-ask about a miss after two weeks */
+  var MAX_ACTIVE = 3;
+  var FAIL_LIMIT = 3;
+
+  /* ---- cache (localStorage, rebuildable — never precious) --------------- */
+  var map = null;
+  function load() {
+    if (map) return map;
+    map = {};
+    try {
+      var raw = window.localStorage.getItem(LS);
+      var j = raw ? JSON.parse(raw) : null;
+      if (j && j.v === VERSION && j.map) map = j.map;
+    } catch (e) { /* private mode / no storage — run memory-only */ }
+    return map;
+  }
+  var saveTimer = null;
+  function save() {
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      saveTimer = null;
+      try {
+        var keys = Object.keys(map);
+        if (keys.length > MAX_ENTRIES) {
+          keys.sort(function (a, b) { return (map[a].ts || 0) - (map[b].ts || 0); });
+          keys.slice(0, keys.length - MAX_ENTRIES).forEach(function (k) { delete map[k]; });
+        }
+        window.localStorage.setItem(LS, JSON.stringify({ v: VERSION, map: map }));
+      } catch (e) { /* quota — the cache is the first thing worth losing */ }
+    }, 400);
+  }
+
+  /* ---- destination -> search attempts ----------------------------------- */
+  function segsOf(f) {
+    var dest = f && !U.isBlank(f.destination) ? String(f.destination).trim() : '';
+    var country = f && !U.isBlank(f.country) ? String(f.country).trim() : '';
+    var segs = dest ? dest.split(',') : [];
+    /* "Kazbegi / Borjomi / Gudauri" — the first alternative names the search */
+    segs = segs.map(function (s) { return s.split('/')[0].trim(); }).filter(Boolean);
+    if (country && !(segs.length && U.normalize(segs[segs.length - 1]) === U.normalize(country))) {
+      segs.push(country);
+    }
+    return segs;
+  }
+  P.keyOf = function (f) { return U.normalize(segsOf(f).join(', ')); };
+  function attemptsOf(f) {
+    var segs = segsOf(f);
+    var out = [];
+    if (segs.length) out.push(segs.join(', '));
+    if (segs.length >= 3) {
+      out.push(segs.slice(1).join(', '));
+      out.push(segs[0] + ', ' + segs[segs.length - 1]);
+    }
+    return out.filter(function (q, i, a) { return q && a.indexOf(q) === i; }).slice(0, 3);
+  }
+
+  /* ---- MediaWiki (keyless; CORS via origin=*) ---------------------------- */
+  var BAD = /(locator|location_map|coat_of_arms|coa_of|flag_of|escudo_|wappen|seal_of|blason|_logo|logo_)/i;
+  function apiUrl(q) {
+    return 'https://en.wikipedia.org/w/api.php' +
+      '?action=query&format=json&origin=*&redirects=1' +
+      '&generator=search&gsrnamespace=0&gsrlimit=3' +
+      '&gsrsearch=' + encodeURIComponent(q) +
+      '&prop=pageimages%7Cinfo&piprop=thumbnail&pithumbsize=1200&inprop=url';
+  }
+  function pickPage(json) {
+    var pages = json && json.query && json.query.pages;
+    if (!pages) return null;
+    var list = Object.keys(pages).map(function (k) { return pages[k]; });
+    list.sort(function (a, b) { return (a.index || 99) - (b.index || 99); });
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i], t = p.thumbnail;
+      if (t && t.source && !BAD.test(t.source) && (t.width || 0) >= 240) {
+        return {
+          u: t.source,
+          t: p.title || '',
+          l: p.fullurl || (p.title ? 'https://en.wikipedia.org/wiki/' + encodeURIComponent(p.title.replace(/ /g, '_')) : '')
+        };
+      }
+    }
+    return null;
+  }
+
+  /* ---- the polite queue -------------------------------------------------- */
+  var pendingCbs = {};
+  var queue = [];
+  var active = 0;
+  var fails = 0;
+  var suspended = false;
+  P.suspended = function () { return suspended; };
+  try {
+    window.addEventListener('online', function () { fails = 0; suspended = false; pump(); });
+  } catch (e) {}
+
+  function flush(key, entry) {
+    var cbs = pendingCbs[key] || [];
+    delete pendingCbs[key];
+    for (var i = 0; i < cbs.length; i++) { try { cbs[i](entry); } catch (e) {} }
+  }
+  function settle(key, entry) {
+    var m = load();
+    m[key] = entry ? { u: entry.u, t: entry.t, l: entry.l, ts: U.now() } : { miss: 1, ts: U.now() };
+    save();
+    flush(key, entry || null);
+  }
+  function suspend(why) {
+    suspended = true;
+    try { console.info('[TRIP:photos] auto photos paused for this session (' + why + ')'); } catch (e) {}
+    while (queue.length) flush(queue.shift().key, null);
+  }
+  function pump() {
+    while (!suspended && active < MAX_ACTIVE && queue.length) {
+      active++;
+      runJob(queue.shift());
+    }
+  }
+  function runJob(job) {
+    var tries = attemptsOf(job.f);
+    var at = 0;
+    function done(entry) { active--; settle(job.key, entry); pump(); }
+    function bail() { active--; flush(job.key, null); pump(); }
+    function step() {
+      if (suspended) return bail();
+      if (at >= tries.length) return done(null);
+      var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var timer = ctl ? setTimeout(function () { try { ctl.abort(); } catch (e) {} }, 12000) : null;
+      window.fetch(apiUrl(tries[at++]), ctl ? { signal: ctl.signal } : undefined)
+        .then(function (res) {
+          if (timer) clearTimeout(timer);
+          if (res.status === 429 || res.status === 403) { var e = new Error('rate'); e.rate = true; throw e; }
+          if (!res.ok) throw new Error('http ' + res.status);
+          return res.json();
+        })
+        .then(function (json) {
+          fails = 0;
+          var hit = pickPage(json);
+          if (hit) done(hit); else step();
+        })
+        .catch(function (err) {
+          if (timer) clearTimeout(timer);
+          fails++;
+          if ((err && err.rate) || fails >= FAIL_LIMIT) {
+            suspend(err && err.rate ? 'rate-limited' : 'network unreachable');
+            return bail();
+          }
+          step();
+        });
+    }
+    step();
+  }
+
+  /* ---- public ------------------------------------------------------------ */
+  P.autoOf = function (f) {
+    var e = load()[P.keyOf(f)];
+    return e && !e.miss && e.u ? e : null;
+  };
+  P.manualOf = function (id) {
+    var p = T.plan && T.plan.get ? T.plan.get(id) : null;
+    var u = p && p.photo;
+    return typeof u === 'string' && /^https?:\/\//i.test(u) ? u : null;
+  };
+  P.coverOf = function (row) {
+    if (!row || !row.rec) return null;
+    var manual = P.manualOf(row.id);
+    if (manual) return { u: manual, kind: 'manual' };
+    var auto = P.autoOf(row.rec.f || {});
+    return auto ? { u: auto.u, t: auto.t, l: auto.l, kind: 'auto' } : null;
+  };
+  P.request = function (rec, cb) {
+    var f = rec && rec.f;
+    var key = f ? P.keyOf(f) : '';
+    if (!key) { if (cb) cb(null); return; }
+    var e = load()[key];
+    if (e && !e.miss && e.u) { if (cb) cb(e); return; }
+    if (e && e.miss && U.now() - (e.ts || 0) < MISS_TTL) { if (cb) cb(null); return; }
+    if (suspended) { if (cb) cb(null); return; }
+    if (pendingCbs[key]) { if (cb) pendingCbs[key].push(cb); return; }
+    pendingCbs[key] = cb ? [cb] : [];
+    queue.push({ key: key, f: f });
+    pump();
+  };
+  P.markBroken = function (row, url) {
+    if (P.manualOf(row.id) === url) return;  /* planning state is not ours to expire */
+    var m = load(), key = P.keyOf((row.rec && row.rec.f) || {});
+    if (m[key] && m[key].u === url) { m[key] = { miss: 1, ts: U.now() }; save(); }
+  };
+
+  /** Keep exactly one .photo layer on an artframe in sync with coverOf(row). */
+  P.paint = function (host, row, opts) {
+    if (!host) return null;
+    opts = opts || {};
+    var cover = P.coverOf(row);
+    var want = cover ? cover.u : null;
+    var img = host.querySelector('.photo');
+    var cur = img ? img.getAttribute('src') : null;
+    if (want === cur) return cover;
+    if (img && img.parentNode) img.parentNode.removeChild(img);
+    if (!want) return cover;
+    img = document.createElement('img');
+    img.className = 'photo';
+    img.alt = '';
+    img.setAttribute('aria-hidden', 'true');
+    img.decoding = 'async';
+    if (opts.lazy) img.loading = 'lazy';
+    img.referrerPolicy = 'no-referrer';
+    img.addEventListener('load', function () { img.classList.add('is-loaded'); });
+    img.addEventListener('error', function () {
+      if (img.parentNode) img.parentNode.removeChild(img);
+      P.markBroken(row, want);
+    });
+    img.src = want;
+    var svg = host.querySelector('svg');
+    if (svg && svg.parentNode === host && svg.nextSibling) host.insertBefore(img, svg.nextSibling);
+    else host.appendChild(img);
+    return cover;
+  };
+
+  /** Quick outbound searches — the fastest honest route to the hotel itself. */
+  P.searchUrls = function (f) {
+    f = f || {};
+    var hotel = U.isBlank(f.hotel) ? '' : String(f.hotel).trim();
+    var place = T.cards && T.cards.placeLine ? T.cards.placeLine(f, ', ') : '';
+    var q = (hotel + (place ? ' ' + place : '')).trim();
+    var enc = encodeURIComponent(q);
+    return {
+      q: q,
+      google: 'https://www.google.com/search?q=' + enc,
+      images: 'https://www.google.com/search?udm=2&q=' + enc,
+      maps: 'https://www.google.com/maps/search/?api=1&query=' + enc
+    };
+  };
+  P.open = function (url) {
+    try { window.open(url, '_blank', 'noopener'); } catch (e) { window.location.href = url; }
+  };
+})(window.TRIP);
+
 /* ==== src/js/20-view-home.js ==== */
 /* 20-view-home.js — HOME (screen S1, docs/UX_SPEC.md §2). OWNER: IMPL-1.
  *
@@ -14227,6 +14590,90 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     T.cards.popover.open(anchor, menu, { className: 'popover--menu', role: 'menu' });
   }
 
+  /* ---- 5a-bis. photos + look-it-up helpers (12-photos wave) ------------- */
+
+  function lookupLink(word, icon, url) {
+    var a = U.el('a', {
+      class: 'btn btn--quiet detail__lookup', href: url,
+      target: '_blank', rel: 'noopener'
+    });
+    a.innerHTML = T.icons.get(icon) + '<span>' + word + '</span>';
+    return a;
+  }
+
+  /** The credit plaque is the honesty line: an auto photo shows the PLACE. */
+  function paintPhotoCredit(credit, row, cover, photoBtn) {
+    U.clear(credit);
+    credit.hidden = !cover;
+    if (photoBtn) {
+      var word = photoBtn.querySelector('span');
+      if (word) word.textContent = cover && cover.kind === 'manual' ? 'Change photo…' : 'Photo…';
+    }
+    if (!cover) return;
+    if (cover.kind === 'manual') {
+      credit.appendChild(document.createTextNode('Photo — added by one of you'));
+    } else {
+      credit.appendChild(document.createTextNode('Photo — '));
+      if (cover.l) {
+        credit.appendChild(U.el('a', { href: cover.l, target: '_blank', rel: 'noopener' },
+          (cover.t || 'the destination') + ' · Wikipedia'));
+      } else {
+        credit.appendChild(document.createTextNode((cover.t || 'the destination') + ' · Wikipedia'));
+      }
+      credit.appendChild(U.el('span', { class: 'detail__photonote' }, '— the place, not this hotel'));
+    }
+  }
+
+  function openPhotoPopover(anchor, id) {
+    var current = T.photos.manualOf(id) || '';
+    var body = U.el('div', { class: 'popover__body photoform' });
+    body.appendChild(U.el('p', { class: 'popover__title', id: 'photo-pop-title' }, 'This trip’s photo'));
+    body.appendChild(U.el('p', { class: 'popover__note' },
+      'Paste an image address and it replaces the artwork here — for both of you. ' +
+      'On Google Images: right-click a photo → “Copy image address”. ' +
+      'Leave it empty to go back to the automatic destination photo.'));
+    var input = U.el('input', {
+      type: 'url', class: 'photoform__input', value: current,
+      placeholder: 'https://…', 'aria-label': 'Image address'
+    });
+    body.appendChild(input);
+    var row = rowOf(id);
+    if (row) {
+      var lu = T.photos.searchUrls(row.rec.f);
+      var find = U.el('p', { class: 'photoform__find' });
+      find.appendChild(U.el('span', { class: 'photoform__findword' }, 'Find one:'));
+      [['Google Images', lu.images], ['Google', lu.google], ['Maps', lu.maps]].forEach(function (d) {
+        find.appendChild(U.el('a', { class: 'btn btn--link', href: d[1], target: '_blank', rel: 'noopener' }, d[0]));
+      });
+      body.appendChild(find);
+    }
+    var actions = U.el('div', { class: 'photoform__actions' });
+    if (current) {
+      var rm = U.el('button', { type: 'button', class: 'btn' }, 'Remove');
+      rm.addEventListener('click', function () {
+        store.dispatch('detail/setField', { id: id, field: 'photo', value: null });
+        T.cards.popover.close();
+        T.notify.toast({ text: 'Photo cleared — back to the automatic one.' });
+      });
+      actions.appendChild(rm);
+    }
+    var save = U.el('button', { type: 'button', class: 'btn btn--primary' }, 'Save');
+    save.addEventListener('click', function () {
+      var v = String(input.value || '').trim();
+      if (v && !/^https?:\/\//i.test(v)) {
+        T.notify.toast({ text: 'That doesn’t look like an image address — it should start with http.' });
+        return;
+      }
+      store.dispatch('detail/setField', { id: id, field: 'photo', value: v || null });
+      T.cards.popover.close();
+      T.notify.toast({ text: v ? 'Photo set — it syncs to both of you.' : 'Photo cleared — back to the automatic one.' });
+    });
+    actions.appendChild(save);
+    body.appendChild(actions);
+    T.cards.popover.open(anchor, body, { labelledby: 'photo-pop-title' });
+    try { input.focus(); } catch (e) {}
+  }
+
   /* ---- 5b. hero (§5.4-1) ------------------------------------------------ */
 
   function buildHero(row, painters) {
@@ -14258,6 +14705,17 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       U.el('span', { class: 'detail__sealword' }, 'Booked')
     ]);
     art.appendChild(seal);
+
+    /* real-photo furniture (12-photos): set/change + credit plaques */
+    var photoBtn = U.el('button', {
+      type: 'button', class: 'detail__photobtn plaque',
+      'aria-label': 'Set or change this trip’s photo'
+    });
+    photoBtn.innerHTML = T.icons.get('photo') + '<span>Photo…</span>';
+    photoBtn.addEventListener('click', function () { openPhotoPopover(photoBtn, id); });
+    art.appendChild(photoBtn);
+    var photoCredit = U.el('p', { class: 'detail__photocredit', hidden: true });
+    art.appendChild(photoCredit);
     hero.appendChild(art);
 
     var head = U.el('div', { class: 'detail__heroText' });
@@ -14278,6 +14736,20 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     painters.push(function () {
       var r = rowOf(id) || row;
       var plan = T.plan.get(id) || {};
+
+      /* the photo layer: manual > auto > plate (12-photos) */
+      if (T.photos) {
+        var cover = T.photos.paint(art, r, {});
+        paintPhotoCredit(photoCredit, r, cover, photoBtn);
+        if (!cover && !hero._photoAsked) {
+          hero._photoAsked = true;
+          T.photos.request(r.rec, function (entry) {
+            if (!entry || !art.isConnected) return;
+            var now = rowOf(id) || r;
+            paintPhotoCredit(photoCredit, now, T.photos.paint(art, now, {}), photoBtn);
+          });
+        }
+      }
 
       /* rank + movement */
       U.clear(rankLine);
@@ -14334,6 +14806,13 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         utility.appendChild(cmp);
       }
       utility.appendChild(T.readiness.meterButton(id));
+      /* look it up — the fastest honest route to the real thing */
+      if (T.photos) {
+        var lu = T.photos.searchUrls(f);
+        utility.appendChild(lookupLink('Google', 'search', lu.google));
+        utility.appendChild(lookupLink('Images', 'gallery', lu.images));
+        utility.appendChild(lookupLink('Maps', 'map', lu.maps));
+      }
 
       /* money line */
       U.clear(money);
@@ -21500,10 +21979,25 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         w: size.w, h: size.h, variant: variant
       });
       card._artFor = row.id;
+      C.paintPhoto(card, row);
     } catch (e) {
       T.diag.note('cards', 'artwork failed for ' + row.id + ': ' + ((e && e.message) || e));
       card._art.classList.add('card__art--absent');
       card._artFor = row.id;
+    }
+  };
+
+  /** The real-photo layer over the plate (12-photos): manual > auto > plate. */
+  C.paintPhoto = function (card, row) {
+    if (!card._art || !T.photos) return;
+    var cover = T.photos.paint(card._art, row, { lazy: true });
+    if (!cover && !card._photoAsked) {
+      card._photoAsked = true;
+      T.photos.request(row.rec, function (entry) {
+        if (entry && card._artFor === row.id && card.isConnected) {
+          T.photos.paint(card._art, row, { lazy: true });
+        }
+      });
     }
   };
 
@@ -21566,6 +22060,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     U.toggleClass(card, 'is-favorite', !!row.favorite);
     U.toggleClass(card, 'is-reviewed', !!row.reviewed);
     U.toggleClass(card, 'is-reconsidered', !!(row.plan && row.plan.statusBeforeReject != null && row.status !== 'rejected'));
+
+    /* the photo layer can change when a manual photo is set or cleared */
+    if (card._artFor === row.id) C.paintPhoto(card, row);
 
     /* reactions + agreement */
     C.paintReaction(card._react, row, ctx);
@@ -21697,7 +22194,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       'data-action': spec.action, 'aria-label': spec.label, title: spec.label,
       tabindex: '-1'
     });
-    b.appendChild(U.el('span', { class: 'card__act-glyph', 'aria-hidden': 'true' }, spec.glyph));
+    var glyph = U.el('span', { class: 'card__act-glyph', 'aria-hidden': 'true' });
+    if (spec.svg) glyph.innerHTML = T.icons.get(spec.svg);
+    else glyph.textContent = spec.glyph == null ? '' : spec.glyph;
+    b.appendChild(glyph);
     if (spec.pressable) b.setAttribute('aria-pressed', 'false');
     b.addEventListener('click', spec.onClick);
     return b;
@@ -21739,6 +22239,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     buttons.push(actionButton({
       action: 'compare', glyph: '⊞', label: 'Compare', pressable: true,
       onClick: function () { T.compare.toggle(id); }
+    }));
+    buttons.push(actionButton({
+      action: 'photos', svg: 'search', label: 'Real photos — Google Images',
+      onClick: function () { T.photos.open(T.photos.searchUrls(row.rec.f).images); }
     }));
     buttons.push(actionButton({
       action: 'more', glyph: '⋯', label: 'More actions',
@@ -21825,6 +22329,14 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         T.notify.toast({ text: res.ok ? 'Link copied.' : 'Copying didn’t work here — the link is ' + url });
       });
     });
+    menu.appendChild(U.el('hr', { class: 'menu__rule' }));
+    heading('Look it up');
+    (function () {
+      var lu = T.photos.searchUrls(row.rec.f);
+      item('Google', function () { T.photos.open(lu.google); });
+      item('Google Images', function () { T.photos.open(lu.images); });
+      item('Google Maps', function () { T.photos.open(lu.maps); });
+    })();
 
     menu.appendChild(U.el('hr', { class: 'menu__rule' }));
     if (row.status === 'rejected') {
@@ -26103,11 +26615,13 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var w = m.workbook;
     var h = HEALTH[w.status] || HEALTH.absent;
     var name = w.name || 'No workbook';
-    var short = name.replace(/\.(xlsx|xlsm|xlsb)$/i, '');
-    if (short.length > 28) short = short.slice(0, 27) + '…';
+    /* De-cramp (2026-08-31): count only up here — the filename double-truncated
+       (27 chars in JS, 9rem in CSS) into noise. It stays in title/aria and on
+       the Data page, which the chip links to. */
+    var text = w.recordCount ? F.plural(w.recordCount, 'option')
+             : (w.status === 'absent' ? 'No workbook' : h.word);
     U.setText(U.qs('.masthead__chipdot', nodes.wbChip), h.glyph);
-    U.setText(U.qs('.masthead__chiptext', nodes.wbChip),
-      short + ' · ' + F.plural(w.recordCount || 0, 'option'));
+    U.setText(U.qs('.masthead__chiptext', nodes.wbChip), text);
     nodes.wbChip.dataset.health = w.status || 'absent';
     nodes.wbChip.setAttribute('aria-label',
       h.word + '. ' + name + ', ' + F.plural(w.recordCount || 0, 'option') +
