@@ -1560,6 +1560,9 @@ input[type="file"]:focus-visible::file-selector-button {
 .detail__photocredit a { color: var(--ink); }
 .detail__photonote { color: var(--ink-faint); }
 
+/* Home strips: give the little art tiles a positioning context for .photo. */
+.minicard__art, .strip__art { position: relative; }
+
 /* Look-it-up links in the hero utility row. */
 .detail__lookup { gap: var(--s1); }
 .detail__lookup .icon { width: 0.95em; height: 0.95em; }
@@ -1958,7 +1961,7 @@ input[type="file"]:focus-visible::file-selector-button {
      Both Love        double hairline border
      Split Decision   a vertical rule BETWEEN the two marks
      Talk it through  a trailing ellipsis after the label
-     Both Reject / Waiting   plain, muted */
+     Both Dislike / Waiting  plain, muted */
 .badge {
   display: inline-flex; align-items: center; gap: var(--s1);
   min-height: 22px; padding: 0 var(--s2);
@@ -4111,6 +4114,7 @@ details[open] > .orphan__setasidesum::after,
 .navmenu__button {
   display: inline-flex;
   align-items: center;
+  gap: var(--s1);
   min-height: var(--tap-min);
   padding: var(--s2) var(--s3);
   border-radius: var(--radius-md);
@@ -4123,6 +4127,16 @@ details[open] > .orphan__setasidesum::after,
 }
 .masthead__link:hover,
 .navmenu__button:hover { color: var(--ink); background: var(--surface-alt); }
+/* Menu furniture (2026-08-31 cleanup): the caret is punctuation, not a word —
+   smaller and quieter than the label it follows. */
+.navmenu__caret { font-size: 0.78em; color: var(--ink-faint); }
+/* Device chip: person shape + name. The old font ⌂ rendered tiny, jammed
+   against the name, and off-baseline; the glyph is now inline SVG (crisp at
+   any DPI, no external asset — CSP fact still holds). */
+.navmenu--device .navmenu__label { display: inline-flex; align-items: center; gap: var(--s2); }
+.navmenu__glyph { display: inline-flex; color: var(--ink-faint); }
+.navmenu__glyph svg { display: block; }
+.navmenu__button:hover .navmenu__glyph { color: inherit; }
 .masthead__link.is-current,
 .navmenu__button.is-current {
   color: var(--ink);
@@ -4631,25 +4645,39 @@ details[open] > .orphan__setasidesum::after,
   color: var(--ink-muted);
 }
 
-.modes { display: inline-flex; }
-.modes__btn {
-  width: var(--tap-min);
-  min-height: var(--tap-min);
-  border: 1px solid var(--line);
+/* Layout switcher (2026-08-31 cleanup): one bordered segmented control that
+   matches .sortctl__select, with interior hairlines — not four buttons with
+   overlapping -1px borders and four font glyphs of four different weights. */
+.modes {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
   background: var(--surface);
-  color: var(--ink-muted);
-  font-size: var(--text-md);
+  overflow: hidden;
 }
-.modes__btn + .modes__btn { margin-left: -1px; }
-.modes__btn:first-child { border-radius: var(--radius-md) 0 0 var(--radius-md); }
-.modes__btn:last-child { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+.modes__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  min-height: var(--tap-min); /* 44px targets; group = 46px = the bordered sort controls */
+  border: 0;
+  background: transparent;
+  color: var(--ink-faint);
+}
+.modes__btn + .modes__btn { border-left: 1px solid var(--line); }
+.modes__btn:hover { color: var(--ink); background: var(--surface-alt); }
+/* overflow:hidden would clip the standard focus ring; draw it inside */
+.modes__btn:focus-visible { outline-offset: -3px; }
 .modes__btn.is-on {
   background: var(--accent-soft);
-  border-color: var(--accent);
   color: var(--ink);
   /* shape as well as colour: a 2px underline marks the active mode */
   box-shadow: inset 0 -2px 0 var(--accent);
 }
+.modes__icon { display: inline-flex; }
+.modes__icon svg { display: block; }
 
 .explore__filters-btn {
   min-height: var(--tap-min);
@@ -6488,7 +6516,7 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
  *
  * Structure and rhythm only; every value is a WS-D token. Blocks: .home,
  * .panel, .funnel, .stats, .money, .nudge, .minicard, .strip, .movers, .loose,
- * .empty.
+ * .dislikes, .empty.
  *
  * The layout is the priority argument (UX §2.6): mobile is one column in the
  * order headline → funnel → unreviewed → conversation → contenders → …, and
@@ -6906,6 +6934,45 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .movers__ranks, .loose__count { font-size: var(--text-xs); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
 .loose__box { color: var(--ready-muted); }
 
+/* ─── THUMBS DOWN (⊘ dislikes) ───────────────────────────────────────────── */
+.dislikes { display: grid; grid-template-columns: 1fr; gap: var(--s4); }
+@media (min-width: 640px) { .dislikes { grid-template-columns: 1fr 1fr; } }
+.dislikes__col { min-width: 0; }
+.dislikes__name {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  margin-bottom: var(--s2);
+}
+.dislikes__glyph { font-size: 0.95em; }
+.dislikes__count { color: var(--ink-muted); font-variant-numeric: tabular-nums lining-nums; }
+.dislikes__list { display: grid; gap: var(--s1); list-style: none; margin: 0; padding: 0; }
+.dislikes__item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+  flex-wrap: wrap;
+  min-height: var(--tap-min);
+  padding: var(--s1) 0;
+  font-size: var(--text-sm);
+  border-bottom: var(--hair) solid var(--line);
+}
+.dislikes__item:last-child { border-bottom: 0; }
+.dislikes__link { flex: 1 1 10rem; font-weight: var(--weight-medium); }
+.dislikes__stand { color: var(--ink-muted); font-size: var(--text-xs); }
+.dislikes__none { color: var(--ink-faint); font-size: var(--text-sm); }
+.dislikes__all { display: inline-block; margin-top: var(--s2); font-size: var(--text-sm); }
+.dislikes__both {
+  margin-top: var(--s4);
+  padding-top: var(--s3);
+  border-top: var(--hair) solid var(--line);
+  font-size: var(--text-sm);
+  max-width: var(--measure);
+}
+
 /* ─── EMPTY STATES (§17) ─────────────────────────────────────────────────── */
 .empty {
   padding: var(--s3) 0;
@@ -7037,7 +7104,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.3.0-photos';
+  T.version = '0.4.0';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -8164,7 +8231,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     none:             { token: 'none',            label: 'Not weighed in',  short: 'None',    sub: 'Neither of you has said.' },
     waiting:          { token: 'waiting',         label: 'Waiting',         short: 'Waiting', sub: 'One of you hasn’t weighed in.' },
     both_love:        { token: 'bothlove',        label: 'Both Love',       short: 'Both',    sub: 'You’re both in.' },
-    both_reject:      { token: 'bothreject',      label: 'Both Reject',     short: 'Neither', sub: 'Neither of you.' },
+    both_reject:      { token: 'bothreject',      label: 'Both Dislike',    short: 'Neither', sub: 'Neither of you.' },
     one_loves:        { token: 'oneloves',        label: 'One Loves',       short: 'One',     sub: 'One of you is all in.' },
     split:            { token: 'split',           label: 'Split',           short: 'Split',   sub: 'You two disagree.' },
     needs_discussion: { token: 'needsdiscussion', label: 'Talk it through', short: 'Talk',    sub: 'Worth a conversation.' },
@@ -11864,6 +11931,16 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     if (m[key] && m[key].u === url) { m[key] = { miss: 1, ts: U.now() }; save(); }
   };
 
+  /** paint now + fetch-then-paint — for simple art tiles (home strips etc). */
+  P.attach = function (host, row, opts) {
+    var cover = P.paint(host, row, opts);
+    if (!cover) {
+      P.request(row.rec, function (entry) {
+        if (entry && host.isConnected) P.paint(host, row, opts);
+      });
+    }
+  };
+
   /** Keep exactly one .photo layer on an artframe in sync with coverOf(row). */
   P.paint = function (host, row, opts) {
     if (!host) return null;
@@ -12202,6 +12279,33 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return { decided: decided, list: pool.slice(0, 3), poolSize: pool.length };
     });
 
+  /** The thumbs-down pile: everything a traveler marked ⊘ that has NOT been
+   *  rejected yet — the “I’d reject this” flags that want a conversation before
+   *  the funnel moves. Counted through the query engine (`reaction=<id>-no`,
+   *  `agreement=bothreject`) so every figure equals the list its link opens;
+   *  the local computation is the engine-less fallback. */
+  T.select.define('home/dislikes',
+    function () {
+      return T.select.researchVersion() + '|' + T.select.planningVersion() + '|' + engineTag();
+    },
+    function () {
+      var travelers = T.plan.TRAVELERS;
+      var ctx = qctx();
+      function local(test) {
+        return (T.select.get('rows') || []).filter(function (r) {
+          return r.status !== 'rejected' && test(r);
+        });
+      }
+      var per = travelers.map(function (t, i) {
+        var rows = ctx ? qrows({ reaction: t.id + '-no' }, ctx) : null;
+        if (!rows) rows = local(function (r) { return T.plan.reaction(r.id, t.id) === 'no'; });
+        return { traveler: t, other: travelers[1 - i], rows: rows, count: rows.length };
+      });
+      var both = ctx ? qrows({ agreement: 'bothreject' }, ctx) : null;
+      if (!both) both = local(function (r) { return r.agreement === 'both_reject'; });
+      return { per: per, bothCount: both.length, any: per[0].count + per[1].count > 0 };
+    });
+
   T.select.define('home/movers',
     function () { return T.select.researchVersion() + '|' + T.select.planningVersion(); },
     function () {
@@ -12418,6 +12522,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var art = U.el('span', { class: 'minicard__art', 'aria-hidden': 'true', role: 'presentation' });
     try { art.innerHTML = T.artwork.render(row.rec, { w: 112, h: 112, variant: 'thumb' }); }
     catch (e) { T.diag.note('home', 'artwork failed for ' + row.id); }
+    if (T.photos) T.photos.attach(art, row, { lazy: true });
     el.appendChild(art);
 
     var main = U.el('div', { class: 'minicard__main' });
@@ -12600,6 +12705,16 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       contenders._body.appendChild(contendersList);
       el.appendChild(contenders);
       painters.push(function () { paintContenders(contendersLede, contendersList); });
+
+      /* ---- thumbs down (per-person dislikes) ------------------------ */
+      var dislikes = panel('home-dislikes', 'Thumbs down', {
+        key: 'dislikes',
+        action: link('explore',
+          { reaction: T.plan.TRAVELERS.map(function (t) { return t.id + '-no'; }).join(',') },
+          'Every dislike ›', 'panel__action')
+      });
+      el.appendChild(dislikes);
+      painters.push(function () { paintDislikes(dislikes._body); });
 
       /* ---- what changed / biggest movers --------------------------- */
       var movers = panel('home-movers', 'What changed', {
@@ -12863,7 +12978,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   }
 
   var REACTION_GLYPH = { love: '●', like: '◐', maybe: '○', no: '⊘' };
-  var REACTION_WORD = { love: 'loves it', like: 'likes it', maybe: 'is unsure', no: 'says no' };
+  var REACTION_WORD = { love: 'loves it', like: 'likes it', maybe: 'is unsure', no: 'dislikes it' };
   function reactionGlyph(v) { return REACTION_GLYPH[v] || '◌'; }
   function reactionWord(who, v) {
     var name = who === 'solomon' ? 'Solomon' : 'Roni';
@@ -12923,6 +13038,56 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return;
     }
     paintCards(host, model.list);
+  }
+
+  function paintDislikes(host) {
+    var m = T.select.get('home/dislikes') || { per: [], bothCount: 0, any: false };
+    U.clear(host);
+    if (!m.any) {
+      host.appendChild(emptyState('Neither of you has marked one yet. “Dislikes it” on any card ' +
+        'flags an option you’d reject — before it actually goes to the No Pile.'));
+      return;
+    }
+    host.appendChild(U.el('p', { class: 'panel__lede',
+      text: 'Disliked, but not yet rejected. Worth a conversation before anything moves to the No Pile.' }));
+    var grid = U.el('div', { class: 'dislikes' });
+    m.per.forEach(function (p) {
+      var col = U.el('div', { class: 'dislikes__col' });
+      col.appendChild(U.el('h3', { class: 'dislikes__name', id: 'dislikes-' + p.traveler.id }, [
+        U.el('span', { class: 'mark mark--no dislikes__glyph', 'aria-hidden': 'true' }, '⊘'),
+        p.traveler.label + ' dislikes',
+        U.el('span', { class: 'dislikes__count' }, F.num(p.count))
+      ]));
+      if (!p.count) {
+        col.appendChild(U.el('p', { class: 'dislikes__none', text: 'Nothing yet.' }));
+      } else {
+        var list = U.el('ul', { class: 'dislikes__list', 'aria-labelledby': 'dislikes-' + p.traveler.id });
+        p.rows.slice(0, 4).forEach(function (r) {
+          var li = U.el('li', { class: 'dislikes__item' });
+          li.appendChild(U.el('a', { class: 'dislikes__link', href: T.router.build('trip', [r.id]) },
+            F.text(r.rec.f.hotel)));
+          li.appendChild(U.el('span', { class: 'dislikes__stand',
+            text: reactionWord(p.other.id, T.plan.reaction(r.id, p.other.id)) }));
+          list.appendChild(li);
+        });
+        col.appendChild(list);
+        if (p.count > 4) {
+          col.appendChild(U.el('a', { class: 'dislikes__all',
+            href: T.router.build('explore', [], { reaction: p.traveler.id + '-no' })
+          }, 'All ' + F.num(p.count) + ' ›'));
+        }
+      }
+      grid.appendChild(col);
+    });
+    host.appendChild(grid);
+    if (m.bothCount) {
+      host.appendChild(U.el('p', { class: 'dislikes__both' }, [
+        m.bothCount === 1 ? 'You both dislike one of them — '
+          : 'You both dislike ' + prose(m.bothCount) + ' of them — ',
+        U.el('a', { href: T.router.build('explore', [], { agreement: 'bothreject' }) },
+          m.bothCount === 1 ? 'reject it together ›' : 'reject them together ›')
+      ]));
+    }
   }
 
   function paintMovers(host) {
@@ -13048,6 +13213,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var a = U.el('a', { class: 'strip__link', href: T.router.build('trip', [r.id]) });
       var art = U.el('span', { class: 'strip__art', 'aria-hidden': 'true', role: 'presentation' });
       try { art.innerHTML = T.artwork.render(r.rec, { w: 80, h: 80, variant: 'thumb' }); } catch (e) {}
+      if (T.photos) T.photos.attach(art, r, { lazy: true });
       a.appendChild(art);
       a.appendChild(U.el('span', { class: 'strip__name', text: F.text(r.rec.f.hotel) }));
       li.appendChild(a);
@@ -13265,15 +13431,26 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       el._dir = dirBtn;
       tools.appendChild(sortWrap);
 
-      /* mode switcher */
+      /* mode switcher — one drawn icon family (24-grid strokes) instead of
+         four font glyphs (▦▤☰⊞) that each rendered at a different weight */
+      var ICON_OPEN = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">';
+      var MODE_ICONS = {
+        gallery: '<rect x="3.5" y="3.5" width="7.2" height="7.2" rx="1.4"/><rect x="13.3" y="3.5" width="7.2" height="7.2" rx="1.4"/><rect x="3.5" y="13.3" width="7.2" height="7.2" rx="1.4"/><rect x="13.3" y="13.3" width="7.2" height="7.2" rx="1.4"/>',
+        compact: '<rect x="3.5" y="3.5" width="17" height="17" rx="1.8"/><path d="M3.5 9.17h17"/><path d="M3.5 14.83h17"/><path d="M9.17 3.5v17"/><path d="M14.83 3.5v17"/>',
+        list: '<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',
+        table: '<rect x="3.5" y="4" width="17" height="16" rx="1.8"/><path d="M3.5 9.6h17"/><path d="M12 9.6V20"/>'
+      };
       var modes = U.el('div', { class: 'modes', role: 'group', 'aria-label': 'Layout' });
-      [['gallery', '▦', 'Gallery'], ['compact', '▤', 'Compact'],
-        ['list', '☰', 'List'], ['table', '⊞', 'Table']].forEach(function (m) {
+      [['gallery', 'Gallery'], ['compact', 'Compact'],
+        ['list', 'List'], ['table', 'Table']].forEach(function (m) {
         var b = U.el('button', {
           type: 'button', class: 'modes__btn', 'data-mode': m[0],
-          'aria-label': m[2], title: m[2], 'aria-pressed': 'false'
+          'aria-label': m[1], title: m[1], 'aria-pressed': 'false'
         });
-        b.appendChild(U.el('span', { 'aria-hidden': 'true' }, m[1]));
+        b.appendChild(U.el('span', {
+          class: 'modes__icon', 'aria-hidden': 'true',
+          html: ICON_OPEN + MODE_ICONS[m[0]] + '</svg>'   // trusted generated SVG
+        }));
         b.addEventListener('click', function () { view.navigate(el, Q.set(el._vs, 'mode', m[0])); });
         modes.appendChild(b);
       });
@@ -20851,7 +21028,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         { value: 'agreement', label: 'Agreement' },
         { value: 'needsdiscussion', label: 'Needs Discussion' },
         { value: 'split', label: 'Split Decision' },
-        { value: 'bothreject', label: 'Both Reject' },
+        { value: 'bothreject', label: 'Both Dislike' },
         { value: 'waitingsolomon', label: 'Waiting on ' + ctx.travelers[0].label },
         { value: 'waitingroni', label: 'Waiting on ' + ctx.travelers[1].label },
         { value: 'none', label: 'No reactions yet' }
@@ -21271,7 +21448,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var cut = token.lastIndexOf('-');
       var who = token.slice(0, cut), what = token.slice(cut + 1);
       return who.charAt(0).toUpperCase() + who.slice(1) + ' ' +
-        ({ love: 'loves it', like: 'likes it', maybe: 'is unsure', no: 'says no' }[what] || what);
+        ({ love: 'loves it', like: 'likes it', maybe: 'is unsure', no: 'dislikes it' }[what] || what);
     }
     if (param === 'weather') {
       if (token.indexOf('beach-') === 0) return 'Beach: ' + token.slice(6).replace(/-/g, ' ');
@@ -21670,7 +21847,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     finalist: 'Finalist', rejected: 'Rejected', booked: 'Booked'
   };
   C.REACTION_GLYPH = { love: '●', like: '◐', maybe: '○', no: '⊘', none: '◌' };
-  C.REACTION_LABEL = { love: 'Loves it', like: 'Likes it', maybe: 'Maybe', no: 'Not for me', none: 'Hasn’t said' };
+  C.REACTION_LABEL = { love: 'Loves it', like: 'Likes it', maybe: 'Maybe', no: 'Dislikes it', none: 'Hasn’t said' };
   C.PROMOTABLE = ['interested', 'shortlist', 'finalist', 'booked'];
 
   /* Plan type -> glyph. Matched on the workbook's own words, so an unknown
@@ -26352,7 +26529,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var btn = U.el('button', {
       type: 'button', class: 'navmenu__button', 'aria-expanded': 'false', 'aria-haspopup': 'true'
     }, [U.el('span', { class: 'navmenu__label', text: label }),
-        U.el('span', { class: 'navmenu__caret', 'aria-hidden': 'true', text: ' ▾' })]);
+        U.el('span', { class: 'navmenu__caret', 'aria-hidden': 'true', text: '▾' })]);
     var list = U.el('ul', { class: 'navmenu__list', hidden: true });
 
     items.forEach(function (item) {
@@ -26573,12 +26750,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return { node: b };
     });
 
-    var menu = dropdown('⌂ Shared', items, { class: 'navmenu--device' });
+    var menu = dropdown('Shared', items, { class: 'navmenu--device' });
     nodes.deviceLabel = U.qs('.navmenu__label', menu);
     /* Glyph and word are separate spans so a phone can drop the word and keep
        a 44px target: the button's aria-label carries the meaning either way. */
     U.clear(nodes.deviceLabel);
-    nodes.deviceGlyph = U.el('span', { class: 'navmenu__glyph', 'aria-hidden': 'true', text: '⌂' });
+    nodes.deviceGlyph = U.el('span', { class: 'navmenu__glyph', 'aria-hidden': 'true' });
     nodes.deviceWho = U.el('span', { class: 'navmenu__who', text: 'Shared' });
     nodes.deviceLabel.appendChild(nodes.deviceGlyph);
     nodes.deviceLabel.appendChild(nodes.deviceWho);
@@ -26588,10 +26765,24 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     return menu;
   }
 
+  /* Person shapes, not the old font ⌂ (2026-08-31 cleanup): the menu answers
+     "who is using this device", and the house glyph rendered tiny, jammed and
+     off-baseline. One figure for a named traveler, two for Shared. Inline SVG
+     only — no external asset (fact 20 holds). */
+  var DEVICE_GLYPHS = {
+    one: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="7.4" r="3.6"/><path d="M19.2 20.4v-1.3a4.7 4.7 0 0 0-4.7-4.7H9.5a4.7 4.7 0 0 0-4.7 4.7v1.3"/></svg>',
+    both: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="9" cy="7.6" r="3.4"/><path d="M15.4 20.4v-1.2a4.5 4.5 0 0 0-4.5-4.5H7.6a4.5 4.5 0 0 0-4.5 4.5v1.2"/><path d="M15.9 4.4a3.4 3.4 0 0 1 0 6.4"/><path d="M17.8 14.9a4.5 4.5 0 0 1 3.1 4.3v1.2"/></svg>'
+  };
+
   function paintDevice() {
     if (!nodes.deviceLabel || !nodes.deviceWho) return;
     var v = store.getState().ui.traveler;
     var label = v === 'solomon' ? 'Solomon' : v === 'roni' ? 'Roni' : 'Shared';
+    var shape = v ? 'one' : 'both';
+    if (nodes.deviceGlyph && nodes.deviceGlyph.dataset.shape !== shape) {
+      nodes.deviceGlyph.innerHTML = DEVICE_GLYPHS[shape];   // trusted generated SVG
+      nodes.deviceGlyph.dataset.shape = shape;
+    }
     U.setText(nodes.deviceWho, label);
     nodes.deviceLabel.parentNode.setAttribute('aria-label', 'This device is: ' + label + '. Change who is using it.');
     nodes.deviceItems.forEach(function (b) {
