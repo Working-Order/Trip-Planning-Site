@@ -2608,10 +2608,10 @@ input[type="file"]:focus-visible::file-selector-button {
 }
 /* ==== src/css/11-comp-filter-panel.css ==== */
 /* 11-comp-filter-panel.css — the filter rail, slide-over and bottom sheet.
- * OWNER: IMPL-2. UX_SPEC §4.1–4.4.
+ * OWNER: IMPL-2. UX_SPEC §4.1–4.4. Accordion + finder + range slider: v0.5.0.
  */
 
-.filters { display: flex; flex-direction: column; gap: var(--s4); padding: var(--s3); }
+.filters { display: flex; flex-direction: column; gap: var(--s3); padding: var(--s3); }
 .filters__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
 .filters__title { font-family: var(--font-display); font-size: var(--text-md); }
 .filters__clear {
@@ -2627,7 +2627,7 @@ input[type="file"]:focus-visible::file-selector-button {
   color: var(--ink-faint);
 }
 
-/* ---- one group --------------------------------------------------------- */
+/* ---- one group: a one-line head that opens ----------------------------- */
 .fgroup { display: flex; flex-direction: column; gap: var(--s2); }
 .fgroup__head {
   display: flex;
@@ -2642,7 +2642,9 @@ input[type="file"]:focus-visible::file-selector-button {
   text-transform: uppercase;
   color: var(--ink-muted);
   border-bottom: 1px solid var(--line);
+  cursor: pointer;
 }
+.fgroup__head:hover .fgroup__label { color: var(--ink); }
 .fgroup__label { flex: 1 1 auto; }
 .fgroup__badge {
   min-width: 20px;
@@ -2656,25 +2658,104 @@ input[type="file"]:focus-visible::file-selector-button {
   letter-spacing: 0;
 }
 .fgroup__chev { color: var(--ink-faint); }
-.fgroup__summary { font-size: var(--text-sm); color: var(--ink-muted); }
-.fgroup__body { display: flex; flex-direction: column; gap: var(--s2); }
+
+/* A collapsed group with active filters shows its values, one line, truncated. */
+.fgroup__values {
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.fgroup__values:hover { color: var(--ink); }
+
+.fgroup__body { display: flex; flex-direction: column; gap: var(--s2); padding-bottom: var(--s1); }
 .fgroup__sub { font-size: var(--text-xs); color: var(--ink-faint); }
 .fgroup__hint { font-size: var(--text-xs); color: var(--ink-faint); font-style: italic; }
 .fgroup__more {
   border: 0; background: transparent; color: var(--accent); cursor: pointer;
-  font: inherit; font-size: var(--text-xs); padding: var(--s1) var(--s2); min-height: 30px;
+  font: inherit; font-size: var(--text-xs); padding: var(--s1) 0; min-height: 30px;
+  text-align: left;
 }
 .fgroup__more:hover { text-decoration: underline; }
+.fgroup__facet { display: flex; flex-direction: column; gap: var(--s2); }
+.fgroup__cloudwrap { display: flex; flex-direction: column; gap: var(--s1); }
 .fgroup__chips { display: flex; flex-wrap: wrap; gap: var(--s2); }
+/* "Show all N" opens INSIDE its own scrollbox — the rail itself never grows. */
+.fgroup__chips--all {
+  max-height: 232px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--s1);
+  margin: calc(-1 * var(--s1));
+  padding-right: var(--s2);
+}
 .fgroup__mode { display: flex; align-items: center; gap: var(--s2); margin-top: var(--s1); }
 .fgroup__mode-label { font-size: var(--text-xs); color: var(--ink-faint); }
 
-.fgroup__range { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s2); }
+/* ---- the type-to-find box for long facets ------------------------------ */
+.fgroup__find {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 var(--s2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-sm);
+}
+.fgroup__find::placeholder { color: var(--ink-faint); }
+.fgroup__find:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+/* ---- the custom budget range: disclosure + dual slider ----------------- */
+.frange { border-top: 1px dashed var(--line); padding-top: var(--s1); }
+.frange__row { display: flex; align-items: center; gap: var(--s1); }
+.frange__head {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+.frange__head:hover { color: var(--ink); }
+.frange__head.is-active { color: var(--ink); font-weight: var(--weight-medium, 500); }
+.frange__chev { color: var(--ink-faint); font-size: var(--text-xs); }
+.frange__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.frange__clear {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-muted);
+  font-size: var(--text-md);
+  cursor: pointer;
+}
+.frange__clear:hover { background: var(--surface-alt); color: var(--ink); }
+.frange__body { display: flex; flex-direction: column; gap: var(--s2); padding-top: var(--s1); }
+.frange__nums { display: flex; align-items: flex-end; gap: var(--s2); }
+.frange__nums .fgroup__num { flex: 1 1 0; min-width: 0; }
+.frange__nums .fgroup__input { width: 100%; }
+.frange__dash { color: var(--ink-faint); padding-bottom: 10px; }
 .fgroup__num { display: flex; flex-direction: column; gap: 2px; }
 .fgroup__numlabel { font-size: var(--text-xs); color: var(--ink-faint); }
 .fgroup__input {
   width: 110px;
-  min-height: var(--tap-min);
+  min-height: 36px;
   padding: var(--s1) var(--s2);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-md);
@@ -2682,7 +2763,57 @@ input[type="file"]:focus-visible::file-selector-button {
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
-.fgroup__input:disabled { opacity: 0.5; }
+
+/* Two overlaid native ranges over one drawn track. Thumbs interactive, tracks not. */
+.range2 { position: relative; height: 28px; }
+.range2__track {
+  position: absolute;
+  left: 8px; right: 8px; top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 999px;
+  background: var(--line);
+}
+.range2__fill { position: absolute; top: 0; bottom: 0; border-radius: 999px; background: var(--accent); }
+.range2 input[type="range"] {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  height: 28px;
+  margin: 0;
+  background: none;
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: none;
+}
+.range2 input[type="range"]::-webkit-slider-runnable-track { background: transparent; height: 28px; }
+.range2 input[type="range"]::-moz-range-track { background: transparent; }
+.range2 input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  width: 16px; height: 16px;
+  margin-top: 6px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--surface);
+  cursor: grab;
+}
+.range2 input[type="range"]::-moz-range-thumb {
+  pointer-events: auto;
+  width: 12px; height: 12px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--surface);
+  cursor: grab;
+}
+.range2 input[type="range"]:focus-visible { outline: none; }
+.range2 input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 4px var(--accent);
+}
+.range2 input[type="range"]:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 4px var(--accent);
+}
 
 /* ---- the persistent rail (>=1280) -------------------------------------- */
 .explore__rail {
@@ -2719,6 +2850,11 @@ input[type="file"]:focus-visible::file-selector-button {
     height: 200px;
     border-bottom: 0;
   }
+}
+/* Rail density: chips read fine smaller under a mouse; touch keeps tap sizes. */
+@media (min-width: 1280px) and (pointer: fine) {
+  .explore__rail .chip { min-height: 28px; padding: 2px var(--s2); font-size: var(--text-xs); gap: var(--s1); }
+  .explore__rail .fgroup__chips { gap: var(--s1) var(--s2); }
 }
 
 /* ---- the 1024–1279 slide-over ------------------------------------------ */
@@ -2919,8 +3055,9 @@ input[type="file"]:focus-visible::file-selector-button {
 .srch__panel--overlay .srch__all { border: 1px solid var(--accent); text-align: center; margin-top: var(--s2); }
 /* ==== src/css/13-comp-saved-views.css ==== */
 /* 13-comp-saved-views.css — the views bar and the save dialog. OWNER: IMPL-2.
- * UX_SPEC §4.6: pinned first, then most-recently-used, then starters, ending
- * with "＋ Save current"; overflow scrolls horizontally with a fade edge.
+ * UX_SPEC §4.6: pinned first, then most-recently-used, then starters; overflow
+ * scrolls horizontally with a fade edge. Since v0.5.1 the save action lives
+ * with the active-filter chips (.chips__save) — this bar holds views only.
  */
 
 .views {
@@ -2974,19 +3111,6 @@ input[type="file"]:focus-visible::file-selector-button {
 @media (pointer: coarse) { .views__more { width: var(--tap-min); min-height: var(--tap-min); } }
 .views__more:hover { color: var(--ink); background: var(--bg-sunken); }
 .views__empty { font-size: var(--text-sm); color: var(--ink-faint); padding: var(--s1) 0; }
-.views__save {
-  flex: 0 0 auto;
-  min-height: 32px;
-  padding: var(--s1) var(--s3);
-  border: 1px dashed var(--line-strong);
-  border-radius: 999px;
-  color: var(--accent);
-  font-size: var(--text-sm);
-  white-space: nowrap;
-}
-@media (pointer: coarse) { .views__save { min-height: var(--tap-min); } }
-.views__save[disabled] { color: var(--ink-faint); border-color: var(--line); cursor: default; }
-
 /* ---- the save dialog ---------------------------------------------------- */
 .saveview { display: flex; flex-direction: column; gap: var(--s2); }
 .saveview__label { font-size: var(--text-sm); color: var(--ink-muted); }
@@ -3097,6 +3221,23 @@ input[type="file"]:focus-visible::file-selector-button {
   min-height: 32px;
   cursor: pointer;
 }
+
+/* "＋ Save view" — the promote-these-filters-to-a-view action (v0.5.1). It
+   borrows the dashed potential-chip look (.chip--suggest): press it and this
+   filter set becomes a real chip in the views bar above. */
+.chips__save {
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+  background: none;
+  color: var(--accent);
+  font-size: var(--text-sm);
+  padding: var(--s1) var(--s3);
+  min-height: 32px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+@media (pointer: coarse) { .chips__save { min-height: var(--tap-min); } }
+.chips__save:hover { border-color: var(--accent); background: var(--accent-soft); }
 
 /* ---- segmented control ------------------------------------------------ */
 .seg {
@@ -6699,6 +6840,20 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .funnel__nudgeglyph { color: var(--warn); }
 .funnel__nudgetext { color: var(--ink); }
 
+/* The ⊘ counter-flow line under the ladder (v0.4.0 dislikes). */
+.funnel__out {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: var(--s4);
+  padding-top: var(--s3);
+  border-top: var(--hair) solid var(--line);
+  font-size: var(--text-sm);
+}
+.funnel__out[hidden] { display: none; }
+.funnel__outtext { color: var(--ink); }
+
 /* ─── NUDGE CARDS (§2.4) ─────────────────────────────────────────────────── */
 .nudge {
   padding: var(--s4);
@@ -7104,7 +7259,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.4.0';
+  T.version = '0.5.1';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -12303,7 +12458,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       });
       var both = ctx ? qrows({ agreement: 'bothreject' }, ctx) : null;
       if (!both) both = local(function (r) { return r.agreement === 'both_reject'; });
-      return { per: per, bothCount: both.length, any: per[0].count + per[1].count > 0 };
+      var union = ctx ? qrows({ reaction: travelers.map(function (t) { return t.id + '-no'; }).join(',') }, ctx) : null;
+      if (!union) union = local(function (r) {
+        return travelers.some(function (t) { return T.plan.reaction(r.id, t.id) === 'no'; });
+      });
+      return { per: per, bothCount: both.length, unionCount: union.length, any: union.length > 0 };
     });
 
   T.select.define('home/movers',
@@ -12669,8 +12828,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var funnelNudge = U.el('div', { class: 'funnel__nudge' });
       funnelPanel._body.appendChild(funnelList);
       funnelPanel._body.appendChild(funnelNudge);
+      var funnelOut = U.el('div', { class: 'funnel__out' });
+      funnelPanel._body.appendChild(funnelOut);
       el.appendChild(funnelPanel);
       painters.push(function () { paintFunnel(funnelList, funnelNudge); });
+      painters.push(function () { paintFunnelOut(funnelOut); });
 
       /* ---- nudge 1: the unreviewed queue (§2.4.1) ------------------- */
       var unreviewed = U.el('section', { class: 'nudge', dataset: { nudge: 'unreviewed' },
@@ -13038,6 +13200,27 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return;
     }
     paintCards(host, model.list);
+  }
+
+  /** The counter-flow under the ladder: options flagged ⊘ that haven't been
+   *  rejected yet. The narrowing shows what's still in play; this line shows
+   *  what's queued to leave it. Hidden entirely at zero. The count is the
+   *  DISTINCT union (one option both of you dislike is one option), and it is
+   *  the same query its link opens. */
+  function paintFunnelOut(host) {
+    var m = T.select.get('home/dislikes') || { unionCount: 0, bothCount: 0 };
+    U.clear(host);
+    if (!m.unionCount) { host.hidden = true; return; }
+    host.hidden = false;
+    host.appendChild(U.el('span', { class: 'mark mark--no funnel__outglyph', 'aria-hidden': 'true' }, '⊘'));
+    host.appendChild(U.el('span', { class: 'funnel__outtext',
+      text: (m.unionCount === 1 ? 'One option is disliked' : Prose(m.unionCount) + ' options are disliked') +
+        ' but not yet rejected.' +
+        (m.bothCount ? ' ' + (m.bothCount === 1 ? 'One' : Prose(m.bothCount)) + ' by both of you.' : '') }));
+    host.appendChild(U.el('a', {
+      class: 'btn btn--quiet',
+      href: T.router.build('explore', [], { reaction: T.plan.TRAVELERS.map(function (t) { return t.id + '-no'; }).join(',') })
+    }, m.unionCount === 1 ? 'Show it →' : 'Show the ' + prose(m.unionCount) + ' disliked →'));
   }
 
   function paintDislikes(host) {
@@ -13599,7 +13782,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
       /* views bar + chips + rail */
       T.savedViews.renderBar(el._views, el._api);
-      T.filterPanel.renderChips(el._chips, el._api, { leadingFilters: false });
+      T.filterPanel.renderChips(el._chips, el._api, { leadingFilters: false, saveView: true });
       el._panel.render();
 
       el.dataset.mode = vs.mode;
@@ -13978,7 +14161,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         if (key !== el._visibleIds) return view.paint(el);
         el._res = res;
         el._announce(res.matched, res.base);
-        T.filterPanel.renderChips(el._chips, el._api, { leadingFilters: false });
+        T.filterPanel.renderChips(el._chips, el._api, { leadingFilters: false, saveView: true });
         el._panel.render();
         return;
       }
@@ -20416,7 +20599,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   Q.equal = function (a, b) {
     return U.stableStringify(Q.serialize(a)) === U.stableStringify(Q.serialize(b));
   };
-  /** True when nothing but layout/sort is set — used by "Save current" and the first-run state. */
+  /** True when nothing but layout/sort is set — used by "＋ Save view" and the first-run state. */
   Q.isFiltered = function (vs) {
     var q = Q.serialize(vs);
     return Object.keys(q).some(function (k) {
@@ -22697,6 +22880,19 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
  *   <1024   bottom sheet, three detents, live filtering behind it, footer
  *           button that reads "Show 23 trips" and dismisses
  *
+ * ACCORDION (v0.5.0): groups render COLLAPSED to a one-line head by default —
+ * only Budget starts open — and the open/closed set is remembered per browser
+ * (trip26:ui → explore.filtersOpen). A collapsed group with active filters
+ * shows its chosen VALUES ("Italy, Spain +2 more") on one truncated line, so
+ * a hidden constraint can never confuse anyone. Long facets (a 500-option
+ * workbook has ~40 countries, 244 regions, 188 activities) render selected
+ * values + the TOP_N most common + a type-to-find box instead of a chip dump;
+ * facets up to ALL_CAP options keep a "Show all" that opens inside its own
+ * scrollbox so the rail itself never grows. The budget custom range is a
+ * closed-by-default disclosure carrying a dual-thumb slider over the data's
+ * honest bounds plus type-in inputs; a thumb resting AT a bound commits null
+ * (no phantom "up to $23,500" filter), and typed values are kept verbatim.
+ *
  * Every option's count comes from the engine and is computed GIVEN THE OTHER
  * GROUPS' filters, so a 0 is information rather than a bug — it is shown greyed
  * and stays tappable, and tapping it explains what to remove (UX §4.2).
@@ -22706,6 +22902,18 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   var U = T.util, F = T.fmt, Q = T.query;
   var P = T.filterPanel = (T.filterPanel || {});
 
+  /* Facet sizing: at FIND_AT options and beyond a facet gets the finder
+     (selected + TOP_N stay visible); beyond ALL_CAP the full dump is gone
+     entirely — finding is typing. MATCH_CAP bounds a query's chip flood. */
+  var FIND_AT = 13, TOP_N = 8, ALL_CAP = 64, MATCH_CAP = 40;
+
+  function prefsRead() {
+    try { return (T.explorePrefs && T.explorePrefs.read()) || {}; } catch (e) { return {}; }
+  }
+  function prefsWrite(patch) {
+    try { if (T.explorePrefs) T.explorePrefs.write(patch); } catch (e) { /* disposable */ }
+  }
+
   /**
    * create(api) -> controller
    * api: { getVs(), setVs(next), getCtx(), getRows(), count(vs) }
@@ -22713,9 +22921,30 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   P.create = function (api) {
     var root = U.el('div', { class: 'filters' });
     var sheetEl = null, slideEl = null, scrimEl = null;
-    var collapsedGroups = Object.create(null);
-    var expandedFacets = {};   // param -> true when a long facet is fully shown
+    var openGroups = null;     // group id -> true; lazy-read from prefs
+    var finders = {};          // facet key -> current find text (survives repaints)
+    var showAll = {};          // facet key -> true while its scrollbox is open
+    var focusKey = null;       // the finder that should regain focus after a repaint
+    var rangeOpen = null;      // budget disclosure: null = auto (open while active)
     var detent = 'half';
+
+    function openMap() {
+      if (!openGroups) {
+        openGroups = { budget: true };
+        var saved = prefsRead().filtersOpen;
+        if (saved && typeof saved === 'object') {
+          openGroups = {};
+          for (var k in saved) { if (saved[k]) openGroups[k] = true; }
+        }
+      }
+      return openGroups;
+    }
+    function isOpen(id) { return !!openMap()[id]; }
+    function setOpen(id, on) {
+      var m = openMap();
+      if (on) m[id] = true; else delete m[id];
+      prefsWrite({ filtersOpen: m });
+    }
 
     /* ---- one group's control block ------------------------------------ */
     function optionChip(param, opt, prefix, counts) {
@@ -22770,38 +22999,71 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       T.cards.popover.open(anchor, body, { className: 'popover--note' });
     }
 
-    function groupBlock(g, counts) {
-      var vs = api.getVs();
-      var activeCount = 0;
+    /* ---- what a group has active, for the badge + the collapsed line --- */
+    function groupParams(g) {
       var params = [g.param].concat((g.subgroups || []).map(function (s) { return s.param || g.param; }));
       if (g.id === 'planning') params = ['status', 'flags'];
-      params.filter(Boolean).forEach(function (p) { activeCount += (vs[p] || []).length; });
-      if (g.id === 'budget' && (vs.budgetmin != null || vs.budgetmax != null)) activeCount++;
-      if (g.id === 'planning' && vs.showrejected) activeCount++;
+      var seen = {}, out = [];
+      params.forEach(function (p) { if (p && !seen[p]) { seen[p] = 1; out.push(p); } });
+      return out;
+    }
 
-      var collapsed = !!collapsedGroups[g.id];
-      var section = U.el('section', { class: 'fgroup', dataset: { group: g.id } });
+    function rangeText(vs) {
+      if (vs.budgetmin != null && vs.budgetmax != null) return F.money(vs.budgetmin) + ' – ' + F.money(vs.budgetmax);
+      if (vs.budgetmin != null) return 'From ' + F.money(vs.budgetmin);
+      return 'Up to ' + F.money(vs.budgetmax);
+    }
+
+    function activeInfo(g) {
+      var vs = api.getVs(), ctx = api.getCtx();
+      var labels = [];
+      groupParams(g).forEach(function (p) {
+        (vs[p] || []).forEach(function (token) {
+          var meta = Q.labelFor(ctx, p, token);
+          labels.push((meta && meta.label) || Q.fallbackLabel(p, token));
+        });
+      });
+      if (g.id === 'budget' && (vs.budgetmin != null || vs.budgetmax != null)) labels.push(rangeText(vs));
+      if (g.id === 'planning' && vs.showrejected) labels.push('Showing rejected');
+      return { count: labels.length, labels: labels };
+    }
+
+    function summaryText(labels) {
+      if (labels.length <= 2) return labels.join(', ');
+      return labels.slice(0, 2).join(', ') + ' +' + (labels.length - 2) + ' more';
+    }
+
+    function groupBlock(g, counts) {
+      var vs = api.getVs();
+      var open = isOpen(g.id);
+      var info = activeInfo(g);
+
+      var section = U.el('section', {
+        class: 'fgroup' + (open ? ' is-open' : ''), dataset: { group: g.id }
+      });
       var headId = 'fgroup-h-' + g.id, bodyId = 'fgroup-b-' + g.id;
 
       var head = U.el('button', {
         type: 'button', class: 'fgroup__head', id: headId,
-        'aria-expanded': collapsed ? 'false' : 'true', 'aria-controls': bodyId
+        'aria-expanded': open ? 'true' : 'false', 'aria-controls': bodyId
       });
       head.appendChild(U.el('span', { class: 'fgroup__label' }, g.label));
-      if (activeCount) head.appendChild(U.el('span', { class: 'fgroup__badge' }, String(activeCount)));
-      head.appendChild(U.el('span', { class: 'fgroup__chev', 'aria-hidden': 'true' }, collapsed ? '▸' : '▾'));
+      if (info.count) head.appendChild(U.el('span', { class: 'fgroup__badge' }, String(info.count)));
+      head.appendChild(U.el('span', { class: 'fgroup__chev', 'aria-hidden': 'true' }, open ? '▾' : '▸'));
       head.addEventListener('click', function () {
-        collapsedGroups[g.id] = !collapsedGroups[g.id];
+        setOpen(g.id, !open);
         render();
       });
       section.appendChild(head);
 
-      /* A group with an active filter never collapses to nothing — it collapses
-         to a summary line, so a hidden constraint can't confuse anyone. */
-      if (collapsed) {
-        if (activeCount) {
-          section.appendChild(U.el('p', { class: 'fgroup__summary' },
-            g.label + ' · ' + activeCount + ' selected'));
+      /* A collapsed group with an active filter shows its VALUES, not a count —
+         one truncated line, clickable, so nothing constrains invisibly. */
+      if (!open) {
+        if (info.count) {
+          var line = U.el('p', { class: 'fgroup__values', title: info.labels.join(', ') },
+            summaryText(info.labels));
+          line.addEventListener('click', function () { setOpen(g.id, true); render(); });
+          section.appendChild(line);
         }
         return section;
       }
@@ -22809,27 +23071,93 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var body = U.el('div', { class: 'fgroup__body', id: bodyId });
       if (g.hint) body.appendChild(U.el('p', { class: 'fgroup__hint' }, g.hint));
 
-      /* Long facets (a 500-option workbook has 244 regions, 188 activities)
-         show their MOST COMMON values plus anything selected, behind one
-         "Show all" — the rail stays scannable and nothing becomes unreachable. */
-      var CHIP_CAP = 14;
-      function chipRow(param, options, prefix) {
-        var wrap = U.el('div', { class: 'fgroup__chips' });
+      /* One facet's chips. Small facets are plain chips; long ones get the
+         finder. `name` only seasons the placeholder. */
+      function facetRow(param, options, prefix, name) {
         var key = param + ':' + (prefix || '');
         var selected = vs[param] || [];
-        var show = options;
-        if (options.length > CHIP_CAP + 2 && !expandedFacets[key]) {
-          show = options.filter(function (o, i) {
-            return i < CHIP_CAP || selected.indexOf((prefix || '') + o.value) >= 0;
-          });
+        function isSel(o) { return selected.indexOf((prefix || '') + o.value) >= 0; }
+
+        var wrap = U.el('div', { class: 'fgroup__facet' });
+
+        if (options.length < FIND_AT) {
+          var plain = U.el('div', { class: 'fgroup__chips' });
+          options.forEach(function (o) { plain.appendChild(optionChip(param, o, prefix, counts)); });
+          wrap.appendChild(plain);
+          return wrap;
         }
-        show.forEach(function (o) { wrap.appendChild(optionChip(param, o, prefix, counts)); });
-        if (show.length < options.length || expandedFacets[key]) {
-          var more = U.el('button', { type: 'button', class: 'fgroup__more' },
-            expandedFacets[key] ? 'Show fewer ▴' : 'Show all ' + options.length + ' ▾');
-          more.addEventListener('click', function () { expandedFacets[key] = !expandedFacets[key]; render(); });
-          wrap.appendChild(more);
+
+        var find = U.el('input', {
+          type: 'text', class: 'fgroup__find', autocomplete: 'off',
+          'data-key': key,
+          placeholder: 'Find in ' + (name || g.label) + ' · ' + options.length,
+          'aria-label': 'Find in ' + (name || g.label) + ', ' + options.length + ' options'
+        });
+        find.value = finders[key] || '';
+        wrap.appendChild(find);
+
+        var cloudHost = U.el('div');
+        wrap.appendChild(cloudHost);
+
+        function buildCloud() {
+          var q = (finders[key] || '');
+          var qn = U.normalize(q).trim();
+          var showingAll = !!showAll[key] && options.length <= ALL_CAP && !qn;
+
+          var out = U.el('div', { class: 'fgroup__chips' + (showingAll ? ' fgroup__chips--all' : '') });
+          var matches, capped = false;
+          if (qn) {
+            matches = options.filter(function (o) { return U.normalize(o.label).indexOf(qn) >= 0; });
+            if (matches.length > MATCH_CAP) { matches = matches.slice(0, MATCH_CAP); capped = true; }
+          } else if (showingAll) {
+            matches = options;
+          } else {
+            matches = options.filter(isSel)
+              .concat(options.filter(function (o) { return !isSel(o); }).slice(0, TOP_N));
+          }
+          matches.forEach(function (o) { out.appendChild(optionChip(param, o, prefix, counts)); });
+
+          var host = U.el('div', { class: 'fgroup__cloudwrap' });
+          host.appendChild(out);
+          if (qn && !matches.length) {
+            host.appendChild(U.el('p', { class: 'fgroup__hint' }, 'Nothing here matches “' + q + '”.'));
+          } else if (capped) {
+            host.appendChild(U.el('p', { class: 'fgroup__hint' },
+              '+' + (options.filter(function (o) { return U.normalize(o.label).indexOf(qn) >= 0; }).length - MATCH_CAP) +
+              ' more — keep typing.'));
+          }
+          if (!qn && options.length <= ALL_CAP) {
+            var more = U.el('button', { type: 'button', class: 'fgroup__more' },
+              showingAll ? 'Show fewer ▴' : 'Show all ' + options.length + ' ▾');
+            more.addEventListener('click', function () { showAll[key] = !showAll[key]; repaintCloud(); });
+            host.appendChild(more);
+          }
+          return host;
         }
+
+        function repaintCloud() {
+          U.clear(cloudHost);
+          cloudHost.appendChild(buildCloud());
+        }
+
+        find.addEventListener('input', function () {
+          finders[key] = find.value;
+          focusKey = key;
+          repaintCloud();
+        });
+        find.addEventListener('focus', function () { focusKey = key; });
+        find.addEventListener('blur', function () {
+          if (document.contains(find)) focusKey = null;   // a real blur, not a repaint
+        });
+        find.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape' && find.value) {
+            ev.stopPropagation();
+            find.value = ''; finders[key] = '';
+            repaintCloud();
+          }
+        });
+
+        repaintCloud();
         return wrap;
       }
 
@@ -22854,10 +23182,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         g.subgroups.forEach(function (sg) {
           body.appendChild(U.el('p', { class: 'fgroup__sub' }, sg.label));
           if (sg.hint) body.appendChild(U.el('p', { class: 'fgroup__hint' }, sg.hint));
-          body.appendChild(chipRow(sg.param || g.param, sg.options, sg.prefix));
+          body.appendChild(facetRow(sg.param || g.param, sg.options, sg.prefix, sg.label));
         });
       } else if (g.options) {
-        body.appendChild(chipRow(g.param, g.options));
+        body.appendChild(facetRow(g.param, g.options, '', g.label));
       }
 
       /* Experience: any / all (UX §4.3 exception 1) */
@@ -22874,41 +23202,132 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         body.appendChild(toggle);
       }
 
-      /* Budget: the custom range, with honest bounds from the data */
+      /* Budget: the custom range disclosure — slider + type-in, honest bounds */
       if (g.id === 'budget' && g.range) {
-        var range = U.el('div', { class: 'fgroup__range' });
-        var minId = 'budget-min', maxId = 'budget-max';
-        var disabled = (vs.budget || []).length > 0;
-        range.appendChild(U.el('p', { class: 'fgroup__sub' }, 'Custom range'));
-        [['min', minId, 'From', vs.budgetmin, g.range.min], ['max', maxId, 'To', vs.budgetmax, g.range.max]]
-          .forEach(function (spec) {
-            var w = U.el('span', { class: 'fgroup__num' });
-            w.appendChild(U.el('label', { for: spec[1], class: 'fgroup__numlabel' }, spec[2]));
-            var input = U.el('input', {
-              type: 'number', id: spec[1], class: 'fgroup__input',
-              min: String(g.range.min), max: String(g.range.max), step: '100',
-              placeholder: String(spec[4])
-            });
-            if (spec[3] != null) input.value = String(spec[3]);
-            if (disabled) input.disabled = true;
-            input.addEventListener('change', function () {
-              var v = input.value === '' ? null : Number(input.value);
-              api.setVs(Q.set(api.getVs(), spec[0] === 'min' ? 'budgetmin' : 'budgetmax', v));
-            });
-            w.appendChild(input);
-            range.appendChild(w);
-          });
-        if (disabled) {
-          range.appendChild(U.el('p', { class: 'fgroup__hint' },
-            'Band chips are doing the work — clear them to use a range.'));
-        } else if (vs.budgetmin != null || vs.budgetmax != null) {
-          range.appendChild(U.el('p', { class: 'fgroup__hint' }, 'Custom range is doing the work now.'));
-        }
-        body.appendChild(range);
+        body.appendChild(rangeBlock(g, vs));
       }
 
       section.appendChild(body);
       return section;
+    }
+
+    /* ---- the custom budget range (v0.5.0) ------------------------------ */
+    function rangeBlock(g, vs) {
+      var lo = g.range.min, hi = g.range.max;
+      var active = vs.budgetmin != null || vs.budgetmax != null;
+      var bandsOn = (vs.budget || []).length > 0;
+      var open = rangeOpen == null ? active : rangeOpen;
+
+      var box = U.el('div', { class: 'frange' + (open ? ' is-open' : '') });
+      var row = U.el('div', { class: 'frange__row' });
+      var head = U.el('button', {
+        type: 'button', class: 'frange__head' + (active ? ' is-active' : ''),
+        'aria-expanded': open ? 'true' : 'false'
+      });
+      head.appendChild(U.el('span', { class: 'frange__chev', 'aria-hidden': 'true' }, open ? '▾' : '▸'));
+      head.appendChild(U.el('span', { class: 'frange__label' },
+        active ? 'Custom range: ' + rangeText(vs) : 'Custom range…'));
+      head.addEventListener('click', function () { rangeOpen = !open; render(); });
+      row.appendChild(head);
+      if (active) {
+        var x = U.el('button', {
+          type: 'button', class: 'frange__clear', 'aria-label': 'Clear the custom range'
+        }, '×');
+        x.addEventListener('click', function () {
+          rangeOpen = null;
+          api.setVs(Q.set(Q.set(api.getVs(), 'budgetmin', null), 'budgetmax', null));
+        });
+        row.appendChild(x);
+      }
+      box.appendChild(row);
+      if (!open) return box;
+
+      var bodyEl = U.el('div', { class: 'frange__body' });
+      if (bandsOn) {
+        bodyEl.appendChild(U.el('p', { class: 'fgroup__hint' }, 'Setting a range replaces the band chips.'));
+      }
+
+      /* Dual-thumb slider: two overlaid native ranges, one drawn track. */
+      var vMin = vs.budgetmin != null ? Math.min(Math.max(vs.budgetmin, lo), hi) : lo;
+      var vMax = vs.budgetmax != null ? Math.min(Math.max(vs.budgetmax, lo), hi) : hi;
+      var slider = U.el('div', { class: 'range2' });
+      var track = U.el('div', { class: 'range2__track', 'aria-hidden': 'true' });
+      var fill = U.el('div', { class: 'range2__fill' });
+      track.appendChild(fill);
+      slider.appendChild(track);
+      var inMin = U.el('input', {
+        type: 'range', class: 'range2__thumb', min: String(lo), max: String(hi), step: '100',
+        'aria-label': 'Minimum modeled total'
+      });
+      var inMax = U.el('input', {
+        type: 'range', class: 'range2__thumb', min: String(lo), max: String(hi), step: '100',
+        'aria-label': 'Maximum modeled total'
+      });
+      inMin.value = String(vMin); inMax.value = String(vMax);
+      slider.appendChild(inMin); slider.appendChild(inMax);
+      bodyEl.appendChild(slider);
+
+      var nums = U.el('div', { class: 'frange__nums' });
+      var numMin = numBox('budget-min', 'From', vs.budgetmin, lo);
+      var numMax = numBox('budget-max', 'To', vs.budgetmax, hi);
+      nums.appendChild(numMin.wrap);
+      nums.appendChild(U.el('span', { class: 'frange__dash', 'aria-hidden': 'true' }, '–'));
+      nums.appendChild(numMax.wrap);
+      bodyEl.appendChild(nums);
+      box.appendChild(bodyEl);
+
+      function numBox(id, label, value, bound) {
+        var w = U.el('span', { class: 'fgroup__num' });
+        w.appendChild(U.el('label', { for: id, class: 'fgroup__numlabel' }, label));
+        var input = U.el('input', {
+          type: 'number', id: id, class: 'fgroup__input',
+          min: String(lo), max: String(hi), step: '100', placeholder: String(bound)
+        });
+        if (value != null) input.value = String(value);
+        input.addEventListener('change', function () {
+          var v = input.value === '' ? null : Number(input.value);
+          if (v != null && !isFinite(v)) v = null;
+          api.setVs(Q.set(api.getVs(), id === 'budget-min' ? 'budgetmin' : 'budgetmax', v));
+        });
+        w.appendChild(input);
+        return { wrap: w, input: input };
+      }
+
+      function paintSlider() {
+        var a = Number(inMin.value), b = Number(inMax.value);
+        var span = (hi - lo) || 1;
+        fill.style.left = ((a - lo) / span * 100) + '%';
+        fill.style.right = (100 - (b - lo) / span * 100) + '%';
+        inMin.setAttribute('aria-valuetext', F.money(a));
+        inMax.setAttribute('aria-valuetext', F.money(b));
+        /* Keep the thumb nearer its own end on top, so overlapped thumbs at
+           either extreme both stay grabbable. */
+        inMin.style.zIndex = a > (lo + hi) / 2 ? 4 : 2;
+        inMax.style.zIndex = 3;
+      }
+      function syncFromSlider() {
+        var a = Number(inMin.value), b = Number(inMax.value);
+        if (a > b) { inMin.value = String(b); a = b; }
+        if (b < a) { inMax.value = String(a); b = a; }
+        numMin.input.value = a <= lo ? '' : String(a);
+        numMax.input.value = b >= hi ? '' : String(b);
+        paintSlider();
+      }
+      /* Live while dragging; the URL commits on release. A thumb resting AT a
+         bound commits null — never a phantom "up to the maximum" filter. */
+      inMin.addEventListener('input', syncFromSlider);
+      inMax.addEventListener('input', syncFromSlider);
+      function commit() {
+        var a = Number(inMin.value), b = Number(inMax.value);
+        var next = Q.set(api.getVs(), 'budgetmin', a <= lo ? null : a);
+        next = Q.set(next, 'budgetmax', b >= hi ? null : b);
+        api.setVs(next);
+      }
+      inMin.addEventListener('change', commit);
+      inMax.addEventListener('change', commit);
+      paintSlider();
+
+      return box;
     }
 
     /* ---- the whole panel ---------------------------------------------- */
@@ -22932,9 +23351,22 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return frag;
     }
 
+    function restoreFinder() {
+      if (!focusKey) return;
+      var el = root.querySelector('.fgroup__find[data-key="' + focusKey + '"]');
+      if (!el) return;
+      el.value = finders[focusKey] || '';
+      try {
+        el.focus({ preventScroll: true });
+        var end = el.value.length;
+        el.setSelectionRange(end, end);
+      } catch (e) { /* focus is a nicety */ }
+    }
+
     function render() {
       U.clear(root);
       root.appendChild(build());
+      restoreFinder();
       if (sheetEl) paintSheetFooter();
       return root;
     }
@@ -23134,6 +23566,18 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       c.appendChild(x);
       el.appendChild(c);
     });
+
+    /* The save-a-view action lives HERE, beside the filters it would save,
+       not in the views bar (v0.5.1) — it exists exactly when the action is
+       possible: a filtered state that isn't already a saved view. */
+    if (opts.saveView && T.savedViews && Q.isFiltered(vs) && !T.savedViews.activeFor(vs)) {
+      var save = U.el('button', {
+        type: 'button', class: 'chips__save',
+        title: 'Save these filters as a view'
+      }, '＋ Save view');
+      save.addEventListener('click', function () { T.savedViews.openSaveDialog(api.getVs(), api); });
+      el.appendChild(save);
+    }
 
     var clear = U.el('button', { type: 'button', class: 'chips__clear' }, 'Clear all');
     clear.addEventListener('click', function () { P.clearAll(api); });
@@ -24026,9 +24470,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   /* ===================================================================== */
 
   /**
-   * renderBar(el, api) — pinned first, then most-recently-used, then starters,
-   * ending with `＋ Save current` (enabled only when the state differs from the
-   * active view / the defaults, UX §4.6).
+   * renderBar(el, api) — pinned first, then most-recently-used, then starters.
+   * Views only since v0.5.1: the save action is `＋ Save view` beside the
+   * active-filter chips (renderChips, 32-comp-filter-panel.js), and appears
+   * exactly when the state is filtered and not already a saved view (UX §4.6).
    */
   V.renderBar = function (el, api) {
     var vs = api.getVs();
@@ -24067,16 +24512,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     });
 
     if (!V.all().length) {
-      list.appendChild(U.el('p', { class: 'views__empty' }, 'Filter something, then save it here.'));
+      list.appendChild(U.el('p', { class: 'views__empty' }, 'Filter something, then save it as a view.'));
     }
     el.appendChild(list);
-
-    var save = U.el('button', { type: 'button', class: 'views__save' }, '＋ Save current');
-    var unchanged = (activeView && V.activeFor(vs) === activeView) || !Q.isFiltered(vs);
-    save.disabled = !!unchanged;
-    save.title = unchanged ? 'Change a filter or sort first.' : 'Save these filters as a view';
-    save.addEventListener('click', function () { V.openSaveDialog(api.getVs(), api); });
-    el.appendChild(save);
     return el;
   };
 
