@@ -2600,6 +2600,11 @@ input[type="file"]:focus-visible::file-selector-button {
   .card--gallery .card__actions { max-width: 0; overflow: hidden; }
   .card--gallery.card:hover .card__actions,
   .card--gallery.card:focus-within .card__actions { max-width: none; overflow: visible; }
+  /* …and "gives way" means goes away: a label squeezed to "Bo…" beside the
+     badge and the icons read as overflow, not as a truncation. The label is
+     back the moment the pointer leaves; the badge always stays. */
+  .card--gallery.card:hover .card__agreement,
+  .card--gallery.card:focus-within .card__agreement { display: none; }
 }
 /* A gallery card can be as narrow as 300px (248 dense), and the foot cannot
    hold two tokens, a badge AND five quick actions in that width — so the card
@@ -4955,6 +4960,9 @@ details[open] > .orphan__setasidesum::after,
 @media (prefers-reduced-motion: reduce) {
   .orx__pill, .orx__kind, .orx__editorsum, .orx__qrow { transition: none; animation: none; }
 }
+
+/* A converted figure keeps what the resort actually wrote beside it (v0.8.0). */
+.money__orig { font-weight: var(--weight-normal); color: var(--ink-muted); font-size: 0.86em; white-space: nowrap; }
 /* ==== src/css/20-comp-shell.css ==== */
 /* 20-comp-shell.css — APPLICATION SHELL. OWNER: IMPL-1 (pairs with src/js/50-shell.js).
  *
@@ -7409,6 +7417,21 @@ details[open] > .orphan__setasidesum::after,
   .health__row { grid-template-columns: 1fr; gap: 0; }
   .health__term { margin-top: var(--s2); }
 }
+
+/* ── Currency (v0.8.0) — one display currency, shared ─────────────────── */
+.curr { display: grid; gap: var(--s3); max-width: var(--measure); margin-bottom: var(--s5); }
+.curr__seg { justify-self: start; }
+.curr__seg .segmented__opt { min-height: 34px; padding: 0 var(--s4); font-size: var(--text-sm); }
+.curr__rate { margin: 0; font-size: var(--text-sm); color: var(--ink-muted); }
+.curr__acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); }
+.curr__acts .curr__refresh[hidden] { display: none; }
+.curr__manual { flex: 1 1 100%; }
+.curr__manual .sync__advsum { min-height: 30px; }
+.curr__err { color: var(--warn); display: block; }
+.curr__form { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); margin-top: var(--s2); }
+.curr__input { width: 7rem; font-family: var(--font-mono); font-size: var(--text-sm); }
+.curr__hint { margin: var(--s1) 0 0; }
+.curr__hint:empty { display: none; }
 /* ==== src/css/39-view-sync.css ==== */
 /* 39-view-sync.css — "Stay in sync" panel + masthead sync chip. Sync wave. */
 .sync { display: grid; gap: var(--s3); margin-bottom: var(--s5); }
@@ -7782,6 +7805,21 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .tile__text { font-size: var(--text-sm); color: var(--ink-muted); max-width: 32ch; }
 .tile__actions { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: auto; padding-top: var(--s2); align-items: center; }
 .tile__list { margin: 0; padding: 0; list-style: none; }
+
+/* The head of the unreviewed queue inside its tile. */
+.queue__lede { font-size: var(--text-xs); color: var(--ink-faint); margin-bottom: var(--s1); }
+.queue__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: var(--s2);
+  padding: var(--s2) 0;
+  font-size: var(--text-sm);
+  border-top: var(--hair) solid var(--line);
+}
+.queue__rank { font-size: var(--text-xs); color: var(--ink-faint); font-variant-numeric: tabular-nums lining-nums; }
+.queue__link { font-weight: var(--weight-medium); min-width: 0; overflow-wrap: anywhere; }
+.queue__where { grid-column: 2; font-size: var(--text-xs); color: var(--ink-muted); }
 .tile__more { display: inline-block; align-self: start; margin-top: auto; padding-top: var(--s3); font-size: var(--text-sm); color: var(--accent); }
 
 /* Urgency is the tile's border: solid for a hold that ends within a day,
@@ -8533,7 +8571,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.7.1';
+  T.version = '0.8.0';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -8772,17 +8810,57 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var n = typeof v === 'number' ? v : parseFloat(String(v).replace(/[^0-9.\-]/g, ''));
     if (!isFinite(n)) return opts.missing || F.MISSING;
     var digits = opts.cents ? 2 : 0;
-    var s;
+    var code = String(opts.currency || 'USD').toUpperCase();
+    /* DISPLAY CURRENCY (v0.8.0, 15-currency.js). `opts.currency` is the
+       currency the value IS in — USD for every workbook figure, whatever the
+       resort said for a quote. When the couple has chosen one display
+       currency the figure is converted for the eye only and prefixed "≈":
+       the stored value, the budget maths and the filters never see the
+       converted number. `convert: false` keeps a figure native (the budget
+       range inputs, which are typed in USD). */
+    var shown = code, approx = false, orig = null;
+    if (opts.convert !== false && T.currency && T.currency.mode) {
+      var want = T.currency.mode();
+      if (want !== 'quoted' && want !== code) {
+        var c = T.currency.convert(n, code, want);
+        if (c != null) {
+          if (opts.showOriginal) orig = fmt(n, code, digits);
+          n = c; shown = want; approx = true;
+        }
+      }
+    }
+    var s = fmt(n, shown, digits);
+    if (approx) s = '\u2248' + s;
+    if (orig) s += ' (' + orig + ')';
+    return opts.signed && n > 0 ? '+' + s : s;
+  };
+  /**
+   * moneyNode(v, opts) -> <span class="money"> — the display figure, and when
+   * it was converted, the native figure after it in a quiet <small>. For the
+   * places where what the resort actually wrote must stay visible (quote
+   * tables, the responses board). Plain F.money keeps the compact tiles.
+   */
+  F.moneyNode = function (v, opts) {
+    opts = opts || {};
+    var main = F.money(v, opts);
+    var node = U.el('span', { class: 'money' }, main);
+    if (main.charAt(0) === '\u2248') {
+      var o = {}; for (var k in opts) o[k] = opts[k];
+      o.convert = false;
+      node.appendChild(U.el('small', { class: 'money__orig' }, ' (' + F.money(v, o) + ')'));
+    }
+    return node;
+  };
+  function fmt(n, code, digits) {
     try {
-      s = n.toLocaleString('en-US', {
-        style: 'currency', currency: opts.currency || 'USD',
+      return n.toLocaleString('en-US', {
+        style: 'currency', currency: code,
         minimumFractionDigits: digits, maximumFractionDigits: digits
       });
     } catch (e) {
-      s = '$' + n.toFixed(digits);
+      return (code === 'EUR' ? '\u20AC' : '$') + n.toFixed(digits);
     }
-    return opts.signed && n > 0 ? '+' + s : s;
-  };
+  }
 
   F.num = function (v, opts) {
     opts = opts || {};
@@ -9374,6 +9452,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         savedViews: Object.create(null),// id -> {id,name,filters,sort,updatedAt,deleted?}
         weights: Object.create(null),   // decision-lab weight sets: id -> {id,name,weights{},updatedAt,deleted?}
         scenarios: Object.create(null), // budget-lab scenarios: id -> {id,name,params{},updatedAt,deleted?}
+        settings: Object.create(null),  // shared preferences (v0.8.0): id -> {id,value,updatedAt,deleted?} — e.g. 'currency'
         recent: [],                     // [{id, at}] most-recent-first, capped
         _t: {}
       },
@@ -9417,7 +9496,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var base = emptyState();
     data.records = data.records || base.records;
     data.global = data.global || base.global;
-    ['tasks', 'savedViews', 'weights', 'scenarios'].forEach(function (k) {
+    ['tasks', 'savedViews', 'weights', 'scenarios', 'settings'].forEach(function (k) {
       if (!data.global[k]) data.global[k] = Object.create(null);
     });
     if (!Array.isArray(data.global.recent)) data.global.recent = [];
@@ -9547,7 +9626,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   });
 
   /* Global collections: one generic upsert/delete pair per collection. */
-  ['tasks', 'savedViews', 'weights', 'scenarios'].forEach(function (coll) {
+  ['tasks', 'savedViews', 'weights', 'scenarios', 'settings'].forEach(function (coll) {
     planningMutator('planning/upsert:' + coll, function (s, p, at) {
       var bag = s.planning.global[coll];
       var id = p.entryId || (p.value && p.value.id) || U.uid(coll.slice(0, 2));
@@ -9834,7 +9913,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     });
 
     /* global collections: union by id, newest-wins per entry, tombstone-aware */
-    ['tasks', 'savedViews', 'weights', 'scenarios'].forEach(function (coll) {
+    ['tasks', 'savedViews', 'weights', 'scenarios', 'settings'].forEach(function (coll) {
       var l = (localState.global && localState.global[coll]) || {};
       var i = (incomingState.global && incomingState.global[coll]) || {};
       var keys = {};
@@ -11196,6 +11275,29 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     if (def.title) { try { document.title = def.title; } catch (e) {} }
     // Move focus for keyboard + screen-reader users on route change.
     try { el.focus({ preventScroll: true }); } catch (e) {}
+  };
+
+  /**
+   * remount(opts) — tear the current view down and mount it again from the
+   * URL, as if the user had left and come back. Used when something that
+   * every view renders changes at once (the display currency, v0.8.0) and a
+   * per-key patch would be dishonest. `keepScroll` restores the scroll
+   * offset so a toggle on the settings page does not jump to the top.
+   */
+  R.remount = function (opts) {
+    opts = opts || {};
+    if (!mountEl || !current) return;
+    var y = opts.keepScroll ? (window.pageYOffset || document.documentElement.scrollTop || 0) : 0;
+    var name = current.name;
+    if (unsub) { unsub(); unsub = null; }
+    try { if (current.def.unmount) current.def.unmount(current.el); }
+    catch (e) { T.diag.note('view', 'unmount ' + name + ': ' + ((e && e.message) || e)); }
+    if (current.el && current.el.parentNode) current.el.parentNode.removeChild(current.el);
+    current = null;
+    R.render();
+    if (opts.keepScroll) {
+      try { window.scrollTo(0, y); } catch (e2) {}
+    }
   };
 
   R.fail = function (name, e) {
@@ -14175,6 +14277,219 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     return sec;
   };
 })(window.TRIP);
+/* ==== src/js/15-currency.js ==== */
+/* 15-currency.js — ONE display currency for the whole site. OWNER: currency
+ * wave (v0.8.0).
+ *
+ * Solomon's ask: the site mixed dollars (every workbook figure is USD) with
+ * euros (most resort quotes) — pick one in Settings and see everything in it.
+ *
+ * WHAT THIS IS, AND IS NOT
+ *   - A lens, not a ledger. Nothing stored changes: workbook money stays USD,
+ *     a quote stays in the currency the resort wrote it in, budget maths and
+ *     the range filters keep running on the native numbers. Only F.money's
+ *     OUTPUT is converted, and a converted figure always carries "≈" so a
+ *     rounded rate is never mistaken for a quoted price (money law).
+ *   - The CHOICE is shared. It rides in planning `global.settings` (entry id
+ *     'currency') so both laptops read the same currency, merged through the
+ *     one merge like tasks and saved views. A manual rate override lives in
+ *     the same entry — if one of them pins a rate, both see the same numbers.
+ *   - The RATE is per browser. The ECB reference rate (via frankfurter.dev,
+ *     keyless, CORS-open, same runtime-data pattern as the Wikipedia photos)
+ *     is cached in localStorage `trip26:currency` — rebuildable, never synced,
+ *     both browsers fetch the same daily figure anyway. A built-in fallback
+ *     (dated) covers a browser that has never been online with it.
+ *
+ * Modes: 'quoted' (native — the pre-0.8.0 behaviour), 'USD', 'EUR'.
+ */
+(function (T) {
+  'use strict';
+  var U = T.util, store = T.store;
+  var C = T.currency = {};
+
+  C.MODES = ['USD', 'EUR', 'quoted'];
+  C.LABELS = { USD: 'US dollars', EUR: 'Euros', quoted: 'As quoted' };
+  C.ENTRY_ID = 'currency';
+  C.LS = 'trip26:currency';
+  /* ECB reference, EUR→USD, the day this wave was built. Used only until a
+     live rate has been fetched once; the settings page names its date. */
+  C.BUILTIN = { eurUsd: 1.159, date: '2026-09-01', source: 'builtin' };
+  C.ENDPOINTS = [
+    'https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD',
+    'https://api.frankfurter.app/latest?from=EUR&to=USD'
+  ];
+  C.STALE_MS = 12 * 3600 * 1000;   /* re-ask after half a day; ECB posts once per working day */
+
+  /* ---- the shared choice (planning) -------------------------------------- */
+  function entry() {
+    try {
+      var s = store.getState();
+      var bag = s.planning && s.planning.global && s.planning.global.settings;
+      var e = bag && bag[C.ENTRY_ID];
+      return e && !e.deleted ? e : null;
+    } catch (e2) { return null; }
+  }
+  C.mode = function () {
+    var e = entry();
+    var m = e && e.value;
+    return C.MODES.indexOf(m) >= 0 ? m : 'quoted';
+  };
+  C.manualRate = function () {
+    var e = entry();
+    var r = e && e.manualRate;
+    return typeof r === 'number' && isFinite(r) && r > 0 ? r : null;
+  };
+  function write(patch) {
+    var e = entry() || {};
+    var value = { value: patch.value !== undefined ? patch.value : (e.value || 'quoted') };
+    value.manualRate = patch.manualRate !== undefined ? patch.manualRate : (e.manualRate == null ? null : e.manualRate);
+    store.dispatch('planning/upsert:settings', { entryId: C.ENTRY_ID, value: value });
+  }
+  C.setMode = function (mode) {
+    if (C.MODES.indexOf(mode) < 0 || mode === C.mode()) return;
+    write({ value: mode });   /* the store subscriber below does the repaint */
+  };
+  /** Pin a EUR→USD rate for both laptops, or null to follow the ECB again. */
+  C.setManualRate = function (rate) {
+    var r = rate == null || rate === '' ? null : Number(rate);
+    if (r != null && !(isFinite(r) && r > 0)) return false;
+    if (r === C.manualRate()) return true;
+    write({ manualRate: r });
+    return true;
+  };
+
+  /* ---- the rate (per browser cache + fetch) ------------------------------ */
+  var cached = null;      /* {eurUsd, date, fetchedAt} */
+  var inflight = null;
+  var lastError = null;
+  function loadCache() {
+    if (cached) return cached;
+    try {
+      var raw = localStorage.getItem(C.LS);
+      var obj = raw ? JSON.parse(raw) : null;
+      if (obj && typeof obj.eurUsd === 'number' && isFinite(obj.eurUsd) && obj.eurUsd > 0) cached = obj;
+    } catch (e) { cached = null; }
+    return cached;
+  }
+  function saveCache(obj) {
+    cached = obj;
+    try { localStorage.setItem(C.LS, JSON.stringify(obj)); } catch (e) { /* cache only */ }
+  }
+  /** rate() -> {eurUsd, date, source: 'manual'|'ecb'|'builtin', fetchedAt?} */
+  C.rate = function () {
+    var manual = C.manualRate();
+    if (manual != null) return { eurUsd: manual, date: null, source: 'manual' };
+    var c = loadCache();
+    if (c) return { eurUsd: c.eurUsd, date: c.date, source: 'ecb', fetchedAt: c.fetchedAt };
+    return { eurUsd: C.BUILTIN.eurUsd, date: C.BUILTIN.date, source: 'builtin' };
+  };
+  C.lastError = function () { return lastError; };
+  C.isStale = function () {
+    var c = loadCache();
+    return !c || (U.now() - (c.fetchedAt || 0)) > C.STALE_MS;
+  };
+
+  function fetchOne(url) {
+    var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, 8000) : null;
+    return fetch(url, { signal: ctl ? ctl.signal : undefined, cache: 'no-store' })
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (json) {
+        var r = json && json.rates && Number(json.rates.USD);
+        if (!(isFinite(r) && r > 0.5 && r < 3)) throw new Error('unexpected payload');
+        return { eurUsd: r, date: String(json.date || '').slice(0, 10) || null };
+      })
+      .then(function (v) { if (timer) clearTimeout(timer); return v; },
+            function (e) { if (timer) clearTimeout(timer); throw e; });
+  }
+  function fetchFrom(i) {
+    if (i >= C.ENDPOINTS.length) return Promise.reject(new Error('no endpoint answered'));
+    return fetchOne(C.ENDPOINTS[i]).catch(function () { return fetchFrom(i + 1); });
+  }
+  /**
+   * refresh(force) -> Promise<rate>. Fetches the ECB rate when the cache is
+   * stale (or always with force), stores it, repaints if the figure moved.
+   * Never rejects: offline resolves to whatever rate() already says.
+   */
+  C.refresh = function (force) {
+    if (inflight) return inflight;
+    if (!force && !C.isStale()) return Promise.resolve(C.rate());
+    if (typeof fetch !== 'function') return Promise.resolve(C.rate());
+    var before = C.rate().eurUsd;
+    inflight = fetchFrom(0).then(function (v) {
+      lastError = null;
+      saveCache({ eurUsd: v.eurUsd, date: v.date, fetchedAt: U.now() });
+      inflight = null;
+      if (C.mode() !== 'quoted' && C.manualRate() == null && v.eurUsd !== before) remount();
+      else paintSettings();
+      return C.rate();
+    }, function (e) {
+      lastError = (e && e.message) || 'offline';
+      inflight = null;
+      paintSettings();
+      return C.rate();
+    });
+    return inflight;
+  };
+
+  /* ---- conversion --------------------------------------------------------- */
+  /** convert(amount, from, to) -> number | null (null = can't; caller keeps native). */
+  C.convert = function (amount, from, to) {
+    from = String(from || 'USD').toUpperCase(); to = String(to || 'USD').toUpperCase();
+    if (from === to) return amount;
+    var r = C.rate().eurUsd;
+    if (from === 'EUR' && to === 'USD') return amount * r;
+    if (from === 'USD' && to === 'EUR') return amount / r;
+    return null;   /* GBP, CHF… stay as quoted — no rate on file for them */
+  };
+  C.symbol = function (code) { return code === 'EUR' ? '€' : code === 'USD' ? '$' : code + ' '; };
+  /** One sentence for captions: "Shown in euros at the ECB rate of 2026-09-01 (1 EUR = $1.16)". */
+  C.rateSentence = function () {
+    var m = C.mode();
+    if (m === 'quoted') return 'Shown as quoted — workbook figures in US dollars, each resort in its own currency.';
+    var r = C.rate();
+    var pair = '1 EUR = $' + r.eurUsd.toFixed(3).replace(/(\.\d\d)0$/, '$1');
+    var basis = r.source === 'manual' ? 'a rate you set'
+      : r.source === 'ecb' ? 'the ECB rate of ' + r.date
+      : 'the built-in ECB rate of ' + r.date + ' (no live rate yet)';
+    return 'Shown in ' + C.LABELS[m].toLowerCase() + ' at ' + basis + ' (' + pair + '). Converted figures carry ≈.';
+  };
+
+  /* ---- repaint plumbing --------------------------------------------------- */
+  /* A currency change touches every money figure on screen; the honest
+     repaint is a fresh mount of the current view (state lives in the URL and
+     the store, so nothing is lost) with the scroll position put back. */
+  function remount() {
+    if (T.router && T.router.remount) T.router.remount({ keepScroll: true });
+  }
+  var settingsPainters = [];
+  C.onRateChange = function (fn) { settingsPainters.push(fn); return function () {
+    settingsPainters = settingsPainters.filter(function (f) { return f !== fn; });
+  }; };
+  function paintSettings() { settingsPainters.forEach(function (f) { try { f(); } catch (e) {} }); }
+
+  /* ---- boot --------------------------------------------------------------- */
+  function key() { return C.mode() + '|' + C.manualRate(); }
+  C.init = function () {
+    var last = key();
+    /* ONE repaint path for a local toggle, a paste-import and a sync arrival
+       alike: whenever the shared choice differs from what is on screen, the
+       current view is mounted again. */
+    store.subscribe(function (state, changed) {
+      if (!store.touches(changed, 'planning')) return;
+      var now = key();
+      if (now === last) return;
+      last = now;
+      if (C.mode() !== 'quoted') C.refresh();
+      remount();
+    }, { id: 'currency' });
+    if (C.mode() !== 'quoted') C.refresh();
+    window.addEventListener('online', function () { if (C.mode() !== 'quoted') C.refresh(); });
+  };
+})(window.TRIP);
 /* ==== src/js/20-view-home.js ==== */
 /* 20-view-home.js — HOME (screen S1, docs/UX_SPEC.md §2). OWNER: IMPL-1.
  *
@@ -15158,6 +15473,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     }, 'Show the ' + prose(n.over) + ' weakest →'));
   }
 
+  var UNREVIEWED_QUERY = { flags: 'unreviewed', sort: 'rank', dir: 'asc' };
+
+  /** The queue, with its head showing: the next three unreviewed options in
+   *  the workbook's order — the same three a review run would open with, so
+   *  the tile previews the action instead of only counting it. */
   function paintUnreviewed(host, sec) {
     var counts = T.select.get('counts') || {};
     var n = counts.unreviewed || 0;
@@ -15170,12 +15490,35 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return;
     }
     figure(host, n, n === 1 ? 'option you haven’t looked at yet.' : 'options you haven’t looked at yet.');
+
+    var next = qrows(UNREVIEWED_QUERY);
+    if (!next) {
+      next = (T.select.get('rows') || []).filter(function (r) {
+        return !r.reviewed && r.status !== 'rejected';
+      }).sort(byRank);
+    }
+    if (next.length) {
+      var list = U.el('ul', { class: 'tile__list queue' });
+      next.slice(0, 3).forEach(function (r) {
+        var f = r.rec.f;
+        var li = U.el('li', { class: 'queue__item' });
+        li.appendChild(U.el('span', { class: 'queue__rank', 'aria-hidden': 'true',
+          text: F.isMissing(f.currentRank) ? '—' : '#' + F.num(f.currentRank) }));
+        li.appendChild(U.el('a', { class: 'queue__link', href: T.router.build('trip', [r.id]) },
+          F.text(f.hotel)));
+        li.appendChild(U.el('span', { class: 'queue__where', text: placeLine(f, ', ') || '' }));
+        list.appendChild(li);
+      });
+      host.appendChild(U.el('p', { class: 'queue__lede', text: 'Next up, in the workbook’s order:' }));
+      host.appendChild(list);
+    }
+
     var actions = U.el('div', { class: 'tile__actions' });
     /* Review Run (§2.5) is a later wave; the link still works today as the
        plainly-filtered Explore view it will one day launch from. */
     actions.appendChild(U.el('a', {
       class: 'btn btn--primary',
-      href: T.router.build('explore', [], { flags: 'unreviewed', sort: 'rank', dir: 'asc' })
+      href: T.router.build('explore', [], UNREVIEWED_QUERY)
     }, 'Start a review run'));
     actions.appendChild(U.el('a', {
       class: 'btn btn--quiet',
@@ -18223,7 +18566,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         var amt = U.el('td', { class: 'orx__q-amount' });
         /* Blank is never $0 (BRIEF §2): the glyph AND the word. */
         U.fill(amt, q.amount == null ? missing('no number given')
-          : F.money(q.amount, { currency: q.currency }));
+          : F.moneyNode(q.amount, { currency: q.currency }));
         tr.appendChild(amt);
         tr.appendChild(U.el('td', { class: 'orx__q-note' },
           U.isBlank(q.note) ? '' : String(q.note)));
@@ -20963,8 +21306,8 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     m.quotes.forEach(function (q) {
       var li = U.el('li', { class: 'rboard__quote' });
       /* BLANK IS NOT ZERO: "they replied but gave no number" is a legal quote. */
-      li.appendChild(U.el('span', { class: 'rboard__qamount',
-        text: q.amount == null ? F.MISSING : F.money(q.amount, { currency: q.currency }) }));
+      li.appendChild(U.el('span', { class: 'rboard__qamount' },
+        q.amount == null ? F.MISSING : F.moneyNode(q.amount, { currency: q.currency })));
       li.appendChild(kindBadge(q.kind));
       li.appendChild(U.el('span', { class: 'rboard__qlabel', text: F.text(q.label) }));
       var meta = [];
@@ -22972,6 +23315,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   var SECTIONS = [
     { key: 'workbook', label: 'The workbook' },
     { key: 'sync', label: 'Stay in sync' },
+    { key: 'currency', label: 'Currency' },
     { key: 'load', label: 'Load your spreadsheet' },
     { key: 'orphans', label: 'Notes without a trip' },
     { key: 'transfer', label: 'Your planning data' }
@@ -23522,6 +23866,82 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   }
 
   /* ===================================================================== */
+  /* A3 · CURRENCY — one display currency for every price (v0.8.0)         */
+  /* ===================================================================== */
+  /* The choice is shared planning state (T.currency, 15-currency.js), so
+     the segmented control here is a radiogroup over a synced value; the
+     rate line is per browser. Everything repaints through T.currency's own
+     store subscriber — this panel only dispatches. */
+  function currencyBlock(sec) {
+    var CU = T.currency;
+    var box = U.el('div', { class: 'curr' });
+
+    var seg = U.el('div', { class: 'segmented curr__seg', role: 'radiogroup', 'aria-label': 'Show prices in' });
+    CU.MODES.forEach(function (m) {
+      var b = U.el('button', {
+        type: 'button', class: 'segmented__opt', role: 'radio',
+        dataset: { mode: m }, 'aria-checked': String(CU.mode() === m), text: CU.LABELS[m]
+      });
+      b.addEventListener('click', function () { CU.setMode(m); });
+      seg.appendChild(b);
+    });
+    box.appendChild(seg);
+
+    var rate = U.el('p', { class: 'curr__rate' });
+    var rateText = U.el('span', { class: 'curr__ratetext' });
+    var refresh = U.el('button', { type: 'button', class: 'btn btn--sm btn--quiet curr__refresh', text: 'Refresh rate' });
+    var err = U.el('span', { class: 'curr__err', hidden: true });
+    rate.appendChild(rateText); rate.appendChild(err);
+    box.appendChild(rate);
+    var acts = U.el('div', { class: 'curr__acts' });
+    acts.appendChild(refresh);
+    box.appendChild(acts);
+    refresh.addEventListener('click', function () {
+      refresh.disabled = true; U.setText(refresh, 'Checking…');
+      CU.refresh(true).then(function () { refresh.disabled = false; U.setText(refresh, 'Refresh rate'); paint(); });
+    });
+
+    /* Manual rate — for the day the two of you would rather agree a number
+       than follow the ECB (a card's real rate, say). Shared like the choice. */
+    var det = U.el('details', { class: 'curr__manual' });
+    det.appendChild(U.el('summary', { class: 'sync__advsum', text: 'Set the rate yourselves…' }));
+    var form = U.el('div', { class: 'curr__form' });
+    var lab = U.el('label', { class: 'sync__label', for: 'curr-rate', text: '1 EUR = USD' });
+    var input = U.el('input', {
+      type: 'number', id: 'curr-rate', class: 'input curr__input', step: '0.001', min: '0.5', max: '3',
+      placeholder: String(CU.BUILTIN.eurUsd), inputmode: 'decimal'
+    });
+    var use = U.el('button', { type: 'button', class: 'btn btn--sm', text: 'Use this rate' });
+    var follow = U.el('button', { type: 'button', class: 'btn btn--sm btn--quiet', text: 'Follow the ECB again' });
+    var hint = U.el('p', { class: 'field__hint curr__hint' });
+    form.appendChild(lab); form.appendChild(input); form.appendChild(use); form.appendChild(follow);
+    det.appendChild(form); det.appendChild(hint);
+    acts.appendChild(det);
+    use.addEventListener('click', function () {
+      if (!CU.setManualRate(input.value)) { U.setText(hint, 'Enter a rate between 0.5 and 3, like 1.16.'); return; }
+      U.setText(hint, ''); paint();
+    });
+    follow.addEventListener('click', function () { CU.setManualRate(null); input.value = ''; paint(); });
+
+    function paint() {
+      var mode = CU.mode(), r = CU.rate();
+      U.qsa('.segmented__opt', seg).forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.mode === mode)); });
+      U.setText(rateText, CU.rateSentence());
+      refresh.hidden = mode === 'quoted' || r.source === 'manual';
+      var e = CU.lastError();
+      err.hidden = !e || mode === 'quoted';
+      U.setText(err, e ? 'Could not reach the rate service — using the last rate on file.' : '');
+      follow.hidden = r.source !== 'manual';
+      if (r.source === 'manual' && !input.value) input.value = String(r.eurUsd);
+      det.open = det.open || r.source === 'manual';
+    }
+    paint();
+    sec._paintCurrency = paint;
+    sec._offRate = CU.onRateChange(paint);
+    return box;
+  }
+
+  /* ===================================================================== */
   /* THE VIEW                                                               */
   /* ===================================================================== */
 
@@ -23558,6 +23978,17 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         secS.appendChild(syncHost);
         el.appendChild(secS);
         T.sync.mount(syncHost);
+      }
+
+      /* ---- A3 · currency (15-currency.js) ------------------------------ */
+      if (T.currency && T.currency.mode) {
+        var secCu = sectionEl('currency', 'Currency',
+          'One currency for every price on the site, for both of you. Nothing underneath changes — ' +
+          'the workbook’s figures stay in dollars and each quote in whatever the resort wrote; a ' +
+          'converted figure carries ≈ so it is never mistaken for the number itself.');
+        secCu.appendChild(currencyBlock(secCu));
+        el.appendChild(secCu);
+        el._secCu = secCu;
       }
 
       /* ---- B · load your spreadsheet ---------------------------------- */
@@ -23604,7 +24035,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var secE = U.el('section', { class: 'datapane__section', 'aria-labelledby': 'data-later' });
       secE.appendChild(U.el('h2', { id: 'data-later', class: 'datapane__h', text: 'Still to come' }));
       secE.appendChild(U.el('p', { class: 'datapane__lede', text:
-        'Preferences — theme, density, whose device this is, the display names, the ' +
+        'Preferences — theme, density, the display names, the ' +
         'price-staleness window — and the managers for saved views, scenarios and weight ' +
         'profiles arrive in a later wave. Nothing you decide before then is at risk: it is ' +
         'already saved on this device, and you can copy it out above at any time.' }));
@@ -23622,6 +24053,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
           changed.has('reload') || changed.has('planning:imported')) {
         if (el._secC) paintOrphans(el._secC);
         if (el._secD && el._secD._out && el._secD._out._refresh) el._secD._out._refresh();
+        if (el._secCu && el._secCu._paintCurrency) el._secCu._paintCurrency();
       }
       if (changed.has('caps') && el._secD && el._secD._out && el._secD._out._syncSave) {
         el._secD._out._syncSave();
@@ -23633,7 +24065,8 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       T.health.unmount();
       T.reload._repaint = null;
       if (T.sync) T.sync._repaint = null;
-      el._secC = null; el._secD = null;
+      if (el._secCu && el._secCu._offRate) el._secCu._offRate();
+      el._secC = null; el._secD = null; el._secCu = null;
     }
   };
 
@@ -24909,8 +25342,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       });
     });
     if (vs.budgetmin != null || vs.budgetmax != null) {
-      var lo = vs.budgetmin != null ? F.money(vs.budgetmin) : 'any';
-      var hi = vs.budgetmax != null ? F.money(vs.budgetmax) : 'any';
+      /* Chip mirrors the typed USD numbers — never a converted view of them. */
+      var lo = vs.budgetmin != null ? F.money(vs.budgetmin, { convert: false }) : 'any';
+      var hi = vs.budgetmax != null ? F.money(vs.budgetmax, { convert: false }) : 'any';
       var cleared = Q.set(Q.set(vs, 'budgetmin', null), 'budgetmax', null);
       push('range', 'budget', 'range', lo + '–' + hi, cleared);
     }
@@ -26513,9 +26947,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     }
 
     function rangeText(vs) {
-      if (vs.budgetmin != null && vs.budgetmax != null) return F.money(vs.budgetmin) + ' – ' + F.money(vs.budgetmax);
-      if (vs.budgetmin != null) return 'From ' + F.money(vs.budgetmin);
-      return 'Up to ' + F.money(vs.budgetmax);
+      /* Native USD on purpose: these are the numbers typed into the inputs. */
+      var usd = { convert: false };
+      if (vs.budgetmin != null && vs.budgetmax != null) return F.money(vs.budgetmin, usd) + ' – ' + F.money(vs.budgetmax, usd);
+      if (vs.budgetmin != null) return 'From ' + F.money(vs.budgetmin, usd);
+      return 'Up to ' + F.money(vs.budgetmax, usd);
     }
 
     function activeInfo(g) {
@@ -26750,6 +27186,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       if (bandsOn) {
         bodyEl.appendChild(U.el('p', { class: 'fgroup__hint' }, 'Setting a range replaces the band chips.'));
       }
+      /* The range is typed in the workbook's own currency whatever the site is
+         showing (v0.8.0) — say so only when it would otherwise mislead. */
+      if (T.currency && T.currency.mode && T.currency.mode() === 'EUR')
+        bodyEl.appendChild(U.el('p', { class: 'fgroup__hint' }, 'Range amounts are in US dollars — the workbook’s currency.'));
 
       /* Dual-thumb slider: two overlaid native ranges, one drawn track. */
       var vMin = vs.budgetmin != null ? Math.min(Math.max(vs.budgetmin, lo), hi) : lo;
@@ -26802,8 +27242,8 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         var span = (hi - lo) || 1;
         fill.style.left = ((a - lo) / span * 100) + '%';
         fill.style.right = (100 - (b - lo) / span * 100) + '%';
-        inMin.setAttribute('aria-valuetext', F.money(a));
-        inMax.setAttribute('aria-valuetext', F.money(b));
+        inMin.setAttribute('aria-valuetext', F.money(a, { convert: false }));
+        inMax.setAttribute('aria-valuetext', F.money(b, { convert: false }));
         /* Keep the thumb nearer its own end on top, so overlapped thumbs at
            either extreme both stay grabbable. */
         inMin.style.zIndex = a > (lo + hi) / 2 ? 4 : 2;
@@ -32378,7 +32818,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var g = state.global || {};
     return U.fnv1a(U.stableStringify({
       records: state.records || {},
-      tasks: g.tasks || {}, savedViews: g.savedViews || {}, weights: g.weights || {}, scenarios: g.scenarios || {},
+      tasks: g.tasks || {}, savedViews: g.savedViews || {}, weights: g.weights || {}, scenarios: g.scenarios || {}, settings: g.settings || {},
       orphans: state.orphans || {}
     }));
   };
@@ -33344,6 +33784,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     // 5. Sharing over GitHub (82-sync.js) — local-first; waits for the cached
     //    research so a shared workbook never races the first paint.
     if (T.sync && T.sync.init) T.sync.init({ after: researchReady });
+
+    // 6. Display currency (15-currency.js) — fetches today's ECB rate only
+    //    when the couple has chosen one currency; otherwise nothing leaves.
+    if (T.currency && T.currency.init) T.currency.init();
 
     store.dispatch('ui/set', { ready: true });
     T.booted = true;
