@@ -8717,7 +8717,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.9.0';
+  T.version = '0.9.1';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -14116,18 +14116,31 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   });
 })(window.TRIP);
 /* ==== src/js/14-outreach-import.js ==== */
-/* 14-outreach-import.js — the one-time "import the Sep 1 replies" offer.
- * OWNER: outreach wave (v0.6.0).
+/* 14-outreach-import.js — the one-time "import what the resorts said" offers.
+ * OWNER: outreach wave (v0.6.0); batches since v0.9.1.
  *
- * Seven resorts answered on 1 September 2026. This module carries what they
- * said as a frozen seed, offers it once per browser, and — when accepted —
- * folds it in through the ONE merge (T.plan.mergeState) and the ONE applicator
- * (planning/import). There is no second merge and no direct state write.
+ * Replies arrive in BATCHES: seven resorts answered on 1 September 2026, and
+ * Vila Planinka came back with a real six-night proposal on 3 September. Each
+ * batch is a frozen seed with its own clock, offered once per browser, and —
+ * when accepted — folded in through the ONE merge (T.plan.mergeState) and the
+ * ONE applicator (planning/import). There is no second merge and no direct
+ * state write. Every pending batch is offered through ONE panel: accepting
+ * imports all of them, "Not now" hides all of them, so the surface never grows
+ * a stack of panels as replies keep landing.
  *
- * WHY preferLocal + a FIXED past clock: every seed field is stamped at
- * SEED_AT, so anything either of them typed by hand — which necessarily has a
- * later clock — wins. Belt and braces on top of the "hide it once any outreach
- * data exists" rule.
+ * WHY preferLocal + a FIXED past clock per batch: every seed field is stamped
+ * at the batch's `at`, so anything either of them typed by hand AFTER the reply
+ * landed — which necessarily has a later clock — wins. A later batch about the
+ * same resort carries a later clock, so its fields replace the earlier batch's
+ * ("sent" on Sep 1 becomes "replied" on Sep 3) exactly as the merge intends.
+ *
+ * WHY two "already there" rules: the Sep 1 batch predates every outreach
+ * field in existence, so "any outreach data anywhere" meant "someone already
+ * has this". A later batch cannot use that test (there is always data by
+ * then); it asks instead whether ITS deterministic quote ids already sit on
+ * the record — true once either laptop imported it (entries travel through
+ * sync; a deleted quote is a tombstone that keeps its key), and never true
+ * because somebody typed a note by hand, so hand-typing can't hide an import.
  *
  * WHY the explicit sync call: planning/import returns ['planning',
  * 'planning:imported'] and 82-sync.js's push trigger returns EARLY on that key
@@ -14135,9 +14148,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
  * Data page inherits that gap and sits unpushed until the next unrelated
  * planning edit. This one must not.
  *
- * The dismissal flag lives in the shared `trip26:ui` envelope under our own
- * sub-key, read-modify-written exactly like T.explorePrefs. No new storage
- * key, and deliberately NOT synced: hiding the offer is per-person
+ * The dismissal flags live in the shared `trip26:ui` envelope under our own
+ * sub-key, read-modify-written exactly like T.explorePrefs. The Sep 1 batch
+ * keeps its original flat keys (importAcceptedAt / importDismissedAt, written
+ * by v0.6.0 browsers); later batches live under `batches[key]`. No new storage
+ * key, and deliberately NOT synced: hiding an offer is per-person
  * housekeeping, while the data it imports is shared anyway.
  */
 (function (T) {
@@ -14269,47 +14284,128 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
   I.SEED_IDS = SEED.map(function (r) { return r.id; });
 
-  /**
-   * A full planning state carrying nothing but the seed. Quote entry ids are
-   * DETERMINISTIC (q-seed-N, never U.uid) so that both laptops importing the
-   * same seed produce the same entry keys and the entry-map union collapses
-   * them instead of doubling every quote.
-   */
-  I.buildSeedState = function () {
-    var state = T.plan.emptyState();
-    var n = 0;
-    SEED.forEach(function (seed) {
-      var r = T.plan.emptyRecord(seed.id);
-      var field;
-      for (field in seed.fields) {
-        if (!Object.prototype.hasOwnProperty.call(seed.fields, field)) continue;
-        r[field] = seed.fields[field];
-        r._t[field] = SEED_AT;
+  /* ---- batch 2: Vila Planinka's proposal, 3 September 2026 ----------------
+   * One resort, one reply — but the reply is the six-night retreat we had been
+   * trying to get them to build: three two-night packages stacked. The two
+   * headline totals are the quotes; the per-package components sit in each
+   * quote's note so the tile and the board show ONE six-night bucket, not a
+   * misleading "2 nt €1,169" beside it (a package leg is not a two-night stay
+   * you can book on its own). Our own reading of the offer — value, suite
+   * call, the spa caveat, what they skipped — goes in the notes, as the Sep 1
+   * seed did for Nayara. */
+  var SEED_AT_SEP3 = Date.parse('2026-09-03T16:00:00Z');
+  I.SEED_AT_SEP3 = SEED_AT_SEP3;
+
+  var SEED_SEP3 = [
+    { id: 'vila-planinka-boutique-hotel~zgornje-jezersko-slovenia',   /* Vila Planinka Boutique Hotel */
+      fields: {
+        outreachContacted: true,
+        outreachStatus: 'replied',
+        outreachDates: 'Oct 18–24 (6 nights, Sun–Sat) — their proposal inside our Oct 14–24 ask. Built as 2 nights Love Retreat + 2 nights Active Pampering + 2 nights Gourmet Adventure, priced per room category for two',
+        outreachMeals: 'Breakfast every morning for two (one served in the room). Dinner EVERY night: 5 four-course dinners + 1 seven-course tasting dinner for two (≈€840 at their menu prices: €64 / €100 pp). Welcome drinks, fruit + sparkling wine in the room, 2 smoothies. Not included: lunch, drinks/wine pairings with dinner, airport transfer',
+        outreachSpa: 'Wine tasting for two (guided, 1–2 h, Slovenian wines, priced "on request" standalone). One 30-min massage each (€75 each standalone) — a real treatment, not the 60–90 min spa massage. Two e-bikes for a full day (€39 each standalone); mountain bikes throughout (free for every guest anyway). Sauna all six nights — infrared + Finnish-bio, BOTH max ~60°C, no steam room, plunge or pool: an intimate Alpine wellness room, not a serious spa complex. Private sauna NOT included: 20% off a 60-min session (€95 → €76; 90 min €112; 2 h €144; includes sparkling wine, fruit, tea; book 48 h ahead). Gourmet leg: 20% off massages + e-bikes Mon–Thu. Late checkout to 3 PM and Sun–Thu room upgrades, both subject to availability. No guided nature experience or night hike',
+        outreachTerms: 'NOT answered, though we asked: whether the totals are tax-inclusive, deposit, cancellation policy, payment deadline. Breakfast, welcome drink, regular bikes and sauna are standard direct-booking perks for any guest — don\'t count them as package value',
+        outreachNotes: 'This is the ¾-board Alpine structure we were after, reached by stacking packages: nothing to plan except one e-bike day, one massage each and the wine tasting. Take the Corner Deluxe SUITE (38 m², terrace, XL bed + sofa bed) — €89 more than the 32 m² Room over all six nights (≈$17/night). Real added value ≈€1,068 at their own prices (dinners €840 + massages €150 + e-bikes €78) before the wine tasting and romantic extras. Ask them to sequence Gourmet (Sun–Mon) → Active (Tue–Wed) → Romance (Thu–Fri) so the late checkout lands on departure day, and to keep us in ONE suite all six nights. Budget: €3,917 ≈ $4,548 at 1.161 = ~76% of the $6k target → ≈$1,450 left for flights, car, lunches, private sauna — realistically a low-to-mid $6k trip. Weak point is the spa (60°C, no circuit). Still open: tax-inclusive final, deposit/cancellation, one-suite confirmation, package sequence'
+      },
+      quotes: [
+        { label: 'Corner Deluxe Suite — 6-night stacked package', amount: 3917, currency: 'EUR', kind: 'quote', nights: 6, dates: 'Oct 18–24',
+          note: 'Active Pampering €1,357 + Love Retreat €1,199 + Gourmet Adventure €1,361 · ≈€653/night for two · tax-inclusive not confirmed' },
+        { label: 'Corner Deluxe Room — 6-night stacked package', amount: 3828, currency: 'EUR', kind: 'quote', nights: 6, dates: 'Oct 18–24',
+          note: 'Active Pampering €1,328 + Love Retreat €1,169 + Gourmet Adventure €1,331 · ≈€638/night for two · tax-inclusive not confirmed' }
+      ] }
+  ];
+  I.SEED_IDS_SEP3 = SEED_SEP3.map(function (r) { return r.id; });
+
+  /* ---- the batches, oldest first ---------------------------------------
+   * `quotePrefix` must be unique per batch: entry ids are deterministic so
+   * that both laptops importing the same batch produce the same keys and the
+   * entry-map union collapses them instead of doubling every quote.
+   * `present` answers "is this batch already in planning?" (see the header). */
+  var BATCHES = [
+    { key: 'sep1', at: SEED_AT, seed: SEED, quotePrefix: 'q-seed-',
+      short: 'Sep 1', count: 7,
+      title: 'Import 7 resort responses — Sep 1',
+      lede: 'The replies that came back on 1 September — Minos Beach, Kempinski San Lawrenz, ' +
+        'Matca, Nayara Alto Atacama, Domes Zeen, ADLER Lodge ALPE and Vila Planinka — with ' +
+        'their dates, inclusions, terms and the prices each one quoted.',
+      done: 'Seven resort responses imported.',
+      present: function () { return T.outreach.anyData(); } },
+    { key: 'sep3-vila', at: SEED_AT_SEP3, seed: SEED_SEP3, quotePrefix: 'q-sep3-',
+      short: 'Sep 3', count: 1,
+      title: 'Import Vila Planinka’s reply — Sep 3',
+      lede: 'Vila Planinka came back on 3 September with a six-night proposal for Oct 18–24: ' +
+        'three two-night packages stacked — breakfast every day, dinner every night, wine ' +
+        'tasting, massages, e-bikes and sauna — €3,828 in the Corner Deluxe Room or €3,917 ' +
+        'in the Suite. Their status moves from “Awaiting reply” to “Response in”.',
+      done: 'Vila Planinka’s reply imported.',
+      present: function () { return I.batchImported(SEED_SEP3, 'q-sep3-'); } }
+  ];
+  I.BATCHES = BATCHES;
+
+  /** True when any seeded record already holds a quote entry minted with this
+   *  batch's prefix — the batch was imported on either laptop (entries sync,
+   *  and a deleted quote is a tombstone that keeps its key). Live rows and
+   *  orphans alike, like anyData(). A batch that seeds no quotes cannot use
+   *  this test; give it its own. */
+  I.batchImported = function (seed, quotePrefix) {
+    var s = T.store.getState();
+    var recs = (s.planning && s.planning.records) || {};
+    return seed.some(function (r) {
+      var rec = Object.prototype.hasOwnProperty.call(recs, r.id) ? recs[r.id] : null;
+      var quotes = (rec && rec.quotes) || {};
+      for (var k in quotes) {
+        if (Object.prototype.hasOwnProperty.call(quotes, k) && k.indexOf(quotePrefix) === 0) return true;
       }
-      if (seed.quotes.length) {
-        r.quotes = {};
-        seed.quotes.forEach(function (q) {
-          n++;
-          var eid = 'q-seed-' + n;
-          r.quotes[eid] = {
-            id: eid,
-            label: q.label,
-            dates: q.dates,
-            nights: q.nights,
-            amount: q.amount,
-            currency: q.currency,
-            kind: q.kind,
-            note: q.note,
-            createdAt: SEED_AT,
-            updatedAt: SEED_AT
-          };
-          r._t['quote:' + eid] = SEED_AT;
-        });
-      }
-      r.updatedAt = SEED_AT;
-      state.records[seed.id] = r;
+      return false;
     });
-    state.updatedAt = SEED_AT;
+  };
+
+  /**
+   * A full planning state carrying nothing but the given batches (default:
+   * every batch — the Sep 1 tests and the paste path rely on that). Quote
+   * entry ids are DETERMINISTIC (<prefix>N, never U.uid) so that both laptops
+   * importing the same batch produce the same entry keys and the entry-map
+   * union collapses them instead of doubling every quote.
+   */
+  I.buildSeedState = function (batches) {
+    var state = T.plan.emptyState();
+    var latest = 0;
+    (batches || BATCHES).forEach(function (batch) {
+      var n = 0;
+      batch.seed.forEach(function (seed) {
+        var r = state.records[seed.id] || T.plan.emptyRecord(seed.id);
+        var field;
+        for (field in seed.fields) {
+          if (!Object.prototype.hasOwnProperty.call(seed.fields, field)) continue;
+          r[field] = seed.fields[field];
+          r._t[field] = batch.at;
+        }
+        if (seed.quotes.length) {
+          r.quotes = r.quotes || {};
+          seed.quotes.forEach(function (q) {
+            n++;
+            var eid = batch.quotePrefix + n;
+            r.quotes[eid] = {
+              id: eid,
+              label: q.label,
+              dates: q.dates,
+              nights: q.nights,
+              amount: q.amount,
+              currency: q.currency,
+              kind: q.kind,
+              note: q.note,
+              createdAt: batch.at,
+              updatedAt: batch.at
+            };
+            r._t['quote:' + eid] = batch.at;
+          });
+        }
+        r.updatedAt = Math.max(r.updatedAt || 0, batch.at);
+        state.records[seed.id] = r;
+      });
+      if (batch.at > latest) latest = batch.at;
+    });
+    state.updatedAt = latest;
     return state;
   };
 
@@ -14332,21 +14428,54 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     }
   };
 
-  /** Once only, and never when either laptop already has outreach data. */
-  I.shouldOffer = function () {
+  /* ---- per-batch flags: the Sep 1 batch keeps v0.6.0's flat keys ---------- */
+  function flagsFor(p, batch) {
+    if (batch.key === 'sep1') return { acceptedAt: p.importAcceptedAt, dismissedAt: p.importDismissedAt };
+    var b = (p.batches || {})[batch.key] || {};
+    return { acceptedAt: b.acceptedAt, dismissedAt: b.dismissedAt };
+  }
+  function flagPatch(batches, name) {
     var p = I.prefs.read();
-    if (p.importDismissedAt || p.importAcceptedAt) return false;   // rule: once only
-    if (T.outreach.anyData()) return false;                        // rule: data exists
-    return true;
+    var patch = {}, now = U.now();
+    var map = {};
+    var old = p.batches || {};
+    for (var k in old) if (Object.prototype.hasOwnProperty.call(old, k)) map[k] = old[k];
+    batches.forEach(function (batch) {
+      if (batch.key === 'sep1') { patch[name === 'acceptedAt' ? 'importAcceptedAt' : 'importDismissedAt'] = now; return; }
+      map[batch.key] = map[batch.key] || {};
+      map[batch.key][name] = now;
+    });
+    patch.batches = map;
+    return patch;
+  }
+
+  /** The batches still worth offering on this browser, oldest first: not yet
+   *  accepted or dismissed here, and not already in planning by either of them. */
+  I.pending = function () {
+    var p = I.prefs.read();
+    return BATCHES.filter(function (batch) {
+      var f = flagsFor(p, batch);
+      if (f.acceptedAt || f.dismissedAt) return false;   // rule: once only, per batch
+      var present = false;
+      try { present = !!batch.present(); } catch (e) { present = false; }
+      return !present;                                     // rule: data exists
+    });
   };
 
-  /** Fold the seed in through the ONE merge, then push it explicitly. */
+  /** Once only per batch, and never when either laptop already has it. */
+  I.shouldOffer = function () {
+    return I.pending().length > 0;
+  };
+
+  /** Fold every pending batch in through the ONE merge, then push explicitly. */
   I.accept = function (node) {
+    var batches = I.pending();
+    if (!batches.length) { if (node && node.parentNode) node.parentNode.removeChild(node); return null; }
     var local = T.store.getState().planning;
-    var incoming = I.buildSeedState();
+    var incoming = I.buildSeedState(batches);
     var res = T.plan.mergeState(local, incoming, { preferLocal: true });
     T.store.dispatch('planning/import', { merged: res.state });
-    I.prefs.write({ importAcceptedAt: U.now() });
+    I.prefs.write(flagPatch(batches, 'acceptedAt'));
 
     /* planning/import returns ['planning','planning:imported'], and 82-sync.js's
        push trigger returns EARLY on 'planning:imported' (it is the marker for
@@ -14358,20 +14487,33 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     if (node && node.parentNode) node.parentNode.removeChild(node);
     /* T.notify lives in a later module; in a bare boot it may not be up yet. */
     if (T.notify) {
-      T.notify.toast({ text: 'Seven resort responses imported. They sync to both of you.' });
+      var done = batches.map(function (b) { return b.done; }).join(' ');
+      T.notify.toast({ text: done + ' They sync to both of you.' });
       T.notify.announce('Resort responses imported.');
     }
     return res.stats;
   };
 
-  /** Hide the offer on this browser. Imports nothing, deletes nothing. */
+  /** Hide every pending offer on this browser. Imports nothing, deletes nothing. */
   I.dismiss = function (node) {
-    I.prefs.write({ importDismissedAt: U.now() });
+    var batches = I.pending();
+    if (batches.length) I.prefs.write(flagPatch(batches, 'dismissedAt'));
     if (node && node.parentNode) node.parentNode.removeChild(node);
     if (T.notify) {
       T.notify.announce('Import offer hidden. Every reply can still be entered by hand on each trip page.');
     }
   };
+
+  /** One title for whatever is pending: a single batch keeps its own words. */
+  function offerCopy(batches) {
+    if (batches.length === 1) return { title: batches[0].title, lede: batches[0].lede };
+    var total = 0, shorts = [];
+    batches.forEach(function (b) { total += b.count; shorts.push(b.short); });
+    return {
+      title: 'Import ' + total + ' resort responses — ' + shorts.join(' & '),
+      lede: batches.map(function (b) { return b.lede; }).join(' ')
+    };
+  }
 
   /**
    * The offer itself: a self-contained `.panel` built from classes that are
@@ -14380,26 +14522,26 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
    * this node is complete without it. Returns the node — the caller mounts it.
    */
   I.render = function () {
+    var batches = I.pending();
+    var copy = offerCopy(batches);
     var sec = U.el('section', {
       class: 'panel panel--offer',
       'aria-labelledby': 'outreach-offer-title',
-      dataset: { panel: 'outreach-offer' }
+      dataset: { panel: 'outreach-offer', batches: batches.map(function (b) { return b.key; }).join(' ') }
     });
 
     var head = U.el('div', { class: 'panel__head' });
     head.appendChild(U.el('h2', {
       class: 'panel__title', id: 'outreach-offer-title',
-      text: 'Import 7 resort responses — Sep 1'
+      text: copy.title
     }));
     sec.appendChild(head);
 
     var body = U.el('div', { class: 'panel__body' });
     body.appendChild(U.el('p', {
       class: 'panel__lede',
-      text: 'The replies that came back on 1 September — Minos Beach, Kempinski San Lawrenz, ' +
-        'Matca, Nayara Alto Atacama, Domes Zeen, ADLER Lodge ALPE and Vila Planinka — with ' +
-        'their dates, inclusions, terms and the prices each one quoted. Importing writes them ' +
-        'onto the trip pages and syncs them to both of you.'
+      text: copy.lede + ' Importing writes it onto the trip page' + (batches.length === 1 && batches[0].count === 1 ? '' : 's') +
+        ' and syncs to both of you.'
     }));
 
     /* `.empty__actions` is the app's existing row-of-buttons (08-editorial.css)
