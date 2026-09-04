@@ -6118,6 +6118,17 @@ details[open] > .orphan__setasidesum::after,
 .own--empty .orx__editorsum { display: none; }
 .own--empty.own--writing .orx__editorsum { display: flex; }
 .own--writing .own__open { display: none; }
+/* v0.10.3 — the package select is the block's ONE control, in the display
+   (a caps word + the select, same vocabulary as the sub-labels above it);
+   the drawer keeps only the overrides. */
+.own__picks { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); margin: var(--s1) 0 var(--s2); }
+.own__picks[hidden] { display: none; }
+.own__pick { display: flex; align-items: center; gap: var(--s3); flex: 1 1 18rem; max-width: 32rem; }
+.own__pick[hidden] { display: none; }
+.own__board { flex-basis: 14rem; max-width: 22rem; }
+.own__picklabel { flex: none; font-size: var(--text-2xs); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--ink-faint); }
+.own__pick .select { flex: 1 1 auto; min-width: 0; }
+.own__kv .kv__row[data-source="workbook"] .kv__key { color: var(--ink-muted); }
 .detail__quotedline { margin: 0; }
 .detail__quotedpill {
   font-size: var(--text-sm);
@@ -8369,6 +8380,7 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .rboard__cell--terms,
 .rboard__cell--notes { min-width: 9rem; max-width: 18rem; }
 .rboard__cell--best { min-width: 9rem; }
+.rboard__cell--own { min-width: 9rem; }
 
 /* An expired hold is history: the whole row steps back rather than shouting. */
 .rboard__row[data-urgency="passed"] > .rboard__cell { color: var(--ink-muted); }
@@ -8519,6 +8531,14 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   font-size: var(--text-xs);
   color: var(--ink-faint);
 }
+
+/* ── your all-in (v0.10.4) — same shape as best, plus the budget word ─── */
+.rboard__own { display: grid; gap: 2px; }
+.rboard__owntotal { font-size: var(--text-sm); font-weight: var(--weight-semi); font-variant-numeric: tabular-nums; }
+.rboard__ownlabel, .rboard__ownblank { font-size: var(--text-xs); color: var(--ink-faint); }
+.rboard__ownword { font-size: var(--text-xs); color: var(--ink-muted); }
+.rboard__own[data-state="over"] .rboard__ownword { color: var(--danger, var(--ink)); }
+.rboard__own[data-state="borderline"] .rboard__ownword { color: var(--warn, var(--ink)); }
 
 /* ── best ─────────────────────────────────────────────────────────────── */
 .rboard__best { display: grid; gap: 2px; }
@@ -8733,7 +8753,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.10.2';
+  T.version = '0.10.4';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -10005,7 +10025,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       'outreachHoldUntil', 'outreachHoldLabel', 'outreachDates',
       'outreachMeals', 'outreachSpa', 'outreachTerms', 'outreachNotes',
       /* v0.10.1 "your own all-in" scenario (16-scenario.js): same rule. */
-      'ownQuoteId', 'ownHotel', 'ownFlights', 'ownMeals', 'ownGround', 'ownExtras', 'ownNote'].forEach(pick);
+      'ownQuoteId', 'ownHotel', 'ownFlights', 'ownMeals', 'ownGround', 'ownExtras', 'ownNote',
+      /* v0.10.4: what the package feeds them (16-scenario.js S.BOARD). */
+      'ownBoard'].forEach(pick);
 
     /* reactions: owner authority, else newest-wins per traveler */
     var reactions = {};
@@ -14869,21 +14891,54 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
  * into dollars — the ONE conversion in the app that is summed — because a
  * sum needs one currency and the budget is in dollars; the figure carries
  * ≈ and the caption names the rate it used.
+ *
+ * v0.10.3 — PACKAGE → INSTANT TOTAL. Picking a package alone is a trip: when
+ * the caller hands in the research row, the flights line defaults to the
+ * workbook's fare for two and the meals line to the workbook's allowance
+ * PRORATED to the package's nights (the allowance is a MODEL_NIGHTS figure —
+ * the workbook's Oct 15–22 scenario; a six-night package gets 6/7 of it).
+ * A typed figure always wins; ground and extras have no workbook default and
+ * stay blank until typed. Every line says where it came from (`source`:
+ * 'typed' | 'workbook' | null) so the page can print the provenance beside
+ * the number, and the defaults are computed at read time — nothing about
+ * them is stored, so a new workbook re-prices the same scenario.
  */
 (function (T) {
   'use strict';
   var U = T.util, store = T.store;
   var S = T.scenario = {};
 
-  /** The seven scalars. Also the whitelist for scenario/setField. */
-  S.FIELDS = ['ownQuoteId', 'ownHotel', 'ownFlights', 'ownMeals', 'ownGround', 'ownExtras', 'ownNote'];
+  /** The eight scalars (v0.10.4 added ownBoard). Also the whitelist for scenario/setField. */
+  S.FIELDS = ['ownQuoteId', 'ownHotel', 'ownFlights', 'ownMeals', 'ownGround', 'ownExtras', 'ownNote', 'ownBoard'];
+  /**
+   * v0.10.4 — what the package feeds them. The workbook's allowance is what
+   * the hotel does NOT cover — lunches, dinners, drinks, coffee, the odd
+   * taxi — sized for a breakfast-only stay. A package with dinners inside
+   * covers part of that, so the default meals line keeps only a SHARE of the
+   * allowance. The shares are a planning model (roughly: dinners 45%, lunches
+   * 25%, drinks + local 30% of the allowance), stated on the page as such;
+   * a typed meals figure always wins over them.
+   */
+  S.BOARD = [
+    { key: 'breakfast', label: 'Breakfast only', keep: 1, words: 'breakfast only — as the workbook assumed' },
+    { key: 'half', label: 'Breakfast + dinner', keep: 0.55, words: 'the breakfasts and dinners inside the package' },
+    { key: 'full', label: 'Breakfast, lunch + dinner', keep: 0.30, words: 'the three meals a day inside the package' },
+    { key: 'all', label: 'All-inclusive, drinks too', keep: 0.15, words: 'the all-inclusive package' }
+  ];
+  S.boardOf = function (key) {
+    for (var i = 0; i < S.BOARD.length; i++) if (S.BOARD[i].key === key) return S.BOARD[i];
+    return null;
+  };
   /** The dollar lines, in ledger order, with the words the page uses. */
   S.LINES = [
-    { field: 'ownFlights', label: 'Flights, both of you', short: 'flights', hint: 'Round trip, for two, in dollars' },
-    { field: 'ownMeals', label: 'Meals & drinks', short: 'meals', hint: 'What the hotel doesn’t cover — lunches, drinks, coffee' },
+    { field: 'ownFlights', label: 'Flights, both of you', short: 'flights', hint: 'Round trip, for two, in dollars', defaultKey: 'airfareForTwo' },
+    { field: 'ownMeals', label: 'Meals & drinks', short: 'meals', hint: 'What the hotel doesn’t cover — lunches, drinks, coffee', defaultKey: 'mealsAllowance' },
     { field: 'ownGround', label: 'Getting around', short: 'ground', hint: 'Rental car, transfers, fuel, parking' },
     { field: 'ownExtras', label: 'Extras', short: 'extras', hint: 'Spa, excursions, the private sauna…' }
   ];
+  /** The nights the workbook's fare + allowance model (its Oct 15–22 trip) when
+      no quote column header says otherwise ("Booking.com 7N Quote"). */
+  S.MODEL_NIGHTS = 7;
 
   function own(bag, k) { return Object.prototype.hasOwnProperty.call(bag, k); }
   function num(v) { return (typeof v === 'number' && isFinite(v)) ? v : null; }
@@ -14912,6 +14967,46 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     });
   };
 
+  /**
+   * How many nights the workbook's model covers: the "(N)N" in a hotel quote
+   * column's own header when the research carries one, else MODEL_NIGHTS.
+   */
+  S.modelNights = function () {
+    var cat = (store.getState().research || {}).fieldCatalog || [];
+    var keys = ['bestQuote', 'hotelQuote', 'bookingQuote', 'pricelineQuote', 'expediaQuote'];
+    for (var i = 0; i < keys.length; i++) {
+      var f = cat.filter(function (c) { return c.key === keys[i]; })[0];
+      var m = f && f.sourceHeader && String(f.sourceHeader).match(/(\d+)\s*N\b/i);
+      if (m && +m[1] > 0) return +m[1];
+    }
+    return S.MODEL_NIGHTS;
+  };
+
+  /**
+   * The workbook's own figure for a line, sized to `nights` when the line is
+   * a per-trip allowance. `f` is the research row's fields. Returns
+   *   { value, basis: 'fare' | 'allowance' | 'prorated', from, fromNights, nights }
+   * or null when the workbook has nothing for that line (blank ≠ 0).
+   */
+  S.defaultFor = function (line, f, nights, board) {
+    if (!line || !line.defaultKey || !f) return null;
+    var v = num(f[line.defaultKey]);
+    if (v == null) return null;
+    if (line.defaultKey !== 'mealsAllowance') return { value: Math.round(v), basis: 'fare', from: v };
+    var mn = S.modelNights(), n = num(nights);
+    var b = S.boardOf(board);
+    var keep = b && b.keep < 1 ? b.keep : 1;
+    var prorated = (n == null || n < 1 || n === mn) ? null : v * n / mn;
+    var base = prorated == null ? v : prorated;
+    return {
+      value: Math.round(base * keep),
+      basis: prorated == null ? 'allowance' : 'prorated',
+      from: v, fromNights: mn, nights: n,
+      prorated: prorated == null ? null : Math.round(prorated),
+      board: keep < 1 ? b : null, keep: keep
+    };
+  };
+
   /** The live quote the scenario points at, or null (deleted, no amount, gone). */
   S.quoteOf = function (planOrId) {
     var v = S.of(planOrId);
@@ -14930,15 +15025,22 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
    *
    *   hotel: { usd, native: {amount, currency} | null, source: 'quote'|'typed'|null,
    *            converted: bool, label, unconvertible: bool }
-   *   lines: [{ field, label, short, value }]  (value null when blank)
-   *   entered / blank: the short words of lines with / without a figure
+   *   lines: [{ field, label, short, value, source, basis }]
+   *          value null when blank; source 'typed' | 'workbook' | null;
+   *          basis (workbook lines only) = the S.defaultFor answer
+   *   entered / defaulted / blank: the short words of lines typed / taken
+   *          from the workbook / neither
    *   total: dollars, or null when there is no hotel figure (a scenario with
    *          no hotel is not a trip — it is not summed)
    *   partial: true when total exists but some line is blank
+   *
+   * `opts.f` (v0.10.3) is the research row's fields; without it no line
+   * defaults to the workbook (an orphan has no workbook to lean on).
    *   headroom: budget - total (null without both)
    *   state: 'under' | 'borderline' | 'over' | null   (borderline = within 250 over)
    */
-  S.totalOf = function (planOrId, budget) {
+  S.totalOf = function (planOrId, budget, opts) {
+    opts = opts || {};
     var v = S.of(planOrId);
     var q = S.quoteOf(planOrId);
     var hotel = { usd: null, native: null, source: null, converted: false, label: null, unconvertible: false };
@@ -14961,10 +15063,15 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     }
 
     var lines = S.LINES.map(function (l) {
-      return { field: l.field, label: l.label, short: l.short, value: num(v[l.field]) };
+      var typed = num(v[l.field]);
+      if (typed != null) return { field: l.field, label: l.label, short: l.short, value: typed, source: 'typed', basis: null };
+      var d = S.defaultFor(l, opts.f, hotel.nights, v.ownBoard);
+      return { field: l.field, label: l.label, short: l.short, value: d ? d.value : null, source: d ? 'workbook' : null, basis: d };
     });
-    var entered = [], blank = [];
-    lines.forEach(function (l) { (l.value == null ? blank : entered).push(l.short); });
+    var entered = [], defaulted = [], blank = [];
+    lines.forEach(function (l) {
+      (l.source === 'typed' ? entered : l.source === 'workbook' ? defaulted : blank).push(l.short);
+    });
 
     var total = null;
     if (hotel.usd != null) {
@@ -14977,9 +15084,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       : headroom >= 0 ? 'under'
         : headroom >= -250 ? 'borderline' : 'over';
     return {
-      hotel: hotel, lines: lines, entered: entered, blank: blank,
+      hotel: hotel, lines: lines, entered: entered, defaulted: defaulted, blank: blank,
       total: total, partial: total != null && blank.length > 0,
       headroom: headroom, state: state, note: v.ownNote || null,
+      board: S.boardOf(v.ownBoard),
       quoteMissing: !!(v.ownQuoteId && !q)
     };
   };
@@ -14999,7 +15107,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return false;
     }
     var value = p.value;
-    if (p.field !== 'ownQuoteId' && p.field !== 'ownNote') {
+    if (p.field === 'ownBoard') {
+      value = S.boardOf(value) ? value : null;    // one of the named boards, or nothing
+    } else if (p.field !== 'ownQuoteId' && p.field !== 'ownNote') {
       value = num(value);                       // dollars or nothing — never ''
       if (value != null && value < 0) value = null;
     } else if (value != null && String(value).trim() === '') value = null;
@@ -19315,23 +19425,53 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
    * 2. Blank is blank. A line they never typed is not $0 — the total is a
    *    sum of what is entered and the caption names what is not.
    * 3. Display first, editor second: the drawer is closed until they ask;
-   *    with nothing typed the block is one sentence and an affordance.
+   *    with nothing chosen the block is one sentence and an affordance.
+   * 4. (v0.10.3) The package select IS the display's one control: choosing a
+   *    package sums it at once with the workbook's fare for two and its
+   *    allowance prorated to the package's nights (16-scenario.js). Lines
+   *    say their source ("· workbook fare", "· allowance, 6 of 7 nights",
+   *    "· your figure"); the drawer holds only the overrides.
    * Degrades to hiding itself when 16-scenario.js is absent (detail rule 2).
    */
   function buildOwn(row, host) {
-    var id = row.id, f = row.rec.f;
+    var id = row.id;
     var S = T.scenario;
     if (!S || !S.totalOf) { host.hidden = true; return function () {}; }
+    function fields() { var r = rowOf(id) || row; return (r && r.rec && r.rec.f) || null; }
 
     host.appendChild(U.el('p', {
       class: 'detail__sublabel',
-      title: 'Your scenario — summed from the figures you two type, never from the workbook'
-    }, 'Your own all-in'));
+      title: 'Your scenario — a package you picked plus the workbook’s fare and allowance, or figures you type; never the workbook’s modelled total'
+    }, 'Your all-in'));
+
+    /* -- the ONE control on the page for the hotel line: a package they wrote
+          down, or "type a dollar figure". It sits in the display, not in the
+          drawer, because picking a package is the whole gesture (v0.10.3). -- */
+    var picks = U.el('div', { class: 'own__picks' });
+    var pick = U.el('div', { class: 'own__pick own__hotel' });
+    var hotelSel = U.el('select', { class: 'select', dataset: { field: 'ownQuoteId' }, 'aria-label': 'Package' });
+    pick.appendChild(U.el('span', { class: 'own__picklabel' }, 'Package'));
+    pick.appendChild(hotelSel);
+    picks.appendChild(pick);
+    /* v0.10.4 — what the package feeds them: scales the meals default
+       (S.BOARD shares). Its own control because it is its own fact. */
+    var boardPick = U.el('div', { class: 'own__pick own__board' });
+    var boardSel = U.el('select', { class: 'select', dataset: { field: 'ownBoard' }, 'aria-label': 'Meals in the package' });
+    boardSel.appendChild(U.el('option', { value: '' }, 'As the workbook assumed'));
+    (S.BOARD || []).forEach(function (b) {
+      boardSel.appendChild(U.el('option', { value: b.key }, b.label + (b.keep < 1 ? ' · keeps ' + Math.round(b.keep * 100) + '%' : '')));
+    });
+    boardSel.addEventListener('change', function () { write('ownBoard', boardSel.value || null); });
+    boardPick.appendChild(U.el('span', { class: 'own__picklabel' }, 'Meals in it'));
+    boardPick.appendChild(boardSel);
+    picks.appendChild(boardPick);
+    host.appendChild(picks);
+
     var display = U.el('div', { class: 'own__display' });
     host.appendChild(display);
 
     var editor = U.el('details', { class: 'orx__editor own__editor' });
-    editor.appendChild(U.el('summary', { class: 'orx__editorsum' }, 'Edit your figures'));
+    editor.appendChild(U.el('summary', { class: 'orx__editorsum' }, 'Adjust the figures'));
     var form = U.el('div', { class: 'orx__editorbody own__form' });
     editor.appendChild(form);
     host.appendChild(editor);
@@ -19341,34 +19481,30 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       paintDisplay();
     }
 
-    /* -- the hotel line: a quote they wrote down, or a figure they type -- */
-    var hotelRow = U.el('div', { class: 'orx__row own__hotel' });
-    var hotelSel = U.el('select', { class: 'select', dataset: { field: 'ownQuoteId' } });
-    hotelRow.appendChild(orxField('Hotel', hotelSel,
-      'One of the prices the resort quoted, or your own dollar figure for the whole stay', 'orx__field--wide'));
+    /* -- the typed hotel figure: revealed only by "Type a dollar figure" -- */
+    var hotelRow = U.el('div', { class: 'orx__row' });
     var hotelIn = U.el('input', {
       type: 'text', inputmode: 'decimal', class: 'input', placeholder: 'Dollars, whole stay',
       dataset: { field: 'ownHotel' }
     });
-    var hotelInField = orxField('Hotel, in dollars', hotelIn, null, 'orx__field--num own__hotelin');
+    var hotelInField = orxField('Hotel, in dollars', hotelIn, 'Your own figure for the whole stay, for two', 'orx__field--num own__hotelin');
     hotelRow.appendChild(hotelInField);
     form.appendChild(hotelRow);
 
-    /* -- the four dollar lines; the workbook's figures are placeholders,
-          never values — a suggestion is not something they typed -- */
+    /* -- the four dollar lines. Flights and meals fall back to the workbook's
+          figures when blank (16-scenario.js); the placeholder says so and
+          shows the figure it would use. Ground and extras stay blank. -- */
     var linesRow = U.el('div', { class: 'orx__row' });
     var lineInputs = S.LINES.map(function (l) {
-      var ph = l.field === 'ownFlights' && num(f.airfareForTwo) != null ? 'Workbook: ' + F.money(f.airfareForTwo, { convert: false })
-        : l.field === 'ownMeals' && num(f.mealsAllowance) != null ? 'Workbook: ' + F.money(f.mealsAllowance, { convert: false })
-          : 'Dollars';
       var el = U.el('input', {
-        type: 'text', inputmode: 'decimal', class: 'input', placeholder: ph, dataset: { field: l.field }
+        type: 'text', inputmode: 'decimal', class: 'input', placeholder: 'Dollars', dataset: { field: l.field }
       });
       var flush = function () { write(l.field, orxNumOrNull(el.value)); };
       el.addEventListener('input', U.debounce(flush, 800));
       el.addEventListener('blur', flush);
-      linesRow.appendChild(orxField(l.label, el, l.hint, 'orx__field--sm'));
-      return { field: l.field, el: el };
+      var fld = orxField(l.label, el, l.hint, 'orx__field--sm');
+      linesRow.appendChild(fld);
+      return { field: l.field, el: el, hint: fld.querySelector('.field__hint'), baseHint: l.hint };
     });
     form.appendChild(linesRow);
 
@@ -19389,20 +19525,21 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       if (v === 'typed') {
         store.dispatch('scenario/setField', { id: id, field: 'ownQuoteId', value: null });
         hotelInField.hidden = false;
+        openEditor();
         paintDisplay();
         try { hotelIn.focus(); } catch (e) {}
         return;
       }
-      /* Picking a quote retires a typed figure: one hotel line, one source. */
+      /* Picking a package retires a typed figure: one hotel line, one source. */
       store.dispatch('scenario/setField', { id: id, field: 'ownHotel', value: null });
       write('ownQuoteId', v || null);
       hotelInField.hidden = true;
+      paintEditor();
     });
 
     function openEditor() {
       editor.open = true;
       host.classList.add('own--writing');
-      try { hotelSel.focus(); } catch (e) {}
     }
 
     function rateWords() {
@@ -19418,22 +19555,51 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var t = F.money(usd);
       return t.charAt(0) === '≈' ? t : '≈' + t;
     }
+    function usd(n) { return F.money(n, { convert: false }); }
+    /** The words after a line's label that say where the figure came from. */
+    function sourceWords(l) {
+      if (l.source === 'typed') return 'your figure';
+      if (l.source !== 'workbook' || !l.basis) return '';
+      var b = l.basis;
+      if (b.basis === 'fare') return 'workbook fare';
+      var cut = b.board ? ', ' + Math.round(b.keep * 100) + '% with ' + b.board.label.toLowerCase().replace(', drinks too', '') : '';
+      if (b.basis === 'prorated') return 'allowance, ' + b.nights + ' of ' + b.fromNights + ' nights' + cut;
+      return 'workbook allowance' + cut;
+    }
+    function pricedQuotes() {
+      return T.outreach ? T.outreach.quotesOf(id).filter(function (q) { return num(q.amount) != null; }) : [];
+    }
 
     function paintDisplay() {
       U.clear(display);
       var has = S.has(id);
+      var quotes = pricedQuotes();
       U.toggleClass(host, 'own--empty', !has);
+      /* The package control only exists where there is a package to pick;
+         with nothing quoted the hotel line is a figure they type (drawer).
+         The meals control rides with it, or with any scenario already begun. */
+      pick.hidden = quotes.length === 0;
+      picks.hidden = quotes.length === 0 && !has;
+      if (document.activeElement !== boardSel) boardSel.value = (S.of(id).ownBoard || '');
       if (!has) {
         var empty = U.el('p', { class: 'detail__absent own__empty' },
-          'The trip you’d actually book — a hotel figure plus your own flights, meals and ground — summed here, apart from the workbook’s model. ');
-        var openIt = U.el('button', { type: 'button', class: 'btn btn--link own__open' }, 'Build it ›');
-        openIt.addEventListener('click', openEditor);
+          quotes.length
+            ? 'Pick one of the resort’s packages and it is summed at once with the workbook’s fare for two and its meals allowance sized to the package’s nights — the trip you’d actually book, apart from the workbook’s model. Or '
+            : 'The trip you’d actually book — a hotel figure plus your own flights, meals and ground — summed here, apart from the workbook’s model. ');
+        var openIt = U.el('button', { type: 'button', class: 'btn btn--link own__open' },
+          quotes.length ? 'type your own figures ›' : 'Build it ›');
+        openIt.addEventListener('click', function () {
+          /* both wordings mean the same gesture: the hotel line becomes a
+             figure they type — the select's own "typed" branch does it */
+          hotelSel.value = 'typed';
+          hotelSel.dispatchEvent(new Event('change'));
+        });
         empty.appendChild(openIt);
         display.appendChild(empty);
         return;
       }
       var ctx = qctx();
-      var t = S.totalOf(id, ctx && ctx.budget ? ctx.budget.value : null);
+      var t = S.totalOf(id, ctx && ctx.budget ? ctx.budget.value : null, { f: fields() });
       var kv = U.el('dl', { class: 'kv detail__kv own__kv' });
 
       /* hotel line */
@@ -19442,7 +19608,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         ? 'Hotel — ' + h.label + (h.nights ? ', ' + h.nights + ' nights' : '')
         : h.source === 'typed' ? 'Hotel, your figure' : 'Hotel';
       var hotelVal;
-      if (t.quoteMissing) hotelVal = missing('that quote is gone — pick again');
+      if (t.quoteMissing) hotelVal = missing('that package is gone — pick again');
       else if (h.unconvertible) hotelVal = missing('no rate for ' + h.native.currency + ' — type a dollar figure');
       else if (h.usd == null) hotelVal = missing('not chosen yet');
       else if (h.converted) hotelVal = U.el('span', {}, [
@@ -19454,7 +19620,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
       t.lines.forEach(function (l) {
         if (l.value == null) return;
-        kv.appendChild(kvRow(l.label, F.money(l.value)));
+        var sw = sourceWords(l);
+        var r = kvRow(l.label + (sw ? ' · ' + sw : ''), F.money(l.value));
+        r.dataset.source = l.source;
+        kv.appendChild(r);
       });
 
       var totalVal = t.total == null ? missing('nothing to sum without a hotel figure')
@@ -19473,9 +19642,33 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       }
       display.appendChild(kv);
 
-      var cap = 'Your scenario — the figures you two typed, summed here. It never moves the budget filters or the workbook’s modelled total.';
+      /* the caption: what was summed and where each part came from */
+      var meals = t.lines.filter(function (l) { return l.field === 'ownMeals' && l.source === 'workbook'; })[0];
+      var flights = t.lines.filter(function (l) { return l.field === 'ownFlights' && l.source === 'workbook'; })[0];
+      var fromBook = [];
+      if (flights) fromBook.push('the workbook’s fare for two');
+      if (meals && meals.basis) {
+        var mb = meals.basis, steps = [usd(mb.from)];
+        var mw = 'its ' + (mb.basis === 'prorated' ? mb.fromNights + '-night ' : '') + 'meals allowance';
+        if (mb.basis === 'prorated') { mw += ' prorated to ' + mb.nights; steps.push(usd(mb.prorated)); }
+        if (mb.board) {
+          mw += (mb.basis === 'prorated' ? ' and' : '') + ' cut to ' + Math.round(mb.keep * 100) + '% for ' + mb.board.words;
+        }
+        if (steps[steps.length - 1] !== usd(meals.value)) steps.push(usd(meals.value));
+        if (steps.length > 1) mw += ' (' + steps.join(' → ') + ')';
+        else if (h.source === 'quote' && !h.nights) mw += ' as is — the package’s nights aren’t written down';
+        fromBook.push(mw);
+      }
+      var pieces = [];
+      if (fromBook.length) pieces.push(fromBook.join(' and '));
+      if (t.entered.length) pieces.push(t.entered.join(', ') + ' as you typed ' + (t.entered.length > 1 ? 'them' : 'it'));
+      var cap = 'Your scenario — ' + (h.usd == null ? 'nothing to sum yet.'
+        : (h.source === 'quote' ? 'the package you picked' : 'the hotel figure you typed') +
+          (pieces.length ? ' plus ' + pieces.join('; ') : ', on its own') + '.');
       if (t.partial) cap += ' Not entered yet: ' + t.blank.join(', ') + '.';
+      if (flights && h.source === 'quote' && h.nights) cap += ' The fare was priced for the workbook’s dates, not the package’s — re-check it before booking.';
       if (h.converted) cap += ' Hotel converted at ' + rateWords() + '.';
+      cap += ' It never moves the budget filters or the workbook’s modelled total.';
       display.appendChild(U.el('p', { class: 'detail__subsource own__caption' }, cap));
       if (t.note) display.appendChild(U.el('p', { class: 'own__note' }, t.note));
     }
@@ -19483,10 +19676,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     function paintEditor() {
       var v = S.of(id);
       var live = S.quoteOf(id);
-      var quotes = T.outreach ? T.outreach.quotesOf(id).filter(function (q) { return num(q.amount) != null; }) : [];
+      var quotes = pricedQuotes();
       if (document.activeElement !== hotelSel) {
         U.clear(hotelSel);
-        hotelSel.appendChild(U.el('option', { value: '' }, 'Pick a hotel figure…'));
+        hotelSel.appendChild(U.el('option', { value: '' }, quotes.length ? 'Pick a package…' : 'Pick a hotel figure…'));
         quotes.forEach(function (q) {
           hotelSel.appendChild(U.el('option', { value: q.id },
             (q.label || 'Quote') + ' — ' + F.money(q.amount, { currency: q.currency, convert: false }) +
@@ -19502,7 +19695,21 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         var a = num(v.ownHotel) == null ? '' : String(v.ownHotel);
         if (hotelIn.value !== a) hotelIn.value = a;
       }
+      /* placeholders + hints carry the workbook default the line would use */
+      var nights = live ? num(live.nights) : null;
       lineInputs.forEach(function (li) {
+        var line = S.LINES.filter(function (l) { return l.field === li.field; })[0];
+        var d = S.defaultFor(line, fields(), nights, v.ownBoard);
+        li.el.placeholder = d ? 'Workbook: ' + usd(d.value) : 'Dollars';
+        if (li.hint) {
+          U.setText(li.hint, d
+            ? (d.basis === 'prorated'
+              ? 'Blank uses the workbook’s ' + d.fromNights + '-night allowance of ' + usd(d.from) + ' sized to ' + d.nights + ' nights' +
+                (d.board ? ', ' + Math.round(d.keep * 100) + '% of it with ' + d.board.label.toLowerCase() + ' in the package' : '')
+              : d.basis === 'fare' ? 'Blank uses the workbook’s fare for two'
+                : 'Blank uses the workbook’s allowance' + (d.board ? ', ' + Math.round(d.keep * 100) + '% of it with ' + d.board.label.toLowerCase() + ' in the package' : ''))
+            : li.baseHint);
+        }
         if (document.activeElement === li.el) return;
         var val = num(v[li.field]) == null ? '' : String(v[li.field]);
         if (li.el.value !== val) li.el.value = val;
@@ -21928,7 +22135,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
  * interval in unmount (SPEC §G.5-8). A leaked interval repaints a detached node
  * every minute for the rest of the session.
  *
- * LAYOUT. At >= 1024px this is a real <table> with a <caption>: ten columns of
+ * LAYOUT. At >= 1024px this is a real <table> with a <caption>: eleven columns of
  * short prose want a table, and a table is the only shape a screen reader can
  * navigate cell by cell. Narrower, the same rows become stacked cards with the
  * same fields in the same order. ONE matchMedia listener switches between them,
@@ -21955,7 +22162,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   /* §F.2 — the law, stated once, verbatim, attached to the numbers. */
   var MONEY_LAW = 'Prices here are what the resorts quoted Solomon and Roni. ' +
     'They are not the workbook\'s modelled figures, they never move the budget ' +
-    'filters, and amounts in different currencies are never compared.';
+    'filters, and amounts in different currencies are never compared. ' +
+    /* v0.10.4 — the one column that is NOT a quote says so in the same breath. */
+    '“Your all-in” is your own scenario from the trip page — the package you ' +
+    'picked plus the workbook\'s fare and a sized meals allowance, in dollars — ' +
+    'never a price anyone quoted.';
 
   /* §F.2 columns, in order. `label` doubles as the field label in the narrow
      layout, so the two shapes can never drift apart. */
@@ -21966,6 +22177,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     { key: 'dates', label: 'Dates available' },
     { key: 'quotes', label: 'Quotes' },
     { key: 'best', label: 'Best quote' },
+    { key: 'own', label: 'Your all-in' },
     { key: 'meals', label: 'Inclusions' },
     { key: 'spa', label: 'Spa' },
     { key: 'terms', label: 'Terms' },
@@ -22039,11 +22251,34 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       quotes: T.outreach.quotesOf(handle) || [],
       best: best,
       bestText: T.outreach.bestQuoteText(handle) || '',
+      own: ownFor(id, row),
       dates: textOr(p.outreachDates),
       meals: textOr(p.outreachMeals),
       spa: textOr(p.outreachSpa),
       terms: textOr(p.outreachTerms),
       notes: textOr(p.outreachNotes)
+    };
+  }
+
+  /**
+   * v0.10.4 — the couple's own all-in for this option (16-scenario.js), read
+   * exactly as the trip page reads it: the workbook row's fare + allowance
+   * fill the blank lines, an orphan has nothing to lean on. Null until they
+   * have picked a package or typed a hotel figure on the trip page.
+   */
+  function ownFor(id, row) {
+    var S = T.scenario;
+    if (!S || !S.totalOf || !S.has(id)) return null;
+    var Q = T.query, ctx = null;
+    try { ctx = Q && Q.sharedContext ? Q.sharedContext() : null; } catch (e) { ctx = null; }
+    var t = S.totalOf(id, ctx && ctx.budget ? ctx.budget.value : null, { f: row ? row.rec.f : null });
+    if (t.total == null) return { total: null, label: t.hotel.label || null };
+    var label = t.hotel.source === 'quote' ? t.hotel.label : 'your hotel figure';
+    if (t.hotel.nights) label += ', ' + t.hotel.nights + ' nt';
+    return {
+      total: t.total, approx: !!t.hotel.converted, label: label,
+      state: t.state, headroom: t.headroom, budget: ctx && ctx.budget ? ctx.budget.value : null,
+      blank: t.blank, board: t.board ? t.board.label : null
     };
   }
 
@@ -22170,6 +22405,30 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     return wrap;
   }
 
+  /* v0.10.4 — the scenario total: a figure with its provenance under it.
+     ≈ only when the hotel line was converted; the budget word carries the
+     same data-state the trip page uses. Never a quote, and the header says
+     whose it is. */
+  function ownCell(m) {
+    var o = m.own;
+    if (!o || o.total == null) return missing();
+    var wrap = U.el('span', { class: 'rboard__own', dataset: { state: o.state || 'none' } });
+    var money = F.money(o.total);
+    if (o.approx && money.charAt(0) !== '≈') money = '≈' + money;
+    wrap.appendChild(U.el('span', { class: 'rboard__owntotal', text: money }));
+    wrap.appendChild(U.el('span', { class: 'rboard__ownlabel', text: o.label + (o.board ? ' · ' + o.board.toLowerCase() : '') }));
+    if (o.headroom != null) {
+      var hw = o.state === 'under'
+        ? (o.headroom === 0 ? 'right on the line' : F.money(o.headroom) + ' under')
+        : F.money(-o.headroom) + ' over' + (o.state === 'borderline' ? ' — borderline' : '');
+      wrap.appendChild(U.el('span', { class: 'rboard__ownword', text: hw }));
+    }
+    if (o.blank && o.blank.length) {
+      wrap.appendChild(U.el('span', { class: 'rboard__ownblank', text: 'without ' + o.blank.join(', ') }));
+    }
+    return wrap;
+  }
+
   function proseCell(text) {
     if (!text) return missing();
     return U.el('span', { class: 'rboard__prose', text: text });
@@ -22181,6 +22440,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     if (key === 'hold') return holdCell(m);
     if (key === 'quotes') return quotesCell(m);
     if (key === 'best') return bestCell(m);
+    if (key === 'own') return ownCell(m);
     return proseCell(m[key]);
   }
 
@@ -22196,7 +22456,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     /* Wide content scrolls inside its OWN container — the page body never
        scrolls sideways. tabindex makes the scroller keyboard-reachable. */
     var scroll = U.el('div', { class: 'rboard__scroll', tabindex: '0', role: 'region',
-      'aria-label': 'Resort responses, ten columns' });
+      'aria-label': 'Resort responses, eleven columns' });
     var table = U.el('table', { class: 'rboard__table' });
     table.appendChild(U.el('caption', { class: 'rboard__caption', text: MONEY_LAW }));
 
