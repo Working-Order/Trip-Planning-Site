@@ -8733,7 +8733,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.10.1';
+  T.version = '0.10.2';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -14137,8 +14137,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 /* 14-outreach-import.js — the one-time "import what the resorts said" offers.
  * OWNER: outreach wave (v0.6.0); batches since v0.9.1.
  *
- * Replies arrive in BATCHES: seven resorts answered on 1 September 2026, and
- * Vila Planinka came back with a real six-night proposal on 3 September. Each
+ * Replies arrive in BATCHES: seven resorts answered on 1 September 2026, Vila
+ * Planinka came back with a real six-night proposal on 3 September, and Domes
+ * Noruz Chania sent a five-night proposal on 4 September. Each
  * batch is a frozen seed with its own clock, offered once per browser, and —
  * when accepted — folded in through the ONE merge (T.plan.mergeState) and the
  * ONE applicator (planning/import). There is no second merge and no direct
@@ -14334,6 +14335,40 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   ];
   I.SEED_IDS_SEP3 = SEED_SEP3.map(function (r) { return r.id; });
 
+  /* ---- batch 3: Domes Noruz Chania's proposal, 4 September 2026 -----------
+   * Not a row in any workbook so far (the 578 has Domes Zeen Chania and Domes
+   * Aulūs Elounda). The id is minted exactly as U.slug would for a "Domes
+   * Noruz Chania" / "Chania, Crete, Greece" row, so the record waits as an
+   * orphan (HANDOFF fact 5) and keys itself to the trip page the moment such
+   * a row lands — no re-attach. Three room categories, all five nights,
+   * each total including the €75 Climate Resilience Tax the quote itemises. */
+  var SEED_AT_SEP4 = Date.parse('2026-09-03T19:00:00Z');
+  I.SEED_AT_SEP4 = SEED_AT_SEP4;
+
+  var SEED_SEP4 = [
+    { id: 'domes-noruz-chania~chania-crete-greece',   /* Domes Noruz Chania, Autograph Collection */
+      fields: {
+        outreachContacted: true,
+        outreachStatus: 'hold',
+        outreachHoldUntil: '2026-09-07T12:00:00+03:00',
+        outreachHoldLabel: 'Rooms held on option until Sep 7, noon (Greece)',
+        outreachDates: 'Oct 23–28 (5 nights, Fri–Wed) — their proposal, 5% off the standard rates. Ref b9ed0d50a84b (Quotelier)',
+        outreachMeals: 'Breakfast in every rate — à la carte brunch served until 1 pm. Wellness Loft: breakfast only; half board +€40 pp/day (adds dinner at Topos, their neo-Greek seafood restaurant, 160+ label mostly-local wine list). Sublime Loft Sea View: complimentary upgrade to half board. Pure Haven: Haute Living half board — daily 3-course à la carte lunch OR dinner at Topos, plus one 3-course dinner at the Raw Bar per 5 nights; drinks not included, some items excluded, pre-booking required',
+        outreachSpa: 'Adults-only, design-led and deliberately lively: in-water bar, live DJ sets, mixology, Chania’s Venetian Old Town nearby. Complimentary pool heating. Wellness Loft (min 3 nights): outdoor heated jacuzzi with a bath-minerals spa toolkit (once per stay), ELEMIS wellness case, one 15-min massage per person per stay, suite-only treatments + consultation, 20% off Soma Spa. Pure Haven (Haute Living Selection): Haute Living Room 10:00–22:00 with dedicated concierge, WhatsApp concierge line, Domes beach-towel set, premium amenities. Airport transfer: private, €50 one-way, up to 4 passengers, booked through their link',
+        outreachTerms: 'Free cancellation up to 6 hours before arrival; no-show or cancellation inside 6 hours = 100% charge. Totals include the €75 Climate Resilience Tax (5 nights). Rooms held on option until 07-09-2026 12:00. Contact: Maria Stoimeni, Reservations — maria.stoimeni@domesresorts.com, +30 2310 810624',
+        outreachNotes: 'Sister property of Domes Zeen (the Sep 1 hold) and the opposite mood: nightlife and mixology, not a quiet retreat — judge it on that. Not in the workbook yet: this waits as an orphan on the responses board until a Domes Noruz Chania row lands. Most flexible terms of any reply so far (6-hour cancellation, no deposit stated). Value read: Sublime Loft Sea View with plunge pool at €2,150 half board is the pick — the Wellness Loft plus half board for two comes to €2,075, only €75 less, with no sea view or plunge pool; Pure Haven adds €375 for the sea front, private pool and the lounge/lunch programme. At ≈$1.16: €1,675 ≈ $1,945 · €2,150 ≈ $2,495 · €2,525 ≈ $2,930 for five nights, before flights and a car. Still open: whether the 5% rate can be held past Sep 7, and Zeen vs Noruz if Crete stays on the list'
+      },
+      quotes: [
+        { label: 'Wellness Loft Pool View, outdoor heated jacuzzi — breakfast', amount: 1675, currency: 'EUR', kind: 'quote', nights: 5, dates: 'Oct 23–28',
+          note: '€320/night after 5% off (was €338) + €75 climate tax · breakfast only; half board +€40 pp/day' },
+        { label: 'Sublime Loft Sea View, plunge pool — half board', amount: 2150, currency: 'EUR', kind: 'quote', nights: 5, dates: 'Oct 23–28',
+          note: '€415/night after 5% off (was €438) + €75 climate tax · complimentary half-board upgrade' },
+        { label: 'Pure Haven Sea Front, private pool — Haute Living half board', amount: 2525, currency: 'EUR', kind: 'quote', nights: 5, dates: 'Oct 23–28',
+          note: '€490/night after 5% off (was €519) + €75 climate tax · Haute Living Room + lunch-or-dinner daily' }
+      ] }
+  ];
+  I.SEED_IDS_SEP4 = SEED_SEP4.map(function (r) { return r.id; });
+
   /* ---- the batches, oldest first ---------------------------------------
    * `quotePrefix` must be unique per batch: entry ids are deterministic so
    * that both laptops importing the same batch produce the same keys and the
@@ -14356,7 +14391,16 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         'tasting, massages, e-bikes and sauna — €3,828 in the Corner Deluxe Room or €3,917 ' +
         'in the Suite. Their status moves from “Awaiting reply” to “Response in”.',
       done: 'Vila Planinka’s reply imported.',
-      present: function () { return I.batchImported(SEED_SEP3, 'q-sep3-'); } }
+      present: function () { return I.batchImported(SEED_SEP3, 'q-sep3-'); } },
+    { key: 'sep4-noruz', at: SEED_AT_SEP4, seed: SEED_SEP4, quotePrefix: 'q-sep4-',
+      short: 'Sep 4', count: 1,
+      title: 'Import Domes Noruz Chania’s proposal — Sep 4',
+      lede: 'Domes Noruz Chania (adults-only, Domes Zeen’s livelier sister) sent a Quotelier proposal ' +
+        'for Oct 23–28, five nights, held on option until Sep 7 noon: Wellness Loft €1,675 with breakfast, ' +
+        'Sublime Loft Sea View €2,150 half board, Pure Haven Sea Front €2,525 Haute Living half board — ' +
+        'all with the €75 climate tax in. It isn’t a workbook row yet, so it waits on the responses board.',
+      done: 'Domes Noruz Chania’s proposal imported.',
+      present: function () { return I.batchImported(SEED_SEP4, 'q-sep4-'); } }
   ];
   I.BATCHES = BATCHES;
 
@@ -14527,8 +14571,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     if (batches.length === 1) return { title: batches[0].title, lede: batches[0].lede };
     var total = 0, shorts = [];
     batches.forEach(function (b) { total += b.count; shorts.push(b.short); });
+    var when = shorts.length === 1 ? shorts[0]
+      : shorts.slice(0, -1).join(', ') + ' & ' + shorts[shorts.length - 1];
     return {
-      title: 'Import ' + total + ' resort responses — ' + shorts.join(' & '),
+      title: 'Import ' + total + ' resort responses — ' + when,
       lede: batches.map(function (b) { return b.lede; }).join(' ')
     };
   }
