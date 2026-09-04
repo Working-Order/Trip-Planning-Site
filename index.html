@@ -6036,6 +6036,8 @@ details[open] > .orphan__setasidesum::after,
 .fact__num--missing .missing__word { font-size: var(--text-sm); font-style: italic; }
 .fact__of { font-size: var(--text-sm); font-weight: var(--weight-normal); color: var(--ink-muted); }
 .fact__sub { order: 3; margin: var(--s1) 0 0; }
+/* v0.10.5 — the couple's own all-in as the headline: the same fact, whose
+   word ("YOUR ALL-IN" vs "MODELED ALL-IN") is the whole provenance. */
 .fact__sub .headroom { font-size: var(--text-xs); }
 .detail__bookedline { margin: 0; font-size: var(--text-sm); color: var(--ink-muted); }
 .detail__bookedword {
@@ -8753,7 +8755,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.10.4';
+  T.version = '0.10.5';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -18252,7 +18254,33 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var Q = engine(), ctx = qctx();
       var total = Q && ctx ? Q.priceOf(r, ctx) : num(f.modeledTotal);
       var totalWord = labelOf((ctx && ctx.priceKey) || 'modeledTotal', 'modelled all-in');
-      if (total == null) {
+      /* v0.10.5 — once they have built their own all-in (a package picked or a
+         hotel figure typed, 16-scenario.js), THAT is the page's headline
+         figure: it is the trip they would actually book. Labelled as theirs,
+         with its own headroom; the workbook's modelled total keeps its row
+         in the Money ledger below, and the engine (filters, counts, cards)
+         still reads only the workbook — nothing here is fed back. */
+      var S = T.scenario, own = null;
+      if (S && S.has && S.has(id)) {
+        own = S.totalOf(id, ctx && ctx.budget ? ctx.budget.value : null, { f: f });
+        if (own.total == null) own = null;
+      }
+      if (own) {
+        var ownSub = null;
+        if (own.headroom != null) {
+          ownSub = U.el('span', { class: 'headroom headroom--' + own.state, dataset: { state: own.state } });
+          if (own.state === 'over') ownSub.appendChild(U.el('span', { 'aria-hidden': 'true' }, '▲'));
+          ownSub.appendChild(U.el('span', {}, own.headroom === 0 ? 'right on the line'
+            : F.money(Math.abs(own.headroom)) + (own.headroom < 0 ? ' over' : ' under')));
+        }
+        var ownMoney = F.money(own.total);
+        if (own.hotel.converted && ownMoney.charAt(0) !== '≈') ownMoney = '≈' + ownMoney;
+        var ownFact = fact('Your all-in', ownMoney, { sub: ownSub, className: 'fact--total fact--own' });
+        ownFact.title = 'Your own scenario — ' + (own.hotel.source === 'quote' ? 'the package you picked' : 'the hotel figure you typed') +
+          ' plus flights, meals and ground. The workbook’s ' + totalWord + ' is in The money below' +
+          (total == null ? ' (unpriced)' : ' (' + F.money(total) + ')') + '; the budget filters still use that one.';
+        facts.appendChild(ownFact);
+      } else if (total == null) {
         facts.appendChild(fact(totalWord, missing('unpriced'), { missing: true, className: 'fact--total' }));
       } else {
         var sub = null;
