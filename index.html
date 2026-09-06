@@ -8605,6 +8605,70 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   .home .minicard__art { height: 100%; }
 }
 
+
+/* Research remains a single disclosure, with a compact overview inside. */
+.home__support[open] > .home__research { margin-top: 0; }
+.home__research { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; padding-bottom: .75rem; }
+.home__research > [data-panel="funnel"], .home__research > [data-panel="stats"], .home__research > .home__foot { grid-column: 1 / -1; }
+.home__support .home__research .panel { margin: 0; padding: 1.25rem; background: var(--surface); border: 1px solid var(--line); border-radius: .85rem; }
+.home__research .panel__head { align-items: center; margin-bottom: 1rem; gap: .5rem 1rem; }
+.home__research .panel__title { font-size: 1rem; letter-spacing: -.01em; }
+.home__research .panel__action { font-size: .875rem; }
+.home__research .panel__lede { font-size: .875rem; line-height: 1.5; margin-bottom: 1rem; }
+.home__research .funnel__aim { font-size: .875rem; white-space: normal; }
+.home__research .funnel { margin: 0; gap: 0; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.home__research .funnel__row { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'count' 'track' 'note' 'sits'; gap: .4rem; padding: .5rem 1rem; align-content: start; border: 0; border-left: 1px solid var(--line); border-radius: 0; }
+.home__research .funnel__row:first-child { border-left: 0; padding-left: 0; }
+.home__research .funnel__row:last-child { padding-right: 0; }
+.home__research .funnel__label { font-size: .875rem; font-weight: 500; }
+.home__research .funnel__count { font-size: 1.6rem; text-align: left; margin: 0; }
+.home__research .funnel__track { height: 4px; margin: 1.15rem 0 .25rem; box-shadow: none; }
+.home__research .funnel__ticknum { font-size: .8125rem; }
+.home__research .funnel__note, .home__research .funnel__sits { font-size: .875rem; text-align: left; white-space: normal; line-height: 1.4; }
+.home__research .funnel__note[data-state="ok"] { color: var(--ink-muted); }
+.home__research .funnel__out, .home__research .funnel__nudge { margin-top: .85rem; padding-top: .75rem; gap: .4rem; font-size: .875rem; }
+.home__research .funnel__out .btn, .home__research .funnel__nudge .btn { font-size: .875rem; padding: .25rem .5rem; min-height: 44px; }
+.home__support .home__research [data-panel="stats"] { background: transparent; border: 0; padding: .25rem 0; }
+.home__research .stats { grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; gap: .65rem; }
+.home__research .stats__item { padding: .85rem; gap: .45rem; height: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: .75rem; }
+.home__research a.stats__item:hover { background: var(--surface-alt); border-color: var(--line-strong); }
+.home__research .stats__value { font-size: 1.4rem; line-height: 1.15; }
+.home__research .stats__label { font-size: .875rem; line-height: 1.45; }
+.home__research .stats__basis { margin-top: .85rem; max-width: none; font-size: .875rem; line-height: 1.6; }
+.home__research .home__pair { display: block; min-width: 0; }
+.home__research .dislikes { gap: 1rem; }
+.home__research .dislikes__name { display: flex; flex-wrap: wrap; font-size: .875rem; gap: .35rem; margin-bottom: .75rem; }
+.home__research .dislikes__count { display: inline-flex; justify-content: center; min-width: 1.5rem; padding: 0 .4rem; border-radius: 1rem; background: var(--surface-alt); }
+.home__research .dislikes__item { display: grid; gap: .25rem; padding: .65rem 0; }
+.home__research .dislikes__link { color: var(--ink); text-decoration: none; font-size: .875rem; }
+.home__research .dislikes__link:hover { text-decoration: underline; color: var(--accent); }
+.home__research .dislikes__stand, .home__research .dislikes__none, .home__research .dislikes__all { font-size: .875rem; }
+.home__research .dislikes__both { margin-top: .85rem; padding-top: .85rem; font-size: .875rem; }
+.home__research .home__workbook { display: grid; grid-template-columns: 1fr; gap: 0; padding: .25rem 1.25rem; background: var(--surface); border: 1px solid var(--line); border-radius: .85rem; align-content: start; }
+.home__support .home__research .wbnote { padding: 1rem 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; }
+.home__support .home__research .wbnote:first-child { border-top: 0; }
+.home__research .wbnote .panel__head { margin-bottom: .4rem; }
+.home__research .wbnote__text, .home__research .wbnote__link { font-size: .875rem; line-height: 1.5; }
+.home__research .wbnote__link { margin-top: .35rem; }
+.home__research .home__foot { padding: .85rem 0 0; max-width: none; font-size: .875rem; line-height: 1.6; }
+@media (max-width: 1050px) {
+  .home__research .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  .home__research { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .home__support .home__research .panel { padding: 1rem; }
+  .home__research .funnel { grid-template-columns: minmax(0, 1fr); }
+  .home__research .funnel__row, .home__research .funnel__row:first-child, .home__research .funnel__row:last-child { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'label count' 'track track' 'note sits'; padding: .85rem 0; border: 0; border-top: 1px solid var(--line); }
+  .home__research .funnel__row:first-child { border-top: 0; }
+  .home__research .funnel__sits { text-align: right; }
+  .home__research .funnel__track { margin-top: .9rem; }
+  .home__research .home__workbook { padding-inline: 1rem; }
+  .home__support .home__research .wbnote { padding: 1rem 0; }
+}
+@media (max-width: 479px) {
+  .home__research .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* ==== src/css/41-view-responses.css ==== */
 /* 41-view-responses.css — the Responses board, the Home "Held for you" panel,
  * the Explore card badge and the import-offer host. OWNER: BOARD (v0.6.0).
@@ -16453,10 +16517,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       }
       var support = U.el('details', { class: 'home__support' });
       support.appendChild(U.el('summary', { text: 'Research & planning' }));
+      var research = U.el('div', { class: 'home__research' });
+      support.appendChild(research);
       el.appendChild(support);
       /* ---- the narrowing (§2.3), as a stepper ------------------------ */
       var totalNow = (store.getState().research.records || []).length || 100;
-      var funnelPanel = panel('home-funnel', 'The narrowing', {
+      var funnelPanel = panel('home-funnel', 'Review progress', {
         key: 'funnel', class: 'panel--funnel panel--flat',
         action: U.el('span', { class: 'panel__aside funnel__aim',
           text: 'aiming for ' + F.num(totalNow) + ' → 25 → 10 → 5 → 3 → 1' })
@@ -16467,7 +16533,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       funnelPanel._body.appendChild(funnelList);
       funnelPanel._body.appendChild(funnelNudge);
       funnelPanel._body.appendChild(funnelOut);
-      support.appendChild(funnelPanel);
+      research.appendChild(funnelPanel);
       painters.push(function () { paintFunnel(funnelList, funnelNudge); });
       painters.push(function () { paintFunnelOut(funnelOut); });
 
@@ -16521,7 +16587,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
       /* ---- 4. thumbs down + recently viewed -------------------------- */
       var talk = U.el('div', { class: 'home__pair' });
-      support.appendChild(talk);
+      research.appendChild(talk);
 
       var dislikes = panel('home-dislikes', 'Thumbs down', {
         key: 'dislikes',
@@ -16546,12 +16612,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var numbersFoot = U.el('p', { class: 'stats__basis' });
       numbers._body.appendChild(numbersGrid);
       numbers._body.appendChild(numbersFoot);
-      support.appendChild(numbers);
+      research.insertBefore(numbers, talk);
       painters.push(function () { paintNumbers(numbersGrid, numbersFoot); });
 
       /* ---- 6. from the workbook — one quiet line each ---------------- */
       var wb = U.el('div', { class: 'home__workbook' });
-      support.appendChild(wb);
+      research.appendChild(wb);
 
       var movers = panel('home-movers', 'What changed', { key: 'movers', class: 'panel--flat wbnote' });
       wb.appendChild(movers);
@@ -16567,7 +16633,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
       /* ---- 7. workbook footer line ----------------------------------- */
       var foot = U.el('p', { class: 'home__foot' });
-      support.appendChild(foot);
+      research.appendChild(foot);
       painters.push(function () { paintFoot(foot); });
 
       this.paint(el);
@@ -16686,13 +16752,13 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         note.textContent = '⚑ ' + prose(s.over) + ' over';
         note.dataset.state = 'over';
       } else {
-        note.textContent = '✓ right where you wanted';
+        note.textContent = 'Within target';
         note.dataset.state = 'ok';
       }
       a.appendChild(note);
 
       if (s.sits != null && s.sits !== s.count) {
-        a.appendChild(U.el('span', { class: 'funnel__sits', text: F.num(s.sits) + ' sitting here' }));
+        a.appendChild(U.el('span', { class: 'funnel__sits', text: F.num(s.sits) + ' at this stage' }));
       }
 
       a.setAttribute('aria-label',
