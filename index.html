@@ -6459,6 +6459,18 @@ details[open] > .orphan__setasidesum::after,
 .menu__glyph { font-family: var(--font-marks); }
 .menu__word { font-weight: var(--weight-medium); }
 .menu__meaning { grid-column: 2; font-size: var(--text-2xs); color: var(--ink-faint); }
+/* Package comparison: keep differences visible on wide screens and readable
+   on phones. Cards retain their full evidence even when some fields are
+   unconfirmed. */
+.own__packages { display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:var(--s3); margin-top:var(--s3); }
+.own__package { min-width:0; padding:var(--s3); border:1px solid var(--line); border-radius:var(--radius); background:var(--surface-alt); }
+.own__package[data-selected="1"] { border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
+.own__package-title { font-weight:var(--weight-semibold); margin:0 0 var(--s2); }
+.own__package-price { font-size:var(--text-lg); font-weight:var(--weight-semibold); margin:0; }
+.own__package-meta,.own__package-evidence { color:var(--ink-muted); font-size:var(--text-sm); }
+.own__package-evidence { display:grid; gap:var(--s1); margin:var(--s2) 0; }
+@media (max-width: 700px) { .own__packages { grid-template-columns:1fr; } }
+
 /* ==== src/css/32-view-compare.css ==== */
 /* 32-view-compare.css — the Compare screen. OWNER: IMPL-4.
  *
@@ -8274,6 +8286,40 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   .view--home { padding-top: var(--s7); }
   .home__masthead { padding-top: 0; }
 }
+
+/* Location-first decision flow. Cards remain comparable without a carousel. */
+.home .panel--locations { padding: var(--s5); }
+.locationflow__intro { max-width: 65ch; color: var(--ink-muted); }
+.locationflow__steps { display: flex; flex-wrap: wrap; gap: var(--s3) var(--s5); list-style: none; padding: 0; margin: var(--s4) 0; font-size: var(--text-sm); color: var(--accent); }
+.locationflow__status { margin-bottom: var(--s3); color: var(--ink-muted); font-size: var(--text-sm); }
+.locationflow__cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--s3); }
+.locationcard { display: flex; flex-direction: column; gap: var(--s2); padding: var(--s4); border: var(--hair) solid var(--line-strong); border-radius: var(--radius-md); min-width: 0; }
+.locationcard h3 { font-family: var(--font-display); font-size: var(--text-xl); overflow-wrap: anywhere; }
+.locationcard__eyebrow { font-size: var(--text-2xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--accent); }
+.locationcard__country, .locationcard__count, .locationcard__names, .locationflow__note { font-size: var(--text-xs); color: var(--ink-muted); overflow-wrap: anywhere; }
+.locationcard__actions { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: auto; padding-top: var(--s3); }
+.locationcard__actions .btn { white-space: normal; text-align: left; }
+.locationcard__actions [aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.locationflow__browse { margin-top: var(--s4); border-top: var(--hair) solid var(--line); padding-top: var(--s3); }
+.locationflow__browse summary { cursor: pointer; min-height: var(--tap-min); color: var(--accent); }
+.locationflow__browse input { margin: var(--s3) 0; width: 100%; max-width: 35rem; }
+.locationflow__browse-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); max-height: 22rem; overflow-y: auto; gap: var(--s2); }
+.locationflow__browse-list .btn { text-align: left; justify-content: flex-start; white-space: normal; }
+.locationflow__resorts { display: grid; gap: var(--s4); margin-top: var(--s5); }
+.locationflow__resort-title { font-size: var(--text-md); }
+.locationresorts { display: grid; gap: var(--s3); min-width: 0; }
+.locationresorts h4 { font-family: var(--font-display); font-size: var(--text-lg); }
+.locationresorts__list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: var(--s3); }
+.locationresort { display: grid; gap: var(--s2); padding: var(--s3); border: var(--hair) solid var(--line); border-radius: var(--radius-md); text-decoration: none; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.locationresort:hover { background: var(--surface-alt); border-color: var(--accent); }
+.locationresort__meta { font-size: var(--text-xs); color: var(--ink-muted); }
+.locationresort__next { font-size: var(--text-xs); color: var(--accent); }
+.locationresorts > .btn { justify-self: start; }
+.home__support { display: grid; gap: var(--s4); }
+.home__support > summary { cursor: pointer; color: var(--ink-muted); padding: var(--s3) 0; border-top: var(--hair) solid var(--line); }
+.home__support[open] > :not(summary) { margin-top: var(--s4); }
+@media (max-width: 639px) { .locationflow__cards, .locationresorts__list { grid-template-columns: minmax(0, 1fr); } }
+
 /* ==== src/css/41-view-responses.css ==== */
 /* 41-view-responses.css — the Responses board, the Home "Held for you" panel,
  * the Explore card badge and the import-offer host. OWNER: BOARD (v0.6.0).
@@ -10029,7 +10075,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       /* v0.10.1 "your own all-in" scenario (16-scenario.js): same rule. */
       'ownQuoteId', 'ownHotel', 'ownFlights', 'ownMeals', 'ownGround', 'ownExtras', 'ownNote',
       /* v0.10.4: what the package feeds them (16-scenario.js S.BOARD). */
-      'ownBoard'].forEach(pick);
+      'ownBoard', 'ownReviewQuoteId', 'ownFlightDetails', 'ownExtrasSelected'].forEach(pick);
 
     /* reactions: owner authority, else newest-wins per traveler */
     var reactions = {};
@@ -10238,6 +10284,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     return s.planning;
   };
 })(window.TRIP);
+
 /* ==== src/js/06-ids.js ==== */
 /* 06-ids.js — stable record identity. OWNER: WS-B. CHANGE-CONTROLLED.
  *
@@ -13801,6 +13848,22 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
   function own(bag, k) { return Object.prototype.hasOwnProperty.call(bag, k); }
 
+  /** Deliberately structured evidence: prose is retained elsewhere, never guessed. */
+  O.evidenceOf = function (q) {
+    var fallback = T.outreachImport && T.outreachImport.evidenceFor ? T.outreachImport.evidenceFor(q) : null;
+    var raw = {}, out = {};
+    Object.keys(fallback || {}).forEach(function (k) { raw[k] = fallback[k]; });
+    Object.keys(q && q.evidence || {}).forEach(function (k) { raw[k] = q.evidence[k]; });
+    ['room', 'startDate', 'endDate', 'restrictions', 'supplements', 'cancellation', 'source'].forEach(function (k) {
+      out[k] = typeof raw[k] === 'string' && raw[k].trim() ? raw[k].trim() : null;
+    });
+    out.guests = typeof raw.guests === 'number' && raw.guests > 0 ? raw.guests : null;
+    ['breakfast', 'lunch', 'dinner', 'drinks', 'transfer', 'spa'].forEach(function (k) {
+      out[k] = ['included', 'excluded'].indexOf(raw[k]) >= 0 ? raw[k] : 'unconfirmed';
+    });
+    return out;
+  };
+
   /* ---- presence --------------------------------------------------------- */
   /** Any outreach scalar set, or any live (non-tombstoned) quote. Called once
    *  per row per board paint, so it stays a plain loop with early exits. */
@@ -14142,6 +14205,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     next.updatedAt = at;
     delete next.deleted;
     r.quotes[eid] = next;
+    if (r.ownQuoteId === eid && prev && ['evidence', 'amount', 'currency', 'nights', 'dates', 'startDate', 'endDate'].some(function (field) {
+      return U.stableStringify(prev[field]) !== U.stableStringify(next[field]);
+    })) {
+      r.ownReviewQuoteId = null;
+      r._t.ownReviewQuoteId = at;
+    }
     r._t['quote:' + eid] = at;
     r.updatedAt = at;
     return [];
@@ -14157,6 +14226,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     return [];
   });
 })(window.TRIP);
+
 /* ==== src/js/14-outreach-import.js ==== */
 /* 14-outreach-import.js — the one-time "import what the resorts said" offers.
  * OWNER: outreach wave (v0.6.0); batches since v0.9.1.
@@ -14911,7 +14981,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   var S = T.scenario = {};
 
   /** The eight scalars (v0.10.4 added ownBoard). Also the whitelist for scenario/setField. */
-  S.FIELDS = ['ownQuoteId', 'ownHotel', 'ownFlights', 'ownMeals', 'ownGround', 'ownExtras', 'ownNote', 'ownBoard'];
+  S.FIELDS = ['ownQuoteId', 'ownHotel', 'ownFlights', 'ownMeals', 'ownGround', 'ownExtras', 'ownNote', 'ownBoard', 'ownReviewQuoteId', 'ownFlightDetails', 'ownExtrasSelected'];
   /**
    * v0.10.4 — what the package feeds them. The workbook's allowance is what
    * the hotel does NOT cover — lunches, dinners, drinks, coffee, the odd
@@ -15058,22 +15128,65 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         if (c == null) hotel.unconvertible = true;
         else { hotel.usd = Math.round(c); hotel.converted = true; }
       }
-    } else if (num(v.ownHotel) != null) {
+    } else if (!v.ownQuoteId && num(v.ownHotel) != null) {
       hotel.usd = v.ownHotel;
       hotel.source = 'typed';
       hotel.label = 'Hotel, your figure';
     }
 
+    var evidence = T.outreach.evidenceOf(q);
+    var reviewReasons = [];
+    var hasAssumptions = ['ownFlights', 'ownMeals', 'ownGround', 'ownExtras', 'ownBoard'].some(function (k) { return v[k] != null; });
+    var reviewed = v.ownReviewQuoteId === (v.ownQuoteId || '__typed__');
+    if (hasAssumptions && !reviewed) reviewReasons.push('Review saved flight, meal and add-on assumptions for this package');
+    var boardKey = reviewed ? v.ownBoard : null;
     var lines = S.LINES.map(function (l) {
       var typed = num(v[l.field]);
+      var included = l.field === 'ownGround' && evidence.transfer === 'included'
+        || l.field === 'ownMeals' && ['breakfast', 'lunch', 'dinner', 'drinks'].every(function (k) { return evidence[k] === 'included'; });
+      if (included) return { field: l.field, label: l.label, short: l.short, value: 0, source: 'included', basis: null, savedValue: typed };
       if (typed != null) return { field: l.field, label: l.label, short: l.short, value: typed, source: 'typed', basis: null };
-      var d = S.defaultFor(l, opts.f, hotel.nights, v.ownBoard);
+      var d = S.defaultFor(l, opts.f, hotel.nights, boardKey);
+      if (d && l.field === 'ownMeals' && !boardKey) {
+        // These are editable planning shares, not a priced meal quote. The
+        // workbook assumes breakfast; unknown breakfast needs its own estimate.
+        var keep = 1 - (evidence.dinner === 'included' ? 0.45 : 0) - (evidence.lunch === 'included' ? 0.25 : 0);
+        d.value = Math.round(d.value * keep); d.keep = keep;
+      }
       return { field: l.field, label: l.label, short: l.short, value: d ? d.value : null, source: d ? 'workbook' : null, basis: d };
     });
-    var entered = [], defaulted = [], blank = [];
+    var entered = [], defaulted = [], blank = [], excluded = [];
     lines.forEach(function (l) {
-      (l.source === 'typed' ? entered : l.source === 'workbook' ? defaulted : blank).push(l.short);
+      if (l.source === 'typed') entered.push(l.short);
+      else if (l.source === 'workbook') defaulted.push(l.short);
+      else if (l.source !== 'included') {
+        if (l.field === 'ownExtras' && !v.ownExtrasSelected) { l.optional = true; excluded.push('optional extras'); }
+        else blank.push(l.short);
+      }
     });
+
+    var f = opts.f || {}, fd = v.ownFlightDetails || {};
+    var flightLine = lines[0], typedFlight = flightLine.source === 'typed';
+    var flight = {
+      startDate: fd.startDate || (!typedFlight && f.airfareStartDate) || null,
+      endDate: fd.endDate || (!typedFlight && f.airfareEndDate) || null,
+      departure: fd.departure || (!typedFlight && f.departureAirport) || null,
+      arrival: fd.arrival || (!typedFlight && f.arrivalAirport) || null,
+      baggage: fd.baggage || null,
+      checkedDate: fd.checkedDate || (!typedFlight && f.airfareChecked) || null,
+      source: fd.source || (typedFlight ? 'Your estimate' : 'Workbook fare estimate')
+    };
+    var exactDates = /^\d{4}-\d{2}-\d{2}$/;
+    var dated = [flight.startDate, flight.endDate, evidence.startDate, evidence.endDate].every(function (x) { return exactDates.test(x || ''); });
+    flight.status = !dated ? 'unconfirmed' : flight.startDate === evidence.startDate && flight.endDate === evidence.endDate ? 'matched' : 'mismatch';
+    flight.note = flight.status === 'matched' ? 'Dates match the package; fare remains an estimate for two.' : flight.status === 'mismatch' ? 'Fare dates differ from the package — reprice for both travelers.' : 'Travel dates are unconfirmed — this fare is an estimate for two.';
+    var missing = blank.slice();
+    if (hotel.usd == null) missing.unshift('package price');
+    if (q && evidence.guests !== 2) missing.push('package price for two guests');
+    if (q && (!evidence.startDate || !evidence.endDate)) missing.push('package dates');
+    if (flightLine.value != null && flight.status !== 'matched') missing.push(flight.status === 'mismatch' ? 'matching flight estimate' : 'flight dates');
+    if (lines[1].source === 'workbook' && evidence.breakfast !== 'included' && !boardKey) missing.push('breakfast allowance / inclusion');
+    if (reviewReasons.length) missing.push('saved assumptions review');
 
     var total = null;
     if (hotel.usd != null) {
@@ -15081,15 +15194,18 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       lines.forEach(function (l) { if (l.value != null) total += l.value; });
     }
     var b = num(budget);
-    var headroom = (total != null && b != null) ? b - total : null;
+    var headroom = (total != null && b != null && !missing.length) ? b - total : null;
     var state = headroom == null ? null
       : headroom >= 0 ? 'under'
         : headroom >= -250 ? 'borderline' : 'over';
     return {
       hotel: hotel, lines: lines, entered: entered, defaulted: defaulted, blank: blank,
-      total: total, partial: total != null && blank.length > 0,
+      total: total, partial: total != null && missing.length > 0,
+      label: missing.length ? 'Known subtotal' : 'Estimated trip total',
+      missing: missing, excluded: excluded, evidence: evidence, flight: flight,
+      reviewRequired: reviewReasons.length > 0, reviewReasons: reviewReasons,
       headroom: headroom, state: state, note: v.ownNote || null,
-      board: S.boardOf(v.ownBoard),
+      board: S.boardOf(boardKey),
       quoteMissing: !!(v.ownQuoteId && !q)
     };
   };
@@ -15111,7 +15227,15 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var value = p.value;
     if (p.field === 'ownBoard') {
       value = S.boardOf(value) ? value : null;    // one of the named boards, or nothing
-    } else if (p.field !== 'ownQuoteId' && p.field !== 'ownNote') {
+    } else if (p.field === 'ownExtrasSelected') {
+      value = !!value;
+    } else if (p.field === 'ownFlightDetails') {
+      var cleaned = {};
+      ['startDate', 'endDate', 'departure', 'arrival', 'baggage', 'checkedDate', 'source'].forEach(function (k) {
+        if (value && typeof value[k] === 'string' && value[k].trim()) cleaned[k] = value[k].trim();
+      });
+      value = cleaned;
+    } else if (p.field !== 'ownQuoteId' && p.field !== 'ownNote' && p.field !== 'ownReviewQuoteId') {
       value = num(value);                       // dollars or nothing — never ''
       if (value != null && value < 0) value = null;
     } else if (value != null && String(value).trim() === '') value = null;
@@ -15122,7 +15246,138 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     r.updatedAt = at;
     return [];
   });
+
+  T.plan.mutator('scenario/selectPackage', function (s, p, at) {
+    var r = rec(s, p.id), next = p.quoteId || null;
+    if ((r.ownQuoteId || null) === next) return false;
+    r.ownQuoteId = next; r._t.ownQuoteId = at;
+    r.ownReviewQuoteId = null; r._t.ownReviewQuoteId = at;
+    r.updatedAt = at;
+    return [];
+  });
+  T.plan.mutator('scenario/reviewPackage', function (s, p, at) {
+    var r = rec(s, p.id);
+    r.ownReviewQuoteId = r.ownQuoteId || '__typed__'; r._t.ownReviewQuoteId = at;
+    r.updatedAt = at;
+    return [];
+  });
 })(window.TRIP);
+
+/* ==== src/js/17-locations.js ==== */
+/* Explicit destination choices use independent existing settings entries so
+   concurrent choices merge without replacing a list. Suggestions are read-only. */
+(function (T) {
+  'use strict';
+  var L = T.locations = {}, U = T.util, store = T.store;
+  function clean(s) { return String(s || '').trim(); }
+  L.placeOf = function (row) {
+    var f = row.rec ? row.rec.f : (row.f || row);
+    var country = clean(f.country), region = clean(f.region);
+    var parts = (region || clean(f.destination)).split(',').map(clean).filter(Boolean);
+    if (country && parts.length && parts[parts.length - 1].toLowerCase() === country.toLowerCase()) parts.pop();
+    var area = parts.length ? parts[parts.length - 1] : country || 'Location unrecorded';
+    return { id: 'location:' + encodeURIComponent((country + '|' + area).toLowerCase()), country: country, area: area };
+  };
+  L.isMarked = function (r) { return !!r.favorite || ['interested', 'shortlist', 'finalist', 'booked'].indexOf(r.status) >= 0; };
+  L.selected = function (id) {
+    var p = store.getState().planning, e = p && p.global && p.global.settings && p.global.settings[id];
+    return !!(e && !e.deleted && e.kind === 'location' && e.selected === true);
+  };
+  L.setSelected = function (place, selected) {
+    store.dispatch('planning/upsert:settings', { entryId: place.id,
+      value: { kind: 'location', country: place.country, area: place.area, selected: !!selected } });
+  };
+  L.groups = function () {
+    var groups = Object.create(null);
+    (T.select.get('rows') || []).forEach(function (r) {
+      if (r.status === 'rejected') return;
+      var place = L.placeOf(r), g = groups[place.id];
+      if (!g) g = groups[place.id] = Object.assign(place, { rows: [], marked: [], selected: L.selected(place.id) });
+      g.rows.push(r); if (L.isMarked(r)) g.marked.push(r);
+    });
+    var p = store.getState().planning, bag = p && p.global && p.global.settings || {};
+    Object.keys(bag).forEach(function (id) {
+      var e = bag[id];
+      if (!groups[id] && e && !e.deleted && e.kind === 'location' && e.selected === true)
+        groups[id] = { id: id, country: e.country, area: e.area, rows: [], marked: [], selected: true };
+    });
+    return Object.keys(groups).map(function (id) {
+      var g = groups[id];
+      g.rows.sort(function (a, b) { return Number(L.isMarked(b)) - Number(L.isMarked(a)) || (a.rec.f.currentRank || 9999) - (b.rec.f.currentRank || 9999); });
+      return g;
+    }).sort(function (a, b) { return Number(b.selected) - Number(a.selected) || b.marked.length - a.marked.length || a.area.localeCompare(b.area); });
+  };
+  L.mount = function (host) {
+    var focusId = null, expanded = Object.create(null);
+    host.appendChild(U.el('p', { class: 'locationflow__intro', text: 'Choose a few places, compare the resorts there, then build a package and complete trip estimate for two.' }));
+    host.appendChild(U.el('ol', { class: 'locationflow__steps', 'aria-label': 'Trip planning steps' }, [
+      U.el('li', { text: '1 · Locations' }), U.el('li', { text: '2 · Resorts' }), U.el('li', { text: '3 · Packages + trip cost for two' })
+    ]));
+    var status = U.el('p', { class: 'locationflow__status', 'aria-live': 'polite' }); host.appendChild(status);
+    var cards = U.el('div', { class: 'locationflow__cards' }); host.appendChild(cards);
+    var more = U.el('details', { class: 'locationflow__browse' });
+    more.appendChild(U.el('summary', { text: 'Find another location' }));
+    more.appendChild(U.el('p', { class: 'locationflow__note', text: 'Grouped by the last area in the workbook’s location field, within each country. Marked resorts suggest places; only “Shortlist location” saves a location choice.' }));
+    var search = U.el('input', { type: 'search', class: 'input', placeholder: 'Search area, country or resort', 'aria-label': 'Search locations' }); more.appendChild(search);
+    var browse = U.el('div', { class: 'locationflow__browse-list' }); more.appendChild(browse); host.appendChild(more);
+    var resorts = U.el('section', { class: 'locationflow__resorts', 'aria-label': 'Resorts in focused locations' }); host.appendChild(resorts);
+    function button(label, key, action) {
+      var b = U.el('button', { type: 'button', class: 'btn btn--quiet', text: label, 'data-location-control': key }); b.addEventListener('click', action); return b;
+    }
+    function toggle(g) { L.setSelected(g, !L.selected(g.id)); }
+    function drawBrowse(groups) {
+      U.clear(browse); var term = search.value.trim().toLowerCase();
+      var matches = groups.filter(function (g) { return !term || (g.area + ' ' + g.country + ' ' + g.rows.map(function (r) { return r.rec.f.hotel; }).join(' ')).toLowerCase().indexOf(term) >= 0; });
+      if (!matches.length) browse.appendChild(U.el('p', { text: 'No matching locations in this workbook.' }));
+      matches.forEach(function (g) {
+        var b = button((g.selected ? '✓ ' : '+ ') + g.area + (g.country && g.country !== g.area ? ', ' + g.country : '') + ' · ' + g.rows.length + ' resorts', 'browse-' + g.id, function () { toggle(g); });
+        b.setAttribute('aria-pressed', String(g.selected)); browse.appendChild(b);
+      });
+    }
+    function paint() {
+      var active = document.activeElement, restore = host.contains(active) && active.getAttribute('data-location-control');
+      var groups = L.groups(), chosen = groups.filter(function (g) { return g.selected; });
+      var suggested = groups.filter(function (g) { return g.marked.length; });
+      var shown = chosen.length ? chosen : suggested.slice(0, 6);
+      if (!shown.some(function (g) { return g.id === focusId; })) focusId = null;
+      U.setText(status, chosen.length ? chosen.length + ' locations shortlisted. Choose a location card to focus its resorts, or compare all below.' : suggested.length ? 'Suggested from your marked resorts. Shortlist the locations you want to keep in focus.' : 'Start with “Find another location”, or mark resorts in Explore to get location suggestions.');
+      U.clear(cards);
+      shown.forEach(function (g) {
+        var card = U.el('article', { class: 'locationcard', 'data-location-id': g.id });
+        card.appendChild(U.el('p', { class: 'locationcard__eyebrow', text: g.selected ? 'Your location shortlist' : 'Suggested · not shortlisted' }));
+        card.appendChild(U.el('h3', { text: g.area }));
+        card.appendChild(U.el('p', { class: 'locationcard__country', text: g.country }));
+        card.appendChild(U.el('p', { class: 'locationcard__count', text: g.marked.length + ' marked · ' + g.rows.length + ' resorts in play' }));
+        if (g.marked.length) card.appendChild(U.el('p', { class: 'locationcard__names', text: g.marked.slice(0, 3).map(function (r) { return r.rec.f.hotel; }).join(' · ') + (g.marked.length > 3 ? '…' : '') }));
+        var actions = U.el('div', { class: 'locationcard__actions' });
+        var save = button(g.selected ? '✓ Shortlisted location' : 'Shortlist location', 'save-' + g.id, function () { toggle(g); }); save.setAttribute('aria-pressed', String(g.selected)); actions.appendChild(save);
+        var focus = button(focusId === g.id ? 'Show all locations below' : 'Focus these resorts', 'focus-' + g.id, function () { focusId = focusId === g.id ? null : g.id; paint(); }); focus.setAttribute('aria-pressed', String(focusId === g.id)); actions.appendChild(focus);
+        card.appendChild(actions); cards.appendChild(card);
+      });
+      if (!chosen.length && suggested.length > 6) cards.appendChild(U.el('p', { class: 'locationflow__note', text: (suggested.length - 6) + ' more suggested locations are available in “Find another location”.' }));
+      drawBrowse(groups); U.clear(resorts);
+      if (shown.length) resorts.appendChild(U.el('h3', { class: 'locationflow__resort-title', text: 'Next · Compare resorts and their packages' }));
+      shown.filter(function (g) { return !focusId || g.id === focusId; }).forEach(function (g) {
+        var section = U.el('section', { class: 'locationresorts', 'data-location-resorts': g.id });
+        section.appendChild(U.el('h4', { text: g.area + (g.selected ? '' : ' · suggested location') }));
+        if (!g.rows.length) section.appendChild(U.el('p', { text: 'No resorts in play for this saved location in the current workbook. Your location choice is kept.' }));
+        var list = U.el('div', { class: 'locationresorts__list' });
+        (expanded[g.id] ? g.rows : g.rows.slice(0, 4)).forEach(function (r) {
+          var a = U.el('a', { class: 'locationresort', href: T.router.build('trip', [r.id]) });
+          a.appendChild(U.el('strong', { text: r.rec.f.hotel }));
+          a.appendChild(U.el('span', { class: 'locationresort__meta', text: (L.isMarked(r) ? 'Marked · ' : '') + (r.status || 'not_reviewed').replace(/_/g, ' ') + ' · ' + (r.rec.f.region || r.rec.f.destination || '') }));
+          a.appendChild(U.el('span', { class: 'locationresort__next', text: 'Compare packages + trip cost for two ›' })); list.appendChild(a);
+        }); section.appendChild(list);
+        if (g.rows.length > 4) section.appendChild(button(expanded[g.id] ? 'Show fewer resorts' : 'Show all ' + g.rows.length + ' resorts here', 'expand-' + g.id, function () { expanded[g.id] = !expanded[g.id]; paint(); }));
+        resorts.appendChild(section);
+      });
+      if (restore) Array.prototype.some.call(host.querySelectorAll('[data-location-control]'), function (b) { if (b.getAttribute('data-location-control') === restore) { b.focus({ preventScroll: true }); return true; } });
+    }
+    search.addEventListener('input', function () { drawBrowse(L.groups()); });
+    return { paint: paint };
+  };
+})(window.TRIP);
+
 /* ==== src/js/20-view-home.js ==== */
 /* 20-view-home.js — HOME (screen S1, docs/UX_SPEC.md §2). OWNER: IMPL-1.
  *
@@ -15842,6 +16097,15 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       el.appendChild(head);
       painters.push(function () { paintHeadline(h1, sub); });
 
+      var locationPanel = panel('home-locations', 'Where do you want to go?', { key: 'locations', class: 'panel--locations' });
+      el.appendChild(locationPanel);
+      if (T.locations) {
+        var locationFlow = T.locations.mount(locationPanel._body);
+        painters.push(function () { locationFlow.paint(); });
+      }
+      var support = U.el('details', { class: 'home__support' });
+      support.appendChild(U.el('summary', { text: 'Research overview, review queue and workbook details' }));
+      el.appendChild(support);
       /* ---- the narrowing (§2.3), as a stepper ------------------------ */
       var totalNow = (store.getState().research.records || []).length || 100;
       var funnelPanel = panel('home-funnel', 'The narrowing', {
@@ -15855,13 +16119,13 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       funnelPanel._body.appendChild(funnelList);
       funnelPanel._body.appendChild(funnelNudge);
       funnelPanel._body.appendChild(funnelOut);
-      el.appendChild(funnelPanel);
+      support.appendChild(funnelPanel);
       painters.push(function () { paintFunnel(funnelList, funnelNudge); });
       painters.push(function () { paintFunnelOut(funnelOut); });
 
       /* ---- one-time resort-response import offer (v0.6.0) ------------ */
       var offerHost = U.el('div', { class: 'home__offer' });
-      el.appendChild(offerHost);
+      el.insertBefore(offerHost, support);
       painters.push(function () {
         U.clear(offerHost);
         var show = !!(T.outreachImport && T.outreachImport.shouldOffer());
@@ -15871,7 +16135,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
       /* ---- 2. today: tiles that exist only while they have content --- */
       var today = U.el('div', { class: 'home__today' });
-      el.appendChild(today);
+      support.appendChild(today);
 
       /* hold deadlines (v0.6.0) — hides itself at zero */
       var holds = panel('home-holds', 'Held for you', { key: 'holds', class: 'tile' });
@@ -15904,12 +16168,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var contendersList = U.el('div', { class: 'cardstrip' });
       contenders._body.appendChild(contendersLede);
       contenders._body.appendChild(contendersList);
-      el.appendChild(contenders);
+      support.appendChild(contenders);
       painters.push(function () { paintContenders(contendersLede, contendersList); });
 
       /* ---- 4. thumbs down + recently viewed -------------------------- */
       var talk = U.el('div', { class: 'home__pair' });
-      el.appendChild(talk);
+      support.appendChild(talk);
 
       var dislikes = panel('home-dislikes', 'Thumbs down', {
         key: 'dislikes',
@@ -15919,6 +16183,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       });
       talk.appendChild(dislikes);
       painters.push(function () { paintDislikes(dislikes._body); });
+      /* Keep an active decision tension visible even while the supporting
+         research is collapsed; empty support remains progressive disclosure. */
+      painters.push(function () {
+        var d = T.select.get('home/dislikes');
+        if (d && d.any) support.open = true;
+      });
 
       var recent = panel('home-recent', 'Recently viewed', {
         key: 'recent',
@@ -15933,12 +16203,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var numbersFoot = U.el('p', { class: 'stats__basis' });
       numbers._body.appendChild(numbersGrid);
       numbers._body.appendChild(numbersFoot);
-      el.appendChild(numbers);
+      support.appendChild(numbers);
       painters.push(function () { paintNumbers(numbersGrid, numbersFoot); });
 
       /* ---- 6. from the workbook — one quiet line each ---------------- */
       var wb = U.el('div', { class: 'home__workbook' });
-      el.appendChild(wb);
+      support.appendChild(wb);
 
       var movers = panel('home-movers', 'What changed', { key: 'movers', class: 'panel--flat wbnote' });
       wb.appendChild(movers);
@@ -15954,7 +16224,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
       /* ---- 7. workbook footer line ----------------------------------- */
       var foot = U.el('p', { class: 'home__foot' });
-      el.appendChild(foot);
+      support.appendChild(foot);
       painters.push(function () { paintFoot(foot); });
 
       this.paint(el);
@@ -16527,6 +16797,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       'Workbook & Settings ›'));
   }
 })(window.TRIP);
+
 /* ==== src/js/21-view-explore.js ==== */
 /* 21-view-explore.js — the Explore screen (S2). OWNER: IMPL-2.
  *
@@ -17834,10 +18105,18 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
        position 2 by putting the rail before the reading column in the DOM and
        letting the grid place it on the right. Reading order and tab order
        agree at both sizes. */
-    var MOBILE_ORDER = [secStand, secWhy, secOutreach, secMoney, secFlight, secWeather, secStay,
-      secNotes, secChecks, secProv];
-    var RAIL_ORDER = [secStand, secNotes, secChecks];
-    var MAIN_ORDER = [secWhy, secOutreach, secMoney, secFlight, secWeather, secStay, secProv];
+    function fold(label, sections) {
+      var d = U.el('details', { class: 'detail__research' });
+      d.appendChild(U.el('summary', {}, label));
+      sections.forEach(function (s) { d.appendChild(s); });
+      return d;
+    }
+    var resortResearch = fold('Resort replies & original offer notes', [secOutreach]);
+    var tripResearch = fold('Explore the stay, travel & weather research', [secWhy, secStay, secFlight, secWeather]);
+    var researchNotes = fold('Notes, questions & research checklist', [secNotes, secChecks, secProv]);
+    var MOBILE_ORDER = [secStand, secMoney, resortResearch, tripResearch, researchNotes];
+    var RAIL_ORDER = [secStand];
+    var MAIN_ORDER = [secMoney, resortResearch, tripResearch, researchNotes];
     var mq = window.matchMedia ? window.matchMedia('(min-width: 1024px)') : null;
     var wide = null;
 
@@ -18275,7 +18554,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         }
         var ownMoney = F.money(own.total);
         if (own.hotel.converted && ownMoney.charAt(0) !== '≈') ownMoney = '≈' + ownMoney;
-        var ownFact = fact('Your all-in', ownMoney, { sub: ownSub, className: 'fact--total fact--own' });
+        if (own.missing && own.missing.length) ownSub = U.el('span', { class: 'own__missing' }, 'Still needed: ' + own.missing.join(', '));
+        else if (own.reviewRequired) ownSub = U.el('span', { class: 'own__missing' }, 'Review carried-over assumptions below');
+        var ownFact = fact(own.label || 'Known subtotal', ownMoney, { sub: ownSub, className: 'fact--total fact--own' });
         ownFact.title = 'Your own scenario — ' + (own.hotel.source === 'quote' ? 'the package you picked' : 'the hotel figure you typed') +
           ' plus flights, meals and ground. The workbook’s ' + totalWord + ' is in The money below' +
           (total == null ? ' (unpriced)' : ' (' + F.money(total) + ')') + '; the budget filters still use that one.';
@@ -19366,7 +19647,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
   function buildMoney(row, painters) {
     var id = row.id, f = row.rec.f;
-    var sec = sectionEl('money', 'The money');
+    var sec = sectionEl('money', 'Choose a package → plan the cost for two');
     var body = sec._body;
     var kv = U.el('dl', { class: 'kv detail__kv' });
     body.appendChild(kv);
@@ -19389,6 +19670,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var paintOwn = buildOwn(row, ownHost);
     var providers = U.el('div', { class: 'providers' });
     body.appendChild(providers);
+    var research = U.el('details', { class: 'detail__research own__research' });
+    research.appendChild(U.el('summary', {}, 'Workbook benchmark & provider price research'));
+    [kv, basis, quoted, providers].forEach(function (node) { research.appendChild(node); });
+    body.appendChild(research);
 
     painters.push(function () {
       var r = rowOf(id) || row;
@@ -19470,7 +19755,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     host.appendChild(U.el('p', {
       class: 'detail__sublabel',
       title: 'Your scenario — a package you picked plus the workbook’s fare and allowance, or figures you type; never the workbook’s modelled total'
-    }, 'Your all-in'));
+    }, '1 · Compare packages for the whole stay'));
 
     /* -- the ONE control on the page for the hotel line: a package they wrote
           down, or "type a dollar figure". It sits in the display, not in the
@@ -19492,8 +19777,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     boardSel.addEventListener('change', function () { write('ownBoard', boardSel.value || null); });
     boardPick.appendChild(U.el('span', { class: 'own__picklabel' }, 'Meals in it'));
     boardPick.appendChild(boardSel);
-    picks.appendChild(boardPick);
     host.appendChild(picks);
+    var packages = U.el('div', { class: 'own__packages' });
+    host.appendChild(packages);
 
     var display = U.el('div', { class: 'own__display' });
     host.appendChild(display);
@@ -19503,6 +19789,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var form = U.el('div', { class: 'orx__editorbody own__form' });
     editor.appendChild(form);
     host.appendChild(editor);
+    form.appendChild(boardPick);
+    boardPick.querySelector('.own__picklabel').textContent = 'Meal allowance assumption (an estimate)';
+    var extrasToggle = U.el('input', { type: 'checkbox', dataset: { field: 'ownExtrasSelected' } });
+    extrasToggle.addEventListener('change', function () { write('ownExtrasSelected', extrasToggle.checked); });
+    form.appendChild(U.el('label', { class: 'own__extras-toggle' }, [extrasToggle, ' Include optional extras in this trip estimate']));
 
     function write(field, value) {
       store.dispatch('scenario/setField', { id: id, field: field, value: value });
@@ -19535,6 +19826,21 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return { field: l.field, el: el, hint: fld.querySelector('.field__hint'), baseHint: l.hint };
     });
     form.appendChild(linesRow);
+    var flightEditor = U.el('details', { class: 'own__evidence own__flight-editor' });
+    flightEditor.appendChild(U.el('summary', {}, 'Record the fare’s dates, airports & baggage'));
+    var flightControls = {};
+    ['startDate', 'endDate', 'departure', 'arrival', 'baggage', 'checkedDate', 'source'].forEach(function (key) {
+      var input = U.el('input', { class: 'input', type: /Date$/.test(key) ? 'date' : 'text' });
+      flightControls[key] = input;
+      flightEditor.appendChild(U.el('label', {}, [U.el('span', {}, ({startDate:'Outbound date',endDate:'Return date',departure:'Departure airport',arrival:'Arrival airport',baggage:'Baggage included',checkedDate:'Fare checked date',source:'Fare source'})[key]), input]));
+    });
+    var saveFlight = U.el('button', { type: 'button', class: 'btn' }, 'Save fare details');
+    saveFlight.addEventListener('click', function () {
+      var value = {};
+      Object.keys(flightControls).forEach(function (key) { value[key] = flightControls[key].value || null; });
+      write('ownFlightDetails', value);
+    });
+    flightEditor.appendChild(saveFlight); form.appendChild(flightEditor);
 
     var note = U.el('textarea', {
       class: 'textarea', rows: '2', dataset: { field: 'ownNote' },
@@ -19551,16 +19857,15 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     hotelSel.addEventListener('change', function () {
       var v = hotelSel.value;
       if (v === 'typed') {
-        store.dispatch('scenario/setField', { id: id, field: 'ownQuoteId', value: null });
+        store.dispatch('scenario/selectPackage', { id: id, quoteId: null });
         hotelInField.hidden = false;
         openEditor();
         paintDisplay();
         try { hotelIn.focus(); } catch (e) {}
         return;
       }
-      /* Picking a package retires a typed figure: one hotel line, one source. */
-      store.dispatch('scenario/setField', { id: id, field: 'ownHotel', value: null });
-      write('ownQuoteId', v || null);
+      store.dispatch('scenario/selectPackage', { id: id, quoteId: v || null });
+      paintDisplay();
       hotelInField.hidden = true;
       paintEditor();
     });
@@ -19595,13 +19900,63 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return 'workbook allowance' + cut;
     }
     function pricedQuotes() {
-      return T.outreach ? T.outreach.quotesOf(id).filter(function (q) { return num(q.amount) != null; }) : [];
+      return T.outreach ? T.outreach.quotesOf(id) : [];
+    }
+
+    var packageSignature = null;
+    function paintPackages(quotes) {
+      var signature = U.stableStringify([quotes, S.of(id).ownQuoteId]);
+      if (signature === packageSignature || packages.contains(document.activeElement)) return;
+      packageSignature = signature;
+      U.clear(packages);
+      quotes.forEach(function (q) {
+        var e = T.outreach.evidenceOf ? T.outreach.evidenceOf(q) : (q.evidence || {});
+        var selected = S.of(id).ownQuoteId === q.id;
+        var card = U.el('article', { class: 'own__package', dataset: { quote: q.id, selected: selected ? '1' : '0' } });
+        card.appendChild(U.el('h3', {}, q.label || 'Resort package'));
+        card.appendChild(U.el('p', { class: 'own__package-price' }, num(q.amount) == null ? 'Price unconfirmed' : F.money(q.amount, { currency: q.currency, convert: false })));
+        card.appendChild(U.el('p', { class: 'own__package-meta' }, (q.nights ? q.nights + ' nights' : 'Nights unconfirmed') + ' · ' + (e.guests ? e.guests + ' guests' : 'Guest count unconfirmed')));
+        var info = U.el('dl', { class: 'own__inclusions' });
+        function line(label, value) { info.appendChild(U.el('dt', {}, label)); info.appendChild(U.el('dd', {}, value || 'Unconfirmed')); }
+        line('Room', e.room || q.label);
+        line('Dates', e.startDate && e.endDate ? e.startDate + ' → ' + e.endDate : q.dates);
+        ['breakfast', 'lunch', 'dinner', 'drinks', 'transfer', 'spa'].forEach(function (key) { line(key.charAt(0).toUpperCase() + key.slice(1), e[key] || 'unconfirmed'); });
+        line('Restrictions', e.restrictions); line('Supplements / tax', e.supplements); line('Cancellation', e.cancellation); line('Source', e.source);
+        card.appendChild(info);
+        var choose = U.el('button', { type: 'button', class: 'btn' + (selected ? ' btn--primary' : ''), 'aria-pressed': selected ? 'true' : 'false' }, selected ? 'Selected package' : 'Choose this package');
+        choose.addEventListener('click', function () { store.dispatch('scenario/selectPackage', { id: id, quoteId: q.id }); paintDisplay(); paintEditor(); });
+        card.appendChild(choose);
+        var edit = U.el('details', { class: 'own__evidence' });
+        edit.appendChild(U.el('summary', {}, 'Confirm package details from the offer'));
+        edit.appendChild(U.el('p', {}, 'Record only what the source confirms. Unconfirmed meals keep an estimated allowance; included transfers are not added twice.'));
+        var controls = {};
+        ['room', 'startDate', 'endDate', 'guests', 'breakfast', 'lunch', 'dinner', 'drinks', 'transfer', 'spa', 'restrictions', 'supplements', 'cancellation', 'source'].forEach(function (key) {
+          var inclusion = ['breakfast', 'lunch', 'dinner', 'drinks', 'transfer', 'spa'].indexOf(key) >= 0;
+          var control = U.el(inclusion ? 'select' : 'input', { class: inclusion ? 'select' : 'input', 'aria-label': key + ' for ' + q.label });
+          if (inclusion) ['unconfirmed', 'included', 'excluded'].forEach(function (value) { control.appendChild(U.el('option', { value: value }, value)); });
+          else control.type = key === 'startDate' || key === 'endDate' ? 'date' : key === 'guests' ? 'number' : 'text';
+          control.value = e[key] == null ? (inclusion ? 'unconfirmed' : '') : String(e[key]);
+          controls[key] = control;
+          edit.appendChild(U.el('label', {}, [U.el('span', {}, ({startDate:'Arrival date',endDate:'Departure date',guests:'Guests',source:'Source / URL',supplements:'Supplements / tax'})[key] || key), control]));
+        });
+        var save = U.el('button', { type: 'button', class: 'btn' }, 'Save confirmed details');
+        save.addEventListener('click', function () {
+          var evidence = {};
+          Object.keys(controls).forEach(function (key) { evidence[key] = key === 'guests' ? orxNumOrNull(controls[key].value) : controls[key].value || null; });
+          save.blur();
+          store.dispatch('outreach/upsertQuote', { id: id, entryId: q.id, value: { evidence: evidence } });
+          packageSignature = null;
+          paintDisplay(); paintEditor(); announce('Package details saved.');
+        });
+        edit.appendChild(save); card.appendChild(edit); packages.appendChild(card);
+      });
     }
 
     function paintDisplay() {
       U.clear(display);
       var has = S.has(id);
       var quotes = pricedQuotes();
+      paintPackages(quotes);
       U.toggleClass(host, 'own--empty', !has);
       /* The package control only exists where there is a package to pick;
          with nothing quoted the hotel line is a figure they type (drawer).
@@ -19612,7 +19967,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       if (!has) {
         var empty = U.el('p', { class: 'detail__absent own__empty' },
           quotes.length
-            ? 'Pick one of the resort’s packages and it is summed at once with the workbook’s fare for two and its meals allowance sized to the package’s nights — the trip you’d actually book, apart from the workbook’s model. Or '
+            ? 'Choose a package above to see the trip cost for two, with missing costs and unconfirmed flight dates beside the estimate. Or '
             : 'The trip you’d actually book — a hotel figure plus your own flights, meals and ground — summed here, apart from the workbook’s model. ');
         var openIt = U.el('button', { type: 'button', class: 'btn btn--link own__open' },
           quotes.length ? 'type your own figures ›' : 'Build it ›');
@@ -19628,6 +19983,14 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       }
       var ctx = qctx();
       var t = S.totalOf(id, ctx && ctx.budget ? ctx.budget.value : null, { f: fields() });
+      display.appendChild(U.el('h3', { class: 'own__cost-heading' }, '2 · Trip cost for Solomon & Roni'));
+      if (t.reviewRequired) {
+        var review = U.el('div', { class: 'own__review', role: 'status' });
+        review.appendChild(U.el('p', {}, 'Review this package: ' + (t.reviewReasons || []).join('; ') + '. Your entered figures are preserved.'));
+        var reviewBtn = U.el('button', { type: 'button', class: 'btn' }, 'I reviewed the carried-over figures');
+        reviewBtn.addEventListener('click', function () { store.dispatch('scenario/reviewPackage', { id: id }); paintDisplay(); paintEditor(); });
+        review.appendChild(reviewBtn); display.appendChild(review);
+      }
       var kv = U.el('dl', { class: 'kv detail__kv own__kv' });
 
       /* hotel line */
@@ -19647,16 +20010,18 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       kv.appendChild(kvRow(hotelKey, hotelVal, { missingLook: h.usd == null }));
 
       t.lines.forEach(function (l) {
-        if (l.value == null) return;
         var sw = sourceWords(l);
-        var r = kvRow(l.label + (sw ? ' · ' + sw : ''), F.money(l.value));
+        var optional = l.field === 'ownExtras' && !S.of(id).ownExtrasSelected && l.value == null;
+        var r = kvRow(l.label + (sw ? ' · ' + sw : ''), l.value == null ? (optional ? 'Optional · not selected' : missing('cost needed')) : F.money(l.value));
+        if (l.source === 'included') r.appendChild(U.el('p', { class: 'kv__note' }, 'Included in the package'));
         r.dataset.source = l.source;
         kv.appendChild(r);
       });
 
       var totalVal = t.total == null ? missing('nothing to sum without a hotel figure')
         : (h.converted ? approx(t.total) : F.money(t.total));
-      var totalRow = kvRow('Your all-in', totalVal, { strong: true, missingLook: t.total == null });
+      var totalRow = kvRow(t.label || 'Known subtotal', totalVal, { strong: true, missingLook: t.total == null,
+        note: t.missing && t.missing.length ? 'Still needed: ' + t.missing.join(', ') : t.reviewRequired ? 'Review carried-over assumptions before using this total.' : 'For two · includes the selected costs above; estimates remain estimates.' });
       totalRow.classList.add('own__row--total');
       kv.appendChild(totalRow);
 
@@ -19669,6 +20034,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         kv.appendChild(hr);
       }
       display.appendChild(kv);
+      if (t.flight) {
+        var fl = t.flight;
+        display.appendChild(U.el('p', { class: 'own__flight', dataset: { status: fl.status } }, 'Flight ' + fl.status + ' · ' + (fl.departure || 'Departure airport unconfirmed') + ' → ' + (fl.arrival || 'Arrival airport unconfirmed') + ' · ' + (fl.startDate || 'Dates unconfirmed') + (fl.endDate ? ' → ' + fl.endDate : '') + ' · baggage: ' + (fl.baggage || 'unconfirmed') + ' · checked: ' + (fl.checkedDate || 'unconfirmed') + '. ' + (fl.note || '') ));
+      }
 
       /* the caption: what was summed and where each part came from */
       var meals = t.lines.filter(function (l) { return l.field === 'ownMeals' && l.source === 'workbook'; })[0];
@@ -19703,6 +20072,8 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
     function paintEditor() {
       var v = S.of(id);
+      extrasToggle.checked = !!v.ownExtrasSelected;
+      if (!flightEditor.contains(document.activeElement)) Object.keys(flightControls).forEach(function (key) { flightControls[key].value = (v.ownFlightDetails || {})[key] || ''; });
       var live = S.quoteOf(id);
       var quotes = pricedQuotes();
       if (document.activeElement !== hotelSel) {
@@ -20827,6 +21198,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   D.contextFor = contextFor;
   D.runState = function () { return runState; };
 })(window.TRIP);
+
 /* ==== src/js/23-view-compare.js ==== */
 /* 23-view-compare.js — COMPARE (S5). OWNER: IMPL-4.
  *
@@ -22306,7 +22678,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     return {
       total: t.total, approx: !!t.hotel.converted, label: label,
       state: t.state, headroom: t.headroom, budget: ctx && ctx.budget ? ctx.budget.value : null,
-      blank: t.blank, board: t.board ? t.board.label : null
+      blank: t.missing || t.blank, board: t.board ? t.board.label : null, totalLabel: t.label || 'Known subtotal'
     };
   }
 
@@ -22444,6 +22816,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var money = F.money(o.total);
     if (o.approx && money.charAt(0) !== '≈') money = '≈' + money;
     wrap.appendChild(U.el('span', { class: 'rboard__owntotal', text: money }));
+    wrap.appendChild(U.el('span', { class: 'rboard__ownlabel', text: o.totalLabel + ' · for two' }));
     wrap.appendChild(U.el('span', { class: 'rboard__ownlabel', text: o.label + (o.board ? ' · ' + o.board.toLowerCase() : '') }));
     if (o.headroom != null) {
       var hw = o.state === 'under'
@@ -22452,7 +22825,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       wrap.appendChild(U.el('span', { class: 'rboard__ownword', text: hw }));
     }
     if (o.blank && o.blank.length) {
-      wrap.appendChild(U.el('span', { class: 'rboard__ownblank', text: 'without ' + o.blank.join(', ') }));
+      wrap.appendChild(U.el('span', { class: 'rboard__ownblank', text: 'Still needed: ' + o.blank.join(', ') }));
     }
     return wrap;
   }
@@ -22701,6 +23074,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     }
   });
 })(window.TRIP);
+
 /* ==== src/js/27-view-collections.js ==== */
 /* 27-view-collections.js — the Category Explorer (S9). OWNER: IMPL-4.
  *
