@@ -7596,6 +7596,42 @@ details[open] > .orphan__setasidesum::after,
 @media (prefers-reduced-motion: reduce) {
   .cmp__scroller { scroll-behavior: auto; }
 }
+/* ==== src/css/35-view-budget.css ==== */
+.budget { max-width: 78rem; margin: 0 auto; padding: var(--s5); display: grid; gap: var(--s4); font-size: 1rem; }
+.budget__title { font-family: var(--font-display, Georgia, serif); font-size: clamp(2rem, 4vw, 3rem); }
+.budget__lede { color: var(--ink-muted); max-width: 60ch; }
+.budget__controls { display: grid; grid-template-columns: minmax(12rem, 1fr) minmax(16rem, 2fr); gap: var(--s3); }
+.budget__field { display: grid; gap: .4rem; min-width: 0; font-size: .875rem; }
+.budget input, .budget select { width: 100%; min-width: 0; min-height: 2.75rem; padding: .65rem .75rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: .35rem; font: inherit; }
+.budget input::placeholder { color: var(--ink-faint); opacity: 1; }
+.budget input:focus-visible, .budget select:focus-visible, .budget__table-wrap:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.budget__inputs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s3); padding: var(--s4); border: 1px solid var(--line); background: var(--surface-alt); border-radius: .5rem; }
+.budget__results { display: grid; gap: var(--s3); }
+.budget__results > .btn { justify-self: start; }
+.budget__summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 2px solid var(--accent); border-bottom: 1px solid var(--line); }
+.budget__summary > div { padding: 1rem .75rem; display: grid; gap: .5rem; }
+.budget__summary span { font-size: .875rem; color: var(--ink-muted); }
+.budget__summary strong { font-size: clamp(1.3rem, 2.5vw, 2rem); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.budget__table-wrap { overflow-x: auto; }
+.budget__table { width: 100%; border-collapse: collapse; font-size: .875rem; font-variant-numeric: tabular-nums; }
+.budget__table th, .budget__table td { padding: .85rem .6rem; text-align: right; border-bottom: 1px solid var(--line); }
+.budget__table th:first-child { text-align: left; }
+.budget__table thead { color: var(--ink-muted); }
+.budget__assumptions { color: var(--ink-muted); font-size: .875rem; line-height: 1.6; }
+.budget__notice, .budget__empty { padding: 1rem; background: var(--surface-inset); border-left: 3px solid var(--accent); }
+.budget__saved { display: grid; gap: var(--s3); border-top: 1px solid var(--line); padding-top: var(--s4); }
+.budget__saved h2 { font-size: 1.4rem; }
+.budget__actions { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; }
+.budget__actions label { flex: 1 1 16rem; }
+.budget__saved-list { display: grid; gap: .5rem; }
+.budget__saved-row { display: flex; gap: .75rem; align-items: start; }
+.budget__saved-row > :first-child { flex: 1; text-align: left; justify-content: start; overflow-wrap: anywhere; }
+.budget__saved-row [aria-pressed="true"] { border-color: var(--accent); background: var(--accent-quiet); }
+.budget__message { font-size: .875rem; min-height: 1.5em; }
+.budget__message .btn { margin-left: .75rem; }
+@media (max-width: 800px) { .budget__inputs, .budget__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .budget { padding: var(--s3); } .budget__controls { grid-template-columns: minmax(0, 1fr); } .budget__inputs { padding: var(--s3); } .budget__actions > .btn { flex: 1 1 auto; } .budget__table { min-width: 31rem; } }
+
 /* ==== src/css/36-view-collections.css ==== */
 /* 36-view-collections.css — the Category Explorer + the collection cover strip
  * that rides on top of Explore. OWNER: IMPL-4.
@@ -24361,6 +24397,210 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   });
 })(window.TRIP);
 
+/* ==== src/js/25-view-budget.js ==== */
+/* Budget Lab — USD what-ifs, isolated from workbook and per-trip quotes. */
+(function (T) {
+  'use strict';
+  var U = T.util, store = T.store, active = null, draft = null;
+  var COSTS = ['hotel', 'airfare', 'meals', 'ground', 'extras'];
+  function num(v) {
+    if (v == null || typeof v === 'boolean' || (typeof v !== 'number' && typeof v !== 'string') || String(v).trim() === '') return null;
+    v = Number(v); return isFinite(v) && v >= 0 ? v : null;
+  }
+  function blank(v) { return v == null || String(v).trim() === ''; }
+  function round(v) { return Math.round(v * 100) / 100; }
+  function modelNights() { return T.scenario && T.scenario.modelNights ? T.scenario.modelNights() : 7; }
+  function anchor() { return T.query.sharedContext().budget; }
+  function records() { return store.getState().research.records || []; }
+  function record(id) { return records().filter(function (r) { return r.id === id; })[0] || null; }
+  function fields(r) { return r && (r.f || (r.rec && r.rec.f)) || {}; }
+  function money(v) { return v == null ? '—' : T.fmt.money(v, { convert: false }); }
+  function signed(v) { return v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + money(Math.abs(v)); }
+  function calculate(input, f, baseNights) {
+    input = input || {}; f = f || {}; baseNights = num(baseNights) || 7;
+    var n = num(input.nights), budget = num(input.budget), errors = [];
+    if (n == null || n < 1 || n > 60 || Math.floor(n) !== n) errors.push('Nights must be a whole number from 1 to 60.');
+    if (budget == null || budget > 10000000) errors.push('Enter a trip cap from $0 to $10,000,000.');
+    COSTS.forEach(function (key) {
+      if (!blank(input[key]) && (num(input[key]) == null || num(input[key]) > 10000000)) errors.push('Enter a valid nonnegative ' + key + ' cost.');
+    });
+    var baseline = { hotel: num(f.bestQuote), airfare: num(f.airfareForTwo), meals: num(f.mealsAllowance) };
+    var ratio = n == null ? 1 : n / baseNights;
+    var out = { baseline: baseline, missing: [], errors: errors, nights: n, modelNights: baseNights };
+    ['hotel', 'airfare', 'meals'].forEach(function (key) {
+      out[key] = !blank(input[key]) ? num(input[key]) : baseline[key] == null ? null : round(baseline[key] * (key === 'airfare' ? 1 : ratio));
+    });
+    out.ground = input.ground === undefined ? 0 : num(input.ground);
+    out.extras = input.extras === undefined ? 0 : num(input.extras);
+    COSTS.forEach(function (key) { if (out[key] == null) out.missing.push(key); });
+    out.subtotal = round(COSTS.reduce(function (sum, key) { return sum + (out[key] == null ? 0 : out[key]); }, 0));
+    out.total = out.missing.length || errors.length ? null : out.subtotal;
+    baseline.total = num(f.modeledTotal);
+    if (baseline.total == null && baseline.hotel != null && baseline.airfare != null && baseline.meals != null) baseline.total = round(baseline.hotel + baseline.airfare + baseline.meals);
+    out.delta = out.total != null && baseline.total != null ? round(out.total - baseline.total) : null;
+    out.headroom = out.total != null && budget != null ? round(budget - out.total) : null;
+    return out;
+  }
+  T.budgetlab = { normalize: num, calculate: calculate };
+  function fresh(id) {
+    return { id: id || null, q: '', nights: modelNights(), hotel: null, airfare: null, meals: null,
+      ground: 0, extras: 0, budget: anchor().value, name: '', savedId: null };
+  }
+  function bag() { return store.getState().planning.global.scenarios || {}; }
+  function entries() {
+    return Object.keys(bag()).map(function (id) { return bag()[id]; }).filter(function (x) {
+      return x && !x.deleted && x.kind === 'budget-lab';
+    }).sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
+  }
+  function message(text) { if (active) active.message.textContent = text; }
+  function params() {
+    var p = { id: draft.id, nights: num(draft.nights), budget: num(draft.budget) };
+    COSTS.forEach(function (key) { p[key] = num(draft[key]); }); return p;
+  }
+  function load(id) {
+    var item = bag()[id];
+    if (!item || item.deleted || item.kind !== 'budget-lab' || item.version !== 1 || !item.params) { message('This scenario is unavailable.'); return; }
+    var p = item.params, next = fresh(typeof p.id === 'string' ? p.id : null);
+    ['nights', 'budget'].concat(COSTS).forEach(function (key) { if (Object.prototype.hasOwnProperty.call(p, key)) next[key] = p[key]; });
+    var c = calculate(next, fields(record(next.id)), modelNights());
+    if (c.errors.length) { message('This saved scenario has invalid inputs. It has been kept unchanged.'); return; }
+    ['nights', 'budget'].concat(COSTS).forEach(function (key) { next[key] = num(next[key]); });
+    next.name = String(item.name || '').slice(0, 80); next.savedId = id; draft = next;
+    syncControls(); paintResults(); paintSaved(); message('Loaded ' + next.name + '.');
+  }
+  function save(asNew) {
+    if (!record(draft.id)) { message('Choose a hotel before saving.'); return; }
+    var c = calculate(draft, fields(record(draft.id)), modelNights());
+    if (c.errors.length) { message(c.errors.join(' ')); return; }
+    var name = draft.name.trim().slice(0, 80);
+    if (!name) { message('Give this scenario a name.'); active.name.focus(); return; }
+    if (!asNew && draft.savedId && (!bag()[draft.savedId] || bag()[draft.savedId].deleted)) {
+      message('This scenario was deleted on another device. Save a copy to keep this draft.'); return;
+    }
+    var id = !asNew && draft.savedId ? draft.savedId : U.uid('budget');
+    store.dispatch('planning/upsert:scenarios', { entryId: id, value: { id: id, kind: 'budget-lab', version: 1, name: name, params: params() } });
+    draft.savedId = id; paintSaved(); message('Saved ' + name + '.');
+  }
+  function labelInput(parent, text, attrs) {
+    var label = U.el('label', { class: 'budget__field' }); label.appendChild(U.el('span', { text: text }));
+    var input = U.el('input', attrs); label.appendChild(input); parent.appendChild(label); return input;
+  }
+  function button(text, fn, cls) {
+    var b = U.el('button', { type: 'button', class: cls || 'btn', text: text }); b.addEventListener('click', fn); return b;
+  }
+  function paintOptions() {
+    if (!active) return;
+    var sel = active.select, q = draft.q.trim().toLowerCase(); U.clear(sel);
+    function matches(r) { var f = fields(r); return !q || ((f.hotel || '') + ' ' + (f.destination || '')).toLowerCase().indexOf(q) >= 0; }
+    var found = records().filter(matches), count = found.length, selected = record(draft.id);
+    if (selected && !found.some(function (r) { return r.id === selected.id; })) found.unshift(selected);
+    sel.appendChild(U.el('option', { value: '', text: selected ? 'Choose another hotel' : draft.id ? 'Saved hotel no longer in this workbook' : 'Choose a hotel' }));
+    found.forEach(function (r) { var f = fields(r); sel.appendChild(U.el('option', { value: r.id, text: (f.hotel || 'Unnamed hotel') + ' — ' + (f.destination || 'Location not recorded') })); });
+    sel.value = selected ? draft.id : '';
+    active.matches.textContent = count + (q ? ' matching hotels' : ' hotels');
+  }
+  function syncControls() {
+    if (!active) return;
+    active.search.value = draft.q; active.name.value = draft.name;
+    ['nights', 'budget'].concat(COSTS).forEach(function (key) { active.inputs[key].value = draft[key] == null ? '' : draft[key]; });
+    paintOptions();
+  }
+  function paintResults() {
+    if (!active) return;
+    var r = record(draft.id), host = active.results; U.clear(host);
+    if (!r) {
+      host.appendChild(U.el('p', { class: 'budget__empty', text: draft.id ? 'This scenario’s hotel is no longer in the workbook. Choose a current hotel to continue; the saved scenario is kept.' : 'Choose a hotel to start a budget scenario.' })); return;
+    }
+    var c = calculate(draft, fields(r), modelNights());
+    ['hotel', 'airfare', 'meals'].forEach(function (key) { active.inputs[key].placeholder = c[key] == null ? 'Not recorded' : money(c[key]) + ' estimated'; });
+    var summary = U.el('div', { class: 'budget__summary' });
+    [['Workbook estimate · ' + c.modelNights + ' nights', money(c.baseline.total)],
+      [c.errors.length ? 'Check inputs' : c.total == null ? 'Known subtotal' : 'Scenario estimate · ' + c.nights + ' nights', c.errors.length ? '—' : money(c.total == null ? c.subtotal : c.total)],
+      ['Change from workbook', signed(c.delta)],
+      [c.headroom == null ? 'Budget remaining' : c.headroom < 0 ? 'Over budget' : 'Budget remaining', c.headroom == null ? '—' : money(Math.abs(c.headroom))]
+    ].forEach(function (x) { var box = U.el('div'); box.appendChild(U.el('span', { text: x[0] })); box.appendChild(U.el('strong', { text: x[1] })); summary.appendChild(box); });
+    host.appendChild(summary);
+    if (c.errors.length || c.missing.length) host.appendChild(U.el('p', { class: 'budget__notice', role: 'status', text: c.errors.length ? c.errors.join(' ') : 'Incomplete estimate: add ' + c.missing.join(', ') + '. Missing costs are excluded from the subtotal; budget remaining is unavailable.' }));
+    var wrap = U.el('div', { class: 'budget__table-wrap', tabindex: '0', role: 'region', 'aria-label': 'Budget cost breakdown' });
+    var table = U.el('table', { class: 'budget__table' }), head = U.el('thead'), hr = U.el('tr');
+    ['Cost · USD', 'Workbook · ' + c.modelNights + ' nights', 'Scenario · ' + (c.nights || '—') + ' nights', 'Change'].forEach(function (x) { hr.appendChild(U.el('th', { scope: 'col', text: x })); });
+    head.appendChild(hr); table.appendChild(head); var body = U.el('tbody');
+    [['hotel', 'Hotel stay'], ['airfare', 'Round-trip flights for two'], ['meals', 'Meals & drinks'], ['ground', 'Ground transport'], ['extras', 'Extra allowance']].forEach(function (pair) {
+      var key = pair[0], base = c.baseline[key], row = U.el('tr'); row.appendChild(U.el('th', { scope: 'row', text: pair[1] }));
+      [money(base), money(c[key]), signed(base != null && c[key] != null ? round(c[key] - base) : null)].forEach(function (x) { row.appendChild(U.el('td', { text: x })); }); body.appendChild(row);
+    });
+    table.appendChild(body); wrap.appendChild(table); host.appendChild(wrap);
+    host.appendChild(U.el('p', { class: 'budget__assumptions', text: 'Workbook hotel and meal estimates scale from ' + c.modelNights + ' nights. Flights stay fixed for two travelers. Typed overrides are totals for your chosen stay. Ground transport and extras start at $0; add any expected costs. All amounts are USD.' }));
+    host.appendChild(U.el('p', { class: 'budget__assumptions', text: 'These are planning estimates, not live prices or availability. Saved scenarios recalculate against the current workbook. Selected resort packages and your trip-page totals are separate.' }));
+    host.appendChild(U.el('a', { class: 'btn', href: T.router.build('trip', [r.id]), text: 'Open hotel details' }));
+  }
+  function paintSaved() {
+    if (!active) return;
+    U.clear(active.saved); active.save.textContent = draft.savedId ? 'Update scenario' : 'Save scenario'; active.copy.hidden = !draft.savedId;
+    var list = entries();
+    if (!list.length) active.saved.appendChild(U.el('p', { class: 'budget__assumptions', text: 'No saved scenarios yet.' }));
+    list.forEach(function (item) {
+      var row = U.el('div', { class: 'budget__saved-row' });
+      var loadButton = button(item.name || 'Untitled scenario', function () { load(item.id); });
+      loadButton.setAttribute('aria-pressed', String(draft.savedId === item.id)); row.appendChild(loadButton);
+      var remove = button('Delete', function () {
+        store.dispatch('planning/delete:scenarios', { entryId: item.id });
+        if (draft.savedId === item.id) draft.savedId = null;
+        paintSaved(); message('Deleted ' + (item.name || 'scenario') + '.');
+        active.message.appendChild(button('Undo deletion', function () {
+          store.dispatch('planning/upsert:scenarios', { entryId: item.id, value: item }); paintSaved(); message('Scenario restored.');
+        }));
+      });
+      remove.setAttribute('aria-label', 'Delete ' + (item.name || 'scenario')); row.appendChild(remove); active.saved.appendChild(row);
+    });
+  }
+  T.views.register('budget', {
+    title: 'Budget Lab',
+    mount: function (root, ctx) {
+      var route = ctx && ctx.route, id = route && route.query && route.query.id;
+      if (!draft) draft = fresh(id || (records()[0] || {}).id);
+      active = { inputs: {} }; var section = U.el('section', { class: 'budget', 'data-budget-lab': '' }); root.appendChild(section);
+      section.appendChild(U.el('h1', { class: 'budget__title', text: 'Budget Lab' }));
+      section.appendChild(U.el('p', { class: 'budget__lede', text: 'Try a different stay, airfare or trip cap. Compare the costs and save your what-ifs.' }));
+      var controls = U.el('div', { class: 'budget__controls' });
+      active.search = labelInput(controls, 'Find a hotel', { type: 'search', 'data-field': 'search', placeholder: 'Hotel or destination' });
+      active.search.addEventListener('input', function () { draft.q = this.value; paintOptions(); });
+      var label = U.el('label', { class: 'budget__field' }); label.appendChild(U.el('span', { text: 'Hotel' })); active.select = U.el('select', { 'data-field': 'id' }); label.appendChild(active.select); controls.appendChild(label);
+      active.select.addEventListener('change', function () {
+        var q = draft.q; draft = fresh(this.value); draft.q = q; syncControls(); paintResults(); paintSaved(); message('');
+      }); section.appendChild(controls);
+      active.matches = U.el('p', { class: 'budget__assumptions', 'aria-live': 'polite' }); section.appendChild(active.matches);
+      var form = U.el('div', { class: 'budget__inputs' });
+      [['nights', 'Nights'], ['budget', 'Trip cap · USD'], ['hotel', 'Hotel override · USD / stay'], ['airfare', 'Flights override · USD / two'], ['meals', 'Meals override · USD / stay'], ['ground', 'Ground transport · USD'], ['extras', 'Extra allowance · USD']].forEach(function (pair) {
+        var key = pair[0], input = labelInput(form, pair[1], { type: 'number', min: key === 'nights' ? '1' : '0', max: key === 'nights' ? '60' : '10000000', step: key === 'nights' ? '1' : '0.01', 'data-field': key }); active.inputs[key] = input;
+        input.addEventListener('input', function () { draft[key] = this.value; paintResults(); message(''); });
+      }); section.appendChild(form);
+      section.appendChild(U.el('p', { class: 'budget__assumptions', text: 'Leave hotel, flight and meal overrides blank to use workbook estimates. The initial trip cap is ' + money(anchor().value) + ' (' + anchor().label + '). Changes here only affect this lab.' }));
+      active.results = U.el('div', { class: 'budget__results', 'aria-live': 'polite' }); section.appendChild(active.results);
+      var savedSection = U.el('section', { class: 'budget__saved', 'aria-label': 'Saved budget scenarios' });
+      savedSection.appendChild(U.el('h2', { text: 'Saved scenarios' }));
+      savedSection.appendChild(U.el('p', { class: 'budget__assumptions', text: 'Saved on this device and shared through your existing sync connection when connected.' }));
+      var actions = U.el('div', { class: 'budget__actions' });
+      active.name = labelInput(actions, 'Scenario name', { type: 'text', maxlength: '80', 'data-field': 'name', placeholder: 'A shorter stay' });
+      active.name.addEventListener('input', function () { draft.name = this.value; });
+      active.save = button('Save scenario', function () { save(false); }, 'btn btn--primary'); actions.appendChild(active.save);
+      active.copy = button('Save a copy', function () { save(true); }); actions.appendChild(active.copy);
+      actions.appendChild(button('Reset draft', function () { draft = fresh(draft.id); syncControls(); paintResults(); paintSaved(); message('Draft reset to workbook estimates. Saved scenarios are kept.'); }));
+      savedSection.appendChild(actions); active.message = U.el('p', { class: 'budget__message', role: 'status' }); savedSection.appendChild(active.message);
+      active.saved = U.el('div', { class: 'budget__saved-list' }); savedSection.appendChild(active.saved); section.appendChild(savedSection);
+      syncControls(); paintResults(); paintSaved();
+      var savedId = route && route.query && route.query.scenario; if (savedId) load(savedId);
+    },
+    update: function (root, ctx) {
+      if (!active || !ctx.changed) return;
+      if (store.touches(ctx.changed, 'research') || ctx.changed.has('reload')) { paintOptions(); paintResults(); }
+      if (store.touches(ctx.changed, 'planning')) paintSaved();
+      if (ctx.changed.has('route') && ctx.route.query.scenario) load(ctx.route.query.scenario);
+    },
+    unmount: function () { active = null; }
+  });
+})(window.TRIP);
+
 /* ==== src/js/27-view-collections.js ==== */
 /* 27-view-collections.js — the Category Explorer (S9). OWNER: IMPL-4.
  *
@@ -26812,6 +27052,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       el.appendChild(secD);
       el._secD = secD;
 
+      var secBudget = sectionEl('budget-scenarios', 'Budget scenarios', 'Save and compare your trip-cost what-ifs in Budget Lab.');
+      secBudget.appendChild(U.el('a', { class: 'btn', href: T.router.build('budget'), text: 'Manage budget scenarios' }));
+      el.appendChild(secBudget);
+
       /* ---- E · still to come ------------------------------------------
          Kept as the LAST section and with this exact aria-labelledby:
          36-comp-collections.js inserts its panel immediately before it. */
@@ -26819,7 +27063,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       secE.appendChild(U.el('h2', { id: 'data-later', class: 'datapane__h', text: 'Still to come' }));
       secE.appendChild(U.el('p', { class: 'datapane__lede', text:
         'Preferences — theme, density, the display names, the ' +
-        'price-staleness window — and the managers for saved views, scenarios and weight ' +
+        'price-staleness window — and the managers for saved views and weight ' +
         'profiles arrive in a later wave. Nothing you decide before then is at risk: it is ' +
         'already saved on this device, and you can copy it out above at any time.' }));
       el.appendChild(secE);
@@ -33601,7 +33845,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       line: 'Compare arrives in a later wave — your selections are already being kept.' },
     { name: 'budget', label: 'Budget Lab', group: 'labs',
       title: 'Budget Lab',
-      line: 'The Budget Lab arrives in a later wave — what-ifs on airfare, nights and your working budget, never written back over the workbook.' },
+      line: 'Try nights, airfare and a trip budget, then save your scenarios.' },
     { name: 'decision', label: 'Decision Lab', group: 'labs',
       title: 'Decision Lab',
       line: 'The Decision Lab arrives in a later wave — your own weights, your own ranking, sitting beside the workbook’s.' },
