@@ -6123,7 +6123,7 @@ details[open] > .orphan__setasidesum::after,
 /* v0.10.3 — the package select is the block's ONE control, in the display
    (a caps word + the select, same vocabulary as the sub-labels above it);
    the drawer keeps only the overrides. */
-.own__picks { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); margin: var(--s1) 0 var(--s2); }
+.own__picks { position: relative; display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); margin: var(--s1) 0 var(--s2); }
 .own__picks[hidden] { display: none; }
 .own__pick { display: flex; align-items: center; gap: var(--s3); flex: 1 1 18rem; max-width: 32rem; }
 .own__pick[hidden] { display: none; }
@@ -6246,9 +6246,19 @@ details[open] > .orphan__setasidesum::after,
   background: var(--accent-soft);
   box-shadow: inset 0 -2px 0 var(--accent-fill);
 }
-.stand__badge { display: grid; gap: var(--s1); justify-items: start; }
+/* v0.11.0 — one status line and the control that belongs with it, on one
+   row: the pill, the sentence and the mark strip were three drawings of
+   one fact. The line hides itself once both have said and reviewed. */
+.stand__badge {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: var(--s2) var(--s4);
+}
+.stand__line { margin: 0; flex: 1 1 12rem; font-size: var(--text-sm); color: var(--ink-muted); }
+.stand__line[hidden] { display: none; }
+.stand__line[data-token="love"] { color: var(--ink); }
+.stand__line[data-token="split"] { color: var(--warn); }
 .stand__sub { margin: 0; font-size: var(--text-sm); color: var(--ink-muted); }
-.stand__controls { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+.stand__controls { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; flex: 0 0 auto; }
 .stand__controls > * { min-height: var(--tap-min); }
 .stand__controls .btn--quiet { padding-left: 0; }
 /* Below the desktop breakpoint the phone bar carries Reviewed — once. */
@@ -6459,17 +6469,146 @@ details[open] > .orphan__setasidesum::after,
 .menu__glyph { font-family: var(--font-marks); }
 .menu__word { font-weight: var(--weight-medium); }
 .menu__meaning { grid-column: 2; font-size: var(--text-2xs); color: var(--ink-faint); }
-/* Package comparison: keep differences visible on wide screens and readable
-   on phones. Cards retain their full evidence even when some fields are
-   unconfirmed. */
-.own__packages { display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:var(--s3); margin-top:var(--s3); }
-.own__package { min-width:0; padding:var(--s3); border:1px solid var(--line); border-radius:var(--radius); background:var(--surface-alt); }
-.own__package[data-selected="1"] { border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
-.own__package-title { font-weight:var(--weight-semibold); margin:0 0 var(--s2); }
-.own__package-price { font-size:var(--text-lg); font-weight:var(--weight-semibold); margin:0; }
-.own__package-meta,.own__package-evidence { color:var(--ink-muted); font-size:var(--text-sm); }
-.own__package-evidence { display:grid; gap:var(--s1); margin:var(--s2) 0; }
-@media (max-width: 700px) { .own__packages { grid-template-columns:1fr; } }
+/* ══ v0.11.0 · THE RATE TABLE ═══════════════════════════════════════════
+   Packages are compared, not narrated: one row each, one vocabulary, and
+   the six things a package either feeds them or does not as a strip of
+   three-state glyphs. Nothing merely unconfirmed is ever spelled out. */
+.own__packages { min-width: 0; margin-top: var(--s3); }
+.own__rateswrap { margin: 0; }
+.own__rates { width: 100%; border-collapse: collapse; }
+.own__rates-h {
+  padding: 0 var(--s3) var(--s1) 0;
+  border-bottom: var(--hair) solid var(--line-hair);
+  text-align: left; vertical-align: bottom;
+  font-size: var(--text-2xs); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; font-weight: var(--weight-semi);
+  color: var(--ink-faint); white-space: nowrap;
+}
+.own__rates-h--pick { width: 1.75rem; padding-right: var(--s2); }
+.own__rates-h--price { text-align: right; }
+.own__rate { border-bottom: var(--hair) solid var(--line); cursor: pointer; }
+.own__rate:last-child { border-bottom: 0; }
+.own__rate > * { padding: var(--s2) var(--s3) var(--s2) 0; border-bottom: 0; vertical-align: top; }
+.own__rate:hover { background: var(--surface-alt); }
+.own__rate[data-selected="1"] .own__rate-title { color: var(--accent-on-soft); }
+.own__rate[data-selected="1"] > :first-child { box-shadow: inset 2px 0 0 var(--accent-fill); }
+.own__rate-pick { width: 1.75rem; padding-right: var(--s2); }
+.own__rate-radio { accent-color: var(--accent-fill); margin: 0; }
+.own__rate-name {
+  display: table-cell; text-align: left; letter-spacing: normal;
+  text-transform: none; font-weight: var(--weight-normal); min-width: 12ch;
+}
+.own__rate-title { display: block; font-size: var(--text-sm); font-weight: var(--weight-semi); color: var(--ink); }
+.own__rate-room,
+.own__rate-terms { display: block; font-size: var(--text-xs); color: var(--ink-muted); }
+.own__rate-terms { color: var(--ink-faint); max-width: 46ch; }
+.own__rate-when { font-size: var(--text-sm); color: var(--ink-muted); white-space: nowrap; }
+.own__rate-price {
+  text-align: right; white-space: nowrap;
+  font-size: var(--text-sm); font-weight: var(--weight-semi);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.own__rate-price .money__orig { display: block; font-weight: var(--weight-normal); }
+.own__rate-price .orx__kind {
+  margin-left: var(--s1); padding: 0 3px; vertical-align: baseline;
+  border-color: var(--line); color: var(--ink-faint);
+  font-weight: var(--weight-normal); letter-spacing: 0; text-transform: none;
+}
+.own__rate-incl { white-space: nowrap; }
+.own__rate-incl[data-known="0"] { opacity: 0.72; }
+.own__incl {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.5rem; height: 1.25rem; margin-right: 3px; padding: 0 3px;
+  border: var(--hair) solid var(--line-strong); border-radius: var(--radius-sm);
+  font-size: var(--text-2xs); font-weight: var(--weight-semi);
+  color: var(--ink-faint); background: none; cursor: help;
+}
+.own__incl[data-state="included"] { background: var(--ink); border-color: var(--ink); color: var(--ink-inverse); }
+.own__incl[data-state="excluded"] { border-style: dashed; color: var(--ink-faint); text-decoration: line-through; }
+.own__incl[data-state="unconfirmed"] { border-color: var(--line); color: var(--ink-faint); }
+
+/* the select is the same control in its quiet form — attached, operable,
+   never a second drawing of the fact the table already carries */
+.own__hotel--quiet {
+  position: absolute; width: 1px; height: 1px;
+  margin: 0; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+.own__picks--quiet { margin: 0; }
+
+/* one line under the table: what the package feeds them, and the way out */
+.own__under {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--s2) var(--s5); margin-top: var(--s4);
+}
+.own__under[hidden] { display: none; }
+.own__typedlink { padding-left: 0; }
+
+.own__confirm[hidden] { display: none; }
+.own__confirm { margin-top: var(--s4); }
+.own__display { margin-top: var(--s5); }
+.own__confirm > .orx__editorsum { font-size: var(--text-sm); }
+.own__confirmnote { margin: 0; font-size: var(--text-xs); color: var(--ink-faint); max-width: var(--measure); }
+.own__inclrow .orx__field--incl { flex: 0 1 7.5rem; }
+.own__confirmsave { align-self: start; }
+
+/* the ledger's total: what is still missing, as chips, never a sentence */
+.own__gaps {
+  grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--s1); margin-top: var(--s2);
+}
+.own__gapslabel {
+  font-size: var(--text-2xs); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; color: var(--ink-faint); margin-right: var(--s1);
+}
+.own__gap {
+  padding: 1px var(--s2); border: var(--hair) dashed var(--line-strong);
+  border-radius: var(--radius-round); font-size: var(--text-xs); color: var(--ink-muted);
+}
+.own__gappill { font-size: var(--text-xs); color: var(--ink-faint); }
+.fact__sub .own__gappill { margin-left: var(--s2); }
+
+/* review: accent words on the page's own ground, never a tinted box */
+.own__review {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s1) var(--s3);
+  margin: 0; padding-left: var(--s3);
+  border-left: 2px solid var(--accent-fill);
+  font-size: var(--text-sm);
+}
+.own__review-word { color: var(--accent-on-soft); font-weight: var(--weight-medium); }
+.own__review-btn { padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.own__review-btn:hover { color: var(--accent-hover); }
+
+/* provenance is one disclosure, closed — never a paragraph on arrival */
+.own__how { margin: 0; }
+.own__howsum {
+  cursor: pointer; list-style: none;
+  font-size: var(--text-xs); color: var(--ink-faint);
+}
+.own__howsum::-webkit-details-marker { display: none; }
+.own__howsum::after { content: " \25BE"; }
+.own__how[open] > .own__howsum::after { content: " \25B4"; }
+.own__howsum:hover { color: var(--ink-muted); }
+.own__how .own__caption,
+.own__how .own__flightline { margin: var(--s1) 0 0; }
+
+@media (max-width: 720px) {
+  /* the table becomes stacked rows: name + price, then nights + strip */
+  .own__rates, .own__rates tbody, .own__rate { display: block; width: 100%; }
+  .own__rates thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); }
+  .own__rate {
+    display: grid; grid-template-columns: 1.5rem 1fr auto;
+    gap: 0 var(--s2); padding: var(--s2) 0;
+  }
+  .own__rate > * { padding: 0; }
+  .own__rate-pick { grid-column: 1; grid-row: 1 / span 2; align-self: start; padding-top: 2px; }
+  .own__rate-name { display: block; grid-column: 2; grid-row: 1; }
+  .own__rate-price { grid-column: 3; grid-row: 1; }
+  .own__rate-when { grid-column: 2; grid-row: 2; }
+  .own__rate-incl { grid-column: 3; grid-row: 2; text-align: right; }
+  .own__rate[data-selected="1"] > :first-child { box-shadow: none; }
+  .own__rate[data-selected="1"] { box-shadow: inset 2px 0 0 var(--accent-fill); padding-left: var(--s2); }
+}
 
 /* ==== src/css/32-view-compare.css ==== */
 /* 32-view-compare.css — the Compare screen. OWNER: IMPL-4.
@@ -8912,7 +9051,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.10.5';
+  T.version = '0.11.0';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -15250,7 +15389,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var hasAssumptions = ['ownFlights', 'ownMeals', 'ownGround', 'ownExtras', 'ownBoard'].some(function (k) { return v[k] != null; });
     var reviewed = v.ownReviewQuoteId === (v.ownQuoteId || '__typed__');
     if (hasAssumptions && !reviewed) reviewReasons.push('Review saved flight, meal and add-on assumptions for this package');
-    var boardKey = reviewed ? v.ownBoard : null;
+    var boardKey = v.ownBoard;
     var lines = S.LINES.map(function (l) {
       var typed = num(v[l.field]);
       var included = l.field === 'ownGround' && evidence.transfer === 'included'
@@ -18710,18 +18849,35 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var S = T.scenario;
       var own = S && S.headlineOf ? S.headlineOf(id, ctx && ctx.budget ? ctx.budget.value : null, f) : null;
       if (own) {
-        var ownSub = null;
-        if (own.headroom != null) {
-          ownSub = U.el('span', { class: 'headroom headroom--' + own.state, dataset: { state: own.state } });
-          if (own.state === 'over') ownSub.appendChild(U.el('span', { 'aria-hidden': 'true' }, '▲'));
-          ownSub.appendChild(U.el('span', {}, own.headroom === 0 ? 'right on the line'
-            : F.money(Math.abs(own.headroom)) + (own.headroom < 0 ? ' over' : ' under')));
+        /* v0.11.0 — the strip owns the figures, the section owns the words:
+           the headroom is stated here whether or not lines are still blank,
+           and what is missing is a count, never the ledger's sentence. */
+        var ownBudget = ctx && ctx.budget ? num(ctx.budget.value) : null;
+        var ownHr = own.headroom != null ? own.headroom
+          : (ownBudget != null && own.total != null ? ownBudget - own.total : null);
+        var ownState = ownHr == null ? null : ownHr >= 0 ? 'under' : ownHr >= -250 ? 'borderline' : 'over';
+        var ownBits = [];
+        if (ownHr != null) {
+          var ownHead = U.el('span', { class: 'headroom headroom--' + ownState, dataset: { state: ownState } });
+          if (ownState === 'over') ownHead.appendChild(U.el('span', { 'aria-hidden': 'true' }, '▲'));
+          ownHead.appendChild(U.el('span', {}, ownHr === 0 ? 'right on the line'
+            : F.money(Math.abs(ownHr)) + (ownHr < 0 ? ' over' : ' under')));
+          ownBits.push(ownHead);
         }
+        /* the same set the ledger chips name, counted once: a line the
+           workbook cannot fill is a gap whether or not it is switched on. */
+        var ownSeen = {}, ownGaps = 0;
+        own.lines.filter(function (l) { return l.value == null && l.source !== 'included'; })
+          .map(function (l) { return l.short; })
+          .concat(own.missing || []).forEach(function (m) {
+            if (m === 'saved assumptions review' || ownSeen[m]) return;
+            ownSeen[m] = 1; ownGaps++;
+          });
+        if (ownGaps) ownBits.push(U.el('span', { class: 'own__gappill' }, 'estimate · ' + ownGaps + ' gap' + (ownGaps === 1 ? '' : 's')));
+        else if (own.reviewRequired) ownBits.push(U.el('span', { class: 'own__gappill' }, 'review below'));
         var ownMoney = F.money(own.total);
         if (own.hotel.converted && ownMoney.charAt(0) !== '≈') ownMoney = '≈' + ownMoney;
-        if (own.missing && own.missing.length) ownSub = U.el('span', { class: 'own__missing' }, 'Still needed: ' + own.missing.join(', '));
-        else if (own.reviewRequired) ownSub = U.el('span', { class: 'own__missing' }, 'Review carried-over assumptions below');
-        var ownFact = fact(own.label || 'Known subtotal', ownMoney, { sub: ownSub, className: 'fact--total fact--own' });
+        var ownFact = fact('Your all-in', ownMoney, { sub: ownBits.length ? ownBits : null, className: 'fact--total fact--own' });
         ownFact.title = 'Your own scenario — ' + (own.hotel.source === 'quote' ? 'the package you picked' : 'the hotel figure you typed') +
           ' plus flights, meals and ground. The workbook’s ' + totalWord + ' is in The money below' +
           (total == null ? ' (unpriced)' : ' (' + F.money(total) + ')') + '; the budget filters still use that one.';
@@ -18955,10 +19111,15 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
     var rows = U.el('div', { class: 'stand__rows' });
     body.appendChild(rows);
+    /* v0.11.0 — the status line and the one control that belongs with it
+       share a row: four elements saying the same thing became one. */
     var badge = U.el('div', { class: 'stand__badge' });
     body.appendChild(badge);
+    var status = U.el('p', { class: 'stand__line' });
+    badge.appendChild(status);
     var controls = U.el('div', { class: 'stand__controls' });
-    body.appendChild(controls);
+    badge.appendChild(controls);
+    var STAND_VERB = { love: 'loves it', like: 'likes it', maybe: 'is unsure', no: 'dislikes it' };
 
     painters.push(function () {
       var r = rowOf(id) || row;
@@ -18986,20 +19147,20 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         });
       }
 
-      /* the derived agreement badge + its one line */
-      U.clear(badge);
+      /* v0.11.0 — one status line, not a pill plus a sentence plus a mark
+         strip: the four-segment rows above already carry the reactions, so
+         this states them once in words and hides itself when there is
+         nothing left for it to say. */
       var ag = T.plan.agreementFor(id);
-      var marks = U.el('span', { class: 'badge__marks', 'aria-hidden': 'true' });
-      TRAVELERS().forEach(function (t) {
+      var said = 0;
+      var words = TRAVELERS().map(function (t) {
         var re = T.plan.reaction(id, t.id);
-        marks.appendChild(U.el('span', { class: 'mark mark--' + (re || 'none') },
-          t.label.charAt(0) + T.cards.REACTION_GLYPH[re || 'none']));
+        if (re) said++;
+        return t.label + ' ' + (STAND_VERB[re] || 'hasn’t said');
       });
-      var pill = U.el('p', { class: 'badge badge--' + ag.token.replace(/^waiting.+/, 'waiting') });
-      pill.appendChild(marks);
-      pill.appendChild(U.el('span', { class: 'badge__label' }, ag.label));
-      badge.appendChild(pill);
-      badge.appendChild(U.el('p', { class: 'stand__sub' }, ag.sub));
+      status.dataset.token = ag.token.replace(/^waiting.+/, 'waiting');
+      U.setText(status, said === 0 ? 'Neither of you has weighed in yet.' : words.join(' · '));
+      status.hidden = said >= TRAVELERS().length && !!r.reviewed;
 
       /* v0.9.0: Reviewed lives here (and on the phone bar); the status pill
          lives in the header's action row — one control per fact. */
@@ -19917,22 +20078,66 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     if (!S || !S.totalOf) { host.hidden = true; return function () {}; }
     function fields() { var r = rowOf(id) || row; return (r && r.rec && r.rec.f) || null; }
 
+    /* v0.11.0 — the six things a package either feeds them or does not. One
+       fixed order, one glyph each, three states. Eleven printed
+       "unconfirmed"s become one muted strip. */
+    var INCL = [
+      { key: 'breakfast', tag: 'B', word: 'Breakfast' },
+      { key: 'lunch', tag: 'L', word: 'Lunch' },
+      { key: 'dinner', tag: 'D', word: 'Dinner' },
+      { key: 'drinks', tag: 'Dk', word: 'Drinks' },
+      { key: 'transfer', tag: 'Tr', word: 'Transfer' },
+      { key: 'spa', tag: 'Sp', word: 'Spa' }
+    ];
+    var EV_FIELDS = ['room', 'startDate', 'endDate', 'guests', 'breakfast', 'lunch', 'dinner',
+      'drinks', 'transfer', 'spa', 'restrictions', 'supplements', 'cancellation', 'source'];
+    var EV_LABEL = {
+      room: 'Room', startDate: 'Arrival date', endDate: 'Departure date', guests: 'Guests',
+      breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', drinks: 'Drinks',
+      transfer: 'Transfer', spa: 'Spa', restrictions: 'Restrictions',
+      supplements: 'Supplements / tax', cancellation: 'Cancellation', source: 'Source / URL'
+    };
+    var INCL_VALUES = ['unconfirmed', 'included', 'excluded'];
+    var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    function inclState(v) {
+      var s = v == null ? '' : String(v).trim().toLowerCase();
+      if (!s || s === 'unconfirmed' || s === 'unknown') return 'unconfirmed';
+      if (s.indexOf('exclud') >= 0 || s.indexOf('not includ') >= 0 || s === 'no' || s === 'none') return 'excluded';
+      if (s.indexOf('includ') >= 0 || s === 'yes' || s === 'y') return 'included';
+      return 'unconfirmed';
+    }
+    function shortDates(a, b) {
+      var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(a || ''));
+      var n = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(b || ''));
+      if (!m || !n) return [a, b].filter(Boolean).join(' → ');
+      return MONTHS[+m[2] - 1] + ' ' + (+m[3]) + '–' +
+        (m[2] === n[2] ? String(+n[3]) : MONTHS[+n[2] - 1] + ' ' + (+n[3]));
+    }
+
     host.appendChild(U.el('p', {
       class: 'detail__sublabel',
       title: 'Your scenario — a package you picked plus the workbook’s fare and allowance, or figures you type; never the workbook’s modelled total'
     }, '1 · Compare packages for the whole stay'));
 
-    /* -- the ONE control on the page for the hotel line: a package they wrote
-          down, or "type a dollar figure". It sits in the display, not in the
-          drawer, because picking a package is the whole gesture (v0.10.3). -- */
+    /* -- the hotel line has ONE control. With packages on the record it is
+          the rate table's radio group; the select below stays in the DOM as
+          the same control's accessible/no-table form (and the one a keyboard
+          or a script reaches), never drawn twice. -- */
     var picks = U.el('div', { class: 'own__picks' });
     var pick = U.el('div', { class: 'own__pick own__hotel' });
     var hotelSel = U.el('select', { class: 'select', dataset: { field: 'ownQuoteId' }, 'aria-label': 'Package' });
     pick.appendChild(U.el('span', { class: 'own__picklabel' }, 'Package'));
     pick.appendChild(hotelSel);
     picks.appendChild(pick);
-    /* v0.10.4 — what the package feeds them: scales the meals default
-       (S.BOARD shares). Its own control because it is its own fact. */
+    host.appendChild(picks);
+
+    var packages = U.el('div', { class: 'own__packages' });
+    host.appendChild(packages);
+
+    /* -- under the table: what the package feeds them, and the escape hatch
+          out of packages altogether. One line, two controls, no boxes. -- */
+    var under = U.el('div', { class: 'own__under' });
     var boardPick = U.el('div', { class: 'own__pick own__board' });
     var boardSel = U.el('select', { class: 'select', dataset: { field: 'ownBoard' }, 'aria-label': 'Meals in the package' });
     boardSel.appendChild(U.el('option', { value: '' }, 'As the workbook assumed'));
@@ -19942,9 +20147,20 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     boardSel.addEventListener('change', function () { write('ownBoard', boardSel.value || null); });
     boardPick.appendChild(U.el('span', { class: 'own__picklabel' }, 'Meals in it'));
     boardPick.appendChild(boardSel);
-    host.appendChild(picks);
-    var packages = U.el('div', { class: 'own__packages' });
-    host.appendChild(packages);
+    under.appendChild(boardPick);
+    var typedLink = U.el('button', { type: 'button', class: 'btn btn--link own__typedlink' },
+      'or type your own hotel figure ›');
+    typedLink.addEventListener('click', function () {
+      hotelSel.value = 'typed';
+      hotelSel.dispatchEvent(new Event('change'));
+    });
+    under.appendChild(typedLink);
+    host.appendChild(under);
+
+    /* -- ONE confirm drawer, for the package they picked. Closed. -- */
+    var confirm = U.el('details', { class: 'own__evidence own__confirm' });
+    confirm.hidden = true;
+    host.appendChild(confirm);
 
     var display = U.el('div', { class: 'own__display' });
     host.appendChild(display);
@@ -19954,8 +20170,6 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var form = U.el('div', { class: 'orx__editorbody own__form' });
     editor.appendChild(form);
     host.appendChild(editor);
-    form.appendChild(boardPick);
-    boardPick.querySelector('.own__picklabel').textContent = 'Meal allowance assumption (an estimate)';
     var extrasToggle = U.el('input', { type: 'checkbox', dataset: { field: 'ownExtrasSelected' } });
     extrasToggle.addEventListener('change', function () { write('ownExtrasSelected', extrasToggle.checked); });
     form.appendChild(U.el('label', { class: 'own__extras-toggle' }, [extrasToggle, ' Include optional extras in this trip estimate']));
@@ -19965,7 +20179,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       paintDisplay();
     }
 
-    /* -- the typed hotel figure: revealed only by "Type a dollar figure" -- */
+    /* -- the typed hotel figure: revealed only by "type your own figure" -- */
     var hotelRow = U.el('div', { class: 'orx__row' });
     var hotelIn = U.el('input', {
       type: 'text', inputmode: 'decimal', class: 'input', placeholder: 'Dollars, whole stay',
@@ -20035,6 +20249,21 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       paintEditor();
     });
 
+    /** The rate table and the select are one control: this is its writer. */
+    function choose(quoteId) {
+      hotelSel.value = quoteId;
+      store.dispatch('scenario/selectPackage', { id: id, quoteId: quoteId });
+      hotelInField.hidden = true;
+      Array.prototype.forEach.call(packages.querySelectorAll('.own__rate'), function (tr) {
+        var on = tr.dataset.quote === quoteId;
+        tr.dataset.selected = on ? '1' : '0';
+        var rd = tr.querySelector('.own__rate-radio');
+        if (rd) rd.checked = on;
+      });
+      paintDisplay();
+      paintEditor();
+    }
+
     function openEditor() {
       editor.open = true;
       host.classList.add('own--writing');
@@ -20067,78 +20296,239 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     function pricedQuotes() {
       return T.outreach ? T.outreach.quotesOf(id) : [];
     }
+    function evidenceOf(q) {
+      return (T.outreach && T.outreach.evidenceOf) ? T.outreach.evidenceOf(q) : (q && q.evidence) || {};
+    }
 
-    var packageSignature = null;
-    function paintPackages(quotes) {
-      var signature = U.stableStringify([quotes, S.of(id).ownQuoteId]);
-      if (signature === packageSignature || packages.contains(document.activeElement)) return;
-      packageSignature = signature;
+    /* -- 1 · the rate table ------------------------------------------------
+       One row per quote: pick · name (+ room, + terms) · nights and dates ·
+       price in the resort's own currency · the six-glyph inclusions strip.
+       Nothing that is merely unconfirmed is ever spelled out. */
+    var rateSignature = null;
+    function paintRates(quotes) {
+      var sel = S.of(id).ownQuoteId;
+      var signature = U.stableStringify([quotes.map(function (q) {
+        return [q.id, q.label, q.amount, q.currency, q.nights, q.dates, q.kind, evidenceOf(q)];
+      }), sel, T.currency && T.currency.mode ? T.currency.mode() : null]);
+      if (signature === rateSignature || packages.contains(document.activeElement)) return;
+      rateSignature = signature;
       U.clear(packages);
-      quotes.forEach(function (q) {
-        var e = T.outreach.evidenceOf ? T.outreach.evidenceOf(q) : (q.evidence || {});
-        var selected = S.of(id).ownQuoteId === q.id;
-        var card = U.el('article', { class: 'own__package', dataset: { quote: q.id, selected: selected ? '1' : '0' } });
-        card.appendChild(U.el('h3', {}, q.label || 'Resort package'));
-        card.appendChild(U.el('p', { class: 'own__package-price' }, num(q.amount) == null ? 'Price unconfirmed' : F.money(q.amount, { currency: q.currency, convert: false })));
-        card.appendChild(U.el('p', { class: 'own__package-meta' }, (q.nights ? q.nights + ' nights' : 'Nights unconfirmed') + ' · ' + (e.guests ? e.guests + ' guests' : 'Guest count unconfirmed')));
-        var info = U.el('dl', { class: 'own__inclusions' });
-        function line(label, value) { info.appendChild(U.el('dt', {}, label)); info.appendChild(U.el('dd', {}, value || 'Unconfirmed')); }
-        line('Room', e.room || q.label);
-        line('Dates', e.startDate && e.endDate ? e.startDate + ' → ' + e.endDate : q.dates);
-        ['breakfast', 'lunch', 'dinner', 'drinks', 'transfer', 'spa'].forEach(function (key) { line(key.charAt(0).toUpperCase() + key.slice(1), e[key] || 'unconfirmed'); });
-        line('Restrictions', e.restrictions); line('Supplements / tax', e.supplements); line('Cancellation', e.cancellation); line('Source', e.source);
-        card.appendChild(info);
-        var choose = U.el('button', { type: 'button', class: 'btn' + (selected ? ' btn--primary' : ''), 'aria-pressed': selected ? 'true' : 'false' }, selected ? 'Selected package' : 'Choose this package');
-        choose.addEventListener('click', function () { store.dispatch('scenario/selectPackage', { id: id, quoteId: q.id }); paintDisplay(); paintEditor(); });
-        card.appendChild(choose);
-        var edit = U.el('details', { class: 'own__evidence' });
-        edit.appendChild(U.el('summary', {}, 'Confirm package details from the offer'));
-        edit.appendChild(U.el('p', {}, 'Record only what the source confirms. Unconfirmed meals keep an estimated allowance; included transfers are not added twice.'));
-        var controls = {};
-        ['room', 'startDate', 'endDate', 'guests', 'breakfast', 'lunch', 'dinner', 'drinks', 'transfer', 'spa', 'restrictions', 'supplements', 'cancellation', 'source'].forEach(function (key) {
-          var inclusion = ['breakfast', 'lunch', 'dinner', 'drinks', 'transfer', 'spa'].indexOf(key) >= 0;
-          var control = U.el(inclusion ? 'select' : 'input', { class: inclusion ? 'select' : 'input', 'aria-label': key + ' for ' + q.label });
-          if (inclusion) ['unconfirmed', 'included', 'excluded'].forEach(function (value) { control.appendChild(U.el('option', { value: value }, value)); });
-          else control.type = key === 'startDate' || key === 'endDate' ? 'date' : key === 'guests' ? 'number' : 'text';
-          control.value = e[key] == null ? (inclusion ? 'unconfirmed' : '') : String(e[key]);
-          controls[key] = control;
-          edit.appendChild(U.el('label', {}, [U.el('span', {}, ({startDate:'Arrival date',endDate:'Departure date',guests:'Guests',source:'Source / URL',supplements:'Supplements / tax'})[key] || key), control]));
-        });
-        var save = U.el('button', { type: 'button', class: 'btn' }, 'Save confirmed details');
-        save.addEventListener('click', function () {
-          var evidence = {};
-          Object.keys(controls).forEach(function (key) { evidence[key] = key === 'guests' ? orxNumOrNull(controls[key].value) : controls[key].value || null; });
-          save.blur();
-          store.dispatch('outreach/upsertQuote', { id: id, entryId: q.id, value: { evidence: evidence } });
-          packageSignature = null;
-          paintDisplay(); paintEditor(); announce('Package details saved.');
-        });
-        edit.appendChild(save); card.appendChild(edit); packages.appendChild(card);
+      if (!quotes.length) return;
+      var scroll = U.el('div', { class: 'scroll-x own__rateswrap' });
+      var table = U.el('table', { class: 'own__rates' });
+      var thead = U.el('thead');
+      var hrow = U.el('tr');
+      [['own__rates-h own__rates-h--pick', 'Pick'], ['own__rates-h', 'Package'],
+        ['own__rates-h', 'Nights'], ['own__rates-h own__rates-h--price', 'Price'],
+        ['own__rates-h', 'In it']].forEach(function (h) {
+        hrow.appendChild(U.el('th', { scope: 'col', class: h[0] }, h[1]));
       });
+      thead.appendChild(hrow);
+      table.appendChild(thead);
+      var tbody = U.el('tbody');
+      quotes.forEach(function (q) {
+        var e = evidenceOf(q);
+        var on = sel === q.id;
+        var tr = U.el('tr', { class: 'own__rate', dataset: { quote: q.id, selected: on ? '1' : '0' } });
+
+        var radio = U.el('input', {
+          type: 'radio', class: 'own__rate-radio', name: 'own-package-' + id, value: q.id,
+          'aria-label': 'Use ' + (q.label || 'this package') + ' as the hotel line'
+        });
+        radio.checked = on;
+        radio.addEventListener('change', function () { choose(q.id); });
+        tr.appendChild(U.el('td', { class: 'own__rate-pick' }, radio));
+
+        var name = U.el('th', { scope: 'row', class: 'own__rate-name' });
+        name.appendChild(U.el('span', { class: 'own__rate-title' }, q.label || 'Resort package'));
+        if (e.room && String(e.room).trim() && String(e.room) !== String(q.label || '')) {
+          name.appendChild(U.el('span', { class: 'own__rate-room' }, String(e.room)));
+        }
+        var terms = [];
+        if (e.restrictions) terms.push(String(e.restrictions));
+        if (e.supplements) terms.push('incl. ' + String(e.supplements));
+        if (e.cancellation) terms.push(String(e.cancellation));
+        if (e.source) terms.push(String(e.source));
+        if (terms.length) name.appendChild(U.el('span', { class: 'own__rate-terms' }, terms.join(' · ')));
+        tr.appendChild(name);
+
+        var when = [];
+        if (num(q.nights) != null) when.push(q.nights + ' nt');
+        var dates = e.startDate && e.endDate ? shortDates(e.startDate, e.endDate)
+          : (q.dates ? String(q.dates) : null);
+        if (dates) when.push(dates);
+        var whenCell = U.el('td', { class: 'own__rate-when' });
+        if (when.length) U.setText(whenCell, when.join(' · '));
+        else U.fill(whenCell, missing('nights & dates'));
+        tr.appendChild(whenCell);
+
+        var price = U.el('td', { class: 'own__rate-price' });
+        U.fill(price, q.amount == null ? missing('no number given')
+          : F.moneyNode(q.amount, { currency: q.currency }));
+        if (q.kind === 'estimate') {
+          price.appendChild(U.el('span', {
+            class: 'orx__kind', dataset: { kind: 'estimate' },
+            title: 'Their estimate, not a firm quote'
+          }, 'estimate'));
+        }
+        tr.appendChild(price);
+
+        var strip = U.el('td', { class: 'own__rate-incl' });
+        var known = 0;
+        INCL.forEach(function (c) {
+          var st = inclState(e[c.key]);
+          if (st !== 'unconfirmed') known++;
+          var raw = e[c.key] == null || String(e[c.key]).trim() === '' ? null : String(e[c.key]);
+          var words = c.word + ': ' + (st === 'included' ? 'included' : st === 'excluded' ? 'not included' : 'not confirmed') +
+            (raw && INCL_VALUES.indexOf(raw.toLowerCase()) < 0 ? ' — ' + raw : '');
+          strip.appendChild(U.el('span', {
+            class: 'own__incl', dataset: { state: st }, title: words, 'aria-label': words
+          }, c.tag));
+        });
+        strip.dataset.known = known ? '1' : '0';
+        tr.appendChild(strip);
+
+        tr.addEventListener('click', function (ev) {
+          var t = ev.target;
+          if (t === radio) return;
+          if (t && t.closest && t.closest('a, button')) return;
+          radio.checked = true;
+          choose(q.id);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      scroll.appendChild(table);
+      packages.appendChild(scroll);
+    }
+
+    /* -- the one confirm drawer, for the selected package only ------------- */
+    var confirmSignature = null;
+    function paintConfirm(quotes) {
+      var want = S.of(id).ownQuoteId;
+      var q = null;
+      quotes.forEach(function (x) { if (x.id === want) q = x; });
+      confirm.hidden = !q;
+      if (!q) { confirmSignature = null; U.clear(confirm); return; }
+      var e = evidenceOf(q);
+      var signature = U.stableStringify([q.id, q.label, e]);
+      if (signature === confirmSignature || confirm.contains(document.activeElement)) return;
+      confirmSignature = signature;
+      var wasOpen = confirm.open;
+      U.clear(confirm);
+      confirm.appendChild(U.el('summary', { class: 'orx__editorsum' },
+        'Confirm details for ' + (q.label || 'this package')));
+      var body = U.el('div', { class: 'orx__editorbody own__confirmbody' });
+      var controls = {};
+      function ctl(key) {
+        var inclusion = INCL_VALUES && INCL.some(function (c) { return c.key === key; });
+        var c = U.el(inclusion ? 'select' : 'input', {
+          class: inclusion ? 'select' : 'input',
+          'aria-label': EV_LABEL[key] + ' for ' + (q.label || 'this package')
+        });
+        var raw = e[key] == null ? '' : String(e[key]);
+        if (inclusion) {
+          INCL_VALUES.forEach(function (v) { c.appendChild(U.el('option', { value: v }, v)); });
+          if (raw && INCL_VALUES.indexOf(raw) < 0) c.appendChild(U.el('option', { value: raw }, raw));
+          c.value = raw || 'unconfirmed';
+        } else {
+          c.type = key === 'startDate' || key === 'endDate' ? 'date' : key === 'guests' ? 'number' : 'text';
+          c.value = raw;
+        }
+        controls[key] = c;
+        return c;
+      }
+      var r1 = U.el('div', { class: 'orx__row' });
+      r1.appendChild(orxField(EV_LABEL.room, ctl('room'), null, 'orx__field--wide'));
+      r1.appendChild(orxField(EV_LABEL.startDate, ctl('startDate'), null, 'orx__field--sm'));
+      r1.appendChild(orxField(EV_LABEL.endDate, ctl('endDate'), null, 'orx__field--sm'));
+      r1.appendChild(orxField(EV_LABEL.guests, ctl('guests'), null, 'orx__field--num'));
+      body.appendChild(r1);
+      var r2 = U.el('div', { class: 'orx__row own__inclrow' });
+      INCL.forEach(function (c) { r2.appendChild(orxField(c.word, ctl(c.key), null, 'orx__field--incl')); });
+      body.appendChild(r2);
+      var r3 = U.el('div', { class: 'orx__row' });
+      ['restrictions', 'supplements', 'cancellation', 'source'].forEach(function (k) {
+        r3.appendChild(orxField(EV_LABEL[k], ctl(k), null, 'orx__field--wide'));
+      });
+      body.appendChild(r3);
+      var save = U.el('button', { type: 'button', class: 'btn own__confirmsave' }, 'Save confirmed details');
+      save.addEventListener('click', function () {
+        var evidence = {};
+        EV_FIELDS.forEach(function (k) {
+          evidence[k] = k === 'guests' ? orxNumOrNull(controls[k].value) : (controls[k].value || null);
+        });
+        save.blur();
+        store.dispatch('outreach/upsertQuote', { id: id, entryId: q.id, value: { evidence: evidence } });
+        confirmSignature = null; rateSignature = null;
+        paintDisplay(); paintEditor(); announce('Package details saved.');
+      });
+      body.appendChild(U.el('p', { class: 'own__confirmnote' },
+        'Record only what the source confirms. Unconfirmed meals keep an estimated allowance; included transfers are not added twice.'));
+      body.appendChild(save);
+      confirm.appendChild(body);
+      confirm.open = wasOpen;
+    }
+
+    /* -- the gaps, as chips: short words, never a sentence ----------------- */
+    var GAP_WORDS = {
+      'package price': 'package price',
+      'package price for two guests': '2 guests?',
+      'package dates': 'package dates',
+      'flight dates': 'flight dates',
+      'matching flight estimate': 'reprice flight',
+      'breakfast allowance / inclusion': 'breakfast?'
+    };
+    function gapChips(t, blanks) {
+      var seen = {}, out = [];
+      blanks.concat(t.missing || []).forEach(function (m) {
+        if (m === 'saved assumptions review') return;
+        var w = GAP_WORDS[m] || m;
+        if (seen[w]) return;
+        seen[w] = 1;
+        out.push(w);
+      });
+      if (!out.length) return null;
+      var wrap = U.el('div', { class: 'own__gaps' });
+      wrap.appendChild(U.el('span', { class: 'own__gapslabel' }, 'Still needed'));
+      out.slice(0, 6).forEach(function (w) { wrap.appendChild(U.el('span', { class: 'own__gap' }, w)); });
+      if (out.length > 6) wrap.appendChild(U.el('span', { class: 'own__gap own__gap--more' }, '+' + (out.length - 6) + ' more'));
+      return wrap;
+    }
+
+    function flightWords(fl) {
+      return 'Fare: ' + (fl.departure || 'departure airport unconfirmed') + ' → ' +
+        (fl.arrival || 'arrival airport unconfirmed') + ' · ' +
+        (fl.startDate ? fl.startDate + (fl.endDate ? ' → ' + fl.endDate : '') : 'dates unconfirmed') +
+        ' · baggage ' + (fl.baggage || 'unconfirmed') + ' · checked ' + (fl.checkedDate || 'unconfirmed') +
+        '. ' + (fl.note || '');
     }
 
     function paintDisplay() {
       U.clear(display);
       var has = S.has(id);
       var quotes = pricedQuotes();
-      paintPackages(quotes);
+      paintRates(quotes);
+      paintConfirm(quotes);
       U.toggleClass(host, 'own--empty', !has);
-      /* The package control only exists where there is a package to pick;
-         with nothing quoted the hotel line is a figure they type (drawer).
-         The meals control rides with it, or with any scenario already begun. */
+      /* One control per fact: with a rate table on the page the select is the
+         same control's quiet form — present and operable, never drawn twice. */
       pick.hidden = quotes.length === 0;
+      U.toggleClass(pick, 'own__hotel--quiet', quotes.length > 0);
+      U.toggleClass(picks, 'own__picks--quiet', quotes.length > 0);
       picks.hidden = quotes.length === 0 && !has;
+      under.hidden = quotes.length === 0 || !has;
+      boardPick.hidden = !has;
+      typedLink.hidden = !has;
       if (document.activeElement !== boardSel) boardSel.value = (S.of(id).ownBoard || '');
       if (!has) {
         var empty = U.el('p', { class: 'detail__absent own__empty' },
           quotes.length
-            ? 'Choose a package above to see the trip cost for two, with missing costs and unconfirmed flight dates beside the estimate. Or '
+            ? 'Pick a package above to see the trip cost for two, with what is still missing beside the estimate. Or '
             : 'The trip you’d actually book — a hotel figure plus your own flights, meals and ground — summed here, apart from the workbook’s model. ');
         var openIt = U.el('button', { type: 'button', class: 'btn btn--link own__open' },
           quotes.length ? 'type your own figures ›' : 'Build it ›');
         openIt.addEventListener('click', function () {
-          /* both wordings mean the same gesture: the hotel line becomes a
-             figure they type — the select's own "typed" branch does it */
           hotelSel.value = 'typed';
           hotelSel.dispatchEvent(new Event('change'));
         });
@@ -20147,15 +20537,34 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         return;
       }
       var ctx = qctx();
-      var t = S.totalOf(id, ctx && ctx.budget ? ctx.budget.value : null, { f: fields() });
-      display.appendChild(U.el('h3', { class: 'own__cost-heading' }, '2 · Trip cost for Solomon & Roni'));
+      var budget = ctx && ctx.budget ? num(ctx.budget.value) : null;
+      var t = S.totalOf(id, budget, { f: fields() });
+      /* a line nobody typed and the workbook cannot fill is blank — whether
+         or not it is switched on. The chips and the caption name the same
+         set, once each. */
+      var blanks = t.lines.filter(function (l) { return l.value == null && l.source !== 'included'; })
+        .map(function (l) { return l.short; });
+      var hr = (t.total != null && budget != null) ? budget - t.total : null;
+      var hrState = hr == null ? null : hr >= 0 ? 'under' : hr >= -250 ? 'borderline' : 'over';
+
+      display.appendChild(U.el('h3', { class: 'detail__sublabel own__cost-heading' },
+        '2 · Trip cost for Solomon & Roni'));
+
+      /* review: one accent line, no box, no paragraph */
       if (t.reviewRequired) {
-        var review = U.el('div', { class: 'own__review', role: 'status' });
-        review.appendChild(U.el('p', {}, 'Review this package: ' + (t.reviewReasons || []).join('; ') + '. Your entered figures are preserved.'));
-        var reviewBtn = U.el('button', { type: 'button', class: 'btn' }, 'I reviewed the carried-over figures');
-        reviewBtn.addEventListener('click', function () { store.dispatch('scenario/reviewPackage', { id: id }); paintDisplay(); paintEditor(); });
-        review.appendChild(reviewBtn); display.appendChild(review);
+        var review = U.el('p', { class: 'own__review', role: 'status' });
+        review.appendChild(U.el('span', { class: 'own__review-word' },
+          'Carried-over figures — review them'));
+        var reviewBtn = U.el('button', { type: 'button', class: 'btn btn--link own__review-btn' }, 'I reviewed them');
+        reviewBtn.title = (t.reviewReasons || []).join('; ') + '. Your entered figures are preserved.';
+        reviewBtn.addEventListener('click', function () {
+          store.dispatch('scenario/reviewPackage', { id: id });
+          paintDisplay(); paintEditor();
+        });
+        review.appendChild(reviewBtn);
+        display.appendChild(review);
       }
+
       var kv = U.el('dl', { class: 'kv detail__kv own__kv' });
 
       /* hotel line */
@@ -20174,37 +20583,44 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       else hotelVal = document.createTextNode(F.money(h.usd));
       kv.appendChild(kvRow(hotelKey, hotelVal, { missingLook: h.usd == null }));
 
+      /* the flight's own status rides on the Flights row — the page never
+         carries a paragraph that repeats a row it is standing next to. */
+      var flWord = t.flight
+        ? (t.flight.status === 'matched' ? 'dates match'
+          : t.flight.status === 'mismatch' ? 'dates differ — reprice' : 'dates unconfirmed')
+        : null;
       t.lines.forEach(function (l) {
         var sw = sourceWords(l);
+        var key = l.label + (sw ? ' · ' + sw : '');
+        if (l.field === 'ownFlights' && l.value != null && flWord) key += ' · ' + flWord;
         var optional = l.field === 'ownExtras' && !S.of(id).ownExtrasSelected && l.value == null;
-        var r = kvRow(l.label + (sw ? ' · ' + sw : ''), l.value == null ? (optional ? 'Optional · not selected' : missing('cost needed')) : F.money(l.value));
+        var r = kvRow(key, l.value == null ? (optional ? 'Optional · not selected' : missing('cost needed')) : F.money(l.value));
         if (l.source === 'included') r.appendChild(U.el('p', { class: 'kv__note' }, 'Included in the package'));
         r.dataset.source = l.source;
+        if (l.field === 'ownFlights' && t.flight) r.dataset.flight = t.flight.status;
         kv.appendChild(r);
       });
 
       var totalVal = t.total == null ? missing('nothing to sum without a hotel figure')
         : (h.converted ? approx(t.total) : F.money(t.total));
-      var totalRow = kvRow(t.label || 'Known subtotal', totalVal, { strong: true, missingLook: t.total == null,
-        note: t.missing && t.missing.length ? 'Still needed: ' + t.missing.join(', ') : t.reviewRequired ? 'Review carried-over assumptions before using this total.' : 'For two · includes the selected costs above; estimates remain estimates.' });
+      var totalRow = kvRow('Your all-in', totalVal, { strong: true, missingLook: t.total == null });
       totalRow.classList.add('own__row--total');
+      var chips = gapChips(t, blanks);
+      if (chips) totalRow.appendChild(chips);
       kv.appendChild(totalRow);
 
-      if (t.headroom != null && ctx && ctx.budget) {
-        var hw = t.state === 'under'
-          ? (t.headroom === 0 ? 'right on the line' : F.money(t.headroom) + ' under ✓')
-          : F.money(-t.headroom) + ' over' + (t.state === 'borderline' ? ' — borderline' : ' ▲');
-        var hr = kvRow('Against your ' + F.money(ctx.budget.value) + ' budget', hw);
-        hr.dataset.state = t.state;
-        kv.appendChild(hr);
+      if (hr != null) {
+        var hw = hrState === 'under'
+          ? (hr === 0 ? 'right on the line' : F.money(hr) + ' under ✓')
+          : F.money(-hr) + ' over' + (hrState === 'borderline' ? ' — borderline' : ' ▲');
+        var hrRow = kvRow('Against your ' + F.money(budget) + ' budget', hw);
+        hrRow.dataset.state = hrState;
+        kv.appendChild(hrRow);
       }
       display.appendChild(kv);
-      if (t.flight) {
-        var fl = t.flight;
-        display.appendChild(U.el('p', { class: 'own__flight', dataset: { status: fl.status } }, 'Flight ' + fl.status + ' · ' + (fl.departure || 'Departure airport unconfirmed') + ' → ' + (fl.arrival || 'Arrival airport unconfirmed') + ' · ' + (fl.startDate || 'Dates unconfirmed') + (fl.endDate ? ' → ' + fl.endDate : '') + ' · baggage: ' + (fl.baggage || 'unconfirmed') + ' · checked: ' + (fl.checkedDate || 'unconfirmed') + '. ' + (fl.note || '') ));
-      }
 
-      /* the caption: what was summed and where each part came from */
+      /* the caption: what was summed and where each part came from. One
+         disclosure, closed; the ledger above already carries the figures. */
       var meals = t.lines.filter(function (l) { return l.field === 'ownMeals' && l.source === 'workbook'; })[0];
       var flights = t.lines.filter(function (l) { return l.field === 'ownFlights' && l.source === 'workbook'; })[0];
       var fromBook = [];
@@ -20227,11 +20643,19 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var cap = 'Your scenario — ' + (h.usd == null ? 'nothing to sum yet.'
         : (h.source === 'quote' ? 'the package you picked' : 'the hotel figure you typed') +
           (pieces.length ? ' plus ' + pieces.join('; ') : ', on its own') + '.');
-      if (t.partial) cap += ' Not entered yet: ' + t.blank.join(', ') + '.';
+      if (blanks.length) cap += ' Not entered yet: ' + blanks.join(', ') + '.';
       if (flights && h.source === 'quote' && h.nights) cap += ' The fare was priced for the workbook’s dates, not the package’s — re-check it before booking.';
       if (h.converted) cap += ' Hotel converted at ' + rateWords() + '.';
       cap += ' It never moves the budget filters or the workbook’s modelled total.';
-      display.appendChild(U.el('p', { class: 'detail__subsource own__caption' }, cap));
+      var how = U.el('details', { class: 'own__how' });
+      how.appendChild(U.el('summary', { class: 'own__howsum' }, 'How this was summed'));
+      how.appendChild(U.el('p', { class: 'detail__subsource own__caption' }, cap));
+      if (t.flight) {
+        how.appendChild(U.el('p', {
+          class: 'detail__subsource own__flightline', dataset: { status: t.flight.status }
+        }, flightWords(t.flight)));
+      }
+      display.appendChild(how);
       if (t.note) display.appendChild(U.el('p', { class: 'own__note' }, t.note));
     }
 
@@ -22981,7 +23405,6 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var money = F.money(o.total);
     if (o.approx && money.charAt(0) !== '≈') money = '≈' + money;
     wrap.appendChild(U.el('span', { class: 'rboard__owntotal', text: money }));
-    wrap.appendChild(U.el('span', { class: 'rboard__ownlabel', text: o.totalLabel + ' · for two' }));
     wrap.appendChild(U.el('span', { class: 'rboard__ownlabel', text: o.label + (o.board ? ' · ' + o.board.toLowerCase() : '') }));
     if (o.headroom != null) {
       var hw = o.state === 'under'
