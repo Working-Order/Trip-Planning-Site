@@ -7142,6 +7142,73 @@ details[open] > .orphan__setasidesum::after,
    padding when its "Confirm details…" row is not on the page. */
 .view.detail .tcard:has(> .section__body > .fold--incard:last-child:not([hidden])) { padding-bottom: 0; }
 .view.detail .tcard > .section__body > .fold--incard:last-child[open] > .fold__body { padding-bottom: 1.5rem; }
+
+/* ---- Availability card (v0.14.0) ---------------------------------------
+   One tick, one radio list, one line, one link. The radios are the rate
+   table's 18px ring/dot; the tick is the global .check. Lives in the rail
+   under "Where you two stand" (main column on the phone). */
+.view.detail .avail > .section__body { gap: .35rem; }
+.view.detail .avail__contact { padding: .1rem 0 .35rem; min-height: 0; align-items: center; }
+.view.detail .avail__contact .check__box { margin-top: 0; }
+.view.detail .avail__contact .orx__tick {
+  font-family: var(--font-marks); font-size: var(--text-2xs); line-height: 1;
+  color: var(--surface); opacity: 0;
+}
+.view.detail .avail__contact input:checked ~ .check__box .orx__tick { opacity: 1; }
+.view.detail .avail__contact input:checked ~ .check__label { color: var(--ink); }
+.view.detail .avail__contactlabel { font-size: .875rem; }
+.view.detail .avail__when { color: var(--ink-faint); font-size: .8125rem; }
+.view.detail .avail__answer { display: grid; gap: .35rem; }
+.view.detail .avail__answer[hidden] { display: none; }
+.view.detail .avail__label {
+  margin: .35rem 0 .15rem;
+  font-size: var(--text-2xs); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; color: var(--ink-muted); font-weight: var(--weight-semi);
+}
+.view.detail .avail__opts { display: grid; gap: 0; }
+.view.detail .avail__opt {
+  display: flex; align-items: center; gap: .6rem;
+  min-height: 34px; padding: 0 .35rem; margin: 0 -.35rem;
+  border-radius: .5rem; cursor: pointer;
+  font-size: .875rem; color: var(--ink-muted);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.view.detail .avail__opt:hover { background: var(--surface-alt); color: var(--ink); }
+.view.detail .avail__opt:has(.avail__radio:checked) { color: var(--ink); font-weight: var(--weight-semi); }
+.view.detail .avail__opt:has(.avail__radio:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+.view.detail .avail__radio {
+  appearance: none; -webkit-appearance: none;
+  box-sizing: border-box; flex: none;
+  width: 18px; height: 18px; min-height: 18px; margin: 0; padding: 0;
+  border: var(--hair) solid var(--line-strong); border-radius: 50%;
+  background: var(--surface); cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.view.detail .avail__radio:hover { border-color: var(--accent); }
+.view.detail .avail__radio:checked {
+  border-color: var(--accent-fill);
+  box-shadow: inset 0 0 0 3.5px var(--surface), inset 0 0 0 9px var(--accent-fill);
+}
+.view.detail .avail__radio:focus-visible { outline: none; }
+.view.detail .avail__optglyph {
+  flex: none; width: 1.1em; text-align: center;
+  font-family: var(--font-marks); font-size: .95em; color: var(--ink-faint);
+}
+.view.detail .avail__opt:has(.avail__radio:checked) .avail__optglyph { color: var(--accent); }
+.view.detail .avail__opt[data-status="unavailable"]:has(.avail__radio:checked) .avail__optglyph { color: var(--danger); }
+.view.detail .avail__optlabel { min-width: 0; }
+.view.detail .avail__line {
+  margin: .35rem 0 0; font-size: .8125rem; line-height: 1.45; color: var(--ink-muted);
+}
+.view.detail .avail__line[hidden] { display: none; }
+.view.detail .avail__line[data-tier="urgent"] { color: var(--danger); }
+.view.detail .avail__line[data-tier="soon"] { color: var(--warn); }
+.view.detail .avail__more { justify-self: start; margin-top: .25rem; font-size: .875rem; padding: 0; }
+.view.detail .avail__more[hidden] { display: none; }
+.view.detail .avail[data-status="unavailable"] .avail__line { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) {
+  .view.detail .avail__opt, .view.detail .avail__radio { transition: none; }
+}
 /* ==== src/css/32-view-compare.css ==== */
 /* 32-view-compare.css — the Compare screen. OWNER: IMPL-4.
  *
@@ -9730,7 +9797,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.13.2';
+  T.version = '0.14.0';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -14740,12 +14807,16 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
   /* `rank` is the status sort order for the board: what is being held for us
      first, then what came back, then what we are still waiting on. */
+  /* v0.14.0 — the words are AVAILABILITY words, one vocabulary for the trip
+     page's Availability card, the facet, the board and the Explore badge.
+     Stored values are unchanged ('replied' still means "they came back with
+     rooms"); only the labels moved. */
   O.STATUS_META = {
     none: { key: 'none', token: 'none', label: 'Not contacted', short: 'Not contacted', glyph: '·', rank: 4 },
     sent: { key: 'sent', token: 'sent', label: 'Awaiting reply', short: 'Awaiting', glyph: '→', rank: 2 },
-    replied: { key: 'replied', token: 'replied', label: 'Response in', short: 'Replied', glyph: '✓', rank: 1 },
-    hold: { key: 'hold', token: 'hold', label: 'Offer held', short: 'Hold', glyph: '⏱', rank: 0 },
-    unavailable: { key: 'unavailable', token: 'unavailable', label: 'Unavailable', short: 'Unavailable', glyph: '⊘', rank: 3 }
+    replied: { key: 'replied', token: 'replied', label: 'Available', short: 'Available', glyph: '✓', rank: 1 },
+    hold: { key: 'hold', token: 'hold', label: 'Held for us', short: 'Held', glyph: '⏱', rank: 0 },
+    unavailable: { key: 'unavailable', token: 'unavailable', label: 'Not available', short: 'Not available', glyph: '⊘', rank: 3 }
   };
 
   O.TIERS = ['urgent', 'soon', 'later', 'passed'];
@@ -14810,6 +14881,20 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       }
     }
     return false;
+  };
+
+  /** The reply's WORDS and NUMBERS — anything past the tick and the status:
+   *  a hold deadline, dates, meals, spa, terms, notes, or a live quote. The
+   *  Availability card (v0.14.0) owns the status; the fold owns this. */
+  O.REPLY_FIELDS = ['outreachHoldUntil', 'outreachHoldLabel', 'outreachDates',
+    'outreachMeals', 'outreachSpa', 'outreachTerms', 'outreachNotes'];
+  O.hasReply = function (planOrId) {
+    var p = planOf(planOrId);
+    if (!p) return false;
+    for (var i = 0; i < O.REPLY_FIELDS.length; i++) {
+      if (meaningful(p[O.REPLY_FIELDS[i]])) return true;
+    }
+    return O.quotesOf(p).length > 0;
   };
 
   /** True when ANY record carries outreach data — live rows and orphans alike.
@@ -15161,8 +15246,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
  * OWNER: outreach wave (v0.6.0); batches since v0.9.1.
  *
  * Replies arrive in BATCHES: seven resorts answered on 1 September 2026, Vila
- * Planinka came back with a real six-night proposal on 3 September, and Domes
- * Noruz Chania sent a five-night proposal on 4 September. Each
+ * Planinka came back with a real six-night proposal on 3 September, Domes
+ * Noruz Chania sent a five-night proposal on 4 September, and on 6 September
+ * Quinta do Furão said no while La Loma was still being waited on. Each
  * batch is a frozen seed with its own clock, offered once per browser, and —
  * when accepted — folded in through the ONE merge (T.plan.mergeState) and the
  * ONE applicator (planning/import). There is no second merge and no direct
@@ -15392,6 +15478,44 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   ];
   I.SEED_IDS_SEP4 = SEED_SEP4.map(function (r) { return r.id; });
 
+  /* ---- batch 4: the Sep 5–6 availability emails ---------------------------
+   * No quotes in this batch, so `present` cannot use quote ids: it uses
+   * I.batchStamped — is any seeded field on the record still carrying this
+   * batch's exact clock. `outreachContactedAt` is the anchor: no editor ever
+   * rewrites it (setContacted keeps the stamp), so a later hand edit of the
+   * status cannot make the batch look un-imported.
+   *
+   * Quinta do Furão (Santana, Madeira — rank 1 in the 579): Solomon wrote
+   * 2026-09-06 01:41Z asking for 5–7 nights between Oct 21 and 28; Reservations
+   * answered 08:05Z with no availability for those dates and no alternative.
+   * La Loma Jungle Lodge (Bocas del Toro, Panama): written 2026-09-05 18:09Z
+   * for five nights Oct 17–22, two adults, best direct rate, meals/inclusions,
+   * deposit and cancellation terms — no reply yet. */
+  var SEED_AT_SEP6 = Date.parse('2026-09-06T13:00:00Z');
+  I.SEED_AT_SEP6 = SEED_AT_SEP6;
+
+  var SEED_SEP6 = [
+    { id: 'quinta-do-furao~santana-madeira-portugal',   /* Quinta do Furão */
+      fields: {
+        outreachContacted: true,
+        outreachContactedAt: Date.parse('2026-09-06T01:41:26Z'),
+        outreachStatus: 'unavailable',
+        outreachDates: 'Asked for 5–7 nights between Oct 21 and Oct 28 — none available, no alternative dates offered',
+        outreachNotes: 'Reservations replied Sep 6, 4:05 AM ET: “we regret to inform you that we do not have availability for a stay on the dates you have mentioned.” Nothing on other dates, rates or packages. Written off for October unless the window moves'
+      },
+      quotes: [] },
+    { id: 'la-loma-jungle-lodge-and-chocolate-farm~bocas-del-toro-panama',   /* La Loma Jungle Lodge and Chocolate Farm */
+      fields: {
+        outreachContacted: true,
+        outreachContactedAt: Date.parse('2026-09-05T18:09:54Z'),
+        outreachStatus: 'sent',
+        outreachDates: 'Asked for five nights, Oct 17–22, two adults — availability, best direct rate, the bungalow they’d recommend for a couple, full inclusions with taxes and fees, deposit/payment/cancellation terms, and how to get to Panama City on Oct 22',
+        outreachNotes: 'Sent Sep 5 to reservations@thejunglelodge.com, Ronit cc’d. Also asked about a massage, one off-property experience, and no pork / no shellfish / gluten-free-friendly meals. Awaiting reply'
+      },
+      quotes: [] }
+  ];
+  I.SEED_IDS_SEP6 = SEED_SEP6.map(function (r) { return r.id; });
+
   /* ---- the batches, oldest first ---------------------------------------
    * `quotePrefix` must be unique per batch: entry ids are deterministic so
    * that both laptops importing the same batch produce the same keys and the
@@ -15412,7 +15536,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       lede: 'Vila Planinka came back on 3 September with a six-night proposal for Oct 18–24: ' +
         'three two-night packages stacked — breakfast every day, dinner every night, wine ' +
         'tasting, massages, e-bikes and sauna — €3,828 in the Corner Deluxe Room or €3,917 ' +
-        'in the Suite. Their status moves from “Awaiting reply” to “Response in”.',
+        'in the Suite. Their status moves from “Awaiting reply” to “Available”.',
       done: 'Vila Planinka’s reply imported.',
       present: function () { return I.batchImported(SEED_SEP3, 'q-sep3-'); } },
     { key: 'sep4-noruz', at: SEED_AT_SEP4, seed: SEED_SEP4, quotePrefix: 'q-sep4-',
@@ -15423,7 +15547,15 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         'Sublime Loft Sea View €2,150 half board, Pure Haven Sea Front €2,525 Haute Living half board — ' +
         'all with the €75 climate tax in. It isn’t a workbook row yet, so it waits on the responses board.',
       done: 'Domes Noruz Chania’s proposal imported.',
-      present: function () { return I.batchImported(SEED_SEP4, 'q-sep4-'); } }
+      present: function () { return I.batchImported(SEED_SEP4, 'q-sep4-'); } },
+    { key: 'sep6-avail', at: SEED_AT_SEP6, seed: SEED_SEP6, quotePrefix: 'q-sep6-',
+      short: 'Sep 6', count: 2,
+      title: 'Import 2 availability answers — Sep 6',
+      lede: 'Quinta do Furão (Madeira) came back on 6 September with no availability for Oct 21–28 and ' +
+        'offered nothing else, so it reads “Not available”. La Loma Jungle Lodge (Bocas del Toro) was ' +
+        'written to on 5 September for Oct 17–22 and is still “Awaiting reply”.',
+      done: 'Quinta do Furão and La Loma imported.',
+      present: function () { return I.batchStamped(SEED_SEP6, SEED_AT_SEP6); } }
   ];
   I.BATCHES = BATCHES;
 
@@ -15440,6 +15572,23 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var quotes = (rec && rec.quotes) || {};
       for (var k in quotes) {
         if (Object.prototype.hasOwnProperty.call(quotes, k) && k.indexOf(quotePrefix) === 0) return true;
+      }
+      return false;
+    });
+  };
+
+  /** For a batch that seeds NO quotes: true when any seeded record carries a
+   *  seeded field whose clock is exactly this batch's `at` — the signature
+   *  buildSeedState leaves and no editor reproduces. Records travel through
+   *  sync with their clocks, so either laptop's import counts. */
+  I.batchStamped = function (seed, at) {
+    var s = T.store.getState();
+    var recs = (s.planning && s.planning.records) || {};
+    return seed.some(function (r) {
+      var rec = Object.prototype.hasOwnProperty.call(recs, r.id) ? recs[r.id] : null;
+      var clocks = (rec && rec._t) || {};
+      for (var field in r.fields) {
+        if (Object.prototype.hasOwnProperty.call(r.fields, field) && clocks[field] === at) return true;
       }
       return false;
     });
@@ -19079,6 +19228,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var secStand = buildStand(row, painters);
     var secWhy = buildWhy(row);
     var secOutreach = buildOutreach(row, painters);
+    var secAvail = buildAvail(row, painters);
     var secMoney = buildMoney(row, painters);
     var secFlight = buildFlight(row);
     var secWeather = buildWeather(row);
@@ -19111,11 +19261,20 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return d;
     }
     var folds = U.el('div', { class: 'detail__folds' });
-    folds.appendChild(fold('Resort replies & original offer notes', [secOutreach]));
+    var foldReply = fold('Resort replies & original offer notes', [secOutreach]);
+    folds.appendChild(foldReply);
     folds.appendChild(fold('Explore the stay, travel & weather research', [secWhy, secStay, secFlight, secWeather]));
     folds.appendChild(fold('Notes, questions & research checklist', [secNotes, secChecks, secProv]));
-    var MOBILE_ORDER = [secStand, secMoney, folds];
-    var RAIL_ORDER = [secStand];
+    /* The Availability card owns the tick and the answer; the fold owns the
+       full reply. The card's one link opens the fold (and the drawer when
+       nothing has been written yet) — one path from the status to the words. */
+    secAvail._openReply = function () {
+      foldReply.open = true;
+      if (secOutreach._openEditor && !T.outreach.hasReply(row.id)) secOutreach._openEditor();
+      try { secOutreach.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
+    };
+    var MOBILE_ORDER = [secStand, secAvail, secMoney, folds];
+    var RAIL_ORDER = [secStand, secAvail];
     var MAIN_ORDER = [secMoney, folds];
     var mq = window.matchMedia ? window.matchMedia('(min-width: 1024px)') : null;
     var wide = null;
@@ -19991,6 +20150,155 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     host.appendChild(actions);
   }
 
+  /* ---- 5c-bis. Availability (v0.14.0) ---------------------------------- */
+  /* Did we ask, and what did they say. One tick (outreach/setContacted), one
+     radio group over the four stored statuses (outreach/setField), one muted
+     line that says the thing worth knowing for that status, one link to the
+     full reply. The fold's drawer no longer draws the tick or the status —
+     one control per fact. Nothing here touches the money. */
+
+  /* The dates field is often a paragraph; the card wants its first clause. */
+  function availBrief(text) {
+    var t = String(text).trim();
+    var cut = t.search(/ — |\. |; |\n/);
+    if (cut > 0) t = t.slice(0, cut);
+    if (t.length > 72) t = t.slice(0, 70).replace(/\s+\S*$/, '') + '…';
+    return t;
+  }
+
+  function buildAvail(row, painters) {
+    var id = row.id;
+    var sec = sectionEl('avail', 'Availability');
+    sec.classList.add('avail');
+    var body = sec._body;
+
+    if (!T.outreach) {
+      T.diag.note('detail', 'outreach helpers missing — availability card rendered read-only');
+      body.appendChild(U.el('p', { class: 'detail__absent' }, 'Resort responses aren’t available in this build.'));
+      return sec;
+    }
+
+    /* -- we reached out -- */
+    var contact = U.el('label', { class: 'check avail__contact' });
+    var contactBox = U.el('input', { type: 'checkbox', dataset: { field: 'outreachContacted' } });
+    contact.appendChild(contactBox);
+    contact.appendChild(U.el('span', { class: 'check__box' }, [
+      U.el('span', { class: 'orx__tick', 'aria-hidden': 'true' }, '✓')
+    ]));
+    var contactText = U.el('span', { class: 'check__label avail__contactlabel' });
+    contactText.appendChild(U.el('span', { class: 'avail__contactword' }, 'We reached out'));
+    var when = U.el('span', { class: 'avail__when' });
+    contactText.appendChild(when);
+    contact.appendChild(contactText);
+    body.appendChild(contact);
+
+    contactBox.addEventListener('change', function () {
+      var on = contactBox.checked;
+      if (on) {
+        store.dispatch('outreach/setContacted', { id: id, value: true });
+        announce('Marked as contacted.');
+      } else {
+        /* Unticking means "we never wrote to them", so the answer goes too —
+           a status alone would keep the record reading as contacted. The
+           stamp stays (setContacted keeps it: it is history). */
+        store.dispatch('outreach/setContacted', { id: id, value: false });
+        if (T.plan.get(id) && T.plan.get(id).outreachStatus) {
+          store.dispatch('outreach/setField', { id: id, field: 'outreachStatus', value: null });
+        }
+        announce('Contact mark cleared.');
+      }
+      paint();
+    });
+
+    /* -- their answer -- */
+    var answer = U.el('div', { class: 'avail__answer' });
+    body.appendChild(answer);
+    answer.appendChild(U.el('p', { class: 'avail__label', id: 'avail-label-' + id }, 'Their answer'));
+    var opts = U.el('div', { class: 'avail__opts', role: 'radiogroup', 'aria-labelledby': 'avail-label-' + id });
+    answer.appendChild(opts);
+    var radios = {};
+    AVAIL_ORDER.forEach(function (key) {
+      var meta = T.outreach.STATUS_META[key];
+      var lab = U.el('label', { class: 'avail__opt', dataset: { status: key } });
+      var input = U.el('input', {
+        type: 'radio', class: 'avail__radio', name: 'avail-' + id, value: key,
+        dataset: { status: key }
+      });
+      lab.appendChild(input);
+      lab.appendChild(U.el('span', { class: 'avail__optglyph', 'aria-hidden': 'true' }, meta.glyph));
+      lab.appendChild(U.el('span', { class: 'avail__optlabel' }, meta.label));
+      input.addEventListener('change', function () {
+        if (!input.checked) return;
+        store.dispatch('outreach/setField', { id: id, field: 'outreachStatus', value: key });
+        announce(meta.label + '.');
+        paint();
+      });
+      radios[key] = input;
+      opts.appendChild(lab);
+    });
+
+    /* -- the one line worth reading for that status -- */
+    var line = U.el('p', { class: 'avail__line' });
+    answer.appendChild(line);
+
+    var more = U.el('button', { type: 'button', class: 'btn btn--link avail__more' });
+    more.addEventListener('click', function () { if (sec._openReply) sec._openReply(); });
+    answer.appendChild(more);
+
+    function paint() {
+      var st = T.outreach.statusOf(id);
+      var r = T.plan.get(id) || {};
+      sec.dataset.status = st.key;
+      sec.dataset.contacted = st.contacted ? '1' : '0';
+
+      contactBox.checked = !!st.contacted;
+      U.setText(when, st.contacted && st.contactedAt ? ' · ' + F.date(st.contactedAt) : '');
+
+      answer.hidden = !st.contacted;
+      if (!st.contacted) return;
+
+      AVAIL_ORDER.forEach(function (key) {
+        var input = radios[key];
+        var on = st.key === key;
+        if (input.checked !== on) input.checked = on;
+      });
+
+      /* The line: never the status word again (the radio is the word). */
+      var text = '';
+      if (st.key === 'hold' && st.hold) {
+        var h = st.hold;
+        text = h.valid
+          ? (h.tier === 'urgent' ? 'Urgent — ' : h.tier === 'soon' ? 'Soon — ' : '') + h.text + ' · until ' + h.when
+          : 'Hold deadline not set yet';
+        var best = T.outreach.bestQuoteText(id);
+        if (best) text += ' · ' + best;
+      } else if (st.key === 'replied') {
+        var parts = [];
+        if (!U.isBlank(r.outreachDates)) parts.push(availBrief(r.outreachDates));
+        var bq = T.outreach.bestQuoteText(id);
+        if (bq) parts.push(bq);
+        text = parts.join(' · ');
+      } else if (st.key === 'unavailable') {
+        text = U.isBlank(r.outreachDates) ? 'No rooms for the dates we asked about' : availBrief(r.outreachDates);
+      }
+      line.dataset.tier = st.key === 'hold' && st.hold && st.hold.valid ? st.hold.tier : '';
+      U.setText(line, text);
+      line.hidden = !text;
+
+      var hasReply = T.outreach.hasReply(id);
+      more.hidden = st.key === 'none';
+      U.setText(more, !hasReply ? 'Write down their reply ›'
+        : st.key === 'sent' ? 'What we asked them ›' : 'Read their full reply ›');
+    }
+
+    painters.push(function () {
+      if (sec.contains(document.activeElement)) return;
+      paint();
+    });
+    paint();
+    return sec;
+  }
+
   /* ---- 5d. §3 why it's here -------------------------------------------- */
 
   function buildWhy(row) {
@@ -20103,14 +20411,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       placeholder: 'The rest of the reply.' }
   ];
 
-  /* The empty value is ABSENCE, not a stored 'none' (there is no such status). */
-  var ORX_STATUS_OPTIONS = [
-    { value: '', label: 'Not contacted' },
-    { value: 'sent', label: 'Awaiting reply' },
-    { value: 'replied', label: 'Response in' },
-    { value: 'hold', label: 'Offer held' },
-    { value: 'unavailable', label: 'Unavailable' }
-  ];
+  /* v0.14.0 — the four answers a resort can give, in the order they happen.
+     Labels come from T.outreach.STATUS_META so the card, the facet, the board
+     and the Explore badge never disagree. Absence (no status) is "not
+     contacted"; there is no stored 'none'. */
+  var AVAIL_ORDER = ['sent', 'replied', 'hold', 'unavailable'];
 
   /* EUR first because the resorts we are writing to are euro-priced — never
      because a currency is ever inferred from an amount. Anything else is
@@ -20210,39 +20515,18 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       paintDisplay();
     }
 
-    /* -- we wrote to them -- */
-    var contact = U.el('label', { class: 'check orx__contact' });
-    var contactBox = U.el('input', { type: 'checkbox', dataset: { field: 'outreachContacted' } });
-    contact.appendChild(contactBox);
-    contact.appendChild(U.el('span', { class: 'check__box' }, [
-      U.el('span', { class: 'orx__tick', 'aria-hidden': 'true' }, '✓')
-    ]));
-    contact.appendChild(U.el('span', { class: 'check__label' }, 'We’ve written to them'));
-    contactBox.addEventListener('change', function () {
-      store.dispatch('outreach/setContacted', { id: id, value: contactBox.checked });
-      /* Unticking while a status is set is a no-op the mutator reports as "no
-         change", so nothing would repaint and the box would sit unticked over
-         a record that still reads as contacted. Re-read the normalised truth
-         instead of trusting the click. */
-      var st = T.outreach.statusOf(id);
-      contactBox.checked = !!st.contacted;
-      paintDisplay();
-      announce(contactBox.checked
-        ? 'Marked as contacted.'
-        : 'Contact mark cleared.');
-    });
-    form.appendChild(contact);
+    sec._openEditor = function () {
+      editor.open = true;
+      sec.classList.add('orx--writing');
+      var first = editor.querySelector('input, select, textarea');
+      if (first) try { first.focus(); } catch (e) {}
+    };
 
-    /* -- where it stands, and until when -- */
+    /* v0.14.0 — the tick and the status moved to the Availability card
+       (one control per fact). This drawer holds the words and the numbers:
+       the hold deadline, the dates, meals, spa, terms, notes and the quotes. */
     var statusRow = U.el('div', { class: 'orx__row' });
     form.appendChild(statusRow);
-
-    var statusSel = orxSelect(
-      ORX_STATUS_OPTIONS.map(function (o) { return o.value; }),
-      ORX_STATUS_OPTIONS.map(function (o) { return o.label; })
-    );
-    statusSel.dataset.field = 'outreachStatus';
-    statusRow.appendChild(orxField('Where it stands', statusSel, null, 'orx__field--sm'));
 
     var holdInput = U.el('input', {
       class: 'input', type: 'datetime-local', dataset: { field: 'outreachHoldUntil' }
@@ -20259,16 +20543,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     statusRow.appendChild(holdLabelField);
 
     /* The deadline fields are meaningless unless they are holding something,
-       so they follow the SELECT's live value, not the stored one. */
+       so they follow the stored status (the card's radio writes it). */
     function syncHoldFields() {
-      var on = statusSel.value === 'hold';
+      var on = T.outreach.statusOf(id).key === 'hold';
       holdField.hidden = !on;
       holdLabelField.hidden = !on;
     }
-    statusSel.addEventListener('change', function () {
-      write('outreachStatus', statusSel.value || null);
-      syncHoldFields();
-    });
 
     function holdFlush() {
       write('outreachHoldUntil', orxIsoWithOffset(holdInput.value));
@@ -20526,37 +20806,19 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       /* Empty: one sentence with the affordance in it; the drawer's own
          summary is hidden (CSS, `.orx--empty`) so the page does not say
          "write it down" twice. Once opened, the link withdraws. */
-      U.toggleClass(sec, 'orx--empty', !T.outreach.has(id));
-      if (!T.outreach.has(id)) {
+      U.toggleClass(sec, 'orx--empty', !T.outreach.hasReply(id));
+      if (!T.outreach.hasReply(id)) {
         var empty = U.el('p', { class: 'detail__absent orx__empty' },
           'Nobody has written down a reply from this resort yet. ');
         var openIt = U.el('button', { type: 'button', class: 'btn btn--link orx__open' }, 'Write it down ›');
-        openIt.addEventListener('click', function () {
-          editor.open = true;
-          sec.classList.add('orx--writing');
-          var first = editor.querySelector('input, select, textarea');
-          if (first) try { first.focus(); } catch (e) {}
-        });
+        openIt.addEventListener('click', function () { sec._openEditor(); });
         empty.appendChild(openIt);
         display.appendChild(empty);
         return;
       }
 
-      /* -- status pill (word + glyph + tint, never colour alone) -- */
-      var line = U.el('p', { class: 'orx__statusline' });
-      var pill = U.el('span', {
-        class: 'orx__pill', dataset: { status: st.key, urgency: st.urgency }
-      }, [
-        U.el('span', { class: 'orx__pill-glyph', 'aria-hidden': 'true' }, st.glyph),
-        U.el('span', { class: 'orx__pill-label' },
-          st.key === 'none' && st.contacted ? 'Contacted' : st.label)
-      ]);
-      line.appendChild(pill);
-      if (st.contactedAt) {
-        line.appendChild(U.el('span', { class: 'orx__contacted' },
-          'We wrote ' + F.date(st.contactedAt)));
-      }
-      display.appendChild(line);
+      /* v0.14.0 — no status pill here: the Availability card is the one place
+         that says where it stands. This block is the reply itself. */
 
       /* -- the hold line: the countdown AND the absolute moment, always both,
             because "3 hr left" alone is unreadable on the other laptop. The
@@ -20647,10 +20909,6 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     function paintEditor() {
       var r = T.plan.get(id) || {};
       var st = T.outreach.statusOf(id);
-      /* The tick shows the NORMALISED truth: saying "they replied" says we
-         wrote to them, even when the raw flag was never ticked (§C.2). */
-      contactBox.checked = !!st.contacted;
-      statusSel.value = r.outreachStatus || '';
       var iso = r.outreachHoldUntil ? String(r.outreachHoldUntil).slice(0, 16) : '';
       if (holdInput.value !== iso) holdInput.value = iso;
       if (holdLabelInput.value !== (r.outreachHoldLabel || '')) {
@@ -27963,9 +28221,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       options: [
         { value: 'contacted',   label: 'Contacted' },
         { value: 'sent',        label: 'Awaiting reply' },
-        { value: 'replied',     label: 'Response in' },
-        { value: 'hold',        label: 'Offer held' },
-        { value: 'unavailable', label: 'Unavailable' },
+        { value: 'replied',     label: 'Available' },
+        { value: 'hold',        label: 'Held for us' },
+        { value: 'unavailable', label: 'Not available' },
         { value: 'quoted',      label: 'Has a quote' },
         { value: 'none',        label: 'Not contacted' }
       ]
