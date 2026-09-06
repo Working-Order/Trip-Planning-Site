@@ -8364,7 +8364,8 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .home .minicard__main { padding: 1.25rem; gap: .5rem; width: 100%; flex: 1; }
 .home .minicard__title { font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.45; }
 .home .minicard__where { text-transform: none; letter-spacing: normal; font-size: .875rem; }
-.home .minicard__money { margin-top: .5rem; }
+.home .minicard__basis { font-size: .875rem; color: var(--ink-muted); margin-top: .5rem; }
+.home .minicard__money { margin-top: 0; }
 .home .minicard__price { font-size: 1.35rem; }
 .home .minicard__headroom { border: 0; padding: 0; font-size: .875rem; }
 .home .minicard__meta { font-size: .875rem; gap: .75rem; }
@@ -15320,6 +15321,13 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     };
   };
 
+  // Shared headline selection for Home and the trip information page.
+  S.headlineOf = function (id, budget, fields) {
+    if (!S.has(id)) return null;
+    var total = S.totalOf(id, budget, { f: fields });
+    return total.total == null ? null : total;
+  };
+
   /* ====================================================================== */
   /* MUTATOR — registered here, like outreach/setField. 05-planning.js gains  */
   /* no mutator; it only lists the seven scalars in its pick list.           */
@@ -16071,6 +16079,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     main.appendChild(U.el('p', { class: 'minicard__where',
       text: placeLine(f, ' · ') || 'Where isn’t recorded' }));
 
+    main.appendChild(U.el('span', { class: 'minicard__basis' }));
     var money = U.el('p', { class: 'minicard__money' });
     money.appendChild(U.el('span', { class: 'minicard__price' }));
     money.appendChild(U.el('span', { class: 'minicard__headroom' }));
@@ -16113,6 +16122,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var f = row.rec.f;
     var money = T.select.get('home/money') || { rows: {} };
     var m = money.rows[row.id] || { total: null, headroom: null, band: 'unpriced' };
+    var ctx = qctx();
+    var own = T.scenario && T.scenario.headlineOf
+      ? T.scenario.headlineOf(row.id, ctx && ctx.budget ? ctx.budget.value : null, f) : null;
+    var headline = own ? F.money(own.total) : null;
+    if (own && own.hotel.converted && headline.charAt(0) !== '≈') headline = '≈' + headline;
+    U.setText(el.querySelector('.minicard__basis'), own ? own.label : 'Workbook estimate');
 
     var price = el.querySelector('.minicard__price');
     var head = el.querySelector('.minicard__headroom');
@@ -16122,10 +16137,16 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
        it is never fed back. One bucket plus the count, because a minicard has
        112px of room. Degrades to v0.6.1's rendering with no 31-comp-card.js. */
     var CQ = (T.cards && T.cards.quotedLine) ? T.cards : null;
-    var qline = (CQ && m.band === 'unpriced')
+    var qline = (!own && CQ && m.band === 'unpriced')
       ? CQ.quotedLine(row, { buckets: CQ.QUOTED_BUCKETS_TIGHT }) : '';
     if (CQ) CQ.paintQuotedNode(el.querySelector('.minicard__quoted'), qline);
-    if (m.band === 'unpriced') {
+    head.setAttribute('title', own && own.missing.length ? 'Still needed: ' + own.missing.join(', ') : '');
+    if (own) {
+      U.setText(price, headline);
+      U.setText(head, own.partial ? 'Incomplete' : own.headroom == null ? '' : own.headroom === 0 ? 'On budget'
+        : F.money(Math.abs(own.headroom)) + (own.headroom < 0 ? ' over' : ' under'));
+      head.dataset.band = own.partial ? 'partial' : (own.state || '');
+    } else if (m.band === 'unpriced') {
       U.setText(price, F.MISSING);
       U.setText(head, qline ? '' : 'unpriced');   // never "$0", never a headroom pill
       head.dataset.band = 'unpriced';
@@ -16162,7 +16183,8 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       a.setAttribute('aria-label', F.text(f.hotel) + ', ' +
         (placeLine(f, ', ') || 'location not recorded') + '. ' +
         rankText.replace('#', 'rank ') + '. ' +
-        (m.band === 'unpriced'
+        (own ? own.label + ': ' + headline + (own.partial ? '. Still needed: ' + own.missing.join(', ') : '')
+          : m.band === 'unpriced'
           ? 'No price recorded.' + (qline ? ' ' + qline + '. ' + CQ.QUOTED_HOTEL_ONLY : '')
           : F.money(m.total) + ', ' + (m.band === 'borderline' ? 'borderline on budget'
             : F.money(Math.abs(m.headroom)) + (m.band === 'over' ? ' over budget' : ' under budget')) + '.') +
@@ -18683,13 +18705,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
          hotel figure typed, 16-scenario.js), THAT is the page's headline
          figure: it is the trip they would actually book. Labelled as theirs,
          with its own headroom; the workbook's modelled total keeps its row
-         in the Money ledger below, and the engine (filters, counts, cards)
+         in the Money ledger below, and the engine (filters and counts)
          still reads only the workbook — nothing here is fed back. */
-      var S = T.scenario, own = null;
-      if (S && S.has && S.has(id)) {
-        own = S.totalOf(id, ctx && ctx.budget ? ctx.budget.value : null, { f: f });
-        if (own.total == null) own = null;
-      }
+      var S = T.scenario;
+      var own = S && S.headlineOf ? S.headlineOf(id, ctx && ctx.budget ? ctx.budget.value : null, f) : null;
       if (own) {
         var ownSub = null;
         if (own.headroom != null) {
