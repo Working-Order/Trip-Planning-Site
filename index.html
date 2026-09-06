@@ -8381,11 +8381,16 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .home .tile__figure { margin-bottom: 1rem; }
 .home .holds__item { border-left: 0; padding-left: 0; }
 .home .holds__count, .home .holds__when { font-size: .875rem; }
-.home .strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+.home .strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; overflow: visible; }
 .home .strip__item { min-width: 0; }
-.home .strip__link { width: 100%; display: flex; align-items: center; gap: 1rem; font-size: .875rem; }
-.home .strip__art { width: 5rem; height: 5rem; flex: 0 0 5rem; border-radius: .75rem; }
-.home .strip__name { font-size: .875rem; }
+.home .strip__link { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 0; font-size: .875rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--surface); overflow: hidden; transition: border-color .18s ease, box-shadow .18s ease; }
+.home .strip__link:hover, .home .strip__link:focus-visible { border-color: var(--accent); box-shadow: var(--shadow-sm); }
+.home .strip__link:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.home .strip__caption { min-width: 0; display: grid; gap: .5rem; padding: 1rem; align-content: start; }
+.home .strip__place { font-size: .875rem; line-height: 1.45; color: var(--ink-muted); overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) { .home .strip__link { transition: none; } }
+.home .strip__art { width: 100%; height: auto; aspect-ratio: 16 / 11; flex: 0 0 auto; border-radius: 0; }
+.home .strip__name { font-size: 1rem; font-weight: 600; line-height: 1.45; overflow-wrap: anywhere; }
 .home__support { border-top: 1px solid var(--line); }
 .home__support > summary { display: flex; align-items: center; justify-content: space-between; list-style: none; border: 0; padding: 1.5rem 0; font-size: 1rem; font-weight: 500; color: var(--ink-muted); }
 .home__support > summary::-webkit-details-marker { display: none; }
@@ -8403,7 +8408,7 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .home .home__foot { font-size: .875rem; }
 @media (max-width: 1050px) {
   .locationflow__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .home .strip__link { flex-direction: column; align-items: flex-start; }
+  .home .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 767px) {
   .view--home { gap: 2rem; padding-top: 1.5rem; }
@@ -8412,12 +8417,15 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   .home .minicard__art { height: 100%; min-height: 9rem; border-radius: 1rem 0 0 1rem; }
   .home .minicard__main { padding: 1rem; padding-right: 3rem; }
   .home .minicard__fav { right: .35rem; top: .35rem; }
-  .home .strip { grid-template-columns: 1fr; }
-  .home .strip__link { flex-direction: row; align-items: center; }
+  .home .strip { gap: 1rem; }
   .home .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .locationflow__browse-list { grid-template-columns: 1fr; }
 }
 @media (max-width: 479px) {
+  .home .strip { grid-template-columns: 1fr; }
+  .home .strip__link { flex-direction: row; align-items: stretch; }
+  .home .strip__art { width: 7rem; min-height: 8rem; flex: 0 0 7rem; aspect-ratio: auto; }
+  .home .strip__caption { padding: .875rem; align-content: center; }
   .locationflow__cards { grid-template-columns: 1fr; }
   .locationcard { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
   .locationcard h3 { grid-column: 1 / -1; }
@@ -16849,10 +16857,14 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var li = U.el('li', { class: 'strip__item' });
       var a = U.el('a', { class: 'strip__link', href: T.router.build('trip', [r.id]) });
       var art = U.el('span', { class: 'strip__art', 'aria-hidden': 'true', role: 'presentation' });
-      try { art.innerHTML = T.artwork.render(r.rec, { w: 80, h: 80, variant: 'thumb' }); } catch (e) {}
+      try { art.innerHTML = T.artwork.render(r.rec, { w: 320, h: 220, variant: 'thumb' }); } catch (e) {}
       if (T.photos) T.photos.attach(art, r, { lazy: true });
       a.appendChild(art);
-      a.appendChild(U.el('span', { class: 'strip__name', text: F.text(r.rec.f.hotel) }));
+      var caption = U.el('span', { class: 'strip__caption' });
+      caption.appendChild(U.el('span', { class: 'strip__name', text: F.text(r.rec.f.hotel) }));
+      var place = placeLine(r.rec.f, ' · ');
+      if (place) caption.appendChild(U.el('span', { class: 'strip__place', text: place }));
+      a.appendChild(caption);
       li.appendChild(a);
       strip.appendChild(li);
     });
