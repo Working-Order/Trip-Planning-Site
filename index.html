@@ -2379,6 +2379,8 @@ input[type="file"]:focus-visible::file-selector-button {
   color: var(--ink-muted);
 }
 .card__price { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--s2); }
+.card__basis { flex-basis: 100%; font-size: .875rem; font-weight: 400; line-height: 1.4; }
+.card__headroom--partial { border-style: dotted; color: inherit; }
 .card__total {
   font-size: var(--text-xl);
   font-variant-numeric: tabular-nums;
@@ -28650,8 +28652,16 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         (move.dir === 'up' ? ', up ' + move.delta : move.dir === 'down' ? ', down ' + Math.abs(move.delta) :
           move.dir === 'new' ? ', new this week' : ''));
     }
+    var own = T.scenario && T.scenario.headlineOf
+      ? T.scenario.headlineOf(row.id, ctx.budget ? ctx.budget.value : null, f) : null;
     var total = Q.priceOf(row, ctx);
-    if (total == null) bits.push('no price recorded');
+    if (own) {
+      var amount = F.money(own.total);
+      if (own.hotel.converted && amount.charAt(0) !== '≈') amount = '≈' + amount;
+      bits.push(own.label + ': ' + amount);
+      if (own.partial) bits.push('Still needed: ' + own.missing.join(', '));
+      else if (own.headroom != null) bits.push(F.money(Math.abs(own.headroom)) + (own.headroom >= 0 ? ' under budget' : ' over budget'));
+    } else if (total == null) bits.push('no workbook estimate recorded');
     else {
       var head = Q.headroomOf(row, ctx), state = Q.headroomStateOf(row, ctx);
       bits.push(F.money(total) + (state === 'borderline' ? ', borderline on budget'
@@ -28865,6 +28875,8 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
     /* -- price + headroom ---------------------------------------------- */
     var priceWrap = U.el('p', { class: 'card__price' });
+    card._basis = U.el('span', { class: 'card__basis' });
+    priceWrap.appendChild(card._basis);
     var priceNum = U.el('span', { class: 'card__total' });
     priceWrap.appendChild(priceNum);
     var headPill = U.el('span', { class: 'card__headroom' });
@@ -29041,10 +29053,16 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
     /* price + headroom — a Budget-Lab scenario moves these without any
        research change, so they are patched rather than baked in at build. */
-    var total = Q.priceOf(row, ctx);
-    U.setText(card._price, F.money(total));
-    var state = Q.headroomStateOf(row, ctx);
-    var head = Q.headroomOf(row, ctx);
+    var own = T.scenario && T.scenario.headlineOf
+      ? T.scenario.headlineOf(row.id, ctx.budget ? ctx.budget.value : null, f) : null;
+    var total = own ? own.total : Q.priceOf(row, ctx);
+    var amount = F.money(total);
+    if (own && own.hotel.converted && amount.charAt(0) !== '≈') amount = '≈' + amount;
+    U.setText(card._price, amount);
+    U.setText(card._basis, own ? own.label : 'Workbook estimate');
+    var state = own ? (own.partial ? 'partial' : own.state) : Q.headroomStateOf(row, ctx);
+    var head = own ? own.headroom : Q.headroomOf(row, ctx);
+    card._head.setAttribute('title', own && own.missing.length ? 'Still needed: ' + own.missing.join(', ') : '');
     card._head.dataset.state = state;
     /* v0.6.1 — the quoted-hotel line. `total`, `state` and `head` above are the
        engine's answers and stay the engine's answers; the quote is asked for
@@ -29054,7 +29072,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
        :empty hides); when it does not, the pill reads exactly as before. */
     var quoted = total == null ? C.quotedLine(row) : '';
     C.paintQuoted(card, quoted);
-    if (total == null) {
+    if (own && own.partial) {
+      U.setText(card._head, 'Incomplete');
+      card._head.className = 'card__headroom card__headroom--partial';
+    } else if (total == null) {
       U.setText(card._head, quoted ? '' : 'unpriced');
       card._head.className = quoted ? 'card__headroom' : 'card__headroom card__headroom--unpriced';
     } else if (state === 'borderline') {
