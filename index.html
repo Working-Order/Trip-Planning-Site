@@ -8517,6 +8517,9 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .home .queue__link:hover, .home .holds__link:hover { text-decoration: underline; }
 .home .tile__actions { padding-top: 1.25rem; gap: .5rem; }
 .home .tile__actions .btn { font-size: .875rem; border-radius: 2rem; }
+.home .tile__actions .btn--quiet { padding-inline: var(--s4); border-color: transparent; text-decoration: none; }
+.home .tile__actions .btn--quiet:hover { background: var(--surface-alt); border-color: transparent; color: var(--ink); text-decoration: none; }
+.home .tile__actions .btn--quiet:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .home .tile__figure { margin-bottom: 1rem; }
 .home .holds__item { border-left: 0; padding-left: 0; }
 .home .holds__count, .home .holds__when { font-size: .875rem; }
