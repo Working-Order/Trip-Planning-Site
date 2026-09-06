@@ -6663,6 +6663,307 @@ details[open] > .orphan__setasidesum::after,
   }
 }
 
+
+/* ══════════════════════════════════════════════════════════════════════════
+   v0.12.0 · ONE LANGUAGE WITH HOME
+   Every block on this page is a Home card: lifted --surface, a hairline rule,
+   the 1rem radius, 1.5rem of padding, a SANS bold title and at most one muted
+   line under it. The serif small-caps rubrics and their underline rules are
+   gone — serif is the page headline (the hotel's name) and nothing else.
+   Disclosures are Home's "Research & planning" row: a hairline, a sans title,
+   a "+" that becomes a "−". Tokens only; both themes flip with the sheet.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ---- the card ---------------------------------------------------------- */
+.view.detail .tcard {
+  display: block;
+  min-width: 0;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: var(--hair) solid var(--line);
+  border-radius: 1rem;
+  box-shadow: none;
+}
+.view.detail .tcard__head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  flex-wrap: wrap; gap: .5rem 1rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0;                                  /* the rubric's rule, retired */
+}
+.view.detail .tcard__title {
+  font-family: var(--font-body);
+  font-size: 1.0625rem; font-weight: 600;
+  letter-spacing: -.01em; text-transform: none;
+  line-height: 1.4; color: var(--ink);
+}
+.view.detail .tcard__sub {
+  margin: -.65rem 0 1.15rem;
+  font-size: .875rem; line-height: 1.55;
+  color: var(--ink-muted); max-width: 62ch;
+}
+.view.detail .tcard > .section__body { gap: 1rem; }
+.view.detail .rubric__more,
+.view.detail .tcard__head .btn--link { font-size: .875rem; }
+
+/* ---- the two columns --------------------------------------------------- */
+.view.detail .detail__main,
+.view.detail .detail__rail { display: grid; gap: 1.25rem; align-content: start; }
+.view.detail .detail__moneywrap { display: grid; gap: 1.25rem; min-width: 0; }
+.view.detail .detail__grid { align-items: start; }
+
+/* ---- hero -------------------------------------------------------------- */
+.view.detail .detail__art { border-radius: 1rem; }
+.view.detail .detail__heroText { gap: .4rem; }
+.view.detail .detail__rankline { font-size: .875rem; color: var(--ink-muted); }
+.view.detail .detail__place {
+  margin-top: .1rem;
+  font-size: .9375rem; letter-spacing: normal; text-transform: none;
+  color: var(--ink-muted);
+}
+
+/* the figures, as Home tiles: a small muted label, then the numeral with its
+   qualifier inline beside it. No vertical rules — space does that work. */
+.view.detail .detail__facts { margin: 1.35rem 0 0; gap: 1.15rem 2.5rem; }
+.view.detail .fact {
+  padding: 0; border-left: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "word word" "num  sub";
+  align-items: baseline; column-gap: .65rem; row-gap: .3rem;
+}
+.view.detail .fact__word {
+  grid-area: word; order: 0;
+  font-size: .875rem; letter-spacing: normal; text-transform: none;
+  font-weight: 400; color: var(--ink-muted);
+}
+.view.detail .fact__num {
+  grid-area: num; order: 0;
+  font-family: var(--font-body);
+  font-size: 1.75rem; font-weight: 600; line-height: 1.1;
+}
+.view.detail .fact__num--missing { font-size: 1.25rem; }
+.view.detail .fact__of { font-size: 1rem; }
+.view.detail .fact__sub {
+  grid-area: sub; order: 0; margin: 0;
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: .4rem .6rem;
+}
+.view.detail .fact__sub .headroom {
+  font-size: .8125rem; padding: 2px .6rem; border-radius: 2rem; min-height: 22px;
+}
+.view.detail .fact__sub .own__gappill { margin-left: 0; font-size: .875rem; color: var(--ink-muted); }
+
+/* one button vocabulary: the review-state control is the pill, favourite and
+   compare are ghosts of the same height, the searches are muted links. */
+.view.detail .detail__utility { gap: .5rem; padding-top: 1.35rem; align-items: center; }
+.view.detail .detail__utility > * { min-height: 40px; }
+.view.detail .detail__status {
+  min-height: 40px; padding: 0 1.1rem; gap: .4rem;
+  border: var(--hair) solid var(--line-strong); border-radius: 2rem;
+  background: var(--surface); color: var(--ink);
+  font-size: .875rem; font-weight: 500;
+}
+.view.detail .detail__status:hover { background: var(--surface-alt); }
+.view.detail .detail__status[data-status="shortlist"] {
+  background: var(--accent-1); border-color: var(--accent-3); color: var(--accent-on-soft);
+}
+.view.detail .detail__status[data-status="finalist"],
+.view.detail .detail__status[data-status="booked"] {
+  background: var(--accent-fill); border-color: var(--accent-fill);
+  color: var(--accent-ink); font-weight: 600;
+}
+.view.detail .detail__status[data-status="rejected"] { border-style: dashed; color: var(--ink-faint); }
+.view.detail .detail__utility .btn {
+  min-height: 40px; padding: 0 1rem; border-radius: 2rem; font-size: .875rem;
+}
+.view.detail .detail__utility .btn--quiet { border-color: transparent; }
+.view.detail .detail__utility .btn--quiet:hover {
+  background: var(--surface-alt); border-color: transparent; color: var(--ink);
+}
+.view.detail .detail__lookups { gap: .1rem; margin-left: auto; }
+.view.detail .detail__lookupword {
+  font-size: .8125rem; letter-spacing: normal; text-transform: none;
+  color: var(--ink-faint); margin-right: .4rem;
+}
+.view.detail .detail__lookups .detail__lookup {
+  min-height: 32px; padding: 0 .55rem; border-radius: 2rem;
+  border-color: transparent; background: transparent;
+  color: var(--ink-muted); font-size: .875rem; font-weight: 400;
+}
+.view.detail .detail__lookups .detail__lookup:hover { color: var(--accent); background: transparent; }
+
+/* ---- disclosures: Home's accordion row --------------------------------- */
+.view.detail .detail__folds { display: grid; gap: 0; }
+.view.detail .fold { border-top: var(--hair) solid var(--line); padding-top: 0; }
+.view.detail .fold > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  list-style: none; cursor: pointer;
+  min-height: 0; padding: 1.25rem 0;
+  font-family: var(--font-body); font-size: 1rem; font-weight: 500;
+  color: var(--ink-muted);
+}
+.view.detail .fold > summary::-webkit-details-marker { display: none; }
+.view.detail .fold > summary::after {
+  content: "+";
+  margin: 0; font-family: var(--font-body); font-size: 1.25rem;
+  font-weight: 400; line-height: 1; color: var(--ink-faint);
+}
+.view.detail .fold[open] > summary::after { content: "−"; }
+.view.detail .fold > summary:hover { color: var(--ink); }
+.view.detail .fold > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.view.detail .fold > .fold__body { display: grid; gap: 1.25rem; padding: 0 0 1.5rem; }
+/* a disclosure that lives INSIDE a card runs to the card's edges */
+.view.detail .fold--incard { margin: 0 -1.5rem; padding: 0 1.5rem; }
+.view.detail .fold--incard > summary { padding: 1rem 0; font-size: .9375rem; }
+.view.detail .fold--incard > .fold__body { padding-bottom: 1.25rem; gap: 1rem; }
+.view.detail .own__display > .fold--incard { margin-top: .35rem; }
+
+/* ---- packages -------------------------------------------------------- */
+.view.detail .own__packages { margin-top: 0; }
+.view.detail .own__picks { margin: 0; }
+.view.detail .own__rates-h {
+  padding-bottom: .6rem;
+  border-bottom-color: var(--line);
+  font-size: .75rem; letter-spacing: .05em; font-weight: 600;
+  color: var(--ink-faint);
+}
+.view.detail .own__rate > * {
+  padding-top: 15px; padding-bottom: 15px;
+  border-bottom-color: var(--line);
+}
+.view.detail .own__rate:hover > * { background: var(--surface-alt); }
+/* the fill and the dot carry the state — no outline, no left rule */
+.view.detail .own__rate[data-selected="1"] > * {
+  background: var(--surface-inset); border-bottom-color: transparent;
+}
+.view.detail .own__rate[data-selected="1"] .own__rate-title { color: var(--ink); }
+.view.detail .own__rate[data-selected="1"] > :first-child {
+  border-radius: .7rem 0 0 .7rem; box-shadow: none;
+}
+.view.detail .own__rate[data-selected="1"] > :last-child { border-radius: 0 .7rem .7rem 0; }
+.view.detail .own__rate-title { font-size: .9375rem; font-weight: 600; }
+.view.detail .own__rate-when { font-size: .875rem; }
+.view.detail .own__rate-price { font-size: .9375rem; }
+.view.detail .own__rate-price .money__orig {
+  display: block; margin-top: 2px;
+  font-size: .8125rem; font-weight: 400; color: var(--ink-muted);
+}
+.view.detail .own__rate-pick .own__rate-radio:checked {
+  border-color: var(--accent-fill); background: var(--surface);
+  box-shadow: inset 0 0 0 3.5px var(--surface), inset 0 0 0 9px var(--accent-fill);
+}
+.view.detail .own__incl { font-size: .8125rem; border-radius: 2rem; }
+.view.detail .own__inclnone, .view.detail .own__inclrest { font-size: .8125rem; }
+.view.detail .own__under { margin-top: 1.15rem; gap: .6rem 1.5rem; }
+.view.detail .own__typedlink { font-size: .875rem; }
+
+/* ---- the ledger -------------------------------------------------------- */
+.view.detail .own__kv .kv__row { padding: .7rem 0; border-bottom-color: var(--line); }
+.view.detail .kv__key { font-size: .875rem; }
+.view.detail .kv__val { font-size: .9375rem; }
+.view.detail .own__row--total {
+  border-top: var(--hair) solid var(--line-strong); border-bottom: 0;
+  padding-top: 1rem; margin-top: .35rem; align-items: baseline;
+}
+.view.detail .own__row--total .kv__key { font-size: 1rem; color: var(--ink); font-weight: 600; }
+.view.detail .own__row--total .kv__val--strong {
+  font-family: var(--font-body); font-size: 1.65rem; font-weight: 600; line-height: 1.15;
+}
+.view.detail .own__gaps { margin-top: .75rem; gap: .4rem; }
+.view.detail .own__gap {
+  padding: 2px .65rem; border-style: solid; border-color: var(--line);
+  border-radius: 2rem; font-size: .8125rem;
+}
+.view.detail .own__review { font-size: .875rem; border-left-width: 2px; }
+.view.detail .own__note { font-size: .875rem; }
+
+/* ---- shared small labels: sentence case, muted, never a serif rubric --- */
+.view.detail .detail__sublabel,
+.view.detail .own__picklabel,
+.view.detail .own__gapslabel,
+.view.detail .providers__title,
+.view.detail .stay__coltitle,
+.view.detail .notes__label,
+.view.detail .notes__listtitle {
+  font-size: .8125rem; letter-spacing: normal; text-transform: none;
+  font-weight: 600; color: var(--ink-muted);
+}
+.view.detail .detail__basis,
+.view.detail .detail__subsource,
+.view.detail .detail__meta { font-size: .8125rem; line-height: 1.6; }
+.view.detail .detail__subtext, .view.detail .detail__prose { font-size: .9375rem; }
+
+/* ---- controls: Home's rounding everywhere ------------------------------ */
+.view.detail .input,
+.view.detail .select,
+.view.detail .textarea {
+  min-height: 40px; border-radius: .65rem; border-color: var(--line-strong);
+}
+.view.detail .textarea { min-height: 84px; }
+.view.detail .btn { border-radius: 2rem; }
+.view.detail .btn--link { border-radius: 0; }
+.view.detail .chip { border-radius: 2rem; min-height: 30px; padding: 0 .65rem; }
+.view.detail .chip--tag { padding: 0; }
+
+/* ---- where you two stand ---------------------------------------------- */
+.view.detail .reactionrow__name { font-size: .75rem; letter-spacing: .06em; }
+.view.detail .reactionrow__opts { border-radius: .8rem; }
+.view.detail .reactionopt { border-radius: .6rem; font-size: .8125rem; min-height: 36px; }
+.view.detail .stand__line { font-size: .875rem; }
+.view.detail .stand__badge { margin-top: .25rem; }
+.view.detail .stand__controls .btn { min-height: 36px; padding: 0 .9rem; }
+.view.detail .stand__controls .btn--quiet { padding-left: .9rem; }
+
+/* ---- widths ------------------------------------------------------------ */
+@media (max-width: 1023px) {
+  .view.detail .detail__moneywrap { gap: 1rem; }
+}
+@media (max-width: 767px) {
+  .view.detail .tcard { padding: 1.15rem; border-radius: .85rem; }
+  .view.detail .fold--incard { margin-inline: -1.15rem; padding-inline: 1.15rem; }
+  .view.detail .detail__facts { gap: 1rem 1.75rem; }
+  .view.detail .fact__num { font-size: 1.5rem; }
+  .view.detail .detail__lookups { margin-left: 0; width: 100%; }
+  .view.detail .fold > summary { padding: 1rem 0; font-size: .9375rem; }
+}
+
+/* fit-and-finish, v0.12.0 */
+.view.detail .own__display { margin-top: 0; gap: .35rem; }
+.view.detail .tcard__sub { max-width: 78ch; }
+@media (min-width: 1024px) {
+  /* The rail is 320px wide and the segmented control stays ONE row there:
+     four equal segments, glyph and word on one line, the trailing " it"
+     dropped (the button's aria-label still says the whole phrase). */
+  .view.detail .detail__rail .reactionrow__opts { display: flex; }
+  .view.detail .detail__rail .reactionopt {
+    flex: 1 1 0; min-width: 0;
+    padding: 6px 4px; gap: 3px;
+    font-size: .75rem; white-space: nowrap;
+  }
+  .view.detail .detail__rail .reactionopt__disc { font-size: 1em; flex: none; }
+  .view.detail .detail__rail .reactionopt__label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .view.detail .detail__rail .reactionopt__tail { display: none; }
+}
+@media (max-width: 479px) {
+  .view.detail .reactionrow__opts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* with nothing chosen the block is one sentence and an affordance: the
+   overrides drawer stays out of the way until they ask for it (v0.10.1 rule,
+   re-asserted over the new fold rules). */
+.view.detail .own--empty .own__editor { display: none; }
+.view.detail .own--empty.own--writing .own__editor { display: block; }
+
+@media (max-width: 720px) {
+  /* the stacked rate row: the ROW owns the fill and the rounding — the cells
+     must not each draw their own box or their own 15px of padding. */
+  .view.detail .own__rate { padding: .8rem .65rem; border-radius: .7rem; }
+  .view.detail .own__rate > * { padding: 0; border-bottom: 0; border-radius: 0; background: none; }
+  .view.detail .own__rate:hover > * { background: none; }
+  .view.detail .own__rate[data-selected="1"] > * { background: none; border-radius: 0; box-shadow: none; }
+  .view.detail .own__rate[data-selected="1"] {
+    background: var(--surface-inset); box-shadow: none; border-bottom-color: transparent;
+  }
+}
 /* ==== src/css/32-view-compare.css ==== */
 /* 32-view-compare.css — the Compare screen. OWNER: IMPL-4.
  *
@@ -9206,7 +9507,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.11.1';
+  T.version = '0.12.0';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -18145,13 +18446,15 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     opts = opts || {};
     var id = 'detail-sec-' + key;
     var sec = U.el('section', {
-      class: 'section detail__sec detail__sec--' + key,
+      class: 'section detail__sec detail__sec--' + key + ' tcard',
       'aria-labelledby': id, dataset: { sec: key }
     });
-    var head = U.el('div', { class: 'rubric' });
-    head.appendChild(U.el('h2', { class: 'rubric__label', id: id }, label));
+    var head = U.el('div', { class: 'rubric tcard__head' });
+    head.appendChild(U.el('h2', { class: 'rubric__label tcard__title', id: id }, label));
     if (opts.aside) head.appendChild(opts.aside);
     sec.appendChild(head);
+    /* v0.12.0 — one muted subtitle line under the card title, Home's shape. */
+    if (opts.sub) sec.appendChild(U.el('p', { class: 'tcard__sub' }, opts.sub));
     var body = U.el('div', { class: 'section__body' });
     sec.appendChild(body);
     sec._body = body;
@@ -18574,18 +18877,23 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
        position 2 by putting the rail before the reading column in the DOM and
        letting the grid place it on the right. Reading order and tab order
        agree at both sizes. */
+    /* v0.12.0 - the page's tail is ONE accordion group: hairline rows, a sans
+       title, "+" that becomes a minus. Home's "Research & planning" shape. */
     function fold(label, sections) {
-      var d = U.el('details', { class: 'detail__research' });
-      d.appendChild(U.el('summary', {}, label));
-      sections.forEach(function (s) { d.appendChild(s); });
+      var d = U.el('details', { class: 'detail__research fold' });
+      d.appendChild(U.el('summary', { class: 'fold__sum' }, label));
+      var b = U.el('div', { class: 'fold__body' });
+      sections.forEach(function (s) { b.appendChild(s); });
+      d.appendChild(b);
       return d;
     }
-    var resortResearch = fold('Resort replies & original offer notes', [secOutreach]);
-    var tripResearch = fold('Explore the stay, travel & weather research', [secWhy, secStay, secFlight, secWeather]);
-    var researchNotes = fold('Notes, questions & research checklist', [secNotes, secChecks, secProv]);
-    var MOBILE_ORDER = [secStand, secMoney, resortResearch, tripResearch, researchNotes];
+    var folds = U.el('div', { class: 'detail__folds' });
+    folds.appendChild(fold('Resort replies & original offer notes', [secOutreach]));
+    folds.appendChild(fold('Explore the stay, travel & weather research', [secWhy, secStay, secFlight, secWeather]));
+    folds.appendChild(fold('Notes, questions & research checklist', [secNotes, secChecks, secProv]));
+    var MOBILE_ORDER = [secStand, secMoney, folds];
     var RAIL_ORDER = [secStand];
-    var MAIN_ORDER = [secMoney, resortResearch, tripResearch, researchNotes];
+    var MAIN_ORDER = [secMoney, folds];
     var mq = window.matchMedia ? window.matchMedia('(min-width: 1024px)') : null;
     var wide = null;
 
@@ -18919,14 +19227,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     /* `detail__place`, not `detail__where` — the sub-header's centred middle
        cell already owns that name (it centred this line for a whole wave). */
     head.appendChild(U.el('p', { class: 'detail__place hero__where' }, destinationLine(f)));
-    /* the lede: the workbook's own one-line reasoning, moved up from "Why
-       it's here" (v0.9.0) — it is the sentence that explains the page. */
-    if (!U.isBlank(f.reasoning)) {
-      head.appendChild(U.el('p', {
-        class: 'detail__lede',
-        title: 'The workbook’s own words, from ' + sourceHeaderOf('reasoning', 'its reasoning column')
-      }, String(f.reasoning)));
-    }
+    /* v0.12.0 — the workbook's narrative line is NOT the hero's job: the facts
+       strip below already states every figure it repeats. It went back to
+       "Why it's here", inside the research disclosure at the foot of the page. */
 
     var facts = U.el('dl', { class: 'facts detail__facts' });
     head.appendChild(facts);
@@ -19351,15 +19654,28 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var opts = [];
     T.plan.REACTIONS.forEach(function (re) {
       var on = current === re;
+      /* v0.12.0 — the segmented control is ONE row at every desktop width, and
+         the rail is only 320px wide. The label's trailing word is its own span
+         so the narrow rail can drop " it" and still fit four equal segments;
+         the button keeps the whole phrase as its accessible name, and
+         T.cards.REACTION_LABEL is untouched. */
+      var full = T.cards.REACTION_LABEL[re];
+      var cut = String(full).lastIndexOf(' ');
+      var stem = cut > 0 ? String(full).slice(0, cut) : String(full);
+      var tail = cut > 0 ? String(full).slice(cut) : '';
       var b = U.el('button', {
         type: 'button', class: 'reactionopt', role: 'radio',
         'aria-checked': on ? 'true' : 'false',
+        'aria-label': full,
         tabindex: on || (!current && re === 'love') ? '0' : '-1',
         dataset: { reaction: re, traveler: traveler.id }
       }, [
         U.el('span', { class: 'reactionopt__disc mark mark--' + re, 'aria-hidden': 'true' },
           T.cards.REACTION_GLYPH[re]),
-        U.el('span', { class: 'reactionopt__label' }, T.cards.REACTION_LABEL[re])
+        U.el('span', { class: 'reactionopt__label' }, [
+          stem,
+          tail ? U.el('span', { class: 'reactionopt__tail' }, tail) : null
+        ])
       ]);
       /* v0.9.0: the checked pill clears on a second press (its title says
          so) — the old bordered "clear" button is gone. */
@@ -19472,7 +19788,13 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
        nothing (a rubric over nothing is furniture). */
     var hasScores = (has('fitScore') && num(f.fitScore) != null) ||
       (has('buyNowScore') && num(f.buyNowScore) != null);
-    if (!hasFit && !hasCaveats && !hasScores) { sec.hidden = true; return sec; }
+    if (!hasReasoning && !hasFit && !hasCaveats && !hasScores) { sec.hidden = true; return sec; }
+    /* v0.12.0 — the workbook's own sentence lives here again (it duplicated the
+       hero's facts strip when it sat under the title). */
+    if (hasReasoning) {
+      body.appendChild(subBlock('The workbook’s note', String(f.reasoning),
+        sourceHeaderOf('reasoning', null)));
+    }
     if (hasFit) {
       body.appendChild(subBlock('Strongest fit', String(f.fitSummary),
         sourceHeaderOf('fitSummary', null)));
@@ -20135,12 +20457,23 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
   function buildMoney(row, painters) {
     var id = row.id, f = row.rec.f;
-    var sec = sectionEl('money', 'Choose a package → plan the cost for two');
+    /* v0.12.0 — two Home-style cards, one wrapper. `.detail__own` stays the
+       wrapper so the couple's ledger is still inside it; `.detail__sec--money`
+       is the trip-cost card, which still carries the workbook's own ledger and
+       the quoted-hotel block inside its provenance disclosure. */
+    var wrap = U.el('div', { class: 'detail__moneywrap detail__own own' });
+    var secPack = sectionEl('packages', 'Packages',
+      { sub: 'What the resort quoted for the whole stay' });
+    var sec = sectionEl('money', 'Trip cost for two',
+      { sub: 'Your own sum — the package plus flights, meals and ground; never the workbook’s model' });
+    wrap.appendChild(secPack);
+    wrap.appendChild(sec);
+    wrap._packSec = secPack;
+    wrap._packHost = secPack._body;
+    wrap._costHost = sec._body;
     var body = sec._body;
     var kv = U.el('dl', { class: 'kv detail__kv' });
-    body.appendChild(kv);
     var basis = U.el('p', { class: 'detail__basis' });
-    body.appendChild(basis);
     /* v0.6.2 — the resort's own number, in a block of its own. It is never in
        the kv column above: that column is the workbook's modelled money and a
        quote sharing it would read as one. This is the ONE surface that shows
@@ -20150,17 +20483,16 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
        something honest to put in it. */
     var quoted = U.el('div', { class: 'detail__sub detail__quoted' });
     quoted.hidden = true;
-    body.appendChild(quoted);
-    /* v0.10.1 — the couple's own sum, under the resort's quote and above the
-       providers: the third money block on the page, labelled as THEIRS. */
-    var ownHost = U.el('div', { class: 'detail__sub detail__own own' });
-    body.appendChild(ownHost);
-    var paintOwn = buildOwn(row, ownHost);
+    /* v0.10.1 — the couple's own sum: the money the page leads with. It writes
+       the packages card and the trip-cost card through the wrapper. */
+    var paintOwn = buildOwn(row, wrap);
     var providers = U.el('div', { class: 'providers' });
-    body.appendChild(providers);
-    var research = U.el('details', { class: 'detail__research own__research' });
-    research.appendChild(U.el('summary', {}, 'Workbook benchmark & provider price research'));
-    [kv, basis, quoted, providers].forEach(function (node) { research.appendChild(node); });
+    var research = U.el('details', { class: 'detail__research own__research fold fold--incard' });
+    research.appendChild(U.el('summary', { class: 'fold__sum' },
+      'Workbook benchmark & provider price research'));
+    var researchBody = U.el('div', { class: 'fold__body' });
+    [kv, basis, quoted, providers].forEach(function (node) { researchBody.appendChild(node); });
+    research.appendChild(researchBody);
     body.appendChild(research);
 
     painters.push(function () {
@@ -20208,7 +20540,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       paintOwn();
     });
 
-    return sec;
+    return wrap;
   }
 
   /* ---- 5e-bis. your own all-in (v0.10.1) -------------------------------- */
@@ -20237,7 +20569,14 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   function buildOwn(row, host) {
     var id = row.id;
     var S = T.scenario;
-    if (!S || !S.totalOf) { host.hidden = true; return function () {}; }
+    /* v0.12.0 — `host` is the two-card wrapper: the packages card takes the
+       choosing, the trip-cost card takes the ledger and its drawers. */
+    var packHost = host._packHost || host;
+    var costHost = host._costHost || host;
+    if (!S || !S.totalOf) {
+      if (host._packSec) host._packSec.hidden = true; else host.hidden = true;
+      return function () {};
+    }
     function fields() { var r = rowOf(id) || row; return (r && r.rec && r.rec.f) || null; }
 
     /* v0.11.0 — the six things a package either feeds them or does not. One
@@ -20277,11 +20616,6 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         (m[2] === n[2] ? String(+n[3]) : MONTHS[+n[2] - 1] + ' ' + (+n[3]));
     }
 
-    host.appendChild(U.el('p', {
-      class: 'detail__sublabel',
-      title: 'Your scenario — a package you picked plus the workbook’s fare and allowance, or figures you type; never the workbook’s modelled total'
-    }, '1 · Compare packages for the whole stay'));
-
     /* -- the hotel line has ONE control. With packages on the record it is
           the rate table's radio group; the select below stays in the DOM as
           the same control's accessible/no-table form (and the one a keyboard
@@ -20292,10 +20626,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     pick.appendChild(U.el('span', { class: 'own__picklabel' }, 'Package'));
     pick.appendChild(hotelSel);
     picks.appendChild(pick);
-    host.appendChild(picks);
+    packHost.appendChild(picks);
 
     var packages = U.el('div', { class: 'own__packages' });
-    host.appendChild(packages);
+    packHost.appendChild(packages);
 
     /* -- under the table: what the package feeds them, and the escape hatch
           out of packages altogether. One line, two controls, no boxes. -- */
@@ -20317,21 +20651,21 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       hotelSel.dispatchEvent(new Event('change'));
     });
     under.appendChild(typedLink);
-    host.appendChild(under);
+    packHost.appendChild(under);
 
     /* -- ONE confirm drawer, for the package they picked. Closed. -- */
-    var confirm = U.el('details', { class: 'own__evidence own__confirm' });
+    var confirm = U.el('details', { class: 'own__evidence own__confirm fold fold--incard' });
     confirm.hidden = true;
-    host.appendChild(confirm);
+    packHost.appendChild(confirm);
 
     var display = U.el('div', { class: 'own__display' });
-    host.appendChild(display);
+    costHost.appendChild(display);
 
-    var editor = U.el('details', { class: 'orx__editor own__editor' });
-    editor.appendChild(U.el('summary', { class: 'orx__editorsum' }, 'Adjust the figures'));
-    var form = U.el('div', { class: 'orx__editorbody own__form' });
+    var editor = U.el('details', { class: 'orx__editor own__editor fold fold--incard' });
+    editor.appendChild(U.el('summary', { class: 'orx__editorsum fold__sum' }, 'Adjust the figures'));
+    var form = U.el('div', { class: 'orx__editorbody own__form fold__body' });
     editor.appendChild(form);
-    host.appendChild(editor);
+    costHost.appendChild(editor);
     var extrasToggle = U.el('input', { type: 'checkbox', dataset: { field: 'ownExtrasSelected' } });
     extrasToggle.addEventListener('change', function () { write('ownExtrasSelected', extrasToggle.checked); });
     form.appendChild(U.el('label', { class: 'own__extras-toggle' }, [extrasToggle, ' Include optional extras in this trip estimate']));
@@ -20588,9 +20922,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       confirmSignature = signature;
       var wasOpen = confirm.open;
       U.clear(confirm);
-      confirm.appendChild(U.el('summary', { class: 'orx__editorsum' },
+      confirm.appendChild(U.el('summary', { class: 'orx__editorsum fold__sum' },
         'Confirm details for ' + (q.label || 'this package')));
-      var body = U.el('div', { class: 'orx__editorbody own__confirmbody' });
+      var body = U.el('div', { class: 'orx__editorbody own__confirmbody fold__body' });
       var controls = {};
       function ctl(key) {
         var inclusion = INCL_VALUES && INCL.some(function (c) { return c.key === key; });
@@ -20719,9 +21053,6 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var hr = (t.total != null && budget != null) ? budget - t.total : null;
       var hrState = hr == null ? null : hr >= 0 ? 'under' : hr >= -250 ? 'borderline' : 'over';
 
-      display.appendChild(U.el('h3', { class: 'detail__sublabel own__cost-heading' },
-        '2 · Trip cost for Solomon & Roni'));
-
       /* review: one accent line, no box, no paragraph */
       if (t.reviewRequired) {
         var review = U.el('p', { class: 'own__review', role: 'status' });
@@ -20819,16 +21150,18 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       if (flights && h.source === 'quote' && h.nights) cap += ' The fare was priced for the workbook’s dates, not the package’s — re-check it before booking.';
       if (h.converted) cap += ' Hotel converted at ' + rateWords() + '.';
       cap += ' It never moves the budget filters or the workbook’s modelled total.';
-      var how = U.el('details', { class: 'own__how' });
-      how.appendChild(U.el('summary', { class: 'own__howsum' }, 'How this was summed'));
-      how.appendChild(U.el('p', { class: 'detail__subsource own__caption' }, cap));
+      var how = U.el('details', { class: 'own__how fold fold--incard' });
+      how.appendChild(U.el('summary', { class: 'own__howsum fold__sum' }, 'How this was summed'));
+      var howBody = U.el('div', { class: 'fold__body' });
+      howBody.appendChild(U.el('p', { class: 'detail__subsource own__caption' }, cap));
       if (t.flight) {
-        how.appendChild(U.el('p', {
+        howBody.appendChild(U.el('p', {
           class: 'detail__subsource own__flightline', dataset: { status: t.flight.status }
         }, flightWords(t.flight)));
       }
-      display.appendChild(how);
+      how.appendChild(howBody);
       if (t.note) display.appendChild(U.el('p', { class: 'own__note' }, t.note));
+      display.appendChild(how);
     }
 
     function paintEditor() {
