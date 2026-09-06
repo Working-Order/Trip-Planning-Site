@@ -8335,16 +8335,15 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .home .panel--locations, .home [data-panel="contenders"], .home [data-panel="recent"] { padding: 0; background: none; border: 0; }
 .home .panel--locations .panel__title { font-size: 1.5rem; }
 .locationflow__status { font-size: .875rem; margin-bottom: 1.25rem; }
-.locationflow__cards { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
-.locationcard { display: flex; flex-direction: column; gap: .35rem; padding: 1.25rem; border-radius: 1rem; background: var(--surface); border: 1px solid var(--line); }
-.locationcard h3 { font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.4; font-weight: 600; }
-.locationcard__country { font-size: .875rem; }
-.locationcard__count { font-size: .875rem; color: var(--ink-faint); margin-top: .65rem; }
-.locationcard__actions { padding-top: 1rem; margin-top: auto; gap: .5rem; justify-content: space-between; }
-.locationcard__actions .btn { padding: .35rem .5rem; font-size: .875rem; min-height: 44px; border-radius: .65rem; }
-.locationcard__actions .btn:first-child { color: var(--ink-muted); }
-.locationcard__actions .btn[aria-pressed="true"] { background: var(--surface-alt); border-color: var(--line); color: var(--ink); }
-.locationcard[data-focused="true"] { border-color: var(--accent); }
+.locationflow__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem 1.25rem; }
+.locationcard { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 .75rem; padding: .75rem 1rem; border-radius: .75rem; background: transparent; border: 1px solid var(--line); align-items: center; }
+.locationcard h3 { grid-column: 1; min-width: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1.4; font-weight: 600; }
+.locationcard h3 .btn { display: block; width: 100%; text-align: left; white-space: normal; padding: .25rem 0; min-height: 44px; color: var(--ink); font-size: 1rem; font-weight: 600; border: 0; background: none; }
+.locationcard h3 .btn:hover { color: var(--accent); }
+.locationcard__count { grid-column: 1; font-size: .875rem; color: var(--ink-muted); margin: 0; line-height: 1.5; }
+.locationcard > .locationcard__remove { grid-column: 2; grid-row: 1 / 3; color: var(--ink-faint); font-size: .875rem; min-height: 44px; padding: .35rem .5rem; border-radius: .5rem; }
+.locationcard > .locationcard__remove:hover { background: var(--surface-alt); color: var(--ink); }
+.locationcard[data-focused="true"] { border-color: var(--accent); background: var(--surface); }
 .locationflow__toolbar { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: .75rem; margin-top: 1.25rem; }
 .locationflow__toolbar .btn { margin: 0; padding: .55rem 1.1rem; min-height: 44px; font-size: .875rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 2rem; }
 .locationflow__toolbar .btn:hover, .locationflow__toolbar .btn[aria-expanded="true"] { background: var(--surface-alt); border-color: var(--line-strong); }
@@ -8418,6 +8417,7 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   .home .minicard__main { padding: 1rem; padding-right: 3rem; }
   .home .minicard__fav { right: .35rem; top: .35rem; }
   .home .strip { gap: 1rem; }
+  .locationflow__cards { grid-template-columns: 1fr; }
   .home .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .locationflow__browse-list { grid-template-columns: 1fr; }
 }
@@ -8427,10 +8427,7 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   .home .strip__art { width: 7rem; min-height: 8rem; flex: 0 0 7rem; aspect-ratio: auto; }
   .home .strip__caption { padding: .875rem; align-content: center; }
   .locationflow__cards { grid-template-columns: 1fr; }
-  .locationcard { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
-  .locationcard h3 { grid-column: 1 / -1; }
-  .locationcard__count { margin: 0; }
-  .locationcard__actions { grid-column: 1 / -1; padding-top: .65rem; }
+
 }
 
 /* ==== src/css/41-view-responses.css ==== */
@@ -15396,9 +15393,18 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     var p = store.getState().planning, e = p && p.global && p.global.settings && p.global.settings[id];
     return !!(e && !e.deleted && e.kind === 'location' && e.selected === true);
   };
+  L.dismissed = function (id) {
+    var p = store.getState().planning, e = p && p.global && p.global.settings && p.global.settings[id];
+    return !!(e && !e.deleted && e.kind === 'location' && e.dismissed === true);
+  };
+  L.onHome = function (g) { return !L.dismissed(g.id) && (g.selected || g.marked.length > 0); };
+  L.removeFromHome = function (place) {
+    store.dispatch('planning/upsert:settings', { entryId: place.id,
+      value: { kind: 'location', country: place.country, area: place.area, selected: false, dismissed: true } });
+  };
   L.setSelected = function (place, selected) {
     store.dispatch('planning/upsert:settings', { entryId: place.id,
-      value: { kind: 'location', country: place.country, area: place.area, selected: !!selected } });
+      value: { kind: 'location', country: place.country, area: place.area, selected: !!selected, dismissed: false } });
   };
   L.groups = function () {
     var groups = Object.create(null);
@@ -15421,7 +15427,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     }).sort(function (a, b) { return Number(b.selected) - Number(a.selected) || b.marked.length - a.marked.length || a.area.localeCompare(b.area); });
   };
   L.mount = function (host) {
-    var focusId = null, showAll = false, order = [], expanded = Object.create(null);
+    var focusId = null, showAll = false, lastRemoved = null, order = [], expanded = Object.create(null);
     var status = U.el('p', { class: 'locationflow__status', 'aria-live': 'polite' }); host.appendChild(status);
     var cards = U.el('div', { class: 'locationflow__cards' }); host.appendChild(cards);
     var allLocations = button('Show all locations', 'show-locations', function () { showAll = !showAll; paint(); });
@@ -15432,7 +15438,13 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       if (!more.hidden) search.focus();
     });
     findMore.setAttribute('aria-expanded', 'false'); findMore.setAttribute('aria-controls', 'home-location-search');
-    toolbar.appendChild(findMore); host.appendChild(toolbar);
+    toolbar.appendChild(findMore);
+    var undo = button('Undo removal', 'undo-remove', function () {
+      if (!lastRemoved) return;
+      var g = lastRemoved; lastRemoved = null; L.setSelected(g, true); paint();
+      findMore.focus({ preventScroll: true });
+    });
+    undo.hidden = true; toolbar.appendChild(undo); host.appendChild(toolbar);
     var more = U.el('section', { class: 'locationflow__browse', id: 'home-location-search', 'aria-label': 'Find a location' }); more.hidden = true;
     more.appendChild(U.el('label', { for: 'home-location-query', class: 'locationflow__search-label', text: 'Find a location' }));
     var search = U.el('input', { type: 'search', id: 'home-location-query', class: 'input', placeholder: 'Search area, country or resort', 'aria-label': 'Search locations' }); more.appendChild(search);
@@ -15441,22 +15453,26 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     function button(label, key, action) {
       var b = U.el('button', { type: 'button', class: 'btn btn--quiet', text: label, 'data-location-control': key }); b.addEventListener('click', action); return b;
     }
-    function toggle(g) { L.setSelected(g, !L.selected(g.id)); paint(); }
+
     function drawBrowse(groups) {
       U.clear(browse); var term = search.value.trim().toLowerCase();
       var matches = groups.filter(function (g) { return !term || (g.area + ' ' + g.country + ' ' + g.rows.map(function (r) { return r.rec.f.hotel; }).join(' ')).toLowerCase().indexOf(term) >= 0; });
       if (!matches.length) browse.appendChild(U.el('p', { text: 'No matching locations in this workbook.' }));
       matches.forEach(function (g) {
-        var b = button((g.selected ? '✓ ' : '+ ') + g.area + (g.country && g.country !== g.area ? ', ' + g.country : '') + ' · ' + g.rows.length + ' resorts', 'browse-' + g.id, function () { if (!g.selected && !g.marked.length) showAll = true; toggle(g); });
-        b.setAttribute('aria-pressed', String(g.selected)); browse.appendChild(b);
+        var added = L.onHome(g);
+        var b = button((added ? 'On home · ' : 'Add to home · ') + g.area + (g.country && g.country !== g.area ? ', ' + g.country : '') + ' · ' + g.rows.length + (g.rows.length === 1 ? ' resort' : ' resorts'), 'browse-' + g.id, function () {
+          if (L.onHome(g)) return;
+          showAll = true; lastRemoved = null; L.setSelected(g, true); paint();
+          search.focus({ preventScroll: true });
+        });
+        b.disabled = added; browse.appendChild(b);
       });
     }
     function paint() {
       var active = document.activeElement, restore = host.contains(active) && active.getAttribute('data-location-control');
-      var groups = L.groups(), chosen = groups.filter(function (g) { return g.selected; });
-      var suggested = groups.filter(function (g) { return g.marked.length; });
-      // Saving is additive. Preserve the visible order through save/unsave and sync.
-      var available = groups.filter(function (g) { return g.selected || g.marked.length; });
+      var groups = L.groups();
+      // Home membership is independent of resort marks and review status.
+      var available = groups.filter(L.onHome);
       available.forEach(function (g) { if (order.indexOf(g.id) < 0) order.push(g.id); });
       available.sort(function (a, b) { return order.indexOf(a.id) - order.indexOf(b.id); });
       var shown = showAll ? available : available.slice(0, 4);
@@ -15464,26 +15480,33 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       U.setText(allLocations, showAll ? "Show fewer" : "View all " + available.length + " locations");
       allLocations.setAttribute("aria-expanded", String(showAll));
       if (!shown.some(function (g) { return g.id === focusId; })) focusId = null;
-      U.setText(status, chosen.length ? chosen.length + ' saved · ' + suggested.length + ' suggested from your marked resorts' : suggested.length ? 'Suggested from your marked resorts' : 'Find a location to start your shortlist.');
+      if (lastRemoved && !L.dismissed(lastRemoved.id)) lastRemoved = null;
+      undo.hidden = !lastRemoved;
+      U.setText(status, lastRemoved ? lastRemoved.area + ' removed from home. Resorts and research are unchanged.' : available.length ? 'Choose a location to see its resorts.' : 'Add a location to start exploring.');
       U.clear(cards);
       shown.forEach(function (g) {
         var card = U.el('article', { class: 'locationcard', 'data-location-id': g.id });
-        card.appendChild(U.el('h3', { text: g.area }));
-        card.appendChild(U.el('p', { class: 'locationcard__country', text: g.country }));
-        card.appendChild(U.el('p', { class: 'locationcard__count', text: g.rows.length + (g.rows.length === 1 ? ' resort' : ' resorts') }));
-        var actions = U.el('div', { class: 'locationcard__actions' });
-        var save = button(g.selected ? '✓ Saved' : '+ Save', 'save-' + g.id, function () { toggle(g); }); save.setAttribute('aria-label', (g.selected ? 'Unsave ' : 'Save ') + g.area); save.setAttribute('aria-pressed', String(g.selected)); actions.appendChild(save);
-        var focus = button(focusId === g.id ? 'Close resorts' : 'View resorts', 'focus-' + g.id, function () { focusId = focusId === g.id ? null : g.id; paint(); }); focus.setAttribute('aria-pressed', String(focusId === g.id)); actions.appendChild(focus);
+        var title = U.el('h3');
+        var focus = button(g.area + ' →', 'focus-' + g.id, function () { focusId = focusId === g.id ? null : g.id; paint(); });
+        focus.setAttribute('aria-expanded', String(focusId === g.id));
+        focus.setAttribute('aria-label', (focusId === g.id ? 'Close resorts in ' : 'View resorts in ') + g.area);
+        title.appendChild(focus); card.appendChild(title);
+        card.appendChild(U.el('p', { class: 'locationcard__count', text: (g.country ? g.country + ' · ' : '') + g.rows.length + (g.rows.length === 1 ? ' resort' : ' resorts') + ' · ' + g.marked.length + ' marked' }));
+        var remove = button('Remove', 'remove-' + g.id, function () {
+          lastRemoved = g; L.removeFromHome(g); paint(); undo.focus({ preventScroll: true });
+        });
+        remove.classList.add('locationcard__remove');
+        remove.setAttribute('aria-label', 'Remove ' + g.area + ' from home');
+        remove.setAttribute('title', 'Remove from home; keep resorts and research');
         card.setAttribute('data-focused', String(focusId === g.id));
-        card.setAttribute('data-saved', String(g.selected));
-        card.appendChild(actions); cards.appendChild(card);
+        card.appendChild(remove); cards.appendChild(card);
       });
       drawBrowse(groups); U.clear(resorts);
       resorts.hidden = !focusId;
       shown.filter(function (g) { return g.id === focusId; }).forEach(function (g) {
         var section = U.el('section', { class: 'locationresorts', 'data-location-resorts': g.id });
         section.appendChild(U.el('h4', { text: 'Resorts in ' + g.area }));
-        if (!g.rows.length) section.appendChild(U.el('p', { text: 'No resorts in play for this saved location in the current workbook. Your location choice is kept.' }));
+        if (!g.rows.length) section.appendChild(U.el('p', { text: 'No resorts in play for this location in the current workbook.' }));
         var list = U.el('div', { class: 'locationresorts__list' });
         (expanded[g.id] ? g.rows : g.rows.slice(0, 4)).forEach(function (r) {
           var a = U.el('a', { class: 'locationresort', href: T.router.build('trip', [r.id]) });
