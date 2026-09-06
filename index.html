@@ -6964,6 +6964,29 @@ details[open] > .orphan__setasidesum::after,
     background: var(--surface-inset); box-shadow: none; border-bottom-color: transparent;
   }
 }
+
+/* ---- one rhythm: the columns start on the same line, and every gap on the
+   page below the hero is the same token (--s5). The money wrapper's old
+   16px top margin was what pushed the reading column below the rail. ---- */
+.view.detail .detail__grid { gap: var(--s5); }
+.view.detail .detail__hero { margin-bottom: 0; }
+.view.detail .detail__main,
+.view.detail .detail__rail,
+.view.detail .detail__moneywrap { gap: var(--s5); }
+.view.detail .detail__moneywrap { margin: 0; }
+/* a card that hides itself must actually go (the standalone build ships the
+   plain [hidden] rule, which any later display: on a class would beat). */
+.view.detail .tcard[hidden] { display: none; }
+/* the select in its quiet form takes no room in the trip-cost card either —
+   it is the table's accessible twin, not a gap above the ledger. */
+.view.detail .own__picks--quiet { position: absolute; margin: 0; width: 1px; height: 1px; }
+
+/* A card that ENDS in a disclosure row lets that row own the bottom edge: the
+   card's own bottom padding would double the summary's, leaving ~40px of
+   nothing under the last "+". The [hidden] guard keeps the Packages card's
+   padding when its "Confirm details…" row is not on the page. */
+.view.detail .tcard:has(> .section__body > .fold--incard:last-child:not([hidden])) { padding-bottom: 0; }
+.view.detail .tcard > .section__body > .fold--incard:last-child[open] > .fold__body { padding-bottom: 1.5rem; }
 /* ==== src/css/32-view-compare.css ==== */
 /* 32-view-compare.css — the Compare screen. OWNER: IMPL-4.
  *
@@ -9507,7 +9530,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.12.0';
+  T.version = '0.12.1';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -20626,7 +20649,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     pick.appendChild(U.el('span', { class: 'own__picklabel' }, 'Package'));
     pick.appendChild(hotelSel);
     picks.appendChild(pick);
-    packHost.appendChild(picks);
+    /* v0.12.0 - the select lives in the trip-cost card: the rate table is the
+       visible control, and the Packages card hides itself when there are no
+       quotes, which must never take the accessible control with it. */
+    costHost.appendChild(picks);
 
     var packages = U.el('div', { class: 'own__packages' });
     packHost.appendChild(packages);
@@ -21020,6 +21046,8 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       /* One control per fact: with a rate table on the page the select is the
          same control's quiet form — present and operable, never drawn twice. */
       pick.hidden = quotes.length === 0;
+      /* a panel with nothing to say hides itself (BRIEF): no quotes, no card. */
+      if (host._packSec) host._packSec.hidden = quotes.length === 0;
       U.toggleClass(pick, 'own__hotel--quiet', quotes.length > 0);
       U.toggleClass(picks, 'own__picks--quiet', quotes.length > 0);
       picks.hidden = quotes.length === 0 && !has;
@@ -21028,10 +21056,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       typedLink.hidden = !has;
       if (document.activeElement !== boardSel) boardSel.value = (S.of(id).ownBoard || '');
       if (!has) {
+        /* one short line: the card's subtitle already says what this sum is. */
         var empty = U.el('p', { class: 'detail__absent own__empty' },
           quotes.length
-            ? 'Pick a package above to see the trip cost for two, with what is still missing beside the estimate. Or '
-            : 'The trip you’d actually book — a hotel figure plus your own flights, meals and ground — summed here, apart from the workbook’s model. ');
+            ? 'Pick a package above, or '
+            : 'Nothing summed yet — type a hotel figure to start. ');
         var openIt = U.el('button', { type: 'button', class: 'btn btn--link own__open' },
           quotes.length ? 'type your own figures ›' : 'Build it ›');
         openIt.addEventListener('click', function () {
