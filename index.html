@@ -3445,11 +3445,14 @@ input[type="file"]:focus-visible::file-selector-button {
  * with the active-filter chips (.chips__save) — this bar holds views only.
  */
 
+/* v0.13.0 — the row reads as one line of quiet 32px chips: Home's chip
+   language (hairline, surface, full round), 12px of air above and below, and
+   the overflow masked away rather than sitting under a scrollbar. */
 .views {
   display: flex;
   align-items: center;
   gap: var(--s2);
-  padding: var(--s2) 0;
+  padding: var(--s3) 0;
   border-bottom: 1px solid var(--line);
 }
 .views__list {
@@ -3458,28 +3461,38 @@ input[type="file"]:focus-visible::file-selector-button {
   gap: var(--s2);
   flex: 1 1 auto;
   overflow-x: auto;
-  scrollbar-width: thin;
+  scrollbar-width: none;
   /* fade the overflow edge rather than clipping a chip mid-word */
-  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
-  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
-  padding-bottom: 2px;
+  mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
 }
+.views__list::-webkit-scrollbar { display: none; }
 .views__chip {
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
+  min-height: 32px;
+  padding-right: 2px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--surface);
 }
-.views__chip.is-active { border-color: var(--accent); background: var(--accent-soft); }
-.views__chip.is-active .views__link { font-weight: 600; }
+.views__chip:hover { border-color: var(--line-hair); }
+/* Selected = filled, not outlined in accent: the accent stays scarce. "Filled"
+   means ONE step away from whatever the control sits on — the nav pills sit on
+   --bg and fill with --surface-inset, these sit on --surface and fill with
+   --surface-alt, so both read as filled in either theme. */
+.views__chip.is-active {
+  border-color: var(--line-hair);
+  background: var(--surface-alt);
+}
+.views__chip.is-active .views__link { font-weight: 600; color: var(--ink); }
 .views__link {
   display: inline-flex;
   align-items: center;
   gap: var(--s1);
-  min-height: 32px;
-  padding: var(--s1) var(--s2) var(--s1) var(--s3);
+  min-height: 30px;
+  padding: 0 var(--s1) 0 var(--s3);
   color: var(--ink);
   text-decoration: none;
   font-size: var(--text-sm);
@@ -3487,13 +3500,24 @@ input[type="file"]:focus-visible::file-selector-button {
 }
 @media (pointer: coarse) { .views__link { min-height: var(--tap-min); } }
 .views__pin { color: var(--accent); }
+/* The per-chip menu is furniture, not information: it stays in the DOM (and
+   in the tab order) but only paints while its own chip is hovered or focused.
+   Its box is always reserved, so nothing reflows when it appears. */
 .views__more {
-  width: 32px;
-  min-height: 32px;
+  width: 24px;
+  min-height: 24px;
   border-radius: 999px;
   color: var(--ink-faint);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-1) var(--ease-out);
 }
-@media (pointer: coarse) { .views__more { width: var(--tap-min); min-height: var(--tap-min); } }
+.views__chip:hover .views__more,
+.views__chip:focus-within .views__more { opacity: 1; pointer-events: auto; }
+@media (pointer: coarse) {
+  .views__more { width: 32px; min-height: 32px; opacity: 1; pointer-events: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .views__more { transition: none; } }
 .views__more:hover { color: var(--ink); background: var(--bg-sunken); }
 .views__empty { font-size: var(--text-sm); color: var(--ink-faint); padding: var(--s1) 0; }
 /* ---- the save dialog ---------------------------------------------------- */
@@ -5008,23 +5032,47 @@ details[open] > .orphan__setasidesum::after,
 .shell__skip:focus { transform: translateY(0); }
 
 /* ─── MASTHEAD ───────────────────────────────────────────────────────────── */
-.masthead {
+/* v0.13.0 — the header is page background under ONE hairline: no darker band,
+   no second rule, no 80px of air. The bar itself owns no padding (the inner
+   row owns the height) so the sticky shrink stays a single number to change. */
+.masthead,
+.masthead.is-stuck {
   position: sticky;
   top: 0;
   z-index: 40;
   background: var(--bg);
-  border-bottom: var(--hair) solid var(--line-hair);
+  border-bottom: var(--hair) solid var(--line);
+  min-height: 0;
+  padding: 0;
+  /* No glass. 05-chrome.css gave this bar a translucent colour-mix plus
+     `backdrop-filter: blur(6px)`; the brief asks for plain page background, and
+     the filter also cost correctness — it promotes the bar to its own
+     composited layer, and in a full-page capture Chromium dropped the middle of
+     that layer (the More menu, the search pill and the device menu painted as
+     bare background, while hit-testing and an element-level capture showed all
+     three present and correctly coloured). Opaque is both the design and the
+     safe render. */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
-.masthead__inner {
+/* One centre line: nameplate, nav, then a right cluster whose controls all
+   stand 36px tall with 8px between them (flex, so the cluster stays tight —
+   the old five-column grid spread them by its uniform 24px gap). */
+/* Doubled selector: 40-view-home.css cascades later and sets this row's
+   height, padding and gap for every route — the shell's own geometry has to
+   out-specify it without an !important. */
+.masthead .masthead__inner {
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: var(--s3) var(--gutter);
-  display: grid;
-  grid-template-columns: auto 1fr auto auto auto;
+  padding: 0 var(--gutter);
+  display: flex;
   align-items: center;
-  gap: var(--s5); /* de-cramp 2026-08-31: s4 → s5; ≤1199 query still tightens to s3 */
-  min-height: var(--masthead-h);
+  gap: var(--s2);
+  min-height: 64px;
 }
+.masthead.is-stuck .masthead__inner { min-height: var(--masthead-h-min); }
+.masthead__nameplate { flex: 0 0 auto; }
+.masthead__nav { flex: 1 1 auto; margin-left: var(--s5); }
 
 .masthead__nameplate {
   display: flex;
@@ -5051,6 +5099,8 @@ details[open] > .orphan__setasidesum::after,
 .masthead__nav { min-width: 0; }
 /* Never wrap: a masthead that stacks its five links into a column is worse
    than one that collapses the search (see the 1199px query below). */
+/* v0.13.0 — a nav link is a 36px pill: hover fills quietly, the current page
+   fills for good. The accent underline is gone; the page keeps ONE accent. */
 .masthead__navlist {
   display: flex;
   align-items: center;
@@ -5065,21 +5115,27 @@ details[open] > .orphan__setasidesum::after,
   display: inline-flex;
   align-items: center;
   gap: var(--s1);
-  min-height: var(--tap-min);
-  padding: var(--s2) var(--s3);
-  border-radius: var(--radius-md);
+  min-height: 36px;
+  padding: 0 var(--s3);
+  border: var(--hair) solid transparent;
+  border-radius: var(--radius-round);
+  background: transparent;
   color: var(--ink-muted);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   text-decoration: none;
   white-space: nowrap;
-  border-bottom: 2px solid transparent;
+}
+/* A finger still gets its 44px; a mouse gets the tighter bar. */
+@media (pointer: coarse) {
+  .masthead__link,
+  .navmenu__button { min-height: var(--tap-min); }
 }
 .masthead__link:hover,
 .navmenu__button:hover { color: var(--ink); background: var(--surface-alt); }
 /* Menu furniture (2026-08-31 cleanup): the caret is punctuation, not a word —
    smaller and quieter than the label it follows. */
-.navmenu__caret { font-size: 0.78em; color: var(--ink-faint); }
+.navmenu__caret { font-size: 10px; line-height: 1; color: var(--ink-faint); }
 /* Device chip: person shape + name. The old font ⌂ rendered tiny, jammed
    against the name, and off-baseline; the glyph is now inline SVG (crisp at
    any DPI, no external asset — CSP fact still holds). */
@@ -5087,10 +5143,26 @@ details[open] > .orphan__setasidesum::after,
 .navmenu__glyph { display: inline-flex; color: var(--ink-faint); }
 .navmenu__glyph svg { display: block; }
 .navmenu__button:hover .navmenu__glyph { color: inherit; }
+/* v0.13.0 — the person mark becomes an avatar disc, so the user menu reads as
+   a ghost pill with a face on it rather than a stray icon beside a word. */
+.navmenu--device .navmenu__button { padding-left: 5px; }
+.navmenu--device .navmenu__glyph {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-round);
+  background: var(--surface-inset);
+  border: var(--hair) solid var(--line);
+  color: var(--ink-muted);
+}
+.navmenu--device .navmenu__glyph svg { width: 13px; height: 13px; }
 .masthead__link.is-current,
 .navmenu__button.is-current {
   color: var(--ink);
-  border-bottom-color: var(--accent);
+  background: var(--surface-inset);
+  border-color: var(--line);
   font-weight: var(--weight-semi);
 }
 
@@ -5136,7 +5208,7 @@ details[open] > .orphan__setasidesum::after,
   position: relative;
   display: flex;
   align-items: center;
-  justify-self: end;
+  flex: 0 0 auto;
 }
 .masthead__glass {
   position: absolute;
@@ -5144,13 +5216,15 @@ details[open] > .orphan__setasidesum::after,
   color: var(--ink-faint);
   pointer-events: none;
 }
+/* v0.13.0 — a 36px inset pill, same height and hairline as its neighbours. */
 .masthead__searchfield {
-  width: 11rem;
-  min-height: var(--tap-min);
-  padding: var(--s2) var(--s3) var(--s2) var(--s6);
-  background: var(--surface);
-  border: var(--hair) solid var(--line-strong);
-  border-radius: var(--radius-md);
+  width: 16rem;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 var(--s3) 0 var(--s6);
+  background: var(--surface-inset);
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius-round);
   color: var(--ink);
   font-size: var(--text-sm);
   transition: width var(--dur-3) var(--ease-out);
@@ -5159,20 +5233,24 @@ details[open] > .orphan__setasidesum::after,
    while the traveler is typing — always-open 16rem put the row over the 1280
    budget. Desktop only: below 1200 the magnifier flow owns the field. */
 @media (min-width: 1200px) {
-  .masthead__search:focus-within .masthead__searchfield { width: 15rem; }
+  .masthead__search:focus-within .masthead__searchfield { width: 19rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .masthead__searchfield { transition: none; }
 }
 .masthead__magnifier {
   display: none;
-  width: var(--tap-min);
-  height: var(--tap-min);
+  width: 36px;
+  height: 36px;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-round);
   color: var(--ink-muted);
   font-size: var(--text-lg);
+}
+.masthead__magnifier:hover { background: var(--surface-alt); color: var(--ink); }
+@media (pointer: coarse) {
+  .masthead__magnifier { width: var(--tap-min); height: var(--tap-min); }
 }
 
 /* ─── WORKBOOK CHIP ──────────────────────────────────────────────────────── */
@@ -5180,9 +5258,9 @@ details[open] > .orphan__setasidesum::after,
   display: inline-flex;
   align-items: center;
   gap: var(--s2);
-  min-height: var(--tap-min);
-  padding: var(--s2) var(--s3);
-  border: var(--hair) solid var(--line-hair);
+  min-height: 36px;
+  padding: 0 var(--s3);
+  border: var(--hair) solid var(--line);
   border-radius: var(--radius-round);
   color: var(--ink-muted);
   font-size: var(--text-xs);
@@ -5459,7 +5537,8 @@ details[open] > .orphan__setasidesum::after,
 @media (max-width: 1199px) {
   /* Five children, five columns — four made the workbook chip wrap to a second
      row and doubled the masthead's height. */
-  .masthead__inner { grid-template-columns: auto 1fr auto auto auto; gap: var(--s3); }
+  .masthead__inner { gap: var(--s2); }
+  .masthead__nav { margin-left: var(--s3); }
   .masthead__searchfield { width: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
   .masthead__glass { display: none; }
   .masthead__magnifier { display: inline-flex; }
@@ -5498,7 +5577,7 @@ details[open] > .orphan__setasidesum::after,
 
 /* Phone: the tab bar takes over navigation; the masthead goes slim. */
 @media (max-width: 767px) {
-  .masthead__inner {
+  .masthead .masthead__inner {
     /* Four visible children (the nav is gone), so four columns — three pushed
        the workbook chip onto a second row and cost 50px above the fold.
        The nameplate track carries a REAL minimum: `minmax(0, 1fr)` let the
@@ -5506,11 +5585,12 @@ details[open] > .orphan__setasidesum::after,
        painted straight over the three siblings (nothing overflowed the
        viewport, so a scrollWidth check could not see it). The three trailing
        controls go glyph-compact here to pay for that minimum. */
-    grid-template-columns: minmax(7.5rem, 1fr) auto auto auto;
-    min-height: var(--masthead-h-min);
-    padding: var(--s2) var(--gutter);
+    padding: 0 var(--gutter);
     gap: var(--s2);
   }
+  /* The nameplate is the flexible track now that the nav is gone; it keeps a
+     REAL minimum so the three trailing controls cannot collapse it. */
+  .masthead__nameplate { flex: 1 1 7.5rem; min-width: 7.5rem; }
   .masthead__nav { display: none; }
   /* The name never shrinks or truncates; the sub line gives way first. */
   .masthead__nameplate { min-width: 0; }
@@ -5560,92 +5640,133 @@ details[open] > .orphan__setasidesum::after,
 @media (min-width: 768px) { .explore__search { display: none; } }
 
 /* ---- toolbar ------------------------------------------------------------ */
+/* v0.13.0 — the page headline on the left at Home's h1 size, and on the right
+   ONE cluster: every control 36px tall, 10px radius, 8px apart, all centred on
+   the headline. Four heights and four borders became one language. */
 .explore__toolbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--s3);
 }
 .explore__count {
   font-family: var(--font-display);
-  font-size: var(--text-lg);
+  /* Home's h1 exactly (40-view-home.css `.home__headline`): this is the page
+     headline, so it is set at the page-headline size, not at card-title size. */
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+  font-variation-settings: var(--wonk-display);
   font-weight: 600;
   line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
 }
 .explore__tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
 
-.sortctl { display: flex; align-items: center; gap: var(--s2); }
-.sortctl__label { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
-.sortctl__select {
-  min-height: var(--tap-min);
-  padding: var(--s1) var(--s2);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-md);
+/* Sort = ONE segmented control: the label, the select and the direction toggle
+   share a single border, so the three read as one thing to set rather than a
+   floating small-caps word, a control and a mystery button. The label keeps
+   its `for` — it is the same element, demoted from shout to left cap. */
+.sortctl {
+  display: inline-flex;
+  align-items: stretch;
+  height: 36px;
+  border: var(--hair) solid var(--line);
+  border-radius: 10px;
   background: var(--surface);
+  overflow: hidden;
+}
+.sortctl:hover { border-color: var(--line-hair); }
+.sortctl__label {
+  display: inline-flex;
+  align-items: center;
+  padding-left: var(--s3);
+  font-size: var(--text-sm);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.sortctl__label::after { content: ":"; }
+.sortctl__select {
+  min-height: 0;
+  padding: 0 var(--s2) 0 var(--s1);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--ink);
   font-size: var(--text-sm);
 }
 .sortctl__dir {
-  width: var(--tap-min);
-  min-height: var(--tap-min);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-md);
-  background: var(--surface);
+  width: 34px;
+  min-height: 0;
+  border: 0;
+  border-left: var(--hair) solid var(--line);
+  border-radius: 0;
+  background: transparent;
   color: var(--ink-muted);
 }
+.sortctl__dir:hover { color: var(--ink); background: var(--surface-alt); }
+.sortctl__select:focus-visible,
+.sortctl__dir:focus-visible { outline-offset: -3px; }
 
-/* Layout switcher (2026-08-31 cleanup): one bordered segmented control that
-   matches .sortctl__select, with interior hairlines — not four buttons with
-   overlapping -1px borders and four font glyphs of four different weights. */
+/* Layout switcher: the trip page's reaction control, exactly — a sunken
+   rounded track with no interior rules, the chosen segment a raised pill. */
 .modes {
   display: inline-flex;
   align-items: stretch;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  overflow: hidden;
+  height: 36px;
+  padding: 3px;
+  border: var(--hair) solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-inset);
+  box-shadow: var(--shadow-inset);
 }
 .modes__btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--tap-min);
-  min-height: var(--tap-min); /* 44px targets; group = 46px = the bordered sort controls */
+  width: 34px;
+  min-height: 0;
   border: 0;
+  border-radius: 7px;
   background: transparent;
   color: var(--ink-faint);
+  transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
-.modes__btn + .modes__btn { border-left: 1px solid var(--line); }
 .modes__btn:hover { color: var(--ink); background: var(--surface-alt); }
-/* overflow:hidden would clip the standard focus ring; draw it inside */
 .modes__btn:focus-visible { outline-offset: -3px; }
 .modes__btn.is-on {
-  background: var(--accent-soft);
+  background: var(--surface);
   color: var(--ink);
-  /* shape as well as colour: a 2px underline marks the active mode */
-  box-shadow: inset 0 -2px 0 var(--accent);
+  box-shadow: var(--shadow-sm);
 }
+@media (prefers-reduced-motion: reduce) { .modes__btn { transition: none; } }
 .modes__icon { display: inline-flex; }
 .modes__icon svg { display: block; }
 
 .explore__filters-btn {
-  min-height: var(--tap-min);
-  padding: var(--s1) var(--s3);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-md);
+  height: 36px;
+  min-height: 36px;
+  padding: 0 var(--s3);
+  border: var(--hair) solid var(--line);
+  border-radius: 10px;
   background: var(--surface);
   color: var(--ink);
   font-size: var(--text-sm);
 }
+.explore__filters-btn:hover { border-color: var(--line-hair); background: var(--surface-alt); }
 @media (min-width: 1280px) { .explore__filters-btn { display: none; } }
 .explore__more {
-  width: var(--tap-min);
-  min-height: var(--tap-min);
-  border-radius: var(--radius-md);
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  border: var(--hair) solid transparent;
+  border-radius: 10px;
+  background: transparent;
   color: var(--ink-muted);
   font-size: var(--text-md);
 }
+.explore__more:hover { border-color: var(--line); background: var(--surface-alt); color: var(--ink); }
 
 .explore__chips { padding-bottom: var(--s2); }
 
@@ -8205,24 +8326,33 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
    one border, an interior hairline, still two link targets (workbook → Data,
    sharing → Stay in sync). Workbook side is count-only (see paintWorkbookChip);
    at ≤1023 the chiptexts hide and this reads as two glyph squares in a pill. */
+/* v0.13.0 — ONE status pill: one hairline, one radius, one 36px height, with a
+   thin inner divider where the two link targets meet. The dot still carries
+   the state (the rules below); the pill around it is furniture. */
 .masthead__chips {
   display: inline-flex;
   align-items: stretch;
+  flex: 0 0 auto;
   min-width: 0;
-  border: var(--hair) solid var(--line-hair);
+  min-height: 36px;
+  border: var(--hair) solid var(--line);
   border-radius: var(--radius-round);
+  background: var(--surface);
+  overflow: hidden;
 }
-.masthead__chips:hover { border-color: var(--line-strong); }
+.masthead__chips:hover { border-color: var(--line-hair); }
 .masthead__chips .masthead__chip {
   flex: 0 1 auto;
   min-width: 0;
+  min-height: 0;
   border: 0;
-  border-radius: var(--radius-round) 0 0 var(--radius-round);
+  border-radius: 0;
 }
 .masthead__chips .masthead__chip--sync {
-  border-left: var(--hair) solid var(--line-hair);
-  border-radius: 0 var(--radius-round) var(--radius-round) 0;
+  border-left: var(--hair) solid var(--line);
 }
+/* The children stretch to the pill, so the touch floor lives on the pill. */
+@media (pointer: coarse) { .masthead__chips { min-height: var(--tap-min); } }
 .masthead__chips .masthead__chip:hover { color: var(--ink); background: var(--surface-alt); }
 .masthead__chip--sync .masthead__chiptext { max-width: 7rem; }
 /* The glyph carries the state, colour only reinforces it. */
@@ -9530,7 +9660,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.12.1';
+  T.version = '0.13.0';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
