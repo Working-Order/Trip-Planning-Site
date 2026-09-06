@@ -8570,6 +8570,41 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 
 }
 
+
+/* Compact navigation and home controls; the existing popover owns menu focus. */
+.masthead, .masthead.is-stuck { padding: 0; min-height: 0; }
+.masthead__inner { width: 100%; min-height: 4.5rem; padding-block: .5rem; gap: 1.25rem; }
+.view--home { padding-top: 1.5rem; gap: 1.5rem; }
+.home__masthead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .5rem 1.5rem; }
+.home__headline { font-size: clamp(1.4rem, 2.2vw, 1.8rem); max-width: none; }
+.home__sub { font-size: .875rem; }
+.home .panel--locations .panel__head { align-items: center; gap: .75rem; margin-bottom: .75rem; }
+.home .panel--locations .panel__title { font-size: 1.125rem; }
+.locationflow__toolbar { margin: 0; justify-content: flex-end; gap: .5rem; }
+.locationflow__toolbar .btn { padding: .4rem .8rem; background: transparent; border-color: transparent; border-radius: .6rem; }
+.locationflow__toolbar .locationflow__add { background: var(--surface); border-color: var(--line-strong); }
+.locationflow__status { margin-bottom: .5rem; }
+.locationflow__cards { gap: .75rem; }
+.locationcard { padding: .5rem .75rem; gap: 0 .25rem; }
+.locationcard > .locationcard__remove { font-size: 1.25rem; min-width: 44px; padding: 0; }
+.locationcard__count { font-size: .875rem; }
+.home .minicard__art { height: 8.5rem; }
+.home .minicard__main { padding: 1rem; gap: .35rem; }
+.home [data-panel="contenders"] .panel__head { margin-bottom: .65rem; }
+.home [data-panel="contenders"] .panel__lede { margin-bottom: .75rem; }
+.popover--locations { width: min(27rem, calc(100vw - 24px)); max-width: calc(100vw - 24px); padding: 0; border-radius: .85rem; }
+.popover--locations .locationflow__browse { margin: 0; border: 0; padding: 1rem; }
+.popover--locations .locationflow__browse-list { grid-template-columns: 1fr; max-height: min(20rem, 45vh); }
+.popover--locations .locationflow__browse-list .btn:disabled { opacity: .65; cursor: default; }
+@media (min-width: 1100px) { .locationflow__cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 767px) {
+  .masthead__inner { gap: var(--s2); min-height: 3.75rem; }
+  .view--home { padding-top: 1rem; gap: 1.25rem; }
+  .home__masthead { display: grid; }
+  .locationflow__toolbar { flex-wrap: wrap; justify-content: flex-start; }
+  .home .minicard__art { height: 100%; }
+}
+
 /* ==== src/css/41-view-responses.css ==== */
 /* 41-view-responses.css — the Responses board, the Home "Held for you" panel,
  * the Explore card badge and the import-offer host. OWNER: BOARD (v0.6.0).
@@ -15573,17 +15608,21 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return g;
     }).sort(function (a, b) { return Number(b.selected) - Number(a.selected) || b.marked.length - a.marked.length || a.area.localeCompare(b.area); });
   };
-  L.mount = function (host) {
+  L.mount = function (host, heading) {
     var focusId = null, showAll = false, lastRemoved = null, order = [], expanded = Object.create(null);
     var status = U.el('p', { class: 'locationflow__status', 'aria-live': 'polite' }); host.appendChild(status);
     var cards = U.el('div', { class: 'locationflow__cards' }); host.appendChild(cards);
     var allLocations = button('Show all locations', 'show-locations', function () { showAll = !showAll; paint(); });
     var toolbar = U.el('div', { class: 'locationflow__toolbar' });
     allLocations.classList.add('locationflow__all'); toolbar.appendChild(allLocations);
-    var findMore = button('Find a location', 'find-location', function () {
-      more.hidden = !more.hidden; findMore.setAttribute('aria-expanded', String(!more.hidden));
-      if (!more.hidden) search.focus();
+    var findMore = button('+ Add location', 'find-location', function () {
+      if (findMore.getAttribute('aria-expanded') === 'true') { T.cards.popover.close(); return; }
+      drawBrowse(L.groups());
+      T.cards.popover.open(findMore, more, { className: 'popover--locations', labelledby: 'home-location-menu-title' });
+      search.focus({ preventScroll: true });
     });
+    findMore.classList.add('locationflow__add');
+    findMore.setAttribute('aria-haspopup', 'dialog');
     findMore.setAttribute('aria-expanded', 'false'); findMore.setAttribute('aria-controls', 'home-location-search');
     toolbar.appendChild(findMore);
     var undo = button('Undo removal', 'undo-remove', function () {
@@ -15591,11 +15630,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var g = lastRemoved; lastRemoved = null; L.setSelected(g, true); paint();
       findMore.focus({ preventScroll: true });
     });
-    undo.hidden = true; toolbar.appendChild(undo); host.appendChild(toolbar);
-    var more = U.el('section', { class: 'locationflow__browse', id: 'home-location-search', 'aria-label': 'Find a location' }); more.hidden = true;
-    more.appendChild(U.el('label', { for: 'home-location-query', class: 'locationflow__search-label', text: 'Find a location' }));
+    undo.hidden = true; host.appendChild(undo); (heading || host).appendChild(toolbar);
+    var more = U.el('section', { class: 'locationflow__browse', id: 'home-location-search', 'aria-label': 'Add a location' });
+    more.appendChild(U.el('label', { for: 'home-location-query', id: 'home-location-menu-title', class: 'locationflow__search-label', text: 'Add a location' }));
     var search = U.el('input', { type: 'search', id: 'home-location-query', class: 'input', placeholder: 'Search area, country or resort', 'aria-label': 'Search locations' }); more.appendChild(search);
-    var browse = U.el('div', { class: 'locationflow__browse-list' }); more.appendChild(browse); host.appendChild(more);
+    var browse = U.el('div', { class: 'locationflow__browse-list' }); more.appendChild(browse);
     var resorts = U.el('section', { class: 'locationflow__resorts', 'aria-label': 'Resorts in focused locations' }); host.appendChild(resorts);
     function button(label, key, action) {
       var b = U.el('button', { type: 'button', class: 'btn btn--quiet', text: label, 'data-location-control': key }); b.addEventListener('click', action); return b;
@@ -15629,6 +15668,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       if (!shown.some(function (g) { return g.id === focusId; })) focusId = null;
       if (lastRemoved && !L.dismissed(lastRemoved.id)) lastRemoved = null;
       undo.hidden = !lastRemoved;
+      status.hidden = !lastRemoved && available.length > 0;
       U.setText(status, lastRemoved ? lastRemoved.area + ' removed from home. Resorts and research are unchanged.' : available.length ? 'Choose a location to see its resorts.' : 'Add a location to start exploring.');
       U.clear(cards);
       shown.forEach(function (g) {
@@ -15639,7 +15679,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         focus.setAttribute('aria-label', (focusId === g.id ? 'Close resorts in ' : 'View resorts in ') + g.area);
         title.appendChild(focus); card.appendChild(title);
         card.appendChild(U.el('p', { class: 'locationcard__count', text: (g.country ? g.country + ' · ' : '') + g.rows.length + (g.rows.length === 1 ? ' resort' : ' resorts') + ' · ' + g.marked.length + ' marked' }));
-        var remove = button('Remove', 'remove-' + g.id, function () {
+        var remove = button('×', 'remove-' + g.id, function () {
           lastRemoved = g; L.removeFromHome(g); paint(); undo.focus({ preventScroll: true });
         });
         remove.classList.add('locationcard__remove');
@@ -15667,7 +15707,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       if (restore) Array.prototype.some.call(host.querySelectorAll('[data-location-control]'), function (b) { if (b.getAttribute('data-location-control') === restore) { b.focus({ preventScroll: true }); return true; } });
     }
     search.addEventListener('input', function () { drawBrowse(L.groups()); });
-    search.addEventListener('keydown', function (e) { if (e.key === 'Escape') { more.hidden = true; findMore.setAttribute('aria-expanded', 'false'); findMore.focus(); } });
+    search.addEventListener('keydown', function (e) { if (e.key === 'Escape') { T.cards.popover.close(); } });
     return { paint: paint };
   };
 })(window.TRIP);
@@ -16408,7 +16448,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var locationPanel = panel('home-locations', 'Where do you want to go?', { key: 'locations', class: 'panel--locations' });
       el.appendChild(locationPanel);
       if (T.locations) {
-        var locationFlow = T.locations.mount(locationPanel._body);
+        var locationFlow = T.locations.mount(locationPanel._body, locationPanel.querySelector('.panel__head'));
         painters.push(function () { locationFlow.paint(); });
       }
       var support = U.el('details', { class: 'home__support' });
