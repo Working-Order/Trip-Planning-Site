@@ -8314,24 +8314,15 @@ details[open] > .orphan__setasidesum::after,
 .map.is-dragging { cursor: grabbing; }
 .map__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
-.map__land {
-  fill: var(--map-land);
-  stroke: var(--map-coast);
-  stroke-width: 0.9px;
-  vector-effect: non-scaling-stroke;
-  stroke-linejoin: round;
+.map__base {
+  position: absolute; inset: 0;
+  display: block;
+  transform-origin: 0 0;
+  will-change: transform;
 }
-.map__tilesea { fill: var(--map-sea); stroke: none; }
-.map__lakes { fill: var(--map-sea); stroke: var(--map-coast); stroke-width: 0.6px; vector-effect: non-scaling-stroke; }
-.map__borders {
-  fill: none;
-  stroke: var(--line-hair);
-  stroke-width: 0.7px;
-  stroke-dasharray: 3 2;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.85;
-}
-.map[data-zoom="0"] .map__borders, .map[data-zoom="1"] .map__borders { opacity: 0.45; }
+/* mid-gesture: names and country labels go quiet rather than jitter */
+.map.is-moving .map__label, .map.is-moving .pin__name { visibility: hidden; }
+.map.is-moving .pin { pointer-events: none; }
 
 .map__label {
   font-family: var(--font-display);
@@ -10115,7 +10106,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.16.0';
+  T.version = '0.16.1';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -27077,7 +27068,13 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
  *   focus=<stableId>        open zoomed on one option (the trip page's link)
  *
  * The base map is `18-mapdata.js` (Natural Earth, inline — nothing fetched,
- * so it works on Pages, from disk and offline, and honours fact 20). Positions
+ * so it works on Pages, from disk and offline, and honours fact 20). It is
+ * drawn on a CANVAS (v0.16.1): during a drag / wheel / pinch the canvas only
+ * gets a CSS transform (composited, no repaint) and the discs are moved, not
+ * rebuilt; ~120 ms after the last input the map settles — canvas redrawn at
+ * the exact view, discs re-clustered, names and country labels back. Drawing
+ * the outline as one SVG path re-rasterised 500 KB of geometry per frame and
+ * felt laggy on Solomon's laptop; this is the fix. Positions
  * come from `19-geo.js`: workbook coordinates first, the destination gazetteer
  * second, and a pin that stands for a destination rather than a hotel is drawn
  * HOLLOW and says so (BRIEF §2 — a modelled point is never presented as fact).
@@ -27108,27 +27105,34 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     return n;
   }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-  function pathOf(rings) {
-    var out = [];
-    for (var i = 0; i < rings.length; i++) {
-      var r = rings[i];
-      if (!r.length) continue;
-      var s = 'M' + r[0][0] + ' ' + r[0][1];
-      for (var j = 1; j < r.length; j++) s += 'L' + r[j][0] + ' ' + r[j][1];
-      out.push(s + 'Z');
-    }
-    return out.join('');
-  }
-  function linesOf(rings) {
-    var out = [];
+  /** Rings (world units) -> one Path2D, built once and drawn many times. */
+  function path2d(rings, closed) {
+    var p = new Path2D();
     for (var i = 0; i < rings.length; i++) {
       var r = rings[i];
       if (r.length < 2) continue;
-      var s = 'M' + r[0][0] + ' ' + r[0][1];
-      for (var j = 1; j < r.length; j++) s += 'L' + r[j][0] + ' ' + r[j][1];
-      out.push(s);
+      p.moveTo(r[0][0], r[0][1]);
+      for (var j = 1; j < r.length; j++) p.lineTo(r[j][0], r[j][1]);
+      if (closed) p.closePath();
     }
-    return out.join('');
+    return p;
+  }
+  var PATHS = null;                 // shared across mounts: the world never changes
+  function basePaths() {
+    if (PATHS) return PATHS;
+    var M = T.mapData;
+    PATHS = { land: path2d(M.decode('land'), true), lakes: path2d(M.decode('lakes'), true),
+      borders: path2d(M.decode('borders'), false), tiles: {} };
+    return PATHS;
+  }
+  function tilePath(key) {
+    var P = basePaths();
+    if (P.tiles[key]) return P.tiles[key];
+    var rings = T.mapData.decodeTile(key);
+    return (P.tiles[key] = rings ? path2d(rings, true) : null);
+  }
+  function cssVar(el, name, fallback) {
+    try { var v = getComputedStyle(el).getPropertyValue(name).trim(); return v || fallback; } catch (e) { return fallback; }
   }
   function isMarked(row) { return T.locations && T.locations.isMarked ? T.locations.isMarked(row) : !!row.favorite; }
   function placeName(row) {
@@ -27203,15 +27207,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var main = U.el('div', { class: 'map__main' });
       var stage = U.el('div', { class: 'map', tabindex: '0', role: 'application',
         'aria-label': 'World map of the options. Drag to pan, scroll or pinch to zoom, plus and minus keys zoom, arrow keys pan.' });
+      var canvas = U.el('canvas', { class: 'map__base', 'aria-hidden': 'true' });
+      stage.appendChild(canvas);
+      el._canvas = canvas;
+      el._ctx2d = canvas.getContext('2d');
+      el._baseAt = null;
       var root = svg('svg', { class: 'map__svg', 'aria-hidden': 'true', focusable: 'false' });
-      var world = svg('g', { class: 'map__world' });
-      var land = svg('path', { class: 'map__land', d: pathOf(M.decode('land')), 'fill-rule': 'evenodd' });
-      var lakes = svg('path', { class: 'map__lakes', d: pathOf(M.decode('lakes')), 'fill-rule': 'evenodd' });
-      var borders = svg('path', { class: 'map__borders', d: linesOf(M.decode('borders')) });
-      var tiles = svg('g', { class: 'map__tiles' });
-      world.appendChild(land); world.appendChild(tiles); world.appendChild(lakes); world.appendChild(borders);
-      root.appendChild(world);
-      el._tiles = tiles; el._tileNodes = {};
       var labels = svg('g', { class: 'map__labels' });
       root.appendChild(labels);
       var pins = svg('g', { class: 'map__pins' });
@@ -27242,7 +27243,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       main.appendChild(side);
       el.appendChild(main);
 
-      el._stage = stage; el._svg = root; el._world = world; el._labels = labels;
+      el._stage = stage; el._svg = root; el._labels = labels;
       el._pins = pins; el._tip = tip; el._side = side;
       el._live = U.el('p', { class: 'visually-hidden', role: 'status', 'aria-live': 'polite' });
       el.appendChild(el._live);
@@ -27262,6 +27263,16 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         el._onResize = function () { view.measure(el); view.render(el); };
         window.addEventListener('resize', el._onResize);
       }
+      /* theme flips repaint the canvas (CSS can't recolour pixels) */
+      try {
+        el._mq = window.matchMedia('(prefers-color-scheme: dark)');
+        el._onTheme = function () { if (el.isConnected) view.drawBase(el); };
+        if (el._mq.addEventListener) el._mq.addEventListener('change', el._onTheme); else el._mq.addListener(el._onTheme);
+        if (typeof MutationObserver === 'function') {
+          el._mo = new MutationObserver(el._onTheme);
+          el._mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        }
+      } catch (e) {}
 
       view.readRoute(el, ctx.route);
       view.paint(el, { initial: true });
@@ -27421,15 +27432,32 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       m.cx += before[0] - after[0]; m.cy += before[1] - after[1];
       el._userMoved = true;
       view.clampView(el);
-      view.render(el);
-      view.scheduleUrl(el);
+      view.moved(el);
     },
     panBy: function (el, dx, dy) {
       var s = view.scale(el);
       el._m.cx -= dx / s; el._m.cy -= dy / s;
       el._userMoved = true;
       view.clampView(el);
-      view.render(el);
+      view.moved(el);
+    },
+    /**
+     * Every gesture step lands here: ONE composited frame per animation frame
+     * (canvas CSS transform + disc repositioning), then a full settle 120 ms
+     * after the last step. Nothing is re-rasterised while the finger moves.
+     */
+    moved: function (el) {
+      el._stage.classList.add('is-moving');
+      if (!el._raf) {
+        el._raf = requestAnimationFrame(function () { el._raf = null; if (el.isConnected) view.renderQuick(el); });
+      }
+      if (el._settleTimer) clearTimeout(el._settleTimer);
+      el._settleTimer = setTimeout(function () {
+        el._settleTimer = null;
+        if (!el.isConnected) return;
+        el._stage.classList.remove('is-moving');
+        view.render(el);
+      }, 120);
       view.scheduleUrl(el);
     },
     /** After the viewport settles: the URL follows, and so does "In view". */
@@ -27448,39 +27476,69 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     /* ------------------------------------------------------------------ */
     render: function (el) {
       if (!el._m || !el._placed) return;
-      var m = el._m, s = view.scale(el);
-      var tx = m.w / 2 - m.cx * s, ty = m.h / 2 - m.cy * s;
-      el._world.setAttribute('transform', 'translate(' + tx.toFixed(2) + ' ' + ty.toFixed(2) + ') scale(' + s.toFixed(6) + ')');
-      el._stage.dataset.zoom = String(Math.round(m.z));
-      view.renderTiles(el);
+      el._stage.dataset.zoom = String(Math.round(el._m.z));
+      view.drawBase(el);
       view.renderLabels(el);
       view.renderPins(el);
     },
 
-    /** 1:10m coastline where it exists, only for tiles in view, only when close. */
-    renderTiles: function (el) {
-      var M = T.mapData, m = el._m, g = el._tiles, have = el._tileNodes;
-      var want = {};
+    /** The gesture frame: slide/scale the last canvas, move the discs. */
+    renderQuick: function (el) {
+      if (!el._m || !el._placed) return;
+      var m = el._m, s = view.scale(el), b = el._baseAt;
+      if (!b) return view.render(el);
+      var k = s / b.s;
+      var dx = s * (b.cx - m.cx) + m.w / 2 * (1 - k), dy = s * (b.cy - m.cy) + m.h / 2 * (1 - k);
+      el._canvas.style.transform = 'translate(' + dx.toFixed(2) + 'px,' + dy.toFixed(2) + 'px) scale(' + k.toFixed(5) + ')';
+      var nodes = el._pins.childNodes;
+      for (var i = 0; i < nodes.length; i++) {
+        var c = nodes[i]._cluster;
+        if (!c) continue;
+        var p = view.toScreen(el, c.wx, c.wy);
+        c.sx = p[0]; c.sy = p[1];
+        nodes[i].setAttribute('transform', 'translate(' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ')');
+      }
+    },
+
+    /** Paint the outline for the CURRENT view onto the canvas (settled frames only). */
+    drawBase: function (el) {
+      var M = T.mapData, m = el._m, c = el._canvas, ctx = el._ctx2d;
+      if (!ctx) return;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var W = Math.round(m.w * dpr), H = Math.round(m.h * dpr);
+      if (c.width !== W || c.height !== H) { c.width = W; c.height = H; c.style.width = m.w + 'px'; c.style.height = m.h + 'px'; }
+      var s = view.scale(el), tx = m.w / 2 - m.cx * s, ty = m.h / 2 - m.cy * s;
+      var land = cssVar(el._stage, '--map-land', '#fdfbf7'), sea = cssVar(el._stage, '--map-sea', '#f0e6dc'), coast = cssVar(el._stage, '--map-coast', '#d0c5bb');
+      var P = basePaths();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, m.w, m.h);
+      ctx.save();
+      ctx.translate(tx, ty); ctx.scale(s, s);
+      ctx.lineJoin = 'round';
+      ctx.fillStyle = land; ctx.strokeStyle = coast; ctx.lineWidth = 0.9 / s;
+      ctx.fill(P.land, 'evenodd'); ctx.stroke(P.land);
+      /* 1:10m coastline where it exists, only for tiles in view, only when close */
       if (m.z >= DETAIL_Z && M.tiles) {
         var tile = M.W / M.TILE_N;
-        var a = view.toWorld(el, -20, -20), b = view.toWorld(el, m.w + 20, m.h + 20);
-        var tx0 = Math.max(0, Math.floor(a[0] / tile)), tx1 = Math.min(M.TILE_N - 1, Math.floor(b[0] / tile));
-        var ty0 = Math.max(0, Math.floor(a[1] / tile)), ty1 = Math.min(M.TILE_N - 1, Math.floor(b[1] / tile));
-        for (var tx = tx0; tx <= tx1; tx++) for (var ty = ty0; ty <= ty1; ty++) {
-          var key = tx + '_' + ty;
-          if (!M.tiles[key]) continue;
-          want[key] = true;
-          if (have[key]) continue;
-          var node = svg('g', { class: 'map__tile', 'data-tile': key });
-          node.appendChild(svg('rect', { class: 'map__tilesea', x: tx * tile, y: ty * tile, width: tile, height: tile }));
-          node.appendChild(svg('path', { class: 'map__land map__land--fine', d: pathOf(M.decodeTile(key)), 'fill-rule': 'evenodd' }));
-          g.appendChild(node);
-          have[key] = node;
+        var a = view.toWorld(el, -20, -20), bnd = view.toWorld(el, m.w + 20, m.h + 20);
+        var tx0 = Math.max(0, Math.floor(a[0] / tile)), tx1 = Math.min(M.TILE_N - 1, Math.floor(bnd[0] / tile));
+        var ty0 = Math.max(0, Math.floor(a[1] / tile)), ty1 = Math.min(M.TILE_N - 1, Math.floor(bnd[1] / tile));
+        for (var i = tx0; i <= tx1; i++) for (var j = ty0; j <= ty1; j++) {
+          var tp = M.tiles[i + '_' + j] ? tilePath(i + '_' + j) : null;
+          if (!tp) continue;
+          ctx.fillStyle = sea; ctx.fillRect(i * tile, j * tile, tile, tile);
+          ctx.fillStyle = land; ctx.fill(tp, 'evenodd'); ctx.stroke(tp);
         }
       }
-      Object.keys(have).forEach(function (key) {
-        if (!want[key]) { g.removeChild(have[key]); delete have[key]; }
-      });
+      ctx.fillStyle = sea; ctx.lineWidth = 0.6 / s;
+      ctx.fill(P.lakes, 'evenodd'); ctx.stroke(P.lakes);
+      ctx.strokeStyle = coast; ctx.lineWidth = 0.7 / s;
+      ctx.setLineDash([3 / s, 2 / s]);
+      ctx.globalAlpha = m.z < 2 ? 0.45 : 0.85;
+      ctx.stroke(P.borders);
+      ctx.restore();
+      el._baseAt = { cx: m.cx, cy: m.cy, s: s };
+      c.style.transform = '';
     },
 
     renderLabels: function (el) {
@@ -27524,7 +27582,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
           found.minX = Math.min(found.minX, p.x); found.maxX = Math.max(found.maxX, p.x);
           found.minY = Math.min(found.minY, p.y); found.maxY = Math.max(found.maxY, p.y);
         } else {
-          clusters.push({ sx: sp[0], sy: sp[1], items: [p], marked: p.marked, exact: p.g.precision === 'hotel',
+          clusters.push({ sx: sp[0], sy: sp[1], wx: p.x, wy: p.y, items: [p], marked: p.marked, exact: p.g.precision === 'hotel',
             minX: p.x, maxX: p.x, minY: p.y, maxY: p.y });
         }
       }
@@ -27664,11 +27722,18 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         if (pin && pin._cluster.items.length > 1 && pin._cluster.splittable) return view.zoomToCluster(el, pin._cluster);
         view.zoomBy(el, 1, ev.clientX - rect.left, ev.clientY - rect.top);
       });
+      /* wheel steps are folded into one zoom per animation frame */
+      var wheelAcc = 0, wheelX = 0, wheelY = 0, wheelRaf = null;
       stage.addEventListener('wheel', function (ev) {
         ev.preventDefault();
         var rect = stage.getBoundingClientRect();
-        var dz = -ev.deltaY * (ev.deltaMode === 1 ? 0.05 : 0.0022);
-        view.zoomBy(el, clamp(dz, -0.6, 0.6), ev.clientX - rect.left, ev.clientY - rect.top);
+        wheelAcc += clamp(-ev.deltaY * (ev.deltaMode === 1 ? 0.05 : 0.0022), -0.6, 0.6);
+        wheelX = ev.clientX - rect.left; wheelY = ev.clientY - rect.top;
+        if (!wheelRaf) wheelRaf = requestAnimationFrame(function () {
+          wheelRaf = null;
+          var dz = clamp(wheelAcc, -1.2, 1.2); wheelAcc = 0;
+          if (dz) view.zoomBy(el, dz, wheelX, wheelY);
+        });
       }, { passive: false });
       stage.addEventListener('keydown', function (ev) {
         var pin = pinOf(ev.target);
@@ -27902,8 +27967,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
     unmount: function (el) {
       if (el._ro) { try { el._ro.disconnect(); } catch (e) {} }
+      if (el._mo) { try { el._mo.disconnect(); } catch (e) {} }
+      if (el._mq && el._onTheme) { try { if (el._mq.removeEventListener) el._mq.removeEventListener('change', el._onTheme); else el._mq.removeListener(el._onTheme); } catch (e) {} }
       if (el._onResize) window.removeEventListener('resize', el._onResize);
       if (el._urlTimer) clearTimeout(el._urlTimer);
+      if (el._settleTimer) clearTimeout(el._settleTimer);
+      if (el._raf) cancelAnimationFrame(el._raf);
       el._placed = null; el._clusters = null; el._cardNodes = null;
     }
   };
