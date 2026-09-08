@@ -7699,6 +7699,44 @@ details[open] > .orphan__setasidesum::after,
 @media (max-width: 800px) { .budget__inputs, .budget__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .budget { padding: var(--s3); } .budget__controls { grid-template-columns: minmax(0, 1fr); } .budget__inputs { padding: var(--s3); } .budget__actions > .btn { flex: 1 1 auto; } .budget__table { min-width: 31rem; } }
 
+/* ==== src/css/35-view-decision.css ==== */
+.decision { max-width: 82rem; margin: 0 auto; padding: var(--s5); display: grid; gap: var(--s4); font-size: 1rem; }
+.decision h1 { font-family: var(--font-display, Georgia, serif); font-size: clamp(2rem, 4vw, 3rem); }
+.decision__lede, .decision__hint { color: var(--ink-muted); line-height: 1.6; }
+.decision__hint { font-size: .875rem; }
+.decision__weights { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; padding: 1.25rem; background: var(--surface-alt); border: 1px solid var(--line); border-top: 3px solid var(--accent); border-radius: .5rem; }
+.decision label { display: grid; gap: .5rem; font-size: .875rem; min-width: 0; }
+.decision input, .decision select { width: 100%; min-width: 0; min-height: 2.75rem; padding: .65rem; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: .35rem; }
+.decision input:focus-visible, .decision select:focus-visible, .decision summary:focus-visible, .decision__table-wrap:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.decision__weight input { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+.decision small { color: var(--ink-muted); font-size: .875rem; }
+.decision__controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.decision__results { display: grid; gap: 1rem; }
+.decision__summary { font-weight: 600; }
+.decision__table-wrap { overflow-x: auto; }
+.decision__table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.decision__table th, .decision__table td { padding: 1rem .65rem; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+.decision__table td:first-child { font-size: 1.2rem; font-weight: 600; color: var(--accent); }
+.decision__table small { display: block; margin-top: .35rem; font-weight: 400; }
+.decision__table details { min-width: 11rem; }
+.decision__table summary { cursor: pointer; }
+.decision__table details p { margin-top: .6rem; line-height: 1.5; }
+.decision__pager, .decision__actions, .decision__profile { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+.decision__pager { justify-content: space-between; }
+.decision__actions { align-items: end; }
+.decision__actions label { flex: 1 1 14rem; }
+.decision__saved { display: grid; gap: 1rem; border-top: 1px solid var(--line); padding-top: 1.5rem; }
+.decision__saved h2 { font-size: 1.4rem; }
+.decision__saved > .btn { justify-self: start; }
+.decision__profiles { display: grid; gap: .75rem; }
+.decision__profile > :first-child { flex: 1 1 12rem; overflow-wrap: anywhere; }
+.decision [aria-pressed="true"] { background: var(--accent-quiet); border-color: var(--accent); }
+.decision__empty { padding: 1rem; background: var(--surface-inset); border-left: 3px solid var(--accent); }
+.decision__note { min-height: 1.5em; font-size: .875rem; }
+.decision__note .btn { margin-left: .75rem; }
+@media(max-width: 800px) { .decision__weights { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media(max-width: 520px) { .decision { padding: var(--s3); } .decision__weights { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 1rem; } .decision__controls { grid-template-columns: 1fr; } .decision__table { min-width: 44rem; } }
+
 /* ==== src/css/36-view-collections.css ==== */
 /* 36-view-collections.css — the Category Explorer + the collection cover strip
  * that rides on top of Explore. OWNER: IMPL-4.
@@ -17260,7 +17298,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
    */
 
   function weightsTouched() {
-    return (T.plan.collection('weights') || []).length > 0;
+    return !!(T.decision && T.decision.activeProfile());
   }
 
   /** A tile in the Today row: a panel whose body opens with a figure. */
@@ -24928,6 +24966,192 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   });
 })(window.TRIP);
 
+/* ==== src/js/26-view-decision.js ==== */
+/* Decision Lab: explicit weights, complete evidence, unchanged workbook rank. */
+(function (T) {
+  'use strict';
+  var U = T.util, store = T.store, mounted = null, draft = null;
+  var AXES = [
+    { key: 'fitScore', label: 'Trip fit', weight: 30 },
+    { key: 'weatherScore', label: 'October weather', weight: 25 },
+    { key: 'travelScore', label: 'Travel ease', weight: 20 },
+    { key: 'quoteConfidence', label: 'Quote confidence', weight: 10 },
+    { key: 'modeledTotal', label: 'Lower trip cost', weight: 15, inverse: true }
+  ];
+  function number(v) { return typeof v === 'number' && isFinite(v) ? v : null; }
+  function weights(raw) {
+    var out = {}, errors = [];
+    AXES.forEach(function (a) {
+      var v = raw && raw[a.key];
+      if ((typeof v !== 'number' && typeof v !== 'string') || String(v).trim() === '' || !isFinite(+v) || +v < 0 || +v > 100) errors.push(a.label + ' needs a weight from 0 to 100.');
+      out[a.key] = (typeof v === 'number' || typeof v === 'string') && String(v).trim() !== '' && isFinite(+v) && +v >= 0 && +v <= 100 ? +v : 0;
+    });
+    if (!errors.length && !AXES.some(function (a) { return out[a.key] > 0; })) errors.push('Give at least one priority a weight above zero.');
+    return { values: out, errors: errors };
+  }
+  function rank(records, raw) {
+    var checked = weights(raw), axes = AXES.filter(function (a) { return checked.values[a.key] > 0; }), ranges = {}, sum = 0;
+    axes.forEach(function (a) {
+      var values = records.map(function (r) { return number((r.f || {})[a.key]); }).filter(function (v) { return v != null && (!a.inverse || v >= 0); });
+      ranges[a.key] = values.length ? { min: Math.min.apply(null, values), max: Math.max.apply(null, values), count: values.length } : null;
+      sum += checked.values[a.key];
+    });
+    var rows = records.map(function (r) {
+      var parts = [], missing = [], score = 0;
+      axes.forEach(function (a) {
+        var v = number((r.f || {})[a.key]), range = ranges[a.key];
+        if (v == null || (a.inverse && v < 0) || !range) { missing.push(a.label); return; }
+        var normalized = range.max === range.min ? 0.5 : (v - range.min) / (range.max - range.min);
+        if (a.inverse) normalized = 1 - normalized;
+        var contribution = normalized * checked.values[a.key] / sum * 100;
+        score += contribution; parts.push({ key: a.key, label: a.label, raw: v, normalized: normalized * 100, contribution: contribution });
+      });
+      return { id: r.id, record: r, score: checked.errors.length || missing.length ? null : Math.round(score * 1000000) / 1000000, rank: null, parts: parts, missing: missing };
+    });
+    rows.sort(function (a, b) {
+      if (a.score == null && b.score != null) return 1;
+      if (a.score != null && b.score == null) return -1;
+      if (a.score != null && a.score !== b.score) return b.score - a.score;
+      var ar = number(a.record.f.currentRank), br = number(b.record.f.currentRank);
+      if (ar !== br) return (ar == null ? Infinity : ar) - (br == null ? Infinity : br);
+      return String(a.id).localeCompare(String(b.id));
+    });
+    var prior = null, tied = null;
+    rows.forEach(function (row, i) { if (row.score != null) { if (row.score !== prior) tied = i + 1; row.rank = tied; prior = row.score; } });
+    return { rows: rows, ranges: ranges, errors: checked.errors, weights: checked.values, totalWeight: sum };
+  }
+  function records() { return store.getState().research.records || []; }
+  function profiles() { return store.getState().planning.global.weights || {}; }
+  function activeProfile() {
+    var setting = store.getState().planning.global.settings['decision-profile'];
+    var p = setting && !setting.deleted && profiles()[setting.value];
+    return p && !p.deleted && p.kind === 'decision-lab' && p.version === 1 && !weights(p.weights).errors.length ? p : null;
+  }
+  var cache = { key: null, ranks: null };
+  function rankLookup() {
+    var profile = activeProfile(); if (!profile) return null;
+    var key = T.select.researchVersion() + '|' + T.select.planningVersion();
+    if (cache.key !== key) {
+      var map = Object.create(null); rank(records(), profile.weights).rows.forEach(function (r) { map[r.id] = r.rank; });
+      cache = { key: key, ranks: map };
+    }
+    var map = cache.ranks; return function (id) { return map[id] == null ? null : map[id]; };
+  }
+  T.decision = { rank: rank, validateWeights: weights, axes: AXES, activeProfile: activeProfile, rankLookup: rankLookup };
+  function fresh() { var w = {}; AXES.forEach(function (a) { w[a.key] = a.weight; }); return { weights: w, name: '', id: null, q: '', scope: 'all', page: 1 }; }
+  function note(text) { if (mounted) mounted.note.textContent = text; }
+  function button(label, fn, cls) { var b = U.el('button', { type: 'button', class: cls || 'btn', text: label }); b.addEventListener('click', fn); return b; }
+  function setActive(id) { store.dispatch('planning/upsert:settings', { entryId: 'decision-profile', value: { value: id } }); paintProfiles(); }
+  function save(copy) {
+    var check = weights(draft.weights); if (check.errors.length) { note(check.errors.join(' ')); return; }
+    if (!draft.name.trim()) { note('Name this weight profile before saving.'); mounted.name.focus(); return; }
+    if (!copy && draft.id && (!profiles()[draft.id] || profiles()[draft.id].deleted)) { note('This profile was deleted. Save a copy to keep your draft.'); return; }
+    var id = copy || !draft.id ? U.uid('weights') : draft.id;
+    store.dispatch('planning/upsert:weights', { entryId: id, value: { id: id, kind: 'decision-lab', version: 1, name: draft.name.trim().slice(0, 80), weights: check.values } });
+    draft.id = id; paintProfiles(); note('Saved ' + draft.name.trim() + '.');
+  }
+  function load(id) {
+    var p = profiles()[id];
+    if (!p || p.deleted || p.kind !== 'decision-lab' || p.version !== 1 || weights(p.weights).errors.length) { note('This profile is unavailable or has invalid weights.'); return; }
+    draft.weights = weights(p.weights).values; draft.id = id; draft.name = String(p.name || '').slice(0, 80); draft.page = 1;
+    syncInputs(); paintResults(); paintProfiles(); note('Loaded ' + draft.name + '.');
+  }
+  function syncInputs() { AXES.forEach(function (a) { mounted.inputs[a.key].value = draft.weights[a.key]; }); mounted.name.value = draft.name; }
+  function paintProfiles() {
+    if (!mounted) return; U.clear(mounted.profiles);
+    mounted.save.textContent = draft.id ? 'Update profile' : 'Save profile'; mounted.copy.hidden = !draft.id;
+    var active = activeProfile();
+    mounted.active.textContent = active ? 'Explore & Compare use “' + active.name + '” for weighted ranking.' : 'Explore & Compare have no active weight profile. Workbook ranking is unchanged.';
+    mounted.clear.hidden = !active;
+    var list = Object.keys(profiles()).map(function (k) { return profiles()[k]; }).filter(function (p) { return p && !p.deleted && p.kind === 'decision-lab'; });
+    if (!list.length) mounted.profiles.appendChild(U.el('p', { class: 'decision__hint', text: 'No saved profiles yet. Profiles share through your existing sync connection when connected.' }));
+    list.forEach(function (p) {
+      var row = U.el('div', { class: 'decision__profile' });
+      var open = button(p.name || 'Untitled profile', function () { load(p.id); }); open.setAttribute('aria-pressed', String(draft.id === p.id)); row.appendChild(open);
+      var use = button(active && active.id === p.id ? 'Active in app' : 'Use in Explore & Compare', function () { if (p.version !== 1 || weights(p.weights).errors.length) { note('This profile is unsupported or has invalid weights.'); return; } setActive(p.id); note('Weighted ranking now uses ' + p.name + '. Choose Our weighted ranking in Explore.'); });
+      row.appendChild(use);
+      row.appendChild(button('Delete', function () {
+        store.dispatch('planning/delete:weights', { entryId: p.id }); if (draft.id === p.id) draft.id = null;
+        paintProfiles(); note('Deleted ' + p.name + '.');
+        mounted.note.appendChild(button('Undo deletion', function () { store.dispatch('planning/upsert:weights', { entryId: p.id, value: p }); paintProfiles(); note('Profile restored.'); }));
+      })); mounted.profiles.appendChild(row);
+    });
+  }
+  function paintResults() {
+    if (!mounted) return;
+    var result = rank(records(), draft.weights), host = mounted.results; U.clear(host);
+    AXES.forEach(function (a) { var w = result.weights[a.key]; mounted.shares[a.key].textContent = result.errors.length ? '—' : Math.round(w / result.totalWeight * 100) + '% of score'; });
+    if (result.errors.length) { host.appendChild(U.el('p', { role: 'status', class: 'decision__empty', text: result.errors.join(' ') })); return; }
+    var eligible = result.rows.filter(function (r) {
+      var f = r.record.f, plan = T.plan.get(r.id) || {};
+      if (draft.scope !== 'rejected' && plan.status === 'rejected') return false;
+      if (draft.scope === 'rejected' && plan.status !== 'rejected') return false;
+      if (draft.scope === 'shortlist' && ['shortlist', 'finalist', 'booked'].indexOf(plan.status) < 0) return false;
+      if (draft.scope === 'favorites' && !plan.favorite) return false;
+      return !draft.q.trim() || ((f.hotel || '') + ' ' + (f.destination || '')).toLowerCase().indexOf(draft.q.trim().toLowerCase()) >= 0;
+    });
+    var complete = eligible.filter(function (r) { return r.score != null; }).length;
+    host.appendChild(U.el('p', { class: 'decision__summary', role: 'status', text: complete + ' ranked · ' + (eligible.length - complete) + ' need more evidence · ' + eligible.length + ' matching hotels' }));
+    if (!eligible.length) { host.appendChild(U.el('p', { class: 'decision__empty', text: 'No hotels match this view. Try all options or clear your search.' })); return; }
+    var wrap = U.el('div', { class: 'decision__table-wrap', tabindex: '0', role: 'region', 'aria-label': 'Weighted hotel ranking' }), table = U.el('table', { class: 'decision__table' });
+    var head = U.el('thead'), tr = U.el('tr'); ['Your rank', 'Hotel', 'Score / 100', 'Workbook rank', 'Score breakdown'].forEach(function (s) { tr.appendChild(U.el('th', { scope: 'col', text: s })); }); head.appendChild(tr); table.appendChild(head);
+    var body = U.el('tbody'), size = 25, pages = Math.ceil(eligible.length / size); draft.page = Math.min(draft.page, pages);
+    eligible.slice((draft.page - 1) * size, draft.page * size).forEach(function (row) {
+      var f = row.record.f, tr = U.el('tr'); tr.appendChild(U.el('td', { text: row.rank == null ? '—' : '#' + row.rank }));
+      var name = U.el('th', { scope: 'row' }); name.appendChild(U.el('a', { href: T.router.build('trip', [row.id]), text: f.hotel || 'Unnamed hotel' })); name.appendChild(U.el('small', { text: f.destination || 'Location not recorded' })); tr.appendChild(name);
+      tr.appendChild(U.el('td', { text: row.score == null ? 'Unranked' : row.score.toFixed(1) })); tr.appendChild(U.el('td', { text: number(f.currentRank) == null ? '—' : '#' + f.currentRank }));
+      var cell = U.el('td'), details = U.el('details'); details.appendChild(U.el('summary', { text: row.missing.length ? 'Missing: ' + row.missing.join(', ') : 'Why this score' }));
+      row.parts.forEach(function (p) { details.appendChild(U.el('p', { text: p.label + ': ' + (p.key === 'modeledTotal' ? T.fmt.money(p.raw, { convert: false }) : p.raw) + ' → ' + p.contribution.toFixed(1) + ' points' })); });
+      if (row.score == null) details.appendChild(U.el('p', { text: 'No rank until every priority with a nonzero weight has a recorded value.' })); cell.appendChild(details); tr.appendChild(cell); body.appendChild(tr);
+    });
+    table.appendChild(body); wrap.appendChild(table); host.appendChild(wrap);
+    var pager = U.el('div', { class: 'decision__pager' });
+    var prev = button('Previous', function () { draft.page--; paintResults(); mounted.results.focus(); }); prev.disabled = draft.page <= 1; pager.appendChild(prev);
+    pager.appendChild(U.el('span', { text: 'Page ' + draft.page + ' of ' + pages }));
+    var next = button('Next', function () { draft.page++; paintResults(); mounted.results.focus(); }); next.disabled = draft.page >= pages; pager.appendChild(next); host.appendChild(pager);
+  }
+  T.views.register('decision', {
+    title: 'Decision Lab',
+    mount: function (root, ctx) {
+      if (!draft) draft = fresh(); mounted = { inputs: {}, shares: {} };
+      var section = U.el('section', { class: 'decision' }); root.appendChild(section);
+      section.appendChild(U.el('h1', { text: 'Decision Lab' })); section.appendChild(U.el('p', { class: 'decision__lede', text: 'Decide what matters most. See how your priorities change the order.' }));
+      var form = U.el('div', { class: 'decision__weights' });
+      AXES.forEach(function (a) {
+        var label = U.el('label', { class: 'decision__weight' }); label.appendChild(U.el('span', { text: a.label }));
+        var input = U.el('input', { type: 'number', min: '0', max: '100', step: '1', 'data-weight': a.key }); mounted.inputs[a.key] = input;
+        input.addEventListener('input', function () { draft.weights[a.key] = this.value; draft.page = 1; paintResults(); note('Draft changed. Save to update this profile.'); }); label.appendChild(input);
+        mounted.shares[a.key] = U.el('small'); label.appendChild(mounted.shares[a.key]); form.appendChild(label);
+      }); section.appendChild(form);
+      section.appendChild(U.el('p', { class: 'decision__hint', text: 'Weights are relative; 0 turns a priority off. Scores use the full workbook’s observed low-to-high range; lower cost is better, and higher scores are better for the other priorities. A constant value earns 50/100. Ties share a rank. Filters never change the scoring scale.' }));
+      section.appendChild(U.el('p', { class: 'decision__hint', text: 'Only hotels with every selected score are ranked. Missing data is not zero. Cost uses the workbook’s USD trip estimate, not resort quotes or Budget Lab scenarios. These scores compare options; they are not booking recommendations.' }));
+      var controls = U.el('div', { class: 'decision__controls' }), searchLabel = U.el('label', { text: 'Search hotels' });
+      var search = U.el('input', { type: 'search', 'data-field': 'search', value: draft.q }); search.addEventListener('input', function () { draft.q = this.value; draft.page = 1; paintResults(); }); searchLabel.appendChild(search); controls.appendChild(searchLabel);
+      var scopeLabel = U.el('label', { text: 'Show' }), scope = U.el('select', { 'data-field': 'scope' });
+      [['all', 'All options (excluding No Pile)'], ['shortlist', 'Shortlist and further'], ['favorites', 'Favorites'], ['rejected', 'No Pile']].forEach(function (x) { scope.appendChild(U.el('option', { value: x[0], text: x[1] })); }); scope.value = draft.scope;
+      scope.addEventListener('change', function () { draft.scope = this.value; draft.page = 1; paintResults(); }); scopeLabel.appendChild(scope); controls.appendChild(scopeLabel); section.appendChild(controls);
+      mounted.results = U.el('div', { class: 'decision__results', tabindex: '-1' }); section.appendChild(mounted.results);
+      var saved = U.el('section', { class: 'decision__saved', 'aria-label': 'Saved weight profiles' }); saved.appendChild(U.el('h2', { text: 'Weight profiles' }));
+      mounted.active = U.el('p', { class: 'decision__hint' }); saved.appendChild(mounted.active);
+      var actions = U.el('div', { class: 'decision__actions' }), nameLabel = U.el('label', { text: 'Profile name' });
+      mounted.name = U.el('input', { type: 'text', maxlength: '80', 'data-field': 'name', placeholder: 'Weather first' }); mounted.name.addEventListener('input', function () { draft.name = this.value; }); nameLabel.appendChild(mounted.name); actions.appendChild(nameLabel);
+      mounted.save = button('Save profile', function () { save(false); }, 'btn btn--primary'); actions.appendChild(mounted.save);
+      mounted.copy = button('Save a copy', function () { save(true); }); actions.appendChild(mounted.copy);
+      actions.appendChild(button('Reset weights', function () { var d = fresh(); draft.weights = d.weights; draft.id = null; draft.name = ''; draft.page = 1; syncInputs(); paintResults(); paintProfiles(); note('Default weights restored. Saved profiles are kept.'); }));
+      mounted.clear = button('Stop using weighted ranking', function () { setActive(null); note('Workbook ranking restored.'); }); actions.appendChild(mounted.clear); saved.appendChild(actions);
+      mounted.note = U.el('p', { role: 'status', class: 'decision__note' }); saved.appendChild(mounted.note); mounted.profiles = U.el('div', { class: 'decision__profiles' }); saved.appendChild(mounted.profiles); section.appendChild(saved);
+      saved.appendChild(U.el('a', { class: 'btn', href: T.router.build('explore', [], { sort: 'ourrank' }), text: 'Open Explore weighted ranking' }));
+      syncInputs(); paintResults(); paintProfiles(); var p = ctx && ctx.route.query.weights; if (p) load(p);
+    },
+    update: function (root, ctx) {
+      if (!mounted || !ctx.changed) return;
+      if (store.touches(ctx.changed, 'research') || store.touches(ctx.changed, 'planning') || ctx.changed.has('reload')) { paintResults(); paintProfiles(); }
+      if (ctx.changed.has('route') && ctx.route.query.weights) load(ctx.route.query.weights);
+    },
+    unmount: function () { mounted = null; }
+  });
+})(window.TRIP);
+
 /* ==== src/js/27-view-collections.js ==== */
 /* 27-view-collections.js — the Category Explorer (S9). OWNER: IMPL-4.
  *
@@ -27383,6 +27607,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       secBudget.appendChild(U.el('a', { class: 'btn', href: T.router.build('budget'), text: 'Manage budget scenarios' }));
       el.appendChild(secBudget);
 
+      var secDecision = sectionEl('decision-profiles', 'Decision profiles', 'Set priorities and compare your ranking with the workbook.');
+      secDecision.appendChild(U.el('a', { class: 'btn', href: T.router.build('decision'), text: 'Manage decision profiles' }));
+      el.appendChild(secDecision);
+
       /* ---- E · still to come ------------------------------------------
          Kept as the LAST section and with this exact aria-labelledby:
          36-comp-collections.js inserts its panel immediately before it. */
@@ -27390,8 +27618,8 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       secE.appendChild(U.el('h2', { id: 'data-later', class: 'datapane__h', text: 'Still to come' }));
       secE.appendChild(U.el('p', { class: 'datapane__lede', text:
         'Preferences — theme, density, the display names, the ' +
-        'price-staleness window — and the managers for saved views and weight ' +
-        'profiles arrive in a later wave. Nothing you decide before then is at risk: it is ' +
+        'price-staleness window — and the saved-view manager ' +
+        'arrive in a later wave. Nothing you decide before then is at risk: it is ' +
         'already saved on this device, and you can copy it out above at any time.' }));
       el.appendChild(secE);
 
@@ -27730,7 +27958,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         { id: 'solomon', label: 'Solomon' }, { id: 'roni', label: 'Roni' }],
       now: over.now || Date.now(),
       stalenessDays: over.stalenessDays || 21,       // ledger D-009
-      ourRank: over.ourRank || null,
+      ourRank: over.ourRank || (T.decision ? T.decision.rankLookup() : null),
       views: over.views || null,
       _cache: Object.create(null)
     };
@@ -34177,7 +34405,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       line: 'Try nights, airfare and a trip budget, then save your scenarios.' },
     { name: 'decision', label: 'Decision Lab', group: 'labs',
       title: 'Decision Lab',
-      line: 'The Decision Lab arrives in a later wave — your own weights, your own ranking, sitting beside the workbook’s.' },
+      line: 'Your priorities, your weighted ranking, beside the workbook’s.' },
     { name: 'responses', label: 'Responses', group: 'more',
       title: 'Resort responses' },
     { name: 'changed', label: 'What Changed', group: 'more',
