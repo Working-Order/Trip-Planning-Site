@@ -8328,7 +8328,8 @@ details[open] > .orphan__setasidesum::after,
 }
 :root[data-theme="dark"] { --map-land: var(--surface-alt); --map-coast: var(--line-strong); }
 
-.view--map { display: flex; flex-direction: column; gap: var(--s3); }
+.view--map { display: flex; flex-direction: column; gap: var(--s3); padding-block-start: var(--s5); }
+@media (max-width: 767px) { .view--map { padding-block-start: var(--s4); } }
 .map__toolbar { }
 .map__to-explore { font-size: var(--text-sm); }
 /* the No Pile switch: a quiet control, graphite because it is about what was
