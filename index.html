@@ -10209,7 +10209,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.17.3';
+  T.version = '0.17.4';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -15989,6 +15989,193 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   ];
   I.SEED_IDS_SEP6 = SEED_SEP6.map(function (r) { return r.id; });
 
+  /* ---- Batch 5 — the Sep 8 handoff (v0.17.3) ----------------------------
+   * Solomon's written reconciliation of EVERY reply received through
+   * 8 September ("October 2026 Vacation Research Handoff"), plus the Hotel
+   * Milla Montis proposal of 5 September (re:guest no. 3083/2026) that only
+   * he had opened. One batch, one Import click, fourteen records:
+   *   NEW    Milla Montis (3 quotes, HALF BOARD, 7 nights — priced for
+   *          21–28 SEPTEMBER, not October; valid until Sep 10 ⇒ a hold)
+   *   NEW    Royal Isabela (8 quotes, USD, taxes + fees IN, Oct 21–26)
+   *   UPDATE Minos Beach (hold lapsed Sep 5 ⇒ Available; per-period rates,
+   *          the €15/night tax, balance-on-arrival, the experience menu)
+   *   UPDATE Kempinski San Lawrenz (both windows, flexible vs Stay Longer
+   *          terms, no half board, one-room-left categories)
+   *   UPDATE Matca (per-night weekday/weekend rates; the email itself gave
+   *          NO meal/deposit/cancellation terms — the earlier lines are
+   *          flagged as needing re-confirmation, not deleted)
+   *   UPDATE Nayara (the email carried NO price — the four USD figures
+   *          already on the page are flagged, not deleted)
+   *   UPDATE La Loma (Aaron replied Sep 6: availability, bungalow, three
+   *          meals, dietary needs confirmed; price still missing)
+   *   UPDATE Domes Zeen (first proposal expired; corrected Oct 18–24 offer
+   *          sent Sep 3 — numbers still inside the private link)
+   *   UPDATE Domes Noruz (the Sep 7 hold on option has lapsed ⇒ Available)
+   *   UPDATE Vila Planinka (the meals line had been blanked; restored)
+   *   NEW    four inquiries sent Sep 8 — Phāea Cretan Malia, Pnoé Breathing
+   *          Life, Keyonna Beach, Sublime Comporta ⇒ "Awaiting reply"
+   * Every id is a live row in the 615 workbook (checked by rank). Fields not
+   * listed for a record are left exactly as they are — the batch only writes
+   * what the handoff changes, at the batch clock, so a hand edit made later
+   * than 21:30Z on Sep 8 still wins per field (05-planning.js merge).
+   * Money law: quotes are the resorts' figures in their currency; the
+   * "value read" sentences in the notes are ≈ arithmetic at ≈$1.16 against
+   * the workbook's fare pair and allowance (Meals-in-it shares), never a
+   * price anyone quoted. */
+  var SEED_AT_SEP8 = Date.parse('2026-09-08T21:30:00Z');
+  I.SEED_AT_SEP8 = SEED_AT_SEP8;
+
+  var SEED_SEP8 = [
+    { id: 'milla-montis~maranza-meransen-south-tyrol-italy',   /* Hotel Milla Montis — rank 17 */
+      fields: {
+        outreachContacted: true,
+        outreachStatus: 'hold',
+        outreachHoldUntil: '2026-09-10T23:59:00+02:00',
+        outreachHoldLabel: 'Offer valid until Sep 10 — priced on September dates, re-quote needed',
+        outreachDates: 'Sep 21–28 (7 nights, Mon–Mon) — THREE WEEKS BEFORE the October window, not what the trip needs. Proposal no. 3083/2026 of 5 Sep (a second mail followed on 6 Sep — not yet opened), valid subject to availability until 10 Sep',
+        outreachMeals: 'Half board in all three options — breakfast and dinner from the house kitchen (South Tyrolean, “authentic indulgence”). In the room: Nespresso machine with pods, minibar (not stated as free), smart TV, Wi-Fi. Lunch and drinks not mentioned — assume not included',
+        outreachSpa: 'Montis SPA included. Brixen South Tyrol Guest Pass included (regional public transport; check what else it covers). Train-station shuttle included. Rooms: Double Room Calm 32 m² in the farmhouse — 2×2 m king bed, walk-in wardrobe, loggia or terrace with seating and a Dolomites view, air conditioning, underfloor cooling, shower, separate WC with bidet; Spa Suite 42 m²; Spa Suite Plus 42 m² (details behind their “Details” links)',
+        outreachTerms: '€234 per night for two, half board (Option 1 = 14 person-nights × €234). Valid until 10 Sep 2026, subject to availability. Deposit, cancellation policy and whether local tax is inside the total are NOT stated in the mail (their “Booking infos” tab) — South Tyrol usually adds a municipal tax per person per night; confirm. Contact: Matthias Seeber (online messenger) · Hotel Milla Montis, Huberstraße 25, 39037 Mühlbach (BZ) · info@millamontis.com · +39 0472 520278',
+        outreachNotes: 'THE DATES ARE WRONG: they priced 21–28 September, not October — either the inquiry carried the wrong dates or they misread it. Before the 10 Sep validity lapses, ask Matthias Seeber for the same three options on the October dates, and confirm they are open through late October (autumn-shoulder rates can differ). Value read at ≈$1.16, with “Meals in it” set to Breakfast + dinner: Double Room Calm €3,276 ≈ $3,800 → all-in ≈ $5,830 with the workbook’s $1,590 fare pair and $440 of its $800 allowance; Spa Suite €3,402 ≈ $3,950 → ≈ $5,980; Spa Suite Plus €3,682 ≈ $4,280 → ≈ $6,310 — all three inside the $7,500 target. Against the workbook’s Booking.com 7-night rate of $3,360 the direct half-board offer costs ≈$450 more for the room but carries seven dinners for two — on the all-in it is roughly a wash. If the October re-quote holds, the Spa Suite for €126 more than the Calm room (+€18 a night, 42 vs 32 m²) is the obvious pick'
+      },
+      quotes: [
+        { label: 'Double Room Calm (32 m²) — half board', amount: 3276, currency: 'EUR', kind: 'quote', nights: 7, dates: 'Sep 21–28 (not October)',
+          note: '€234/night for two · farmhouse room, loggia or terrace, Dolomites view · Option 1 of proposal 3083/2026' },
+        { label: 'Spa Suite (42 m²) — half board', amount: 3402, currency: 'EUR', kind: 'quote', nights: 7, dates: 'Sep 21–28 (not October)',
+          note: '€243/night for two · Option 2' },
+        { label: 'Spa Suite Plus (42 m²) — half board', amount: 3682, currency: 'EUR', kind: 'quote', nights: 7, dates: 'Sep 21–28 (not October)',
+          note: '€263/night for two · Option 3' }
+      ] },
+    { id: 'royal-isabela~isabela-puerto-rico',   /* Royal Isabela — rank 531 */
+      fields: {
+        outreachContacted: true,
+        outreachStatus: 'replied',
+        outreachDates: 'Oct 21–26 (5 nights) — their availability inside the Oct 21–28 ask. Reply received Sep 7. “Prices and packages may change”',
+        outreachMeals: 'Not an all-inclusive. Casita-only rates: breakfast NOT stated. Savor the Stillness: daily dinner per adult (what “dinner” covers is not defined). Natural Nirvana: $50 per adult per day breakfast credit at La Casa — dinner not stated. Sanctuary for Couple: ONE three-course dinner only. Whether breakfast can be added to Savor economically — open',
+        outreachSpa: 'Sanctuary for Couple: River & Rhythm experience (kayaking or paddle boarding) + Root to Rise couples massage + one three-course dinner. Natural Nirvana Retreat: Coastal Circuit e-bike experience + River & Rhythm + private yoga + the daily breakfast credit. Savor the Stillness: daily dinner. Casitas in King Nature View or King Ocean View',
+        outreachTerms: 'Every quoted total INCLUDES taxes and fees. Deposit and cancellation terms not stated — ask. Prices and packages may change',
+        outreachNotes: 'The most straightforward U.S. luxury package quoted, and the cheapest complete-feeling trip on the board: the fare pair is only $276. Value read at the workbook’s $1,520 allowance sized to 5 nights ($1,086): Savor the Stillness Nature View $4,133 with dinner every night → ≈ $5,000 all-in (Meals in it: Breakfast + dinner keeps 55%); Natural Nirvana Nature View $4,094 buys e-bike + kayak + private yoga + $50/day breakfast credit instead of dinners → ≈ $5,460; casita-only Nature View $3,604 → ≈ $4,970 with everything à la carte. Ocean View adds $523–654 across the board. Savor’s five dinners cost ≈ $106 a night for two over the bare casita — worth it if dinner at La Casa runs ≥ $50 a head. Get the deposit/cancellation terms and what “daily dinner” covers before choosing'
+      },
+      quotes: [
+        { label: 'King Nature View Casita — room only', amount: 3603.53, currency: 'USD', kind: 'quote', nights: 5, dates: 'Oct 21–26', note: 'Taxes and fees included; breakfast not stated' },
+        { label: 'King Ocean View Casita — room only', amount: 4257.53, currency: 'USD', kind: 'quote', nights: 5, dates: 'Oct 21–26', note: 'Taxes and fees included; breakfast not stated' },
+        { label: 'Sanctuary for Couple — Nature View', amount: 4118.49, currency: 'USD', kind: 'quote', nights: 5, dates: 'Oct 21–26', note: 'Kayak/paddleboard + couples massage + ONE 3-course dinner' },
+        { label: 'Sanctuary for Couple — Ocean View', amount: 4707.09, currency: 'USD', kind: 'quote', nights: 5, dates: 'Oct 21–26', note: 'Kayak/paddleboard + couples massage + ONE 3-course dinner' },
+        { label: 'Natural Nirvana Retreat — Nature View', amount: 4094.43, currency: 'USD', kind: 'quote', nights: 5, dates: 'Oct 21–26', note: 'E-bike + kayak/paddleboard + private yoga + $50 pp/day breakfast credit' },
+        { label: 'Natural Nirvana Retreat — Ocean View', amount: 4650.33, currency: 'USD', kind: 'quote', nights: 5, dates: 'Oct 21–26', note: 'E-bike + kayak/paddleboard + private yoga + $50 pp/day breakfast credit' },
+        { label: 'Savor the Stillness — Nature View', amount: 4132.83, currency: 'USD', kind: 'quote', nights: 5, dates: 'Oct 21–26', note: 'Daily dinner per adult' },
+        { label: 'Savor the Stillness — Ocean View', amount: 4656.03, currency: 'USD', kind: 'quote', nights: 5, dates: 'Oct 21–26', note: 'Daily dinner per adult' }
+      ] },
+    { id: 'minos-beach-art-hotel~agios-nikolaos-crete-greece',   /* Minos Beach Art Hotel — rank 2 */
+      fields: {
+        outreachStatus: 'replied',
+        outreachHoldUntil: null,
+        outreachHoldLabel: null,
+        outreachDates: 'Any dates Oct 14–24. Per night for two with breakfast: Nature Junior Suite (main building) €494 through Oct 20 / €408 from Oct 21; Nature Superior Bungalow with private garden €543 / €443; Superior Seafront Bungalow €656 / €513 — plus €15/night climate resilience tax on top. The Sep 5 courtesy hold has lapsed: inventory and rates need reconfirming',
+        outreachMeals: 'Breakfast only. Minos said explicitly that it does NOT offer bundled packages — dinners, treatments and experiences are assembled separately',
+        outreachSpa: 'Complimentary: yoga, Pilates, Technogym, city bicycles, tennis court (reserve; lessons €60/h), watersports and dive-centre access. Spa extra. On request: cooking classes, wine tastings, winery and olive-oil experiences — “Olive Essence” half-day olive-oil tour with cooking/lunch in Kritsa, transfer in, €130 pp. Private driver €55/h (Knossos, the Heraklion museum, Lassithi plateau); Richtis and Sarakina gorges recommended. Boats: Sailing Grace catamaran 6 h €1,800 private / €140 pp shared; luxury catamaran 5 h same prices; Azimut motor yacht €1,500 half day / €1,900 full day (cash — card +24% VAT; €200 non-refundable deposit); traditional fishing boat from Elounda 3 h €90 pp with lunch from the catch. Also hiking, riding, climbing, diving',
+        outreachTerms: '20% deposit, fully refundable if cancelled at least 14 days before arrival; balance paid at the hotel on arrival. €15/night climate tax not in the room rates. The original hold ran only to Sep 5 — reconfirm before relying on any of it',
+        outreachNotes: 'Widest date flexibility in Crete and the kindest cancellation, but everything beyond breakfast is assembly work. The Oct 19–24 quotes on this page are the two-rate maths with the €15/night tax inside: €2,287 / €2,490 / €2,926 for five nights. Garden Bungalow at €2,490 still leaves room for dinners, a treatment and one boat day. Reconfirm the rates first — the hold is gone'
+      },
+      quotes: [] },
+    { id: 'kempinski-hotel-san-lawrenz~san-lawrenz-gozo-malta',   /* Kempinski Hotel San Lawrenz — rank 158 */
+      fields: {
+        outreachDates: 'Oct 14–19 (5 nights) or Oct 14–21 (7 nights). The quotes on this page are the Stay Longer & Save More rates (−20% for 5 nights, −25% for 7), breakfast included; the flexible rates were €333 / €348 / €368 / €493 a night for 5 nights and €330.71 / €345.71 / €365.71 / €490.71 for 7. Superior Country View and Superior Pool View: only ONE room each when quoted',
+        outreachMeals: 'Breakfast included. NO half-board option — the hotel’s restaurants are à la carte',
+        outreachSpa: 'Resort spa extra. The hotel recommends Barbarossa Excursions (guided buggy tours of Gozo) and Xlendi Water Sports (boat trips round Gozo and Comino — Blue Lagoon, Crystal Lagoon, Santa Marija Bay, swimming stops). Kempinski Discovery membership advertises member rates, an extra 10% and Discovery Dollars on room, dining and spa — whether that stacks on Stay Longer is unconfirmed',
+        outreachTerms: 'Flexible rate: free cancellation until 2 days before arrival, no deposit. Stay Longer rate: free cancellation until 14 days before arrival, then full prepayment taken 14 days before arrival',
+        outreachNotes: 'Strongest island value quantified so far: Deluxe Pool View €1,999 for 7 nights with breakfast (€285.54 a night). The compromise is that dinner, activities and spa are all separate. Ask whether the Discovery 10% stacks before booking'
+      },
+      quotes: [] },
+    { id: 'matca-transylvanian-sanctuary~transylvania-brasov-sibiu-romania',   /* Matca — rank 233 */
+      fields: {
+        outreachDates: 'Oct 18–24 only — not available Oct 14–18. Per night for two: Standard Double €299 weekday / €347 weekend (1 left), Double Deluxe €330 / €386 (6 left), Junior Suite €373 / €436 (6), Suite €485 / €513 (1), Villa €584 / €690 (7). The six-night totals on this page = five weekday nights + one weekend night',
+        outreachMeals: 'The email itself did NOT state breakfast or meal inclusions, or half-board pricing. “Breakfast + taxes included” was recorded earlier from the attached accommodation offer — reconfirm before relying on it',
+        outreachTerms: 'Indicative only — subject to availability at confirmation; a reservation is confirmed only after the hotel’s written confirmation AND receipt of the agreed deposit. The exact deposit and the cancellation deadline were not in the email (“50% deposit, refundable until 5 days before” came from the attached terms — reconfirm). Attachments received: detailed accommodation offer, full spa menu, activities booklet',
+        outreachNotes: 'Junior Suite probably the sweet spot: €2,301 ≈ $2,670 for six nights → ≈ $5,430 all-in with the $1,650 fare pair and the allowance sized to 6 nights (breakfast only). Suite €2,938 → ≈ $6,170; Villa €3,610 → ≈ $6,950 — still inside $7,500. Pin down what the rate includes and the deposit terms before treating any of it as bookable'
+      },
+      quotes: [] },
+    { id: 'nayara-alto-atacama~san-pedro-de-atacama-chile',   /* Nayara Alto Atacama — rank 486 */
+      fields: {
+        outreachDates: 'Oct 18–24 (Quitor room, whole stay) or Oct 19–24 (Catarpe room). Reply of Aug 30; availability explicitly subject to change',
+        outreachTerms: 'No price in the email body — Dream, Full Experience and Full Private Experience were presented as bookable choices without their rates. No deposit or cancellation terms shown. Availability subject to change',
+        outreachNotes: 'The most complete destination package on the board — transfers, full board, open bar, minibar, one full-day or two half-day guided excursions per night, private-observatory astronomy — but THE PRICE IS MISSING from the email. The four USD figures on this page (Dream $5,891 / $5,914, Full Experience $8,910 / $8,505) were recorded on Sep 1 from a source other than the email body: treat them as unconfirmed until Nayara states them in writing. Even at those figures the Full Experience before flights sits above the $7,500 target'
+      },
+      quotes: [] },
+    { id: 'la-loma-jungle-lodge-and-chocolate-farm~bocas-del-toro-panama',   /* La Loma Jungle Lodge — rank 538 */
+      fields: {
+        outreachStatus: 'replied',
+        outreachDates: 'Oct 17–22 (5 nights) — “some availability” confirmed by Aaron on Sep 6. He recommends the Rainforest King Bungalow for a couple',
+        outreachMeals: 'Three meals daily in every stay. No pork, no shellfish, gluten-free-friendly: confirmed “no problem”',
+        outreachSpa: 'Included in every stay: farm tour, kayaks, the run of the property, boat transfer in and boat transfer out. Their team arranges activities once on property. NOT confirmed though asked: morning yoga, the cacao/permaculture experience, massage options or prices, the Rainforest King total, and how to continue to Panama City on Oct 22',
+        outreachTerms: 'Cancellation depends on the rate chosen in their booking engine; they pointed us to it for live inventory and best pricing. No total was quoted',
+        outreachNotes: 'The most immersive low-planning nature stay: three meals, boat transfers, the farm, kayaks, dietary needs already cleared. Two blanks before it can be compared: the Rainforest King five-night total (the workbook’s $3,544 is a website rate) and the Bocas hop — PAC–BOC shows no price online, so the fare pair is unpriced in the airfare pass'
+      },
+      quotes: [] },
+    { id: 'domes-zeen-chania~chania-crete-greece',   /* Domes Zeen Chania — rank 14 */
+      fields: {
+        outreachStatus: 'replied',
+        outreachHoldUntil: null,
+        outreachHoldLabel: null,
+        outreachDates: 'Oct 18–24 (6 nights) — the corrected ask after their first proposal (wrong dates) expired. Domes confirmed on Sep 3 that a NEW detailed offer went out for these dates: last available room category, bed & breakfast rate, half-board add-on pricing, an extra discount on published rates, added benefits',
+        outreachMeals: 'Bed & breakfast, with half board offered as a priced add-on (numbers inside the private proposal)',
+        outreachSpa: 'Concierge PDFs received: restaurants, historical experiences, land and cultural experiences, water experiences. Soma Spa “The Finest” treatment menu sent separately; spa access, treatments and packages go through the Spa Manager',
+        outreachTerms: 'Inside the private proposal, still to extract: exact category, 6-night total, half-board supplement, added benefits, taxes, payment and cancellation terms',
+        outreachNotes: 'Inventory is tight — they are already calling it the last available room category. Open the proposal and pull the number before judging it against Noruz (its livelier sister, Oct 23–28): nothing on this page is a price yet'
+      },
+      quotes: [] },
+    { id: 'domes-noruz-chania~chania-crete-greece',   /* Domes Noruz Chania — rank 579 */
+      fields: {
+        outreachStatus: 'replied',
+        outreachHoldUntil: null,
+        outreachHoldLabel: null,
+        outreachDates: 'Oct 23–28 (5 nights, Fri–Wed) — their proposal at 5% off the standard rates, ref b9ed0d50a84b (Quotelier). The rooms were held on option only until Sep 7 noon (Greece) — that has lapsed; ask whether the rooms and the 5% are still available'
+      },
+      quotes: [] },
+    { id: 'vila-planinka-boutique-hotel~zgornje-jezersko-slovenia',   /* Vila Planinka — rank 49 */
+      fields: {
+        outreachMeals: 'Breakfast every morning (one of them served in the room); dinner every night — five 4-course dinners and one 7-course tasting menu; welcome drinks; fruit and sparkling wine on arrival; two smoothies. Lunch, drinks and transfers not included. (Restored Sep 8 — this line had been blanked.)'
+      },
+      quotes: [] },
+    { id: 'phaea-cretan-malia~malia-crete-greece',   /* Phāea Cretan Malia — rank 580 */
+      fields: {
+        outreachContacted: true,
+        outreachContactedAt: Date.parse('2026-09-08T14:00:00Z'),
+        outreachStatus: 'sent',
+        outreachDates: 'Asked Sep 8 for 5–7 nights, Oct 14–24, two adults. Only an automated acknowledgement so far — reservations answer Mon–Fri 09:00–19:00 and weekends 10:00–18:00 Greek time',
+        outreachNotes: 'Awaiting an actual offer'
+      },
+      quotes: [] },
+    { id: 'pnoe-breathing-life~karteros-crete-greece',   /* Pnoé Breathing Life — rank 581 */
+      fields: {
+        outreachContacted: true,
+        outreachContactedAt: Date.parse('2026-09-08T14:00:00Z'),
+        outreachStatus: 'sent',
+        outreachDates: 'Asked Sep 8 for 5–7 nights, Oct 14–24, a couples stay — specifically about all-inclusive or heavily inclusive options',
+        outreachNotes: 'Awaiting reply'
+      },
+      quotes: [] },
+    { id: 'keyonna-beach-resort~johnsons-point-antigua-and-barbuda',   /* Keyonna Beach Resort — rank 587 */
+      fields: {
+        outreachContacted: true,
+        outreachContactedAt: Date.parse('2026-09-08T14:00:00Z'),
+        outreachStatus: 'sent',
+        outreachDates: 'Asked Sep 8 for 5–7 nights, Oct 14–24, dates flexible, a couples-oriented stay — asked about an inclusive stay',
+        outreachNotes: 'Awaiting reply'
+      },
+      quotes: [] },
+    { id: 'sublime-comporta~comporta-alentejo-portugal',   /* Sublime Comporta — rank 615 */
+      fields: {
+        outreachContacted: true,
+        outreachContactedAt: Date.parse('2026-09-08T14:00:00Z'),
+        outreachStatus: 'sent',
+        outreachDates: 'Asked Sep 8 for 5–7 nights, flexible October dates, a couples getaway',
+        outreachNotes: 'Awaiting reply'
+      },
+      quotes: [] }
+  ];
+  I.SEED_IDS_SEP8 = SEED_SEP8.map(function (r) { return r.id; });
+
   /* ---- the batches, oldest first ---------------------------------------
    * `quotePrefix` must be unique per batch: entry ids are deterministic so
    * that both laptops importing the same batch produce the same keys and the
@@ -16028,7 +16215,18 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         'offered nothing else, so it reads “Not available”. La Loma Jungle Lodge (Bocas del Toro) was ' +
         'written to on 5 September for Oct 17–22 and is still “Awaiting reply”.',
       done: 'Quinta do Furão and La Loma imported.',
-      present: function () { return I.batchStamped(SEED_SEP6, SEED_AT_SEP6); } }
+      present: function () { return I.batchStamped(SEED_SEP6, SEED_AT_SEP6); } },
+    { key: 'sep8-handoff', at: SEED_AT_SEP8, seed: SEED_SEP8, quotePrefix: 'q-sep8-',
+      short: 'Sep 8', count: 14,
+      title: 'Import the Sep 8 handoff — 14 resort updates',
+      lede: 'Everything received through 8 September, reconciled: Hotel Milla Montis’s half-board proposal ' +
+        '(three rooms, seven nights — but priced for Sep 21–28, valid only to Sep 10, so it lands as an offer held ' +
+        'to that date); Royal Isabela’s eight tax-inclusive package totals for Oct 21–26; Minos Beach, Domes Zeen ' +
+        'and Domes Noruz moving from lapsed holds to “Available”; La Loma’s Sep 6 answer; fuller terms for ' +
+        'Kempinski, Matca and Nayara; Vila Planinka’s meals line restored; and four new inquiries sent Sep 8 ' +
+        '(Phāea Cretan Malia, Pnoé Breathing Life, Keyonna Beach, Sublime Comporta) as “Awaiting reply”.',
+      done: 'The Sep 8 handoff imported — 14 resorts updated.',
+      present: function () { return I.batchImported(SEED_SEP8, 'q-sep8-'); } }
   ];
   I.BATCHES = BATCHES;
 
