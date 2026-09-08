@@ -8288,6 +8288,19 @@ details[open] > .orphan__setasidesum::after,
 .view--map { display: flex; flex-direction: column; gap: var(--s3); }
 .map__toolbar { }
 .map__to-explore { font-size: var(--text-sm); }
+/* the No Pile switch: a quiet control, graphite because it is about what was
+   set aside, never a warm mark */
+.map__nopile {
+  height: 36px; min-height: 36px;
+  padding: 0 var(--s3);
+  border: var(--hair) solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+}
+.map__nopile:hover { border-color: var(--line-hair); color: var(--ink); }
+.map__nopile[aria-pressed="true"] { background: var(--surface-inset); color: var(--ink); border-color: var(--line-hair); }
 /* Explore hides its Filters button at ≥1280 because it has a rail; the map has no rail */
 @media (min-width: 1280px) { .map__filters-btn { display: inline-block; } }
 @media (max-width: 767px) { .map__to-explore { display: none; } }
@@ -8363,6 +8376,14 @@ details[open] > .orphan__setasidesum::after,
 .pin--cluster .pin__disc { fill: var(--surface); stroke: var(--ink); stroke-width: 2px; }
 .pin--cluster.pin--marked .pin__disc { stroke: var(--accent); }
 .pin--cluster.pin--approx .pin__disc { stroke-dasharray: 3 2; }
+/* the No Pile, when drawn: graphite, quieter than everything live */
+.pin--rejected .pin__disc { fill: var(--graphite-2); stroke: var(--surface); }
+.pin--rejected.pin--approx .pin__disc { fill: var(--surface); stroke: var(--graphite-3); }
+.pin--rejected.pin--cluster .pin__disc { fill: var(--surface); stroke: var(--graphite-3); }
+.pin--rejected .pin__count { fill: var(--graphite-4); }
+.pin__name--rejected { fill: var(--graphite-4); }
+.pin--rejected.is-selected .pin__disc { fill: var(--graphite-4); stroke: var(--graphite-4); }
+.pin--rejected.is-selected .pin__count { fill: var(--surface); }
 .pin.is-selected .pin__disc { stroke-width: 3px; }
 .pin--cluster.is-selected .pin__disc { fill: var(--ink); stroke: var(--ink); }
 .pin--cluster.pin--marked.is-selected .pin__disc { fill: var(--accent); stroke: var(--accent); }
@@ -8437,6 +8458,7 @@ details[open] > .orphan__setasidesum::after,
 }
 .map__key--approx::before { background: var(--surface); }
 .map__key--marked::before { background: var(--accent); border-color: var(--accent); }
+.map__key--rejected::before { background: var(--graphite-2); border-color: var(--graphite-3); }
 @media (max-width: 480px) { .map__legend { display: none; } }
 
 .map__tip {
@@ -10117,7 +10139,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.17.2';
+  T.version = '0.17.3';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 1;      // planning-state schema
   T.envelopeVersion = 1;    // research snapshot envelope
@@ -27285,6 +27307,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       filtersBtn.addEventListener('click', function () { el._panel.open(); });
       tools.appendChild(filtersBtn);
       el._filtersBtn = filtersBtn;
+      /* the No Pile: rejected rows are hidden exactly as Explore hides them —
+         but the map must SAY so, because the workbook chip still counts them */
+      var nopile = U.el('button', { type: 'button', class: 'map__nopile', 'aria-pressed': 'false', hidden: true });
+      nopile.addEventListener('click', function () { view.navigate(el, Q.set(el._vs, 'showrejected', !el._vs.showrejected)); });
+      tools.appendChild(nopile);
+      el._nopile = nopile;
       var toExplore = U.el('a', { class: 'btn btn--quiet map__to-explore' }, 'Same set in Explore ›');
       tools.appendChild(toExplore);
       el._toExplore = toExplore;
@@ -27326,6 +27354,9 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       legend.appendChild(U.el('span', { class: 'map__key map__key--hotel' }, 'at the hotel'));
       legend.appendChild(U.el('span', { class: 'map__key map__key--approx' }, 'at the destination'));
       legend.appendChild(U.el('span', { class: 'map__key map__key--marked' }, 'marked by one of you'));
+      var keyRej = U.el('span', { class: 'map__key map__key--rejected', hidden: true }, 'in the No Pile');
+      legend.appendChild(keyRej);
+      el._keyRejected = keyRej;
       stage.appendChild(legend);
 
       var tip = U.el('div', { class: 'map__tip', role: 'tooltip', hidden: true });
@@ -27428,16 +27459,33 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var parts = T.geo.partition(res.rows);
       el._placed = parts.placed.map(function (r) {
         var g = T.geo.of(r), p = T.mapData.project(g.lng, g.lat);
-        return { row: r, g: g, x: p[0], y: p[1], marked: isMarked(r) };
+        return { row: r, g: g, x: p[0], y: p[1], marked: isMarked(r) && r.status !== 'rejected', rejected: r.status === 'rejected' };
       });
       el._unplaced = parts.unplaced;
 
+      /* how many are in the No Pile, and whether they are drawn */
+      var rejectedCount = 0;
+      for (var ri = 0; ri < rows.length; ri++) if (rows[ri].status === 'rejected') rejectedCount++;
+      el._nopile.hidden = rejectedCount === 0;
+      el._keyRejected.hidden = !(rejectedCount && vs.showrejected);
+      if (rejectedCount) {
+        var showing = !!vs.showrejected;
+        el._nopile.setAttribute('aria-pressed', showing ? 'true' : 'false');
+        U.setText(el._nopile, showing ? 'Hide the No Pile (' + rejectedCount + ')' : 'No Pile · ' + rejectedCount + ' not drawn');
+        el._nopile.title = showing ? 'Rejected options are drawn in grey. Click to hide them again.'
+          : F.plural(rejectedCount, 'rejected option') + ' ' + (rejectedCount === 1 ? 'is' : 'are') + ' not on the map — the same rule as Explore. Click to draw them in grey.';
+      }
+
       /* headline + tools */
       U.setText(el._heading, 'Map · ' + res.matched + ' of ' + res.base);
-      var activeFilters = Q.chips(vs, ctx).filter(function (c) { return c.kind !== 'search' && c.kind !== 'mode'; }).length;
+      /* the No Pile switch has its own control in the toolbar, so it is neither a
+         "filter" in the count nor a chip here — one control per fact */
+      var activeFilters = Q.chips(vs, ctx).filter(function (c) { return c.kind !== 'search' && c.kind !== 'mode' && c.kind !== 'switch'; }).length;
       U.setText(el._filtersBtn, activeFilters ? 'Filters (' + activeFilters + ')' : 'Filters');
       el._toExplore.setAttribute('href', T.router.build('explore', [], Q.serialize(vs)));
       T.filterPanel.renderChips(el._chips, el._api, { leadingFilters: false, saveView: false });
+      U.qsa('.chip--switch', el._chips).forEach(function (n) { n.parentNode.removeChild(n); });
+      if (!el._chips.querySelector('.chip')) el._chips.hidden = true;
       if (el._panel.isOpen()) el._panel.render();
 
       /* viewport: focus > at > fit (unless the traveler has moved it) */
@@ -27681,11 +27729,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         if (found) {
           found.items.push(p);
           found.marked = found.marked || p.marked;
+          found.rejected = found.rejected && p.rejected;
           found.exact = found.exact || p.g.precision === 'hotel';
           found.minX = Math.min(found.minX, p.x); found.maxX = Math.max(found.maxX, p.x);
           found.minY = Math.min(found.minY, p.y); found.maxY = Math.max(found.maxY, p.y);
         } else {
-          clusters.push({ sx: sp[0], sy: sp[1], wx: p.x, wy: p.y, items: [p], marked: p.marked, exact: p.g.precision === 'hotel',
+          clusters.push({ sx: sp[0], sy: sp[1], wx: p.x, wy: p.y, items: [p], marked: p.marked, rejected: p.rejected, exact: p.g.precision === 'hotel',
             minX: p.x, maxX: p.x, minY: p.y, maxY: p.y });
         }
       }
@@ -27711,7 +27760,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         var n = c.items.length, single = n === 1;
         var r = single ? 6.5 : clamp(9 + Math.sqrt(n) * 2.2, 11, 19);
         var node = svg('g', {
-          class: 'pin' + (single ? '' : ' pin--cluster') + (c.marked ? ' pin--marked' : '') +
+          class: 'pin' + (single ? '' : ' pin--cluster') + (c.marked ? ' pin--marked' : '') + (c.rejected ? ' pin--rejected' : '') +
             (c.exact ? '' : ' pin--approx') + (c.key === selectedKey ? ' is-selected' : ''),
           transform: 'translate(' + c.sx.toFixed(1) + ' ' + c.sy.toFixed(1) + ')',
           role: 'button', tabindex: '0', 'data-key': c.key
@@ -27737,7 +27786,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
             if (box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1]) return;
           }
           taken.push(box);
-          g.appendChild(svg('text', { class: 'pin__name' + (c.marked ? ' pin__name--marked' : ''), x: x0.toFixed(1), y: (c.sy + 4).toFixed(1) },
+          g.appendChild(svg('text', { class: 'pin__name' + (c.marked ? ' pin__name--marked' : '') + (c.rejected ? ' pin__name--rejected' : ''), x: x0.toFixed(1), y: (c.sy + 4).toFixed(1) },
             name.length > 34 ? name.slice(0, 33) + '…' : name));
         });
       }
@@ -27752,11 +27801,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       var n = c.items.length;
       if (n === 1) {
         var r = c.items[0].row, f = r.rec.f;
-        return (f.hotel || 'Unnamed option') + ', ' + shortPlace(r) + (c.exact ? '' : ' (placed at the destination)') + (c.marked ? ', marked' : '');
+        return (f.hotel || 'Unnamed option') + ', ' + shortPlace(r) + (c.exact ? '' : ' (placed at the destination)') + (c.marked ? ', marked' : '') + (c.rejected ? ', in the No Pile' : '');
       }
       var places = Object.keys(c.places).sort(function (a, b) { return c.places[b] - c.places[a]; });
       var where = places.slice(0, 2).map(function (p) { return p.split(',')[0].trim(); }).join(', ') + (places.length > 2 ? ' +' + (places.length - 2) : '');
-      return F.plural(n, 'option') + ' near ' + where + (c.marked ? ', some marked' : '');
+      return F.plural(n, 'option') + ' near ' + where + (c.marked ? ', some marked' : '') + (c.rejected ? ', all in the No Pile' : '');
     },
 
     /* ------------------------------------------------------------------ */
@@ -28047,7 +28096,10 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         if (U.stableStringify(q) === el._routeKey) return;          // our own replace(), or a repeat
         var before = Q.serialize(el._vs);
         view.readRoute(el, route);
-        if (el._extra.at) view.applyAt(el, el._extra.at);
+        /* a URL without `at` means "show me this set" — fit it. Our own
+           navigations (chips, panel, the No Pile switch) always carry `at`,
+           so a viewport the traveler chose survives those. */
+        if (el._extra.at) view.applyAt(el, el._extra.at); else el._userMoved = false;
         var same = U.stableStringify(before) === U.stableStringify(Q.serialize(el._vs));
         if (!same) el._selected = null;
         view.paint(el, { initial: !same && !el._userMoved });
@@ -28060,7 +28112,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
           var rowsById = {};
           (T.select.get('rows') || []).forEach(function (r) { rowsById[r.id] = r; });
           el._cardNodes.forEach(function (node, id) { if (rowsById[id]) T.cards.patch(node, rowsById[id], { ctx: el._ctx }); });
-          el._placed.forEach(function (p) { var r = rowsById[p.row.id]; if (r) { p.row = r; p.marked = isMarked(r); } });
+          el._placed.forEach(function (p) { var r = rowsById[p.row.id]; if (r) { p.row = r; p.marked = isMarked(r) && r.status !== 'rejected'; p.rejected = r.status === 'rejected'; } });
           view.renderPins(el);
           return;
         }
