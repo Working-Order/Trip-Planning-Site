@@ -10361,6 +10361,8 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   transition: transform var(--dur-1) var(--ease-out);
 }
 .rl[data-open="1"] .rl__chev { transform: rotate(180deg); }
+/* Belt and braces: a closed row never shows a reply, whatever the DOM holds. */
+.rl[data-open="0"] > .rl__reply { display: none; }
 
 @media (min-width: 1024px) {
   .rl__head {
@@ -10720,7 +10722,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.19.0';
+  T.version = '0.19.1';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 2;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs)
@@ -27866,6 +27868,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       if (now && !art._reply) {
         art._reply = replyBody(m);
         art.appendChild(art._reply);
+      } else if (!now && art._reply) {
+        /* Closing REMOVES the reply — a hidden node would still be tabbable
+           content for a screen reader, and the next open rebuilds it from
+           the live model anyway. */
+        if (art._reply.parentNode === art) art.removeChild(art._reply);
+        art._reply = null;
       }
       syncAllButton(el);
     });
