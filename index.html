@@ -1160,7 +1160,11 @@ input[type="file"]:focus-visible::file-selector-button {
   transition: min-height var(--dur-3) var(--ease-out), padding var(--dur-3) var(--ease-out);
 }
 @supports not (backdrop-filter: blur(2px)) { .masthead { background: var(--bg); } }
-.masthead.is-stuck { min-height: var(--masthead-h-min); padding: var(--s2) 0; }
+/* `.masthead.is-stuck` (sticky-shrink) removed A-hybrid wave: confirmed dead
+   — grep across every JS module found zero `classList.add('is-stuck')` on
+   any masthead element (the class itself is alive elsewhere, on
+   `.detail__rail.is-stuck` in 22-view-detail.js, which is unrelated and
+   untouched). See DIAGNOSIS.md #10 / RECON.md (h)1. */
 
 /* ─ Nameplate ─ "The Trip List", set as a periodical's nameplate rather than
    a logo: the article small and italic, the name in the display serif at full
@@ -1208,119 +1212,23 @@ input[type="file"]:focus-visible::file-selector-button {
   outline: 2px solid var(--focus); outline-offset: 4px; border-radius: var(--radius-sm);
 }
 
-/* ─ Trip name ─ the trip bar's own headline, and the trip switcher. This is
-   the page's H-level identity now: the display serif at reading-headline
-   size, with the caret it has always had trailing it. `.navmenu__button`'s
-   chip styling (comp-shell.css) is overridden here by the higher-specificity
-   compound selector — no border, no pill background, no fixed 36px height,
-   because a headline is not a control until you hover it. The old dateline
-   treatment (italic, 0.6875rem, buried in the nameplate) is exactly what
-   Solomon could not see, so nothing quiet survives here. */
-.tripbar__name.tripswitch {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.32em;
-  min-height: 0;
-  min-width: 0;
-  max-width: min(24rem, 46vw);
-  padding: 2px 5px;
-  margin: -2px -5px;
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: none;
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-variation-settings: var(--wonk-nameplate);
-  font-size: 1.25rem;
-  font-weight: var(--weight-semi);
-  font-style: normal;
-  letter-spacing: -0.004em;
-  line-height: 1.1;
-}
-.tripbar__name.tripswitch .navmenu__label {
-  display: block;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.tripbar__name.tripswitch .navmenu__caret {
-  color: var(--ink-faint);
-  font-size: 0.5em;
-  transform: translateY(-0.15em);
-}
-@media (hover: hover) {
-  .tripbar__name.tripswitch:hover { color: var(--accent); background: var(--surface-alt); }
-  .tripbar__name.tripswitch:hover .navmenu__caret { color: inherit; }
-}
-.tripbar__name.tripswitch[aria-expanded="true"] { color: var(--accent); background: var(--surface-alt); }
+/* ─ Trip chip (the switcher) ─ A-hybrid SPEC §4. This used to be the trip
+   bar's own display-serif headline (`font-family: var(--font-display)`,
+   1.25rem, no border at any state — diagnosis #1/#2: two serif headlines
+   within 50px of each other, competing for "which one is the app"). It is
+   now a genuine CHIP in the Archivo/sans family: a labelled, clickable fact
+   that opens a panel, hairline-on-hover/open, never filled — the taxonomy
+   SPEC §0 sets out for the trip chip and the identity chip alike. Its dates
+   (`.tripswitch__meta`) moved from a separate sibling `.tripbar__facts`
+   element into ONE line inside this same button (50-shell.js
+   `buildTripSwitch()`), so name + dates read as the single fact they are.
+   Full rule set lives in 20-comp-shell.css (the structural file, which
+   cascades after this one and after 40-view-home.css's own `.masthead`/
+   `.masthead__inner` rules — see RECON.md (h)2 for why a masthead rule that
+   needs to reliably win belongs there, not here) — this file keeps only the
+   nameplate's own voice now that the trip switcher's is fully structural. */
 @media (max-width: 767px) {
-  .tripbar__name.tripswitch { font-size: 1.0625rem; max-width: 58vw; }
-}
-
-/* The dates line, in the voice the nameplate's dateline used to use: quiet,
-   italic, unemphatic — it qualifies the name beside it, it does not compete. */
-.tripbar__facts {
-  font-size: 0.75rem;
-  font-style: italic;
-  letter-spacing: 0.005em;
-  color: var(--ink-faint);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-}
-@media (max-width: 767px) {
-  .tripbar__facts { font-size: 0.6875rem; }
-}
-
-.tripbar__nav { display: flex; align-items: center; gap: var(--s1); min-width: 0; }
-/* The utility cluster SHRINKS rather than pushing the page wide — the masthead
-   is the one bar that has to survive 375px with a nameplate already in it. */
-.masthead__util { display: flex; align-items: center; gap: var(--s2); flex: 0 1 auto; min-width: 0; }
-.masthead__util .search { width: 260px; min-width: 0; }
-
-.navlink {
-  position: relative;
-  display: inline-flex; align-items: center; gap: var(--s1);
-  min-height: 34px; padding: 0 var(--s3);
-  font-size: var(--text-sm); font-weight: var(--weight-medium);
-  color: var(--ink-muted); text-decoration: none;
-  border-radius: var(--radius-sm);
-}
-.navlink:hover { color: var(--ink); background: var(--surface-alt); }
-.navlink[aria-current="page"] { color: var(--ink); font-weight: var(--weight-semi); }
-.navlink[aria-current="page"]::after {
-  content: ""; position: absolute; left: var(--s3); right: var(--s3); bottom: -2px;
-  height: 2px; background: var(--accent-fill);
-}
-/* A dot on More/What Changed after a reload, until the digest is opened. */
-.navlink__dot {
-  width: 6px; height: 6px; border-radius: var(--radius-round);
-  background: var(--accent-fill); flex: none;
-}
-
-/* Device identity chip — the one deliberately round thing in the chrome. */
-.devicechip {
-  display: inline-flex; align-items: center; gap: var(--s1);
-  min-height: 30px; padding: 0 var(--s3);
-  border: var(--hair) solid var(--line-hair);
-  border-radius: var(--radius-round);
-  background: var(--surface);
-  font-size: var(--text-xs); color: var(--ink-muted);
-}
-.devicechip:hover { border-color: var(--line-strong); color: var(--ink); }
-
-@media (max-width: 1023px) {
-  .masthead__util .search { width: auto; }
-}
-@media (max-width: 767px) {
-  .masthead { min-height: 60px; }
   .nameplate .nameplate__title { font-size: 1.0625rem; }
-  /* No keyboard shortcut hint on a phone, and search gives up its width first
-     (mobile search lives in the view itself — UX §1.5). */
-  .search__key { display: none; }
-  .masthead__util .search { flex: 1 1 auto; }
 }
 
 /* ══ APP-WIDE BANNER (orphans, degraded storage) ═════════════════════════
@@ -5151,18 +5059,46 @@ details[open] > .orphan__setasidesum::after,
 .shell__skip:focus { transform: translateY(0); }
 
 /* ─── MASTHEAD ───────────────────────────────────────────────────────────── */
-/* v0.13.0 — the header is page background under ONE hairline: no darker band,
-   no second rule, no 80px of air. The bar itself owns no padding (the inner
-   row owns the height) so the sticky shrink stays a single number to change. */
-.masthead,
-.masthead.is-stuck {
+/* CSS Grid — ONE mechanism at every width, no `display:contents`, no flex
+   `order` (VERIFY 2026-09-09 finding 2: `order` reorders paint only, never
+   Tab sequence, so the old display:contents+order MODE 1/MODE 2 split let a
+   keyboard user's Tab order diverge from what was on screen at >=1280px —
+   wordmark, search, identity, gear, trip chip, nav, when the eye read
+   wordmark, trip chip, nav, search, identity, gear).
+   `header.masthead` IS the grid; its three DOM children sit in that same
+   source order at every width — `.masthead__global` (nameplate), then
+   `.masthead__trip` (trip chip + primary nav), then `.masthead__util`
+   (search, identity, settings) — which is also the >=1280px left-to-right
+   reading order, so Tab now walks the row the way the eye does (see
+   50-shell.js `buildMasthead()` for why DOM order, not a `matchMedia`
+   listener that moves nodes, was picked to encode that). `grid-template-
+   areas` alone decides WHERE each one paints, independent of that source
+   order:
+     <1280   "global util" / "trip trip"   — two rows, util hugs the right
+     >=1280  "global trip util"            — one row (== --page-max)
+   Doubled selectors: 40-view-home.css cascades LATER than this file and
+   carries its own unconditional bare `.masthead`/`.masthead__inner` rules
+   (padding:0, min-height:0 — the SAME values this file already used, so no
+   visible conflict existed before this wave). Any rule below that needs to
+   reliably win regardless of that file's position uses the `header.masthead`
+   element+class selector, or the two-class `.masthead .masthead__X` form
+   (both higher specificity than a bare class) rather than the bare class
+   alone. */
+header.masthead {
   position: sticky;
   top: 0;
   z-index: 40;
   background: var(--bg);
   border-bottom: var(--hair) solid var(--line);
-  min-height: 0;
-  padding: 0;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  grid-template-areas: "global util" "trip trip";
+  align-items: center;
+  column-gap: var(--s3);
   /* No glass. 05-chrome.css gave this bar a translucent colour-mix plus
      `backdrop-filter: blur(6px)`; the brief asks for plain page background, and
      the filter also cost correctness — it promotes the bar to its own
@@ -5174,49 +5110,42 @@ details[open] > .orphan__setasidesum::after,
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-/* TWO centre lines (v0.19.0, NAV_SPEC §2), each a plain flex row inside the
-   one sticky header:
-     row 1 `.masthead__global` — the app. Nameplate, search (it takes the
-       slack), device, Settings, the two health chips. Never hidden.
-     row 2 `.masthead__trip.tripbar` — the trip. Its name, its dates, its
-       sections, under a hairline. `hidden` on the trips catalog, where no one
-       trip is being looked at.
-   There is no child-count invariant any more: the five/four-column grid this
-   file used to describe is gone, so a new control in either row costs a gap,
-   not a second line. Widths are bought back by shrinking controls to glyphs
-   (the queries at the foot of this file), never by wrapping. */
-/* Doubled selectors: 40-view-home.css cascades later and sets `.masthead__inner`
-   height, padding and gap for every route — the shell's own geometry has to
-   out-specify it without an !important. */
 .masthead .masthead__inner {
-  max-width: var(--page-max);
-  margin: 0 auto;
-  padding: 0 var(--gutter);
   display: flex;
   align-items: center;
   gap: var(--s2);
-  min-height: 64px;
 }
-.masthead .masthead__global { min-height: 60px; }
-.masthead.is-stuck .masthead__global { min-height: var(--masthead-h-min); }
+.masthead .masthead__global { grid-area: global; min-height: 52px; gap: var(--s3); }
+/* No `min-width:0` on these two: the "global"/"util" tracks are meant to
+   stay protected by the browser's normal content-based automatic minimum
+   (nameplate keeps a real floor at phone width below; the identity chip's
+   name is meant to stay legible down to 390px too, per the ladder comment
+   above). `.masthead__trip` gets it explicitly, below — that row's whole
+   point (VERIFY 2026-09-09 finding 1) is squeezing past its content size. */
+.masthead .masthead__util { grid-area: util; justify-content: flex-end; min-height: 52px; gap: var(--s3); }
 /* Every direct child of a row stands the SAME height and is centred on the
    row's own centre line. That is what makes each row read as one optical
    line whatever is in it — and it is also the invariant QA can check without
    knowing the design: two children of one row with different `offsetTop`
-   means the row wrapped. Controls keep their own inner alignment. */
+   means the row wrapped (the e2e §27 390px no-wrap check). Controls keep
+   their own inner alignment. */
 .masthead .masthead__inner > * { align-self: center; min-height: 36px; }
-@media (max-width: 1023px) {
+@media (pointer: coarse) {
   .masthead .masthead__inner > * { min-height: var(--tap-min); }
 }
-.masthead__chips { display: flex; align-items: center; }
 
 /* Row 2 sits under a hairline of the same weight as the one below the whole
    masthead — the trip bar is a second running head, not a toolbar. */
 .masthead .masthead__trip {
-  min-height: 52px;
+  grid-area: trip;
+  min-width: 0;
+  min-height: 40px;
   gap: var(--s3);
   border-top: var(--hair) solid var(--line-hair);
 }
+/* A `display:none` grid item is dropped from grid box generation entirely —
+   its named area's track collapses to zero on its own — so this needs no
+   `!important` the way the old `display:contents` mechanism did. */
 .masthead .masthead__trip[hidden] { display: none; }
 
 .masthead__nameplate { flex: 0 0 auto; }
@@ -5235,98 +5164,246 @@ details[open] > .orphan__setasidesum::after,
   letter-spacing: var(--tracking-caps);
 }
 
-/* The trip's own sections take the slack in row 2, so the name and dates sit
-   left and the nav runs out to the right edge under the chips. */
-.tripbar__nav { flex: 1 1 auto; min-width: 0; justify-content: flex-end; }
-.tripbar__facts { flex: 0 1 auto; }
-/* Never wrap: a masthead that stacks its links into a column is worse
-   than one that collapses the search (see the 1199px query below). */
-/* v0.13.0 — a nav link is a 36px pill: hover fills quietly, the current page
-   fills for good. The accent underline is gone; the page keeps ONE accent. */
+/* ─── TRIP CHIP (the switcher) ───────────────────────────────────────────────
+   A-hybrid SPEC §4 — a genuine chip now, not a serif headline: hairline on
+   hover/open, never filled. Name + one merged `.tripswitch__meta` dates line,
+   both inside the SAME trigger button (the two used to be split across a
+   button and a separate sibling `.tripbar__facts` span, at two different
+   scales — diagnosis #1/#2). Archivo (`--font-body`), not Fraunces: one
+   serif display element (the wordmark) is the house rule now. */
+.navmenu--trip .tripswitch {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4em;
+  min-height: 36px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 2px 10px;
+  border: var(--hair) solid transparent;
+  border-radius: var(--radius-round);
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.navmenu--trip .tripswitch .navmenu__label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4em;
+  min-width: 0;
+  overflow: hidden;
+}
+/* Trap B (handoff-notes §6) — truncation stays on the text span, never on
+   `.navmenu` (the positioning wrapper) or any ancestor of `.navmenu__list`
+   (the popover): clipping the wrapper would clip the OPEN dropdown too. */
+.tripswitch__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: min(16rem, 40vw);
+}
+/* `overflow:hidden` here (not just `white-space:nowrap`) gives meta its own
+   automatic minimum size of 0, same as the name span two rules up — without
+   it, a flex item with visible overflow refuses to shrink below its own
+   content size at all, so under a real squeeze meta would hold its full
+   width and starve the name down to nothing instead of both giving way
+   together (VERIFY 2026-09-09 finding 1: a `display:none` breakpoint here
+   was the first attempt, but it fired at every trip's 1280-1535px range
+   regardless of name length, zeroing this element's rect for an ordinary
+   short name too — the null-budget "trip bar sits above the headline" check
+   caught it). */
+.tripswitch__meta {
+  color: var(--ink-muted);
+  font-weight: var(--weight-normal);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.navmenu--trip .tripswitch .navmenu__caret { font-size: 9px; transform: translateY(-1px); }
+@media (hover: hover) {
+  .navmenu--trip .tripswitch:hover { border-color: var(--line-strong); }
+}
+.navmenu--trip .tripswitch[aria-expanded="true"] { border-color: var(--line-strong); color: var(--accent); }
+.navmenu--trip .tripswitch:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-round);
+}
+@media (max-width: 767px) {
+  .navmenu--trip .tripswitch { font-size: 0.9375rem; }
+  .tripswitch__name { max-width: 40vw; }
+}
+.navmenu--trip .navmenu__list { min-width: 18.5rem; left: 0; }
+
+/* ─── PRIMARY NAV + the merged More▾ trigger ─────────────────────────────────
+   A-hybrid SPEC §6 — ONE plain-text vocabulary for the whole group (the five
+   links AND the More▾ trigger): no ghost-pill, no fill, ever. Hover = ink
+   brightens only. Active (`aria-current="page"`) = ink brightens AND a 2px
+   accent underline sits 9px below the text baseline. More▾'s own open state
+   gets the hover treatment (brighter ink), never the underline — that stays
+   reserved for the actual current route. */
+.tripbar__nav { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; justify-content: center; }
 .masthead__navlist {
   display: flex;
   align-items: center;
-  gap: var(--s1);
+  gap: var(--s4);
   list-style: none;
   margin: 0;
   padding: 0;
   flex-wrap: nowrap;
 }
+.masthead__navlist > li { list-style: none; }
 .masthead__link,
-.navmenu__button {
+.navmenu--more .navmenu__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  font-family: var(--font-body);
+  text-decoration: none;
+  white-space: nowrap;
+  position: relative;
+}
+/* A finger still gets its 44px; a mouse gets the tighter bar. */
+@media (pointer: coarse) {
+  .masthead__link,
+  .navmenu--more .navmenu__button { min-height: var(--tap-min); }
+}
+.masthead__link:hover,
+.navmenu--more .navmenu__button:hover { color: var(--ink); }
+.masthead__link:focus-visible,
+.navmenu--more .navmenu__button:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-sm);
+}
+.masthead__link[aria-current="page"] { color: var(--ink); }
+.masthead__link[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 1px; right: 1px; bottom: -9px;
+  height: 2px;
+  background: var(--accent-fill);
+}
+.navmenu--more .navmenu__button[aria-expanded="true"] { color: var(--ink); }
+/* Menu furniture (2026-08-31 cleanup): the caret is punctuation, not a word —
+   smaller and quieter than the label it follows. */
+.navmenu__caret { font-size: 10px; line-height: 1; color: var(--ink-faint); }
+
+/* ─── IDENTITY CHIP (was "device chip") ──────────────────────────────────────
+   A-hybrid SPEC §8 — same hairline-on-hover/open treatment as the trip chip
+   above, replacing the old ghost-pill (`background:var(--surface-alt)` on
+   hover, no border). Person shape + name; the glyph is inline SVG (no
+   external asset — CSP fact still holds), and now carries a small corner
+   severity dot mirroring the sync state (`.masthead__userdot`, painted by
+   `paintUserBadge()` in 50-shell.js). */
+.navmenu--device .navmenu__button {
   display: inline-flex;
   align-items: center;
   gap: var(--s1);
   min-height: 36px;
-  padding: 0 var(--s3);
+  padding: 2px var(--s2) 2px 4px;
   border: var(--hair) solid transparent;
   border-radius: var(--radius-round);
   background: transparent;
   color: var(--ink-muted);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
-  text-decoration: none;
+  font-family: var(--font-body);
   white-space: nowrap;
+  cursor: pointer;
 }
-/* A finger still gets its 44px; a mouse gets the tighter bar. */
 @media (pointer: coarse) {
-  .masthead__link,
-  .navmenu__button { min-height: var(--tap-min); }
+  .navmenu--device .navmenu__button { min-height: var(--tap-min); }
 }
-.masthead__link:hover,
-.navmenu__button:hover { color: var(--ink); background: var(--surface-alt); }
-/* Menu furniture (2026-08-31 cleanup): the caret is punctuation, not a word —
-   smaller and quieter than the label it follows. */
-.navmenu__caret { font-size: 10px; line-height: 1; color: var(--ink-faint); }
-/* Device chip: person shape + name. The old font ⌂ rendered tiny, jammed
-   against the name, and off-baseline; the glyph is now inline SVG (crisp at
-   any DPI, no external asset — CSP fact still holds). */
+@media (hover: hover) {
+  .navmenu--device .navmenu__button:hover { color: var(--ink); border-color: var(--line); }
+}
+.navmenu--device .navmenu__button[aria-expanded="true"] { color: var(--ink); border-color: var(--line-strong); }
+.navmenu--device .navmenu__button:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-round);
+}
 .navmenu--device .navmenu__label { display: inline-flex; align-items: center; gap: var(--s2); }
-.navmenu__glyph { display: inline-flex; color: var(--ink-faint); }
+.navmenu__glyph {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-faint);
+}
 .navmenu__glyph svg { display: block; }
 .navmenu__button:hover .navmenu__glyph { color: inherit; }
-/* v0.13.0 — the person mark becomes an avatar disc, so the user menu reads as
-   a ghost pill with a face on it rather than a stray icon beside a word. */
 .navmenu--device .navmenu__button { padding-left: 5px; }
 .navmenu--device .navmenu__glyph {
   width: 22px;
   height: 22px;
   flex: 0 0 22px;
-  align-items: center;
-  justify-content: center;
   border-radius: var(--radius-round);
   background: var(--surface-inset);
   border: var(--hair) solid var(--line);
   color: var(--ink-muted);
 }
 .navmenu--device .navmenu__glyph svg { width: 13px; height: 13px; }
-.masthead__link.is-current,
-.navmenu__button.is-current {
-  color: var(--ink);
-  background: var(--surface-inset);
-  border-color: var(--line);
-  font-weight: var(--weight-semi);
+.navmenu--device .navmenu__list { right: 0; min-width: 17rem; }
+
+/* Corner severity dot on the identity trigger — SPEC §10 "Identity dot":
+   ok/syncing (pulsing)/error/offline, the same four states the sync chip and
+   the identity panel's sync row use. */
+.masthead__userdot {
+  position: absolute; right: -2px; bottom: -2px;
+  width: 8px; height: 8px;
+  border-radius: var(--radius-round);
+  border: 1.5px solid var(--bg);
+  box-sizing: content-box;
 }
+.masthead__userdot[data-severity="ok"] { background: var(--ok); }
+.masthead__userdot[data-severity="info"] { background: var(--info); animation: dot-pulse 1.6s var(--ease-in-out) infinite; }
+.masthead__userdot[data-severity="danger"] { background: var(--danger); }
+.masthead__userdot[data-severity="offline"] { background: var(--ink-faint); }
+@keyframes dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+/* VERIFY 2026-09-09 finding 3 — a bare `.masthead__userdot` (0,1,0) cannot
+   out-rank `.masthead__userdot[data-severity="info"]` (0,2,0), the only rule
+   that ever starts the animation, so the override never won regardless of
+   source order. Match its specificity instead — same fix already used for
+   the sync chip's own pulsing dot two rules up in 39-view-sync.css. */
+@media (prefers-reduced-motion: reduce) {
+  .masthead__userdot[data-severity="info"] { animation: none; }
+}
+
+.masthead__link.is-current,
+.navmenu__button.is-current { color: var(--ink); }
 
 /* ─── DISCLOSURE MENUS ───────────────────────────────────────────────────── */
 .navmenu { position: relative; }
 .navmenu__list {
   position: absolute;
-  top: calc(100% + var(--s1));
+  top: calc(100% + var(--s2));
   left: 0;
   z-index: 50;
   min-width: 15rem;
   margin: 0;
-  padding: var(--s1);
+  padding: var(--s2);
   list-style: none;
   background: var(--surface);
   border: var(--hair) solid var(--line-hair);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+  animation: fade-in var(--dur-1) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .navmenu__list { animation: fade-in 100ms linear; }
 }
 .navmenu--device .navmenu__list,
 .navmenu--more .navmenu__list { left: auto; right: 0; }
-.navmenu__link {
+.navmenu__link,
+.navmenu__plainrow {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -5334,32 +5411,87 @@ details[open] > .orphan__setasidesum::after,
   width: 100%;
   min-height: var(--tap-min);
   padding: var(--s2) var(--s3);
+  border: 0;
+  background: none;
   border-radius: var(--radius-md);
   color: var(--ink);
   font-size: var(--text-sm);
+  font-family: var(--font-body);
   text-align: left;
   text-decoration: none;
+  cursor: pointer;
 }
-.navmenu__link:hover { background: var(--surface-alt); }
+.navmenu__link:hover,
+.navmenu__plainrow:hover { background: var(--surface-alt); }
 .navmenu__link.is-current { font-weight: var(--weight-semi); }
 .navmenu__link.is-current::after { content: "✓"; color: var(--accent); }
 .navmenu__dot { color: var(--accent); font-weight: var(--weight-bold); }
+.navmenu__grouplabel {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: var(--weight-semi);
+  padding: var(--s2) var(--s2) var(--s1);
+  list-style: none;
+}
+.navmenu__item { list-style: none; }
 
 /* A plain divider between menu sections (the trip switcher's "New trip…" /
-   "Manage trips" pair, below the trip list). */
-.navmenu__sep { height: var(--hair); margin: var(--s1) var(--s2); background: var(--line-hair); }
+   "All trips" pair, below the trip list; the device menu's "This device"
+   group above its two status rows). */
+.navmenu__sep { height: var(--hair); margin: var(--s2) var(--s1); background: var(--line-hair); list-style: none; }
 
 /* Trip switcher menu items (`navmenu--trip`) carry two lines — the trip's
-   name, then its dates so two trips with the same name are never ambiguous. */
-.navmenu__link--trip { align-items: flex-start; }
-.navmenu__triplines { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.navmenu__tripname {
-  color: var(--ink); font-size: var(--text-sm); font-weight: var(--weight-medium);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+   name, then its dates so two trips with the same name are never ambiguous.
+   (This is the MENU's own two-line row, unchanged from before A-hybrid — only
+   the CLOSED trigger button merged its name+dates to one line, §4 above.) */
+.navmenu__link--trip {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  width: 100%; min-height: 44px; padding: var(--s2) var(--s3);
+  border: 0; background: none; border-radius: var(--radius-md);
+  text-align: left; cursor: pointer;
 }
+.navmenu__link--trip:hover { background: var(--surface-alt); }
+.navmenu__tripname { color: var(--ink); font-size: var(--text-sm); font-weight: var(--weight-medium); display: flex; align-items: center; gap: var(--s2); }
+.navmenu__tripname .check { color: var(--accent); font-weight: var(--weight-bold); }
 .navmenu__triplabel { color: var(--ink-muted); font-size: var(--text-xs); }
 .navmenu__link--trip[aria-current="true"] .navmenu__tripname { font-weight: var(--weight-semi); }
-.navmenu__link--trip[aria-current="true"]::after { content: "✓"; color: var(--accent); flex: none; }
+
+/* ─── IDENTITY PANEL — device group + the two merged status rows ────────────
+   A-hybrid SPEC §8 — one line per fact: a dot (colour = state, §10) + text.
+   These replace the old row-1 `.masthead__chip`/`.masthead__chip--sync` pills
+   — same elements (`nodes.wbChip`/`nodes.syncChip`, same class hooks, same
+   `dataset.health`/`dataset.sync`, same paint functions), relocated into this
+   menu and merged from two lines each down to one. */
+.identity__statusrow {
+  display: flex; align-items: center; gap: var(--s2);
+  width: 100%; min-height: 38px; padding: var(--s2) var(--s3);
+  border-radius: var(--radius-md);
+  color: var(--ink); font-size: var(--text-sm); text-decoration: none;
+}
+.identity__statusrow:hover { background: var(--surface-alt); }
+/* The dot is the same `.masthead__chipdot` span the old chip painted (glyph
+   text via `U.setText`, unchanged JS) — visually it is now a small filled
+   circle, not a glyph character, so the text is collapsed to nothing and the
+   colour comes from `background`, keyed off the SAME `[data-health]`/
+   `[data-sync]` attributes the old pill used (health mapping below;
+   `[data-sync]` mapping lives in 39-view-sync.css, unchanged selectors). */
+.identity__statusdot {
+  width: 7px; height: 7px; flex: 0 0 auto;
+  border-radius: var(--radius-round);
+  font-size: 0; line-height: 0; overflow: hidden;
+  background: var(--ink-faint);
+}
+.masthead__chip[data-health="ok"] .identity__statusdot       { background: var(--ok); }
+.masthead__chip[data-health="warnings"] .identity__statusdot { background: var(--warn); }
+.masthead__chip[data-health="error"] .identity__statusdot,
+.masthead__chip[data-health="absent"] .identity__statusdot   { background: var(--danger); }
+.identity__statusrow .masthead__chiptext {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
 /* ─── SEARCH ─────────────────────────────────────────────────────────────── */
 /* The search is row 1's flexible track: it takes whatever the nameplate and
@@ -5369,8 +5501,16 @@ details[open] > .orphan__setasidesum::after,
   position: relative;
   display: flex;
   align-items: center;
-  flex: 1 1 10rem;
+  flex: 0 0 auto;
   min-width: 0;
+  /* `flex:0 0 auto` keeps the form sized to its own content — a `flex-grow`
+     here instead was the earlier (wrong) attempt, and it stretched the FORM
+     across the row's free space while the input inside kept its own fixed
+     width, so the ⌘K/Ctrl K kbd hint (absolutely positioned against the
+     form) floated at the form's far right edge, nowhere near the visible
+     input. Pushing this whole cluster to the row's right edge is now
+     `.masthead__util`'s job (`justify-content:flex-end`, VERIFY 2026-09-09
+     finding 2) rather than an auto margin on this one child of it. */
 }
 .masthead__glass {
   position: absolute;
@@ -5378,30 +5518,46 @@ details[open] > .orphan__setasidesum::after,
   color: var(--ink-faint);
   pointer-events: none;
 }
-/* v0.13.0 — a 36px inset pill, same height and hairline as its neighbours. */
 .masthead__searchfield {
-  width: 16rem;
+  width: 13.75rem;
   max-width: 100%;
   min-width: 0;
   height: 36px;
   min-height: 36px;
-  padding: 0 var(--s3) 0 var(--s6);
+  padding: 0 3rem 0 var(--s6);
   background: var(--surface-inset);
   border: var(--hair) solid var(--line);
   border-radius: var(--radius-round);
   color: var(--ink);
   font-size: var(--text-sm);
-  transition: width var(--dur-3) var(--ease-out);
+  font-family: var(--font-body);
+  transition: border-color var(--dur-2) var(--ease-out), width var(--dur-3) var(--ease-out);
 }
-/* De-cramp (2026-08-31): the field idles narrow and buys its full measure only
-   while the traveler is typing — always-open 16rem put the row over the 1280
-   budget. Desktop only: below 1200 the magnifier flow owns the field. */
-@media (min-width: 1200px) {
-  .masthead__search:focus-within .masthead__searchfield { width: 19rem; }
+.masthead__searchfield::placeholder { color: var(--ink-faint); }
+/* A-hybrid SPEC §5 — focused state changes border-colour and background
+   only, never a glow/shadow (this app's elevation language is paper, not
+   glass; a focus ring here would be the only glow anywhere in the header). */
+.masthead__searchfield:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
 }
 @media (prefers-reduced-motion: reduce) {
   .masthead__searchfield { transition: none; }
 }
+/* The ⌘K/Ctrl K hint. `.search__key`'s own base rule (04-controls.css) is for
+   an unrelated, currently-unbuilt component; this selector is deliberately
+   more specific so it fully controls the masthead's own kbd hint regardless
+   of that rule. It hides on focus so real typed text never collides with it
+   (extends the existing phone-only `.search__key{display:none}` rule below
+   to the focused state, at every width). */
+.masthead__search .search__key {
+  position: absolute; right: var(--s2); top: 50%; transform: translateY(-50%);
+  font-family: var(--font-body); font-size: var(--text-2xs); color: var(--ink-faint);
+  border: var(--hair) solid var(--line); border-radius: var(--radius-sm);
+  padding: 1px 5px; line-height: 1.5; background: var(--surface); pointer-events: none;
+}
+.masthead__search:focus-within .search__key { display: none; }
 .masthead__magnifier {
   display: none;
   width: 36px;
@@ -5411,6 +5567,9 @@ details[open] > .orphan__setasidesum::after,
   border-radius: var(--radius-round);
   color: var(--ink-muted);
   font-size: var(--text-lg);
+  background: none;
+  border: 0;
+  cursor: pointer;
 }
 .masthead__magnifier:hover { background: var(--surface-alt); color: var(--ink); }
 @media (pointer: coarse) {
@@ -5418,64 +5577,67 @@ details[open] > .orphan__setasidesum::after,
 }
 
 /* ─── SETTINGS LINK ──────────────────────────────────────────────────────── */
-/* Same 36px ghost pill as a nav link, so row 1's right-hand cluster reads as
-   one set of controls; it is a LINK, not a chip, because it goes somewhere
-   rather than reporting a state. Below 1024 the word goes and the cog keeps a
-   full tap target, like its neighbours. */
+/* A-hybrid SPEC §0/§9 — icon-only, ghost, at EVERY width (closes the
+   HANDOFF-flagged "Settings hidden on phone" thread — same conclusion as the
+   prior wave, unchanged reasoning). It is a LINK, not a chip, because it goes
+   somewhere rather than reporting a state. */
 .masthead__settings {
   display: inline-flex;
   align-items: center;
-  gap: var(--s2);
+  justify-content: center;
   flex: 0 0 auto;
-  min-height: 36px;
-  padding: 0 var(--s3);
-  border: var(--hair) solid transparent;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-round);
   color: var(--ink-muted);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
   text-decoration: none;
-  white-space: nowrap;
+  font-size: 1.05rem;
 }
 .masthead__settings:hover { color: var(--ink); background: var(--surface-alt); }
-.masthead__settings.is-current {
-  color: var(--ink);
-  background: var(--surface-inset);
-  border-color: var(--line);
-  font-weight: var(--weight-semi);
+.masthead__settings:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-round);
 }
-.masthead__settingsglyph { font-size: var(--text-md); line-height: 1; }
+.masthead__settings.is-current { color: var(--ink); background: var(--surface-inset); }
 @media (pointer: coarse) {
-  .masthead__settings { min-height: var(--tap-min); }
+  .masthead__settings { width: var(--tap-min); height: var(--tap-min); }
 }
 
-/* ─── WORKBOOK CHIP ──────────────────────────────────────────────────────── */
-.masthead__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s2);
-  min-height: 36px;
-  padding: 0 var(--s3);
-  border: var(--hair) solid var(--line);
-  border-radius: var(--radius-round);
-  color: var(--ink-muted);
-  font-size: var(--text-xs);
-  text-decoration: none;
-  white-space: nowrap;
+/* ─── MORE▾ MEGA-LITE PANEL ───────────────────────────────────────────────────
+   A-hybrid SPEC §7 — Labs + More merge into ONE trigger, a two-column panel:
+   icon + bold title + one-line description per row. 440px, right-aligned to
+   the trigger, quieter than the app's other menus — a hairline border does
+   the separating work, not a heavy shadow (`--shadow-sm`, not `--shadow-md`),
+   per the gallery pass's "dark panel separates with a hairline" rule. */
+.navmenu--more .navmenu__list {
+  right: 0;
+  width: 440px;
+  max-width: calc(100vw - 2 * var(--gutter));
+  padding: var(--s3);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 var(--s4);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
 }
-.masthead__chip:hover { border-color: var(--line-strong); color: var(--ink); }
-/* A long workbook name must never push the nav around. */
-.masthead__chiptext {
-  max-width: min(17rem, 34vw);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.navmenu__col { display: flex; flex-direction: column; }
+.navmenu__rowlink {
+  display: flex; align-items: flex-start; gap: var(--s3);
+  width: 100%; min-height: 0; padding: var(--s2) var(--s2);
+  border-radius: var(--radius-md);
+  color: var(--ink); text-decoration: none;
 }
-/* The glyph carries the state; colour only reinforces it (§18.5). */
-.masthead__chip[data-health="ok"] .masthead__chipdot       { color: var(--ok); }
-.masthead__chip[data-health="warnings"] .masthead__chipdot { color: var(--warn); }
-.masthead__chip[data-health="error"] .masthead__chipdot,
-.masthead__chip[data-health="absent"] .masthead__chipdot   { color: var(--danger); }
+.navmenu__rowlink:hover { background: var(--surface-alt); }
+.navmenu__rowlink:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: -2px; border-radius: var(--radius-md);
+}
+.navmenu__rowglyph { flex: 0 0 16px; width: 16px; height: 16px; margin-top: 2px; color: var(--ink-faint); }
+.navmenu__rowglyph svg { display: block; width: 16px; height: 16px; }
+.navmenu__rowtext { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.navmenu__rowtitle { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--ink); }
+.navmenu__rowdesc { font-size: var(--text-2xs); color: var(--ink-muted); line-height: 1.3; }
+@media (max-width: 767px) {
+  .navmenu--more .navmenu__list { width: min(440px, calc(100vw - 2 * var(--gutter))); }
+}
 
 /* ─── BANDS ──────────────────────────────────────────────────────────────── */
 .shell__bands {
@@ -5725,24 +5887,91 @@ details[open] > .orphan__setasidesum::after,
 .datapane__lede { max-width: var(--measure); color: var(--ink-muted); margin-bottom: var(--s3); }
 
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
+/* A-hybrid SPEC §3 — the four-tier ladder, replacing the old single 1199px
+   search-breakpoint/1023px chip-collapse tiers (both gone: the chips they
+   used to shrink no longer live in row 1 at all, and the identity trigger's
+   name never goes glyph-only — the mock keeps "Solomon" visible at every
+   width down to 390px, freed up by the chips leaving row 1).
+     >=1280      MODE 2 — one row (the block right below)
+     1024-1279   MODE 1, two rows — search stays full (13.75rem)
+     900-1023    MODE 1, two rows — search shrinks to 10rem, ⌘K hint hides
+     768-899     MODE 1, two rows — search collapses to an icon-only magnifier
+     <768        phone — unchanged mechanic from before, new control styling
+   Breakpoint measured empirically (SPEC.md §3): at 1200px the gap between the
+   nav's rendered content and the search field is -10px (real overlap); it
+   only reaches a stable >=24px gap at 1280px, which is also `--page-max`, so
+   the masthead's own max-width caps there too. */
 
-/* Below 1200 an always-open search field costs more than it is worth, so it
-   collapses to a magnifier and reopens in place (§1.3's tablet treatment,
-   applied by fit rather than by a fixed width — a real workbook name makes
-   the chip ~230px and 1024 no longer has the room). */
-@media (max-width: 1199px) {
-  .masthead__inner { gap: var(--s2); }
+/* ---- MODE 2: single row, >=1280px (== --page-max) --------------------- */
+@media (min-width: 1280px) {
+  header.masthead {
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto;
+    grid-template-areas: "global trip util";
+    column-gap: var(--s5);
+    min-height: 62px;
+  }
+  /* One row now, so the row-2 hairline (a two-row-only divider) goes away. */
+  .masthead .masthead__trip { border-top: 0; }
+  /* VERIFY 2026-09-09 finding 1 — `.tripswitch__name` already ellipsizes
+     internally (Trap B, ~line 159), but the BUTTON around it had no ceiling
+     of its own: a long trip name let it claim whatever width it wanted, so
+     it ate into the room `.tripbar__nav`'s `flex:1 1 auto` (min-width:0,
+     line 190) had to give the primary nav, and the nav's own overflow
+     (nowrap, no ellipsis) painted back over the chip. Capping the button
+     itself gives the nav a share of the "trip" column it can never lose,
+     independent of the trip name's length. min-width:0 already sits on the
+     button (line 140), so this only ever pulls it narrower, never wider.
+     A fixed value, not a `clamp(…, Nvw, …)` — `header.masthead` is capped
+     at `max-width:var(--page-max)` (== 1280px, unconditionally, not just in
+     this media block), so past 1280px of REAL viewport the row's actual
+     budget stops growing at all; a `vw` term keeps growing regardless and
+     first ate visibly into the nav's own ~396px content minimum at 1440px
+     (`.masthead__navlist` has no width ceiling of its own — see 4 lines
+     below for why it can't safely get one — so any width this button takes
+     beyond what leaves the nav's true minimum untouched reappears as the
+     nav's own content bleeding out of its now-too-small box, half to each
+     side of its `justify-content:center`, which is what actually painted
+     back over the chip). 16rem matches `.tripswitch__name`'s own existing
+     ceiling above, so the whole-button case degrades the same way the
+     name-alone case already did. */
+  .navmenu--trip .tripswitch { max-width: 16rem; }
+  /* `.masthead__navlist` (recall: also `.tripbar__navlist`, its only other
+     class) cannot take `overflow:hidden` or a `max-width` of its own to
+     enforce this from its side instead — the More▾ trigger's popover is a
+     DESCENDANT of this list (an `<li>`, per buildTripBar() in 50-shell.js),
+     and clipping or shrink-forcing the list would clip or visually squash
+     that open popover along with it (the exact Trap B this file already
+     warns about for the trip switcher's own list two rules up). So the only
+     lever left is capping what competes with it — this button — generously
+     enough below its own natural minimum that the list is never asked to
+     shrink at all. */
+}
+
+/* ---- 1024-1279: two rows, search stays full width (no override needed —
+   the base rules above already give it 13.75rem and full padding) -------- */
+
+/* ---- 900-1023: search shrinks -------------------------------------------- */
+@media (max-width: 1023px) and (min-width: 900px) {
+  .masthead__searchfield { width: 10rem; padding-right: 2.6rem; }
+  .masthead__search .search__key { display: none; }
+}
+
+/* ---- <900 (down to 768): search collapses to an icon, matching phone's
+   mechanic early -------------------------------------------------------- */
+@media (max-width: 899px) {
   .masthead__searchfield { width: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
   .masthead__glass { display: none; }
   .masthead__magnifier { display: inline-flex; }
+  .masthead__search .search__key { display: none; }
   /* Opening search expands the field IN the row rather than dropping a
-     popover: the search is row 1's flexible track now, so the room is already
+     popover: the search is row 1's flexible track, so the room is already
      there. The old absolute panel hung off the form's bottom edge, which
      since v0.19.0 is the trip bar — it covered row 2 to type in. */
   .masthead.is-searching .masthead__searchfield {
     width: auto;
     flex: 1 1 6rem;
-    padding: 0 var(--s3);
+    padding: 0 var(--s3) 0 var(--s6);
     border: var(--hair) solid var(--line-strong);
     opacity: 1;
     pointer-events: auto;
@@ -5751,41 +5980,13 @@ details[open] > .orphan__setasidesum::after,
   .masthead.is-searching .masthead__magnifier { display: none; }
 }
 
-/* Tablet (768–1023). The bottom tab bar does not exist up here, so the trip
-   bar MUST keep its links; the width is bought back from the chips and the
-   device menu, which go glyph-only. Their health glyph stays visible and
-   their aria-labels still carry the name and the count. */
-@media (max-width: 1023px) {
-  .masthead__chip {
-    padding: var(--s2);
-    min-width: var(--tap-min);
-    min-height: var(--tap-min);
-    justify-content: center;
-  }
-  .masthead__chiptext { display: none; }
-  .masthead__settings {
-    padding: var(--s2);
-    min-width: var(--tap-min);
-    min-height: var(--tap-min);
-    justify-content: center;
-  }
-  .masthead__settingstext { display: none; }
-  .navmenu--device .navmenu__button { min-width: var(--tap-min); justify-content: center; }
-  .navmenu--device .navmenu__who { display: none; }
-}
-
-/* Phone: the tab bar takes over the trip's navigation; the masthead goes slim.
-   Row 1 keeps four controls — nameplate, search glyph, device, the two chips —
-   and Settings steps out, because the More sheet's "Setup" group already
-   carries it and a fifth control would put the row over 390px. Row 2 keeps
-   the two things that say WHICH trip you are in: its name and its dates. */
+/* ---- phone (<768): row heights tighten; nav moves to the bottom tab bar;
+   the new control styling (chip taxonomy, always-icon Settings) carries
+   through unchanged from the tiers above it -------------------------------- */
 @media (max-width: 767px) {
-  .masthead .masthead__inner {
-    padding: 0 var(--gutter);
-    gap: var(--s2);
-  }
-  .masthead .masthead__global { min-height: 56px; }
-  .masthead .masthead__trip { min-height: 44px; gap: var(--s2); }
+  .masthead .masthead__global { min-height: 48px; gap: var(--s2); }
+  .masthead .masthead__util { min-height: 48px; gap: var(--s2); }
+  .masthead .masthead__trip { min-height: 36px; gap: var(--s2); }
   /* The nameplate is the flexible track now that the nav has gone downstairs;
      it keeps a REAL minimum so the trailing controls cannot collapse it.
      `minmax(0,1fr)` once let them take everything and squashed it to ~5px,
@@ -5794,17 +5995,10 @@ details[open] > .orphan__setasidesum::after,
   .masthead__nameplate { flex: 1 1 7.5rem; min-width: 7.5rem; }
   .masthead__nameplate .nameplate__title,
   .masthead__title { white-space: nowrap; }
-  .masthead__settings { display: none; }
   /* The trip's sections live in the tab bar and the More sheet down here; the
-     trip bar keeps only the name and the dates, on one line that truncates
-     rather than wraps. */
+     trip bar keeps only the trip chip (name + dates, one line, truncating
+     rather than wrapping — the chip's own `.tripswitch__name` ellipsis). */
   .tripbar__nav { display: none; }
-  .masthead .masthead__trip .tripbar__facts { flex: 1 1 auto; }
-  /* Both chips keep their 44px target and their aria-labels; only the words go.
-     Nothing is lost: Home's own sub-line names the workbook and its count.
-     Compact does NOT mean small: a glyph-only control still owes 44×44 (§18.3). */
-  .masthead__chip { max-width: none; }
-  .navmenu--device .navmenu__button { padding: var(--s2); }
 
   .tabbar { display: block; }
   /* Reserve room so the bar never covers the last row of content. */
@@ -9172,48 +9366,29 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .sync__when { color: var(--ink-faint); flex: 0 0 auto; min-width: 6rem; font-variant-numeric: tabular-nums; }
 .sync__what { overflow-wrap: anywhere; }
 
-/* Masthead chips share one grid cell (see 50-shell.js buildMasthead).
-   De-cramp (2026-08-31): the two pills fused into ONE quiet status group —
-   one border, an interior hairline, still two link targets (workbook → Data,
-   sharing → Stay in sync). Workbook side is count-only (see paintWorkbookChip);
-   at ≤1023 the chiptexts hide and this reads as two glyph squares in a pill. */
-/* v0.13.0 — ONE status pill: one hairline, one radius, one 36px height, with a
-   thin inner divider where the two link targets meet. The dot still carries
-   the state (the rules below); the pill around it is furniture. */
-.masthead__chips {
-  display: inline-flex;
-  align-items: stretch;
-  flex: 0 0 auto;
-  min-width: 0;
-  min-height: 36px;
-  border: var(--hair) solid var(--line);
-  border-radius: var(--radius-round);
-  background: var(--surface);
-  overflow: hidden;
+/* A-hybrid SPEC §8 — the sync chip is no longer a visible row-1 pill (the old
+   `.masthead__chips` wrapper it shared with the workbook chip is gone: both
+   moved into the identity panel as one-line `.identity__statusrow`s, see
+   20-comp-shell.css's "IDENTITY PANEL" block for the row/dot base styles).
+   `.masthead__chip--sync[data-sync]` still exists — same element, same
+   attribute, same paint path (`paintSyncChip()` in 50-shell.js, unchanged) —
+   it just lives inside `.navmenu--device .navmenu__list` now, and its state
+   now reads as the ROW's dot background rather than a coloured glyph
+   character (the character is still set by JS; `.identity__statusdot` in
+   20-comp-shell.css collapses it to invisible via `font-size:0` and shows
+   only the background colour). */
+.masthead__chip--sync .masthead__chiptext { max-width: 12rem; }
+.masthead__chip[data-sync="ok"] .identity__statusdot      { background: var(--ok); }
+.masthead__chip[data-sync="syncing"] .identity__statusdot,
+.masthead__chip[data-sync="pending"] .identity__statusdot { background: var(--info); animation: dot-pulse 1.6s var(--ease-in-out) infinite; }
+.masthead__chip[data-sync="offline"] .identity__statusdot { background: var(--ink-faint); }
+.masthead__chip[data-sync="error"] .identity__statusdot   { background: var(--danger); }
+.masthead__chip[data-sync="off"] .identity__statusdot,
+.masthead__chip[data-sync="idle"] .identity__statusdot    { background: var(--ink-faint); }
+@media (prefers-reduced-motion: reduce) {
+  .masthead__chip[data-sync="syncing"] .identity__statusdot,
+  .masthead__chip[data-sync="pending"] .identity__statusdot { animation: none; }
 }
-.masthead__chips:hover { border-color: var(--line-hair); }
-.masthead__chips .masthead__chip {
-  flex: 0 1 auto;
-  min-width: 0;
-  min-height: 0;
-  border: 0;
-  border-radius: 0;
-}
-.masthead__chips .masthead__chip--sync {
-  border-left: var(--hair) solid var(--line);
-}
-/* The children stretch to the pill, so the touch floor lives on the pill. */
-@media (pointer: coarse) { .masthead__chips { min-height: var(--tap-min); } }
-.masthead__chips .masthead__chip:hover { color: var(--ink); background: var(--surface-alt); }
-.masthead__chip--sync .masthead__chiptext { max-width: 7rem; }
-/* The glyph carries the state, colour only reinforces it. */
-.masthead__chip[data-sync="ok"] .masthead__chipdot      { color: var(--ok); }
-.masthead__chip[data-sync="syncing"] .masthead__chipdot,
-.masthead__chip[data-sync="pending"] .masthead__chipdot { color: var(--info); }
-.masthead__chip[data-sync="offline"] .masthead__chipdot { color: var(--warn); }
-.masthead__chip[data-sync="error"] .masthead__chipdot   { color: var(--danger); }
-.masthead__chip[data-sync="off"] .masthead__chipdot,
-.masthead__chip[data-sync="idle"] .masthead__chipdot    { color: var(--ink-faint); }
 /* ==== src/css/40-view-trips.css ==== */
 /* 40-view-trips.css — THE TRIPS CATALOG (#/trips). OWNER: WS-B.
  *
@@ -10842,7 +11017,7 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
 (function (T) {
   'use strict';
 
-  T.version = '0.20.0';
+  T.version = '0.20.2';   // REBASE 2026-09-09: continues theirs' 0.20.0 (Lists) line
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -12756,6 +12931,21 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
   }
   TR.rangeLabel = rangeLabel;
 
+  /** Same as rangeLabel, without the year, for contexts that already name the
+   *  trip/year elsewhere (A-hybrid SPEC §4 — the masthead trip chip: its own
+   *  name line already carries the year, e.g. "October 2026", so the meta
+   *  line under it reads "Oct 15–22 · 7 nights", not "...–22, 2026 · ...").
+   *  Only the same-year form drops it; a trip spanning a year boundary keeps
+   *  one year on the end date so the range stays unambiguous. */
+  function rangeLabelShort(start, end) {
+    var a = parseDay(start), b = parseDay(end);
+    if (!a || !b) return null;
+    if (a.y === b.y && a.m === b.m) return SHORT[a.m - 1] + ' ' + a.d + '–' + b.d;
+    if (a.y === b.y) return SHORT[a.m - 1] + ' ' + a.d + ' – ' + SHORT[b.m - 1] + ' ' + b.d;
+    return SHORT[a.m - 1] + ' ' + a.d + ' – ' + SHORT[b.m - 1] + ' ' + b.d + ', ' + b.y;
+  }
+  TR.rangeLabelShort = rangeLabelShort;
+
   /* ---- the research window (the workbook's own dates) -------------------- */
   /* The workbook prices ONE date window and never says so in a cell, so it is
      declared once as a parse-spec constant (`priceWindow`) and emitted into
@@ -12992,6 +13182,14 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     var t = trip || TR.active();
     if (!t || !t.start || !t.end || !t.nights) return 'No dates yet';
     return rangeLabel(t.start, t.end) + ' · ' + t.nights + ' night' + (t.nights === 1 ? '' : 's');
+  };
+
+  /** labelShort(trip) -> 'Oct 15–22 · 7 nights' | 'No dates yet' — same as
+   *  label(), no year (see rangeLabelShort above). */
+  TR.labelShort = function (trip) {
+    var t = trip || TR.active();
+    if (!t || !t.start || !t.end || !t.nights) return 'No dates yet';
+    return rangeLabelShort(t.start, t.end) + ' · ' + t.nights + ' night' + (t.nights === 1 ? '' : 's');
   };
 
   /** version() — bumped by every trips upsert/delete and every setActive. */
@@ -18287,8 +18485,10 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
  *
  * Replies arrive in BATCHES: seven resorts answered on 1 September 2026, Vila
  * Planinka came back with a real six-night proposal on 3 September, Domes
- * Noruz Chania sent a five-night proposal on 4 September, and on 6 September
- * Quinta do Furão said no while La Loma was still being waited on. Each
+ * Noruz Chania sent a five-night proposal on 4 September, on 6 September
+ * Quinta do Furão said no while La Loma was still being waited on, the Sep 8
+ * handoff reconciled everything to date, and on 9 September Pnoé, Phāea,
+ * Keyonna and Sublime Comporta all came back with real offers. Each
  * batch is a frozen seed with its own clock, offered once per browser, and —
  * when accepted — folded in through the ONE merge (T.plan.mergeState) and the
  * ONE applicator (planning/import). There is no second merge and no direct
@@ -18743,6 +18943,98 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
   ];
   I.SEED_IDS_SEP8 = SEED_SEP8.map(function (r) { return r.id; });
 
+  /* ---- Batch 6 — the Sep 9 handoff (v0.20.2) ----------------------------
+   * Solomon's "October 2026 Vacation Research Handoff" of 9 September: the
+   * inbox pass in which four of the Sep 8 inquiries came back with real
+   * offers or package structures, plus one update:
+   *   NEW    Pnoé Breathing Life — 7-night all-inclusive with private pool,
+   *          €2,870 with the tax in, NON-REFUNDABLE ⇒ "Available"
+   *   NEW    Phāea Cretan Malia — 7-night extensive all-inclusive, Garden
+   *          €3,605 / Beach Front €3,878 with the climate fee in; no sauna,
+   *          steam or hammam; heated main pool ⇒ "Available"
+   *   NEW    Keyonna Beach — 7-night Caribbean all-inclusive, $6,785 plunge-
+   *          pool / $8,560 beachfront sanctuary, taxes in; split stay offered
+   *          ⇒ "Available"
+   *   NEW    Sublime Comporta — full package structure (Comporta Slowly, half
+   *          board €75 pp per meal, the two spas, massage menu, €310 transfer
+   *          each way) but NO room price until we send exact dates + room
+   *          ⇒ "Available", no quote yet
+   *   UPDATE Milla Montis — a modified private proposal arrived Sep 9 ("per
+   *          our wishes"); the mail body shows no dates or rate, so the hold
+   *          and the September-dated quotes stand until the link is opened
+   * Royal Isabela, Vila Planinka, Minos, Kempinski, Matca, Nayara, La Loma,
+   * Domes Zeen/Noruz and Quinta carry no new facts in this handoff and are
+   * left exactly as batch 5 wrote them. Money law as before: quotes are the
+   * resorts' figures in their currency; ≈$ sentences in the notes are
+   * arithmetic at ≈$1.16 and say "before flights" — never a price anyone
+   * quoted. The clock is fixed in the past (06:00Z Sep 9) so anything typed
+   * by hand after the handoff still wins per field. */
+  var SEED_AT_SEP9 = Date.parse('2026-09-09T06:00:00Z');
+  I.SEED_AT_SEP9 = SEED_AT_SEP9;
+
+  var SEED_SEP9 = [
+    { id: 'pnoe-breathing-life~karteros-crete-greece',   /* Pnoé Breathing Life — rank 581 */
+      fields: {
+        outreachStatus: 'replied',
+        outreachDates: 'Oct 18–25 (7 nights) confirmed for two adults — Breeze Double Deluxe with PRIVATE POOL, Complete Experience all-inclusive. €395 per room per night = €2,765 + the €15/night accommodation tax (€105) = €2,870 for the week. Reply received Sep 9',
+        outreachMeals: 'Complete Experience all-inclusive. Anasa restaurant: breakfast 07:30–10:30, lunch 12:30–15:00, dinner 18:30–21:30; Thymises Cretan à la carte dinner 18:30–21:30. Selected wines, beers and soft drinks with meals. Aeri pool bar 10:00–17:30; Cicada beach service 10:00–17:30 (the beach is ≈350 m away — free two-minute shuttle); pool/beach snacks and street food 12:00–17:00; Uranos rooftop bar 18:00–00:30. Welcome minibar on arrival — refills cost extra. In-room espresso machine, capsules replenished daily. Room service 07:30–22:30 with a €10 tray charge',
+        outreachSpa: 'Complimentary daily yoga and Pilates. ONE complimentary 10-minute Zerobody dry-flotation session OR one 10-minute hyperbaric oxygen session per stay. 15% off all spa treatments. NOT answered though asked: whether the private pool is heated (or can be), sauna / hammam / steam availability, whether general spa facilities are included, a couples-massage package, excursion packages, and pork-free / shellfish-free / gluten-free confirmation. Airport transfer Heraklion → hotel €25, paid to the driver',
+        outreachTerms: 'This rate is NON-REFUNDABLE: 100% of the stay at booking via their payment link, no free-cancellation window. That is the offer’s one real weakness',
+        outreachNotes: 'The lowest true luxury all-inclusive on the board: €2,870 ≈ $3,330 for seven nights with a private pool, three meals, drinks with meals, pool and beach bars, a rooftop bar, yoga and Pilates, adults-only — before flights. Phāea’s Garden Bungalow costs ≈€735 more for the same week and buys à la carte variety, a refilled minibar, a heated pool and refundable terms. Before paying 100% up front, get written answers on private-pool heating, the thermal facilities and the dietary needs — none of those is confirmed'
+      },
+      quotes: [
+        { label: 'Breeze Double Deluxe with private pool — Complete Experience all-inclusive', amount: 2870, currency: 'EUR', kind: 'quote', nights: 7, dates: 'Oct 18–25',
+          note: '€395/night for two + €15/night accommodation tax (€105) · non-refundable, 100% at booking' }
+      ] },
+    { id: 'phaea-cretan-malia~malia-crete-greece',   /* Phāea Cretan Malia — rank 580 */
+      fields: {
+        outreachStatus: 'replied',
+        outreachDates: 'Oct 16–23 (7 nights) recommended by the hotel for two adults, all-inclusive: Signature Bungalow Garden €500/night → €3,500 + €105 climate-resilience fee = €3,605; Bungalow Beach Front €539/night → €3,773 + €105 = €3,878 — the beachfront upgrade is €273 for the whole week. Full offer received Sep 9',
+        outreachMeals: 'Extensive all-inclusive, well beyond a buffet: Mediterraneo — buffet breakfast and dinner daily, no reservation. Mouries Cretan restaurant — à la carte breakfast 08:00–11:00 and dinner 18:30–22:00 included as often as wanted (some items carry supplements; closed Fridays; reserve). Almyra Italian — à la carte lunch 12:30–16:00 and dinner 18:30–22:00 included (supplements on some items; closed Saturdays). Mezze — lunch 12:30–16:30 included, adults-only dinner 19:00–22:00 (closed Mondays). The Crush gelateria (ice cream, crêpes, waffles, cakes) and Beach Shack snacks. Wide selection of local and international drinks. Minibar stocked on arrival AND refilled during the stay. Dietary needs CONFIRMED: pork-free and shellfish-free meals possible, gluten-free accommodated',
+        outreachSpa: 'NO sauna, steam room or hammam — the Cute Spa is treatment-led, not a bathhouse; that is the trip’s thermal-wellness gap here. Main pool heated when temperatures fall (≈27–28 °C late season). Couples rituals: Wine Harvest Ritual 90 min €140 pp (€280 for two — olive-kernel/rose exfoliation, antioxidant mask, warm sesame-oil massage); Summer Affair 70 min €130 pp (€260). Other: Minoan Princess 90 min €160; Cretan Garden Detox 90 min €140; Délos Signature Revival 70 min €130; aromatherapy massage 60/90 min €120/€150; candle massage €130/€160; deep tissue €140/€170. Packages: Day Spa €200 pp (scrub + 60-min aromatherapy + 60-min facial; €400 for two), Two-Day Spa €260 pp (€520 for two). Airport transfer Heraklion → hotel: taxi €70 each way (up to 3), minivan €115, paid at checkout; changes inside four hours charged in full',
+        outreachTerms: 'Deposit = two nights (first and last): ≈€1,000 for the Garden Bungalow, ≈€1,078 for Beach Front. Cancel or change more than 15 days before arrival: deposit refunded. Inside 14 days: the two-night deposit is forfeited. No-show: the whole stay plus tax charged',
+        outreachNotes: 'The most complete traditional-resort all-inclusive on the board: seven nights, real à la carte restaurants, lunch and dinner covered, alcohol, refilled minibar, heated pool, beach, and refundable terms — €3,605 ≈ $4,180 (Garden) or €3,878 ≈ $4,500 (Beach Front) before flights. Against Pnoé it costs ≈€735 more for the week and gives up the private pool; against Vila Planinka it has a seventh night, lunch, and a beach but no sauna. The €273 beachfront upgrade is cheap for what it is — take it if the budget holds'
+      },
+      quotes: [
+        { label: 'Signature Bungalow Garden — all-inclusive', amount: 3605, currency: 'EUR', kind: 'quote', nights: 7, dates: 'Oct 16–23',
+          note: '€500/night for two + €105 climate-resilience fee · two-night deposit, refundable to 15 days out' },
+        { label: 'Bungalow Beach Front — all-inclusive', amount: 3878, currency: 'EUR', kind: 'quote', nights: 7, dates: 'Oct 16–23',
+          note: '€539/night for two + €105 climate-resilience fee · +€273 over Garden for the week' }
+      ] },
+    { id: 'keyonna-beach-resort~johnsons-point-antigua-and-barbuda',   /* Keyonna Beach Resort — rank 587 */
+      fields: {
+        outreachStatus: 'replied',
+        outreachDates: 'Oct 14–21 (7 nights) offered as the example for two adults: Plunge Pool Cottage $6,785 total, Beachfront Sanctuary Pool Cottage $8,560 — government taxes already inside both. Keyonna also suggested a SPLIT STAY (e.g. 3 nights beachfront + 4 nights plunge-pool or sanctuary) and will price a custom 5-, 6- or 7-night combination once told our budget and whether a split is acceptable. Reply received Sep 9',
+        outreachMeals: 'True all-inclusive: all meals, snacks, beverages including top-shelf liquor, minibar restocked daily, Wi-Fi, an assigned beach bed and loungers, in-room amenities, government taxes. Dietary needs CONFIRMED: no pork, no shellfish, gluten-free. Private beach dinner $255 per couple (private beachfront setup, à la carte, dedicated waiter, champagne, taxes)',
+        outreachSpa: 'Airport transfer: private VIP arrival transfer $90 per couple, or a standard taxi ≈$36. Spa and excursion details not in this reply',
+        outreachTerms: '30% deposit ($2,035.50 on the plunge-pool cottage, $2,568 on the beachfront sanctuary). Cancellation 30 days or more before arrival: penalty-free. Inside 30 days: 30% of the reservation value',
+        outreachNotes: 'A real Caribbean all-inclusive with the dietary needs cleared, but at $6,785 for the cottage alone it takes ≈90% of the $7,500 total before flights — it only works if the fare pair is unusually cheap, the budget moves, or a split stay / shorter stay brings the lodging line down. Worth one reply with a target figure, 5–6 nights and “split stay OK” to see what they come back with'
+      },
+      quotes: [
+        { label: 'Plunge Pool Cottage — all-inclusive', amount: 6785, currency: 'USD', kind: 'quote', nights: 7, dates: 'Oct 14–21',
+          note: 'Government taxes included · 30% deposit $2,035.50' },
+        { label: 'Beachfront Sanctuary Pool Cottage — all-inclusive', amount: 8560, currency: 'USD', kind: 'quote', nights: 7, dates: 'Oct 14–21',
+          note: 'Government taxes included · 30% deposit $2,568' }
+      ] },
+    { id: 'sublime-comporta~comporta-alentejo-portugal',   /* Sublime Comporta — rank 615 */
+      fields: {
+        outreachStatus: 'replied',
+        outreachDates: 'Flexible in October, but NO room price yet: the hotel wants exact dates and a chosen room before it quotes, then issues a customised offer including the Comporta Slowly package. Rooms they recommend for a couple: Bio-Pool Suite, Cabana Room, Cabana Suite. Detailed reply received Sep 9',
+        outreachMeals: 'Comporta Slowly package: €100 resort dining credit, complimentary non-alcoholic minibar, welcome amenity. Half board €75 per person per meal — €150 a dinner for two (5 dinners €750, 6 €900, 7 €1,050): couvert, starter, main, dessert, still or sparkling water; alcohol not included. Restaurants — Terracotta wing: Sem Porta, Canalha Comporta, Food Circle (supplement); Sand wing: Beefbar Comporta, Davvero Comporta; outside the resort: Jacaré da Comporta, Sado, Sublime Comporta Beach Club. At Canalha, Food Circle and Beefbar the half board works as a €75 per-adult dining credit rather than a set meal. Whether breakfast is in the base room rate: not stated',
+        outreachSpa: 'Terracotta Spa (adults-only): heated pool, jacuzzi, sauna, Turkish bath, treatment rooms — access reserved for guests with a PRE-BOOKED massage or treatment, not open-house. Sand Wing wellness centre (more family-oriented): second heated pool, sauna, Turkish bath, cold plunge. Two gyms, Pilates studio, padel, tennis. Massages, per person: Deep Relax Balance 50 min €165 / 80 min €225 (€330 / €450 for two); Sport 50 min €190 / 80 min €240; Tailored €200 / €250; Forest Signature Ritual 80 min €260. Duo treatments in one room possible. Private Pilates 50 min €90 (€120 for two). Spa 09:00–21:00; cancellations inside 24 h charged in full. Airport transfer via their partner: €310 EACH WAY (€620 return). The activity planner they attached is a summer example — not the October schedule',
+        outreachTerms: 'Not yet stated: room rate, taxes, deposit, cancellation terms — all follow once we send dates and a room type',
+        outreachNotes: 'The strongest thermal set-up of the new replies (two heated pools, two saunas, two Turkish baths, a cold plunge) and a serious food scene, but every line is à la carte: seven half-board dinners alone are €1,050 ≈ $1,220, the transfers €620 ≈ $720, and the room is still unpriced. Send Oct 18–24 (or 16–23) and “Cabana Suite” to get the real number; judge it only when the room, breakfast and taxes are in writing'
+      },
+      quotes: [] },
+    { id: 'milla-montis~maranza-meransen-south-tyrol-italy',   /* Hotel Milla Montis — rank 17 */
+      fields: {
+        outreachDates: 'Sep 21–28 (7 nights, Mon–Mon) — THREE WEEKS BEFORE the October window, not what the trip needs. Proposal no. 3083/2026 of 5 Sep, valid subject to availability until 10 Sep. UPDATE Sep 9: Milla Montis wrote that “the customized proposal has been modified according to our wishes” — an updated private proposal is available, but the mail body shows no dates, room, rate, meals or cancellation terms. Open the link and check whether it is now on the October dates',
+        outreachNotes: 'THE DATES WERE WRONG in the first proposal: they priced 21–28 September, not October. A MODIFIED proposal arrived Sep 9 — it cannot be ranked until the link is opened, so the three September-dated quotes on this page stay as the last known figures. If the October re-quote holds at the same rates (value read at ≈$1.16, “Meals in it” = breakfast + dinner): Double Room Calm €3,276 ≈ $3,800 → all-in ≈ $5,830 with the workbook’s $1,590 fare pair and $440 of its $800 allowance; Spa Suite €3,402 ≈ $3,950 → ≈ $5,980; Spa Suite Plus €3,682 ≈ $4,280 → ≈ $6,310 — all inside the $7,500 target. The Spa Suite for €126 more than the Calm room (+€18 a night, 42 vs 32 m²) is the obvious pick'
+      },
+      quotes: [] }
+  ];
+  I.SEED_IDS_SEP9 = SEED_SEP9.map(function (r) { return r.id; });
+
   /* ---- the batches, oldest first ---------------------------------------
    * `quotePrefix` must be unique per batch: entry ids are deterministic so
    * that both laptops importing the same batch produce the same keys and the
@@ -18801,7 +19093,18 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
         'Kempinski, Matca and Nayara; Vila Planinka’s meals line restored; and four new inquiries sent Sep 8 ' +
         '(Phāea Cretan Malia, Pnoé Breathing Life, Keyonna Beach, Sublime Comporta) as “Awaiting reply”.',
       done: 'The Sep 8 handoff imported — 14 resorts updated.',
-      present: function () { return I.batchImported(SEED_SEP8, 'q-sep8-', this.window); } }
+      present: function () { return I.batchImported(SEED_SEP8, 'q-sep8-', this.window); } },
+    { key: 'sep9-handoff', at: SEED_AT_SEP9, seed: SEED_SEP9, quotePrefix: 'q-sep9-', window: RESEARCH_WINDOW,
+      short: 'Sep 9', count: 5,
+      title: 'Import the Sep 9 handoff — 5 resort updates',
+      lede: 'The Sep 9 inbox pass: Pnoé Breathing Life’s seven-night private-pool all-inclusive at €2,870 with the tax in ' +
+        '(non-refundable); Phāea Cretan Malia’s seven-night extensive all-inclusive — Garden Bungalow €3,605 or Beach Front ' +
+        '€3,878 with the climate fee in, heated pool, no sauna or hammam; Keyonna Beach’s Caribbean all-inclusive at $6,785 ' +
+        '(plunge-pool cottage) or $8,560 (beachfront sanctuary), taxes in, split stay offered; Sublime Comporta’s full ' +
+        'package structure with the room still unpriced; and word from Milla Montis that a modified proposal is waiting ' +
+        'behind its link. All four Sep 8 inquiries move from “Awaiting reply” to “Available”.',
+      done: 'The Sep 9 handoff imported — 5 resorts updated.',
+      present: function () { return I.batchImported(SEED_SEP9, 'q-sep9-', this.window); } }
   ];
   I.BATCHES = BATCHES;
 
@@ -41805,22 +42108,22 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     { name: 'responses', label: 'Responses', group: 'primary',
       title: 'Resort responses' },
     { name: 'budget', label: 'Budget Lab', group: 'labs',
-      title: 'Budget Lab',
+      title: 'Budget Lab', menuDesc: 'Model your nights, airfare, budget',
       line: 'Try nights, airfare and a trip budget, then save your scenarios.' },
     { name: 'decision', label: 'Decision Lab', group: 'labs',
-      title: 'Decision Lab',
+      title: 'Decision Lab', menuDesc: 'Weigh your priorities against the workbook',
       line: 'Your priorities, your weighted ranking, beside the workbook’s.' },
     { name: 'compare', label: 'Compare', group: 'more', tab: 'Compare', glyph: '⊞',
-      title: 'Compare',
+      title: 'Compare', menuDesc: 'Put two options side by side',
       line: 'Compare arrives in a later wave — your selections are already being kept.' },
     { name: 'changed', label: 'What Changed', group: 'more',
-      title: 'What Changed',
+      title: 'What Changed', menuDesc: 'See what changed since last visit',
       line: 'The movement digest arrives in a later wave. Until then, Home keeps the biggest movers where you can see them.' },
     { name: 'tasks', label: 'Loose ends', group: 'more',
-      title: 'Loose ends',
+      title: 'Loose ends', menuDesc: 'Unresolved checks across your shortlist',
       line: 'The full loose-ends list arrives in a later wave. Home already shows what’s still open on your shortlist.' },
     { name: 'archive', label: 'The No Pile', group: 'more',
-      title: 'The No Pile',
+      title: 'The No Pile', menuDesc: 'Rejected options, kept but archived',
       line: 'The archive arrives in a later wave — nothing you reject is ever thrown away, so it will all be here.' },
     { name: 'data', label: 'Workbook & Settings', group: 'none',
       title: 'Workbook & Settings' },
@@ -41937,18 +42240,36 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
 
     /** (re)populate the list. Exposed as `wrap._setItems` so a menu whose
      *  contents can change after it is built (the trip switcher — trips get
-     *  added/renamed) can be repainted without rebuilding the trigger button. */
+     *  added/renamed) can be repainted without rebuilding the trigger button.
+     *  Two item shapes beyond the plain link were added for the merged More▾
+     *  mega-lite panel (A-hybrid SPEC §7): `{grouplabel}` renders a plain
+     *  `<li class="navmenu__grouplabel">` (no interactive content, skipped by
+     *  the arrow-key walk below since `links()` only collects `a, button`),
+     *  and `{col:[...]}` wraps a sub-list of items (grouplabels + rows) in one
+     *  `<div class="navmenu__col">` appended directly into the `<ul>` — two
+     *  columns side by side via CSS grid on `.navmenu__list`. Every real `a`/
+     *  `button` inside a column is still found by `U.qsa('a, button', list)`
+     *  (it searches all descendants), so Esc/arrow-key/outside-click/mutual
+     *  exclusion below are unchanged and apply uniformly to every menu. */
     function setItems(nextItems) {
       U.clear(list);
-      (nextItems || []).forEach(function (item) {
-        if (item.sep) { list.appendChild(U.el('li', { class: 'navmenu__sep', role: 'separator' })); return; }
-        var li = U.el('li', { class: 'navmenu__item', dataset: item.liDataset });
-        if (item.liCurrent) li.setAttribute('aria-current', 'true');
-        li.appendChild(item.node || U.el('a', {
-          class: 'navmenu__link', href: item.href, dataset: { route: item.route || '' }
-        }, item.label));
-        list.appendChild(li);
-      });
+      (nextItems || []).forEach(function (item) { appendItem(list, item); });
+    }
+    function appendItem(host, item) {
+      if (item.sep) { host.appendChild(U.el('li', { class: 'navmenu__sep', role: 'separator' })); return; }
+      if (item.grouplabel) { host.appendChild(U.el('li', { class: 'navmenu__grouplabel', text: item.grouplabel })); return; }
+      if (item.col) {
+        var col = U.el('div', { class: 'navmenu__col' });
+        item.col.forEach(function (sub) { appendItem(col, sub); });
+        host.appendChild(col);
+        return;
+      }
+      var li = U.el('li', { class: 'navmenu__item', dataset: item.liDataset });
+      if (item.liCurrent) li.setAttribute('aria-current', 'true');
+      li.appendChild(item.node || U.el('a', {
+        class: 'navmenu__link', href: item.href, dataset: { route: item.route || '' }
+      }, item.label));
+      host.appendChild(li);
     }
     setItems(items);
     wrap._setItems = setItems;
@@ -42035,6 +42356,23 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     return base;
   }
 
+  /* REBASE 2026-09-09 — same as factsFor, but built on T.trips.labelShort (no
+     year) rather than T.trips.label, for the masthead trip chip's own meta
+     line (A-hybrid SPEC §4: the chip's name line already carries the year,
+     so its meta line drops it — "Oct 15–22 · 7 nights", not "...2026..."). A
+     dateless project has no year to drop either way, so the list-name
+     fallback (LISTS_SPEC §5) applies exactly the same as factsFor's full
+     form; only the has-dates branch differs. */
+  function factsForShort(trip) {
+    var metaFn = T.trips.labelShort || T.trips.label;
+    var base = metaFn(trip);
+    if (base === 'No dates yet') {
+      var list = listOf(trip);
+      if (list) return list.name + ' · no dates';
+    }
+    return base;
+  }
+
   function tripMenuItems() {
     var activeId = T.trips.activeId();
     var multiList = !!(T.lists && T.lists.all && T.lists.all().length > 1);
@@ -42044,16 +42382,26 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
         type: 'button', class: 'navmenu__link navmenu__link--trip', dataset: { trip: trip.id }
       });
       if (isActive) b.setAttribute('aria-current', 'true');
-      /* The list word rides quietly on the same line as the date label —
-         `.navmenu__triplabel` is already the muted, small-text line — rather
-         than adding a third line no shell CSS here has styled for. */
+      /* REBASE 2026-09-09 — both waves touched this row: A-hybrid SPEC §4
+         wants a leading "✓" on the active trip's name (inline in the name
+         line, not a trailing ::after, since `.navmenu__link--trip` stacks
+         name/dates in a column); LISTS_SPEC §5 wants the label line to name
+         the trip's own list when relevant (a dateless project shows its list
+         instead of the generic "No dates yet", and — in a mixed dropdown
+         spanning more than one list — every row's label is suffixed with its
+         list name for disambiguation). Both apply independently: the name
+         span carries the checkmark, the label span carries the list-aware
+         text. */
+      var nameChildren = isActive
+        ? [U.el('span', { class: 'check', 'aria-hidden': 'true', text: '✓' }), ' ' + trip.name]
+        : [trip.name];
       var label = factsFor(trip);
       if (multiList) {
         var list = listOf(trip);
         if (list && label.indexOf(list.name) < 0) label = label + ' · ' + list.name;
       }
       b.appendChild(U.el('span', { class: 'navmenu__triplines' }, [
-        U.el('span', { class: 'navmenu__tripname', text: trip.name }),
+        U.el('span', { class: 'navmenu__tripname' }, nameChildren),
         U.el('span', { class: 'navmenu__triplabel', text: label })
       ]));
       b.addEventListener('click', function () {
@@ -42083,8 +42431,14 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     btn.classList.add('tripbar__name', 'tripswitch');
     var labelSpan = U.qs('.navmenu__label', btn);
     U.clear(labelSpan);
+    /* A-hybrid SPEC §4 — the trip chip is ONE line: name + dates, both inside
+       the trigger button (the dates used to live in a separate sibling
+       `.tripbar__facts` element; that element is gone, and its text now
+       lives in `.tripswitch__meta`, right next to the name it qualifies). */
     nodes.tripName = U.el('span', { class: 'tripswitch__name' });
+    nodes.tripMeta = U.el('span', { class: 'tripswitch__meta' });
     labelSpan.appendChild(nodes.tripName);
+    labelSpan.appendChild(nodes.tripMeta);
     nodes.tripswitchButton = btn;
     nodes.tripMenu = menu;
     paintTripSwitch();
@@ -42096,9 +42450,26 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     var active = T.trips.active();
     var facts = factsFor(active);
     U.setText(nodes.tripName, active.name);
+    /* Orchestrator fix — the chip's own name line already carries the year
+       ("October 2026"), so its meta line drops it (labelShort: "Oct 15–22 ·
+       7 nights"); the aria-label stays the full sentence (with year) for
+       screen readers, and the trip switcher panel's rows (tripMenuItems,
+       below) keep T.trips.label()'s full form too — same as
+       paintWorkbookChip()'s visible-text-vs-aria-label split.
+       REBASE 2026-09-09 — both the meta line and the aria-label now route
+       through the LISTS_SPEC §5 dateless-project fallback (factsForShort /
+       factsFor) instead of raw T.trips.labelShort/label, so a dateless
+       wedding-venues project reads "Wedding venues · no dates" on the chip
+       itself, not just in the dropdown row. `nodes.tripFacts` (the old,
+       pre-A-hybrid sibling dates element `.tripbar__facts`) no longer exists
+       — this wave deleted it and folded its text into `.tripswitch__meta`
+       (`nodes.tripMeta`) instead, so THEIRS' own `if (nodes.tripFacts) …`
+       line is dropped rather than kept as dead code; its intent (keep the
+       visible facts text in sync) is served by the `nodes.tripMeta` line
+       below instead. */
+    if (nodes.tripMeta) U.setText(nodes.tripMeta, factsForShort(active));
     nodes.tripswitchButton.setAttribute('aria-label',
       'Switch trip — currently ' + active.name + '. ' + facts + '.');
-    if (nodes.tripFacts) U.setText(nodes.tripFacts, facts);
     if (nodes.tripMenu && nodes.tripMenu._setItems) nodes.tripMenu._setItems(tripMenuItems());
     paintHomeLinks();
   }
@@ -42142,8 +42513,32 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
    * glyphs rather than counting columns. */
   function buildMasthead() {
     var head = U.el('header', { class: 'masthead', role: 'banner' });
+    /* VERIFY 2026-09-09 finding 2 — DOM order now equals MODE-2's visual
+       left-to-right order (nameplate, trip chip + nav, search + identity +
+       gear), so `order` in 20-comp-shell.css becomes purely cosmetic instead
+       of load-bearing for Tab sequence: a keyboard user tabbing through now
+       lands on controls in the same order the eye reads them at >=1280px.
+       Previously `.masthead__global` held [nameplate, search, identity,
+       settings] and `.masthead__trip` held [tripswitch, nav] — visually
+       reordered to nameplate/trip/nav/search/identity/settings by `order`,
+       but Tab still walked the OLD DOM order (nameplate -> search ->
+       identity -> settings -> trip -> nav), diverging sharply from what was
+       on screen. Search+identity+settings move into a third wrapper,
+       `.masthead__util`, appended AFTER the trip bar; `.masthead__global`
+       now holds only the nameplate. Below 1280px the two-row VISUAL layout
+       is unchanged (nameplate+search+identity+gear on top, trip+nav below)
+       via CSS Grid `grid-template-areas: "global util" "trip trip"` in
+       20-comp-shell.css — grid areas place a box by name regardless of its
+       source position, so this costs no visual difference at any width, only
+       a DOM reorder. (Tab order below 1280px now runs nameplate -> trip
+       chip+nav -> search/identity/gear — down to row 2, then back up to the
+       rest of row 1 — rather than straight through row 1 then row 2; this
+       trade was made explicitly, per the coordinator's own prescribed fix,
+       to make DOM order the SAME encoding at every width instead of adding a
+       second, matchMedia-driven reordering mechanism.) */
     head.appendChild(buildGlobalRow());
     head.appendChild(buildTripBar());
+    head.appendChild(buildUtilRow());
     nodes.masthead = head;
     return head;
   }
@@ -42166,10 +42561,20 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
       ]));
     inner.appendChild(plate);
 
+    nodes.globalRow = inner;
+    return inner;
+  }
+
+  /** Row 3 in DOM order (`.masthead__util`) — search, identity, settings.
+   *  Split out of the old `.masthead__global` (VERIFY 2026-09-09 finding 2,
+   *  see buildMasthead()'s comment) so DOM order matches MODE-2's visual
+   *  order without a `matchMedia` reordering listener; visually it still
+   *  sits on row 1 below 1280px via `grid-template-areas`. */
+  function buildUtilRow() {
+    var inner = U.el('div', { class: 'masthead__inner masthead__util' });
+
     /* Search entry. The overlay/dropdown is the search agent's; this is the
-       always-present entry point plus an honest fallback. It also holds the
-       row open: the search is the flexible track, so the nameplate sits left
-       and the controls sit right at every width. */
+       always-present entry point plus an honest fallback. */
     inner.appendChild(buildSearch());
 
     /* Device identity (§7.4) — three states, one control. */
@@ -42178,47 +42583,58 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     /* Settings, in the open. It used to be the last item of the More menu,
        which made the one screen that owns the workbook, sync, currency and
        the trips themselves the hardest thing in the app to reach. It keeps
-       `data-route="data"` so it lights up like any other nav link. */
+       `data-route="data"` so it lights up like any other nav link.
+       A-hybrid SPEC §0/§9 — icon-only, ghost, at every width (the visible
+       "Settings" word is gone; the meaning is carried by aria-label). */
     nodes.settingsLink = U.el('a', {
       class: 'masthead__settings', href: href('data'), dataset: { route: 'data' },
       'aria-label': 'Workbook & Settings'
-    }, [
-      U.el('span', { class: 'masthead__settingsglyph', 'aria-hidden': 'true', text: '⚙' }),
-      U.el('span', { class: 'masthead__settingstext', text: 'Settings' })
-    ]);
+    }, U.el('span', { class: 'masthead__settingsglyph', 'aria-hidden': 'true', text: '⚙' }));
     inner.appendChild(nodes.settingsLink);
 
-    /* Workbook health chip (§16.1) — name, count, health glyph, links to #/data. */
-    nodes.wbChip = U.el('a', { class: 'masthead__chip', href: href('data') }, [
-      U.el('span', { class: 'masthead__chipdot', 'aria-hidden': 'true', text: '○' }),
-      U.el('span', { class: 'masthead__chiptext', text: 'Workbook' })
-    ]);
-    /* Sharing chip (82-sync.js) — are the two laptops looking at the same list?
-       The two chips stay glued into one wrapper: they are one thought ("is the
-       data here, and is it the same data as over there"), and they go
-       glyph-only together below 1024. */
-    nodes.syncChip = U.el('a', { class: 'masthead__chip masthead__chip--sync', href: href('data', [], { section: 'sync' }) }, [
-      U.el('span', { class: 'masthead__chipdot', 'aria-hidden': 'true', text: '○' }),
-      U.el('span', { class: 'masthead__chiptext', text: 'Not sharing' })
-    ]);
-    var chips = U.el('div', { class: 'masthead__chips' });
-    chips.appendChild(nodes.wbChip);
-    chips.appendChild(nodes.syncChip);
-    inner.appendChild(chips);
+    /* A-hybrid SPEC §8 — the workbook-health and sync-status chips are no
+       longer a visible row-1 chip group (that repeated a number the page
+       itself already states, diagnosis #5): `nodes.wbChip`/`nodes.syncChip`
+       are now built by buildDeviceChip() as the identity panel's two merged
+       status rows. `.masthead__chip--sync[data-sync]` still exists and is
+       still painted the same way (paintSyncChip/paintWorkbookChip, unchanged
+       below) — it just lives inside the identity menu now. */
 
-    nodes.globalRow = inner;
+    nodes.utilRow = inner;
     return inner;
+  }
+
+  /* A-hybrid SPEC §7 — one 16px inline glyph per Labs/More route, matching
+     `DEVICE_GLYPHS`'s house style (inline SVG, `stroke="currentColor"`, no
+     external asset — fact 20 holds). Copied verbatim from the pixel-verified
+     mockup (`SCRATCH/design/mock/header-a.html`). */
+  var ROUTE_GLYPHS = {
+    budget: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.2 9.5c.3.6 1 1 1.8 1 1.1 0 2-.6 2-1.5S9.1 7.5 8 7.5s-2-.5-2-1.4c0-.9.9-1.5 2-1.5.8 0 1.5.4 1.8 1"/></svg>',
+    decision: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="4" cy="4" r="1.6"/><circle cx="4" cy="12" r="1.6"/><circle cx="12" cy="8" r="1.6"/><path d="M5.4 4.6 10.6 7.4M5.4 11.4 10.6 8.6"/></svg>',
+    compare: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2.5" y="3" width="4.5" height="10" rx="1"/><rect x="9" y="3" width="4.5" height="10" rx="1"/></svg>',
+    changed: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 8a5 5 0 1 1 1.6 3.7"/><path d="M3 11.2V8h3.2"/></svg>',
+    tasks: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="2.5" width="3.4" height="3.4" rx="0.6"/><path d="M2.9 4.2l.7.7 1.4-1.5"/><path d="M7.6 4.2h6"/><rect x="2" y="10" width="3.4" height="3.4" rx="0.6"/><path d="M7.6 11.7h6"/></svg>',
+    archive: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="4" width="12" height="2.6" rx="0.6"/><path d="M3 6.6v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-6"/><path d="M6.6 9.3h2.8"/></svg>'
+  };
+
+  /** One row of the More▾ mega-lite panel: 16px glyph + bold title + a
+   *  one-line description (A-hybrid SPEC §7). */
+  function moreRow(r) {
+    var a = U.el('a', { class: 'navmenu__rowlink', href: href(r.name), dataset: { route: r.name } }, [
+      U.el('span', { class: 'navmenu__rowglyph', 'aria-hidden': 'true', html: ROUTE_GLYPHS[r.name] || '' }),
+      U.el('span', { class: 'navmenu__rowtext' }, [
+        U.el('span', { class: 'navmenu__rowtitle', text: r.label }),
+        U.el('span', { class: 'navmenu__rowdesc', text: r.menuDesc || '' })
+      ])
+    ]);
+    return { node: a };
   }
 
   /** Row 2: which trip, when it is, and where you can go inside it. */
   function buildTripBar() {
     var bar = U.el('div', { class: 'masthead__inner masthead__trip tripbar', hidden: true });
 
-    /* The facts node is created before the switcher because building the
-       switcher paints it: name and dates are one statement, painted together. */
-    nodes.tripFacts = U.el('span', { class: 'tripbar__facts' });
     bar.appendChild(buildTripSwitch());
-    bar.appendChild(nodes.tripFacts);
 
     /* The trip's sections. Same links, same `[data-route]` + aria-current
        convention and the same dropdown helper as the old `.masthead__nav` —
@@ -42232,13 +42648,16 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
       navList.appendChild(U.el('li', {}, a));
     });
 
-    var labs = dropdown('Labs', SH.ROUTES.filter(function (r) { return r.group === 'labs'; })
-      .map(function (r) { return { label: r.label, href: href(r.name), route: r.name }; }));
-    navList.appendChild(U.el('li', {}, labs));
-
-    var moreItems = SH.ROUTES.filter(function (r) { return r.group === 'more'; })
-      .map(function (r) { return { label: r.label, href: href(r.name), route: r.name }; });
-    var more = dropdown('More', moreItems, { class: 'navmenu--more' });
+    /* A-hybrid SPEC §6/§7 — Labs and More merge into ONE trigger ("More ▾"),
+       a two-column mega-lite panel (Labs | More), replacing the old separate
+       `dropdown('Labs', …)` trigger. Both groups read straight off SH.ROUTES,
+       so a route added to either group appears here with no further edit. */
+    var labsItems = SH.ROUTES.filter(function (r) { return r.group === 'labs'; }).map(moreRow);
+    var moreItems = SH.ROUTES.filter(function (r) { return r.group === 'more'; }).map(moreRow);
+    var more = dropdown('More', [
+      { col: [{ grouplabel: 'Labs' }].concat(labsItems) },
+      { col: [{ grouplabel: 'More' }].concat(moreItems) }
+    ], { class: 'navmenu--more' });
     nodes.moreMenuButton = U.qs('.navmenu__button', more);
     nodes.moreMenuDot = U.el('span', { class: 'navmenu__dot', hidden: true, 'aria-hidden': 'true', text: ' •' });
     nodes.moreMenuButton.insertBefore(nodes.moreMenuDot, U.qs('.navmenu__caret', nodes.moreMenuButton));
@@ -42263,6 +42682,14 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
       placeholder: 'Search anything', enterkeyhint: 'search'
     });
     var glass = U.el('span', { class: 'masthead__glass', 'aria-hidden': 'true', text: '⌕' });
+    /* A-hybrid SPEC §5 — the field is the trigger for T.search; the ⌘K hint is
+       new, purely advisory (the shortcut itself is unchanged — SH.onKeydown
+       below still handles ⌘K/Ctrl+K/`/`), and hides on focus (CSS
+       `:focus-within`) so real typed text never collides with it. No
+       platform-detection precedent existed anywhere else in the app, so this
+       picks the common convention: the Mac glyph on Mac, "Ctrl K" elsewhere. */
+    var isMac = /Mac|iPhone|iPad|iPod/.test((navigator.platform || navigator.userAgent || ''));
+    var searchKey = U.el('kbd', { class: 'search__key', 'aria-hidden': 'true', text: isMac ? '⌘K' : 'Ctrl K' });
 
     function handOff(source) {
       var detail = { query: input.value, source: source || 'masthead' };
@@ -42302,6 +42729,7 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     form.appendChild(label);
     form.appendChild(glass);
     form.appendChild(input);
+    form.appendChild(searchKey);
     form.appendChild(magnifier);
     nodes.searchInput = input;
     return form;
@@ -42322,7 +42750,11 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     function current() { return store.getState().ui.traveler; }
     function labelFor(v) { return v ? LABELS[v] : 'Shared'; }
 
-    var items = [null, 'solomon', 'roni'].map(function (v) {
+    /* A-hybrid SPEC §8/DOM outline — the device choices sit under their own
+       "This device" group label (mock markup: a plain `.navmenu__grouplabel`
+       `<li>`, same as the More▾ panel's "Labs"/"More" — SPEC.md's `li >
+       h3.navmenu__grouplabel` is that same class, just informally noted). */
+    var items = [{ grouplabel: 'This device' }].concat([null, 'solomon', 'roni'].map(function (v) {
       var b = U.el('button', {
         type: 'button', class: 'navmenu__link navmenu__link--choice', dataset: { traveler: v || 'shared' }
       }, labelFor(v));
@@ -42331,7 +42763,35 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
         SH.announce('This device is ' + (v ? labelFor(v) + '’s' : 'shared') + '.');
       });
       return { node: b };
-    });
+    }));
+
+    /* A-hybrid SPEC §8 — the identity panel folds the device group together
+       with ONE merged status block: a sync line and a workbook-health line,
+       each a single `a.identity__statusrow` (dot + one line of text). These
+       used to be two separate row-1 chips (`.masthead__chip`,
+       `.masthead__chip--sync`) that repeated a number the page itself
+       already states (diagnosis #5); the elements — and their class hooks —
+       persist, just relocated and merged to one line each. `nodes.wbChip`/
+       `nodes.syncChip` keep the same identity so `paintWorkbookChip()`/
+       `paintSyncChip()` (unchanged below) keep painting them exactly as
+       before: `.masthead__chipdot`/`.masthead__chiptext` children,
+       `dataset.health`/`dataset.sync` on the row itself. */
+    nodes.syncChip = U.el('a', {
+      class: 'identity__statusrow masthead__chip masthead__chip--sync',
+      href: href('data', [], { section: 'sync' })
+    }, [
+      U.el('span', { class: 'masthead__chipdot identity__statusdot', 'aria-hidden': 'true' }),
+      U.el('span', { class: 'masthead__chiptext', text: 'Not sharing' })
+    ]);
+    nodes.wbChip = U.el('a', {
+      class: 'identity__statusrow masthead__chip', href: href('data')
+    }, [
+      U.el('span', { class: 'masthead__chipdot identity__statusdot', 'aria-hidden': 'true' }),
+      U.el('span', { class: 'masthead__chiptext', text: 'Workbook' })
+    ]);
+    items.push({ sep: true });
+    items.push({ node: nodes.syncChip });
+    items.push({ node: nodes.wbChip });
 
     var menu = dropdown('Shared', items, { class: 'navmenu--device' });
     nodes.deviceLabel = U.qs('.navmenu__label', menu);
@@ -42339,6 +42799,13 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
        a 44px target: the button's aria-label carries the meaning either way. */
     U.clear(nodes.deviceLabel);
     nodes.deviceGlyph = U.el('span', { class: 'navmenu__glyph', 'aria-hidden': 'true' });
+    /* A-hybrid SPEC §8 — a corner severity dot on the identity trigger's own
+       glyph, mirroring the sync state at a glance (same four states as the
+       identity panel's sync row: ok/syncing/error/offline — SPEC §10
+       "Identity dot"). Built once, hidden until paintUserBadge() (called from
+       paintSyncChip) has a real state to show. */
+    nodes.userDot = U.el('span', { class: 'masthead__userdot', hidden: true, 'aria-hidden': 'true' });
+    nodes.deviceGlyph.appendChild(nodes.userDot);
     nodes.deviceWho = U.el('span', { class: 'navmenu__who', text: 'Shared' });
     nodes.deviceLabel.appendChild(nodes.deviceGlyph);
     nodes.deviceLabel.appendChild(nodes.deviceWho);
@@ -42363,7 +42830,12 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     var label = v === 'solomon' ? 'Solomon' : v === 'roni' ? 'Roni' : 'Shared';
     var shape = v ? 'one' : 'both';
     if (nodes.deviceGlyph && nodes.deviceGlyph.dataset.shape !== shape) {
-      nodes.deviceGlyph.innerHTML = DEVICE_GLYPHS[shape];   // trusted generated SVG
+      /* The icon is its own child span, never the whole glyph's innerHTML —
+         `.masthead__userdot` (built once in buildDeviceChip, painted by
+         paintUserBadge) is a sibling that must survive a shape repaint. */
+      if (nodes.deviceGlyphIcon) nodes.deviceGlyph.removeChild(nodes.deviceGlyphIcon);
+      nodes.deviceGlyphIcon = U.el('span', { html: DEVICE_GLYPHS[shape] });   // trusted generated SVG
+      nodes.deviceGlyph.insertBefore(nodes.deviceGlyphIcon, nodes.userDot || null);
       nodes.deviceGlyph.dataset.shape = shape;
     }
     U.setText(nodes.deviceWho, label);
@@ -42383,20 +42855,35 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     absent:   { glyph: '○', word: 'No workbook loaded' }
   };
 
+  /* A-hybrid SPEC §8 — the count fact and the health fact merge into ONE
+     line ("615 options · workbook healthy") instead of the count alone; the
+     health word gets a lowercase, in-line-context form here (the capitalised
+     `HEALTH[...].word` above is still used verbatim in the aria-label/title,
+     which read as full sentences). */
+  var HEALTH_INLINE = {
+    ok: 'workbook healthy',
+    warnings: 'workbook has notes',
+    error: 'workbook unreadable',
+    absent: 'no workbook loaded'
+  };
+
   function paintWorkbookChip() {
     if (!nodes.wbChip) return;
     var m = T.health.model();
     var w = m.workbook;
-    var h = HEALTH[w.status] || HEALTH.absent;
+    var status = w.status || 'absent';
+    var h = HEALTH[status] || HEALTH.absent;
     var name = w.name || 'No workbook';
     /* De-cramp (2026-08-31): count only up here — the filename double-truncated
        (27 chars in JS, 9rem in CSS) into noise. It stays in title/aria and on
        the Data page, which the chip links to. */
-    var text = w.recordCount ? F.plural(w.recordCount, 'option')
-             : (w.status === 'absent' ? 'No workbook' : h.word);
+    var healthInline = HEALTH_INLINE[status] || HEALTH_INLINE.absent;
+    var text = w.recordCount
+      ? F.plural(w.recordCount, 'option') + ' · ' + healthInline
+      : healthInline;
     U.setText(U.qs('.masthead__chipdot', nodes.wbChip), h.glyph);
     U.setText(U.qs('.masthead__chiptext', nodes.wbChip), text);
-    nodes.wbChip.dataset.health = w.status || 'absent';
+    nodes.wbChip.dataset.health = status;
     nodes.wbChip.setAttribute('aria-label',
       h.word + '. ' + name + ', ' + F.plural(w.recordCount || 0, 'option') +
       '. Open Workbook & Settings.');
@@ -42412,6 +42899,20 @@ window.TRIP.EMBEDDED_SNAPSHOTS['wedding-venues'] = {"envelopeVersion":1,"meta":{
     var repo = T.sync.status && T.sync.status.repo;
     nodes.syncChip.setAttribute('aria-label', 'Sharing: ' + d.word + (d.detail ? '. ' + d.detail : '') + '. Open Stay in sync.');
     nodes.syncChip.setAttribute('title', d.word + (repo ? ' — ' + repo : '') + (d.detail ? '\n' + d.detail : ''));
+    paintUserBadge(d.key);
+  }
+
+  /* A-hybrid SPEC §8/§10 — the identity trigger's corner dot mirrors the sync
+     chip's own `data-sync` key, collapsed to the same four severities the
+     states swatch documents. `off`/`idle` (nothing configured, or a plain
+     connected-but-quiet state) show no dot at all — there is nothing worth
+     flagging at a glance yet. */
+  var SYNC_SEVERITY = { ok: 'ok', syncing: 'info', pending: 'info', error: 'danger', offline: 'offline' };
+  function paintUserBadge(syncKey) {
+    if (!nodes.userDot) return;
+    var sev = SYNC_SEVERITY[syncKey];
+    if (sev) { nodes.userDot.dataset.severity = sev; nodes.userDot.hidden = false; }
+    else { nodes.userDot.hidden = true; }
   }
 
   /* ==================================================================== */
