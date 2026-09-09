@@ -1139,13 +1139,18 @@ input[type="file"]:focus-visible::file-selector-button {
  * not as an application toolbar. */
 
 /* ══ MASTHEAD ════════════════════════════════════════════════════════════ */
+/* v0.19.0 — the masthead is TWO stacked lines, not one: the app's own row
+   (nameplate, search, device, settings, health) and, under a hairline, the
+   trip bar (which trip, its dates, its sections). So this is a column; the
+   rows themselves are the flex lines, and 20-comp-shell.css lays them out. */
 .masthead {
   position: sticky;
   top: 0;
   z-index: 40;
   display: flex;
-  align-items: center;
-  gap: var(--s5);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
   min-height: var(--masthead-h);
   padding: var(--s3) 0;
   background: var(--bg);
@@ -1159,14 +1164,13 @@ input[type="file"]:focus-visible::file-selector-button {
 
 /* ─ Nameplate ─ "The Trip List", set as a periodical's nameplate rather than
    a logo: the article small and italic, the name in the display serif at full
-   WONK, and the two travellers plus the active trip on a hairline underneath.
-   The selectors are doubled (`.nameplate .nameplate__title`) so this treatment
-   wins over the shell component's generic `.masthead__title` without an
-   !important — the shell owns the masthead's layout, the design owns its
-   voice. v0.18.0 — the wrapper is a plain `div` now (a `<button>` can't live
-   inside an `<a>`), so `.nameplate` no longer needs to be a link target
-   itself; the Home link is `.nameplate__link` and the trip switcher is
-   `.nameplate__when.tripswitch`, both inside it. */
+   WONK. The selectors are doubled (`.nameplate .nameplate__title`) so this
+   treatment wins over the shell component's generic `.masthead__title`
+   without an !important — the shell owns the masthead's layout, the design
+   owns its voice. v0.19.0 — the dateline and the trip switcher moved out to
+   the trip bar (row 2), where the trip's name is the page's own headline, so
+   the nameplate is a single `<a>` again: one line, one link, to the trips
+   list. `.nameplate__sub` / `.nameplate__when` are retired with it. */
 .nameplate {
   display: grid;
   gap: 2px;
@@ -1197,70 +1201,80 @@ input[type="file"]:focus-visible::file-selector-button {
   transform: translateY(-0.06em);
 }
 .nameplate__name { font-feature-settings: "liga" 1; }
-/* The dateline. Deliberately NOT letterspaced caps — every third editorial
-   page sets its subtitle that way, and caps would also make this line wider
-   than the name it belongs to. An italic dateline is the older, quieter form,
-   and it keeps the whole lockup narrower than the masthead's nav can bear. */
-.nameplate .nameplate__sub {
-  display: flex;
-  align-items: baseline;
-  gap: 0.42em;
-  font-size: 0.6875rem;
-  font-style: italic;
-  font-weight: var(--weight-normal);
-  letter-spacing: 0.005em;
-  text-transform: none;
-  color: var(--ink-faint);
-  transition: opacity var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
-}
-.nameplate__dot { color: var(--line-strong); }
-.masthead.is-stuck .nameplate__sub { opacity: 0; height: 0; overflow: hidden; }
 @media (hover: hover) {
   .nameplate:hover .nameplate__name { color: var(--accent); }
-  .nameplate:hover .nameplate__sub { color: var(--ink-muted); }
 }
 .nameplate__link:focus-visible {
   outline: 2px solid var(--focus); outline-offset: 4px; border-radius: var(--radius-sm);
 }
 
-/* ─ Trip switcher ─ lives where the static "October 2026" dateline used to
-   sit, so it reads exactly like the rest of the subline (same italic voice,
-   same size) until you notice it is a button. `.navmenu__button`'s chip
-   styling (comp-shell.css) is overridden here by the higher-specificity
-   compound selector — no border, no pill background, no extra height. */
-.nameplate__when.tripswitch {
+/* ─ Trip name ─ the trip bar's own headline, and the trip switcher. This is
+   the page's H-level identity now: the display serif at reading-headline
+   size, with the caret it has always had trailing it. `.navmenu__button`'s
+   chip styling (comp-shell.css) is overridden here by the higher-specificity
+   compound selector — no border, no pill background, no fixed 36px height,
+   because a headline is not a control until you hover it. The old dateline
+   treatment (italic, 0.6875rem, buried in the nameplate) is exactly what
+   Solomon could not see, so nothing quiet survives here. */
+.tripbar__name.tripswitch {
   display: inline-flex;
   align-items: baseline;
-  gap: 0.3em;
+  gap: 0.32em;
   min-height: 0;
   min-width: 0;
-  padding: 1px 3px;
-  margin: -1px -3px;
+  max-width: min(24rem, 46vw);
+  padding: 2px 5px;
+  margin: -2px -5px;
   border: 0;
   border-radius: var(--radius-sm);
   background: none;
-  font: inherit;
-  font-style: italic;
-  color: inherit;
-  max-width: 11rem;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-variation-settings: var(--wonk-nameplate);
+  font-size: 1.25rem;
+  font-weight: var(--weight-semi);
+  font-style: normal;
+  letter-spacing: -0.004em;
+  line-height: 1.1;
 }
-.nameplate__when.tripswitch .navmenu__label {
+.tripbar__name.tripswitch .navmenu__label {
   display: block;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.nameplate__when.tripswitch .navmenu__caret { color: inherit; opacity: 0.6; }
-@media (hover: hover) {
-  .nameplate__when.tripswitch:hover { color: var(--accent); background: var(--surface-alt); }
+.tripbar__name.tripswitch .navmenu__caret {
+  color: var(--ink-faint);
+  font-size: 0.5em;
+  transform: translateY(-0.15em);
 }
-.nameplate__when.tripswitch[aria-expanded="true"] { color: var(--accent); background: var(--surface-alt); }
+@media (hover: hover) {
+  .tripbar__name.tripswitch:hover { color: var(--accent); background: var(--surface-alt); }
+  .tripbar__name.tripswitch:hover .navmenu__caret { color: inherit; }
+}
+.tripbar__name.tripswitch[aria-expanded="true"] { color: var(--accent); background: var(--surface-alt); }
 @media (max-width: 767px) {
-  .nameplate__when.tripswitch { max-width: 7rem; }
+  .tripbar__name.tripswitch { font-size: 1.0625rem; max-width: 58vw; }
 }
 
-.masthead__nav { display: flex; align-items: center; gap: var(--s1); flex: 1 1 auto; min-width: 0; }
+/* The dates line, in the voice the nameplate's dateline used to use: quiet,
+   italic, unemphatic — it qualifies the name beside it, it does not compete. */
+.tripbar__facts {
+  font-size: 0.75rem;
+  font-style: italic;
+  letter-spacing: 0.005em;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .tripbar__facts { font-size: 0.6875rem; }
+}
+
+.tripbar__nav { display: flex; align-items: center; gap: var(--s1); min-width: 0; }
 /* The utility cluster SHRINKS rather than pushing the page wide — the masthead
    is the one bar that has to survive 375px with a nameplate already in it. */
 .masthead__util { display: flex; align-items: center; gap: var(--s2); flex: 0 1 auto; min-width: 0; }
@@ -1298,13 +1312,11 @@ input[type="file"]:focus-visible::file-selector-button {
 .devicechip:hover { border-color: var(--line-strong); color: var(--ink); }
 
 @media (max-width: 1023px) {
-  .masthead__nav { display: none; }
   .masthead__util .search { width: auto; }
 }
 @media (max-width: 767px) {
-  .masthead { min-height: 60px; gap: var(--s3); }
+  .masthead { min-height: 60px; }
   .nameplate .nameplate__title { font-size: 1.0625rem; }
-  .nameplate .nameplate__sub { font-size: 0.625rem; }
   /* No keyboard shortcut hint on a phone, and search gives up its width first
      (mobile search lives in the view itself — UX §1.5). */
   .search__key { display: none; }
@@ -5151,10 +5163,18 @@ details[open] > .orphan__setasidesum::after,
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-/* One centre line: nameplate, nav, then a right cluster whose controls all
-   stand 36px tall with 8px between them (flex, so the cluster stays tight —
-   the old five-column grid spread them by its uniform 24px gap). */
-/* Doubled selector: 40-view-home.css cascades later and sets this row's
+/* TWO centre lines (v0.19.0, NAV_SPEC §2), each a plain flex row inside the
+   one sticky header:
+     row 1 `.masthead__global` — the app. Nameplate, search (it takes the
+       slack), device, Settings, the two health chips. Never hidden.
+     row 2 `.masthead__trip.tripbar` — the trip. Its name, its dates, its
+       sections, under a hairline. `hidden` on the trips catalog, where no one
+       trip is being looked at.
+   There is no child-count invariant any more: the five/four-column grid this
+   file used to describe is gone, so a new control in either row costs a gap,
+   not a second line. Widths are bought back by shrinking controls to glyphs
+   (the queries at the foot of this file), never by wrapping. */
+/* Doubled selectors: 40-view-home.css cascades later and sets `.masthead__inner`
    height, padding and gap for every route — the shell's own geometry has to
    out-specify it without an !important. */
 .masthead .masthead__inner {
@@ -5166,14 +5186,32 @@ details[open] > .orphan__setasidesum::after,
   gap: var(--s2);
   min-height: 64px;
 }
-.masthead.is-stuck .masthead__inner { min-height: var(--masthead-h-min); }
-.masthead__nameplate { flex: 0 0 auto; }
-.masthead__nav { flex: 1 1 auto; margin-left: var(--s5); }
+.masthead .masthead__global { min-height: 60px; }
+.masthead.is-stuck .masthead__global { min-height: var(--masthead-h-min); }
+/* Every direct child of a row stands the SAME height and is centred on the
+   row's own centre line. That is what makes each row read as one optical
+   line whatever is in it — and it is also the invariant QA can check without
+   knowing the design: two children of one row with different `offsetTop`
+   means the row wrapped. Controls keep their own inner alignment. */
+.masthead .masthead__inner > * { align-self: center; min-height: 36px; }
+@media (max-width: 1023px) {
+  .masthead .masthead__inner > * { min-height: var(--tap-min); }
+}
+.masthead__chips { display: flex; align-items: center; }
 
+/* Row 2 sits under a hairline of the same weight as the one below the whole
+   masthead — the trip bar is a second running head, not a toolbar. */
+.masthead .masthead__trip {
+  min-height: 52px;
+  gap: var(--s3);
+  border-top: var(--hair) solid var(--line-hair);
+}
+.masthead .masthead__trip[hidden] { display: none; }
+
+.masthead__nameplate { flex: 0 0 auto; }
 .masthead__nameplate {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
   text-decoration: none;
   color: var(--ink);
   line-height: var(--leading-tight);
@@ -5185,15 +5223,12 @@ details[open] > .orphan__setasidesum::after,
   font-weight: var(--weight-semi);
   letter-spacing: var(--tracking-caps);
 }
-.masthead__sub {
-  font-size: var(--text-2xs);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
 
-.masthead__nav { min-width: 0; }
-/* Never wrap: a masthead that stacks its five links into a column is worse
+/* The trip's own sections take the slack in row 2, so the name and dates sit
+   left and the nav runs out to the right edge under the chips. */
+.tripbar__nav { flex: 1 1 auto; min-width: 0; justify-content: flex-end; }
+.tripbar__facts { flex: 0 1 auto; }
+/* Never wrap: a masthead that stacks its links into a column is worse
    than one that collapses the search (see the 1199px query below). */
 /* v0.13.0 — a nav link is a 36px pill: hover fills quietly, the current page
    fills for good. The accent underline is gone; the page keeps ONE accent. */
@@ -5316,11 +5351,15 @@ details[open] > .orphan__setasidesum::after,
 .navmenu__link--trip[aria-current="true"]::after { content: "✓"; color: var(--accent); flex: none; }
 
 /* ─── SEARCH ─────────────────────────────────────────────────────────────── */
+/* The search is row 1's flexible track: it takes whatever the nameplate and
+   the right-hand controls leave, which is what keeps the nameplate hard left
+   and the chips hard right at every width without a spacer element. */
 .masthead__search {
   position: relative;
   display: flex;
   align-items: center;
-  flex: 0 0 auto;
+  flex: 1 1 10rem;
+  min-width: 0;
 }
 .masthead__glass {
   position: absolute;
@@ -5331,6 +5370,8 @@ details[open] > .orphan__setasidesum::after,
 /* v0.13.0 — a 36px inset pill, same height and hairline as its neighbours. */
 .masthead__searchfield {
   width: 16rem;
+  max-width: 100%;
+  min-width: 0;
   height: 36px;
   min-height: 36px;
   padding: 0 var(--s3) 0 var(--s6);
@@ -5363,6 +5404,38 @@ details[open] > .orphan__setasidesum::after,
 .masthead__magnifier:hover { background: var(--surface-alt); color: var(--ink); }
 @media (pointer: coarse) {
   .masthead__magnifier { width: var(--tap-min); height: var(--tap-min); }
+}
+
+/* ─── SETTINGS LINK ──────────────────────────────────────────────────────── */
+/* Same 36px ghost pill as a nav link, so row 1's right-hand cluster reads as
+   one set of controls; it is a LINK, not a chip, because it goes somewhere
+   rather than reporting a state. Below 1024 the word goes and the cog keeps a
+   full tap target, like its neighbours. */
+.masthead__settings {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 var(--s3);
+  border: var(--hair) solid transparent;
+  border-radius: var(--radius-round);
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.masthead__settings:hover { color: var(--ink); background: var(--surface-alt); }
+.masthead__settings.is-current {
+  color: var(--ink);
+  background: var(--surface-inset);
+  border-color: var(--line);
+  font-weight: var(--weight-semi);
+}
+.masthead__settingsglyph { font-size: var(--text-md); line-height: 1; }
+@media (pointer: coarse) {
+  .masthead__settings { min-height: var(--tap-min); }
 }
 
 /* ─── WORKBOOK CHIP ──────────────────────────────────────────────────────── */
@@ -5642,40 +5715,36 @@ details[open] > .orphan__setasidesum::after,
 
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
 
-/* Below 1200 the always-open search field costs more than the five nav links
-   are worth, so it collapses to a magnifier that expands over the nameplate
-   (§1.3's tablet treatment, applied by fit rather than by a fixed width — a
-   real workbook name makes the chip ~230px and 1024 no longer has the room). */
+/* Below 1200 an always-open search field costs more than it is worth, so it
+   collapses to a magnifier and reopens in place (§1.3's tablet treatment,
+   applied by fit rather than by a fixed width — a real workbook name makes
+   the chip ~230px and 1024 no longer has the room). */
 @media (max-width: 1199px) {
-  /* Five children, five columns — four made the workbook chip wrap to a second
-     row and doubled the masthead's height. */
   .masthead__inner { gap: var(--s2); }
-  .masthead__nav { margin-left: var(--s3); }
   .masthead__searchfield { width: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
   .masthead__glass { display: none; }
   .masthead__magnifier { display: inline-flex; }
+  /* Opening search expands the field IN the row rather than dropping a
+     popover: the search is row 1's flexible track now, so the room is already
+     there. The old absolute panel hung off the form's bottom edge, which
+     since v0.19.0 is the trip bar — it covered row 2 to type in. */
   .masthead.is-searching .masthead__searchfield {
-    position: absolute;
-    right: 0;
-    top: calc(100% + var(--s1));
-    width: min(22rem, 70vw);
-    padding: var(--s2) var(--s3);
+    width: auto;
+    flex: 1 1 6rem;
+    padding: 0 var(--s3);
     border: var(--hair) solid var(--line-strong);
     opacity: 1;
     pointer-events: auto;
     background: var(--surface);
-    z-index: 50;
   }
+  .masthead.is-searching .masthead__magnifier { display: none; }
 }
 
-/* Tablet (768–1023). The bottom tab bar does not exist up here, so the
-   masthead MUST keep its links — §1.3 puts the desktop masthead on a tablet
-   with the links collapsed, and 05-chrome.css (WS-D) hides `.masthead__nav`
-   below 1024 for a different masthead structure. This file cascades later and
-   restores it, buying the width back from the workbook chip: its health glyph
-   stays visible and its aria-label still carries the name and the count. */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .masthead__nav { display: block; }
+/* Tablet (768–1023). The bottom tab bar does not exist up here, so the trip
+   bar MUST keep its links; the width is bought back from the chips and the
+   device menu, which go glyph-only. Their health glyph stays visible and
+   their aria-labels still carry the name and the count. */
+@media (max-width: 1023px) {
   .masthead__chip {
     padding: var(--s2);
     min-width: var(--tap-min);
@@ -5683,57 +5752,48 @@ details[open] > .orphan__setasidesum::after,
     justify-content: center;
   }
   .masthead__chiptext { display: none; }
+  .masthead__settings {
+    padding: var(--s2);
+    min-width: var(--tap-min);
+    min-height: var(--tap-min);
+    justify-content: center;
+  }
+  .masthead__settingstext { display: none; }
   .navmenu--device .navmenu__button { min-width: var(--tap-min); justify-content: center; }
   .navmenu--device .navmenu__who { display: none; }
 }
 
-/* Phone: the tab bar takes over navigation; the masthead goes slim. */
+/* Phone: the tab bar takes over the trip's navigation; the masthead goes slim.
+   Row 1 keeps four controls — nameplate, search glyph, device, the two chips —
+   and Settings steps out, because the More sheet's "Setup" group already
+   carries it and a fifth control would put the row over 390px. Row 2 keeps
+   the two things that say WHICH trip you are in: its name and its dates. */
 @media (max-width: 767px) {
   .masthead .masthead__inner {
-    /* Four visible children (the nav is gone), so four columns — three pushed
-       the workbook chip onto a second row and cost 50px above the fold.
-       The nameplate track carries a REAL minimum: `minmax(0, 1fr)` let the
-       auto tracks take everything and collapsed it to ~5px, whose text then
-       painted straight over the three siblings (nothing overflowed the
-       viewport, so a scrollWidth check could not see it). The three trailing
-       controls go glyph-compact here to pay for that minimum. */
     padding: 0 var(--gutter);
     gap: var(--s2);
   }
-  /* The nameplate is the flexible track now that the nav is gone; it keeps a
-     REAL minimum so the three trailing controls cannot collapse it. */
+  .masthead .masthead__global { min-height: 56px; }
+  .masthead .masthead__trip { min-height: 44px; gap: var(--s2); }
+  /* The nameplate is the flexible track now that the nav has gone downstairs;
+     it keeps a REAL minimum so the trailing controls cannot collapse it.
+     `minmax(0,1fr)` once let them take everything and squashed it to ~5px,
+     whose text then painted straight over its three siblings (nothing
+     overflowed the viewport, so a scrollWidth check could not see it). */
   .masthead__nameplate { flex: 1 1 7.5rem; min-width: 7.5rem; }
-  .masthead__nav { display: none; }
-  /* The name never shrinks or truncates; the sub line gives way first.
-     v0.18.0 — the sub line now HOSTS the trip-switcher popover (`ul.navmenu__list`,
-     js__50-shell.js), so the WRAPPER itself must not clip: `overflow:hidden` here
-     used to cut the open menu down to a sliver (QA A-masthead-menu-390) and, being
-     a scroll container, drifted `scrollLeft` when the button took focus, garbling
-     the visible text. Only the plain-text piece (`.nameplate__who`) truncates now;
-     the trip name truncates on its own inside the button (05-chrome.css
-     `.nameplate__when.tripswitch`), so the row still never wraps or overflows. */
-  .masthead__nameplate { min-width: 0; }
   .masthead__nameplate .nameplate__title,
   .masthead__title { white-space: nowrap; }
-  .masthead__sub { white-space: nowrap; }
-  .nameplate__who { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .masthead__settings { display: none; }
+  /* The trip's sections live in the tab bar and the More sheet down here; the
+     trip bar keeps only the name and the dates, on one line that truncates
+     rather than wraps. */
+  .tripbar__nav { display: none; }
+  .masthead .masthead__trip .tripbar__facts { flex: 1 1 auto; }
   /* Both chips keep their 44px target and their aria-labels; only the words go.
-     Nothing is lost: Home's own sub-line names the workbook and its count. */
-  /* Compact does NOT mean small: a glyph-only control still owes 44×44 (§18.3). */
-  .masthead__chip {
-    max-width: none;
-    padding: var(--s2);
-    min-width: var(--tap-min);
-    min-height: var(--tap-min);
-    justify-content: center;
-  }
-  .masthead__chiptext { display: none; }
-  .navmenu--device .navmenu__button {
-    padding: var(--s2);
-    min-width: var(--tap-min);
-    justify-content: center;
-  }
-  .navmenu--device .navmenu__who { display: none; }
+     Nothing is lost: Home's own sub-line names the workbook and its count.
+     Compact does NOT mean small: a glyph-only control still owes 44×44 (§18.3). */
+  .masthead__chip { max-width: none; }
+  .navmenu--device .navmenu__button { padding: var(--s2); }
 
   .tabbar { display: block; }
   /* Reserve room so the bar never covers the last row of content. */
@@ -5741,8 +5801,11 @@ details[open] > .orphan__setasidesum::after,
 }
 
 /* The detail screen replaces the tab bar with its own action bar (§1.4); the
-   shell also hides it for any full-screen overlay via T.shell.hideBottomBar(). */
-.shell--bottom[data-route="trip"] .tabbar { display: none; }
+   trips catalog replaces it with the list itself, every row of which is a way
+   into a trip. The shell also hides it for any full-screen overlay via
+   T.shell.hideBottomBar(). */
+.shell--bottom[data-route="trip"] .tabbar,
+.shell--bottom[data-route="trips"] .tabbar { display: none; }
 
 /* A sheet is modal: the page behind it does not scroll. */
 .has-sheet { overflow: hidden; }
@@ -9081,6 +9144,250 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .masthead__chip[data-sync="error"] .masthead__chipdot   { color: var(--danger); }
 .masthead__chip[data-sync="off"] .masthead__chipdot,
 .masthead__chip[data-sync="idle"] .masthead__chipdot    { color: var(--ink-faint); }
+/* ==== src/css/40-view-trips.css ==== */
+/* 40-view-trips.css — THE TRIPS CATALOG (#/trips). OWNER: WS-B.
+ *
+ * Pairs with 20-view-trips.js (NAV_SPEC §3). Home's language, one surface:
+ * every trip is the same card, the accent appears once (the "New trip"
+ * button), and nothing on the page prints a figure a second time. Structure
+ * and rhythm only; every value is a WS-D token.
+ *
+ * The card is a stretched link (`.tripcard__open::after` covers the card, the
+ * same pattern as 06-card.css) so the whole surface opens the trip without a
+ * single nested interactive element. The two card actions and the archive
+ * confirmation are lifted above it with `position: relative; z-index: 1`.
+ */
+
+.view--trips {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--s6) var(--gutter) var(--s8);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s5);
+  align-content: start;
+}
+
+/* ─── HEADER ─────────────────────────────────────────────────────────────── */
+.trips__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s3) var(--s5);
+}
+.trips__headmain { display: grid; gap: var(--s2); min-width: 0; }
+.trips__title {
+  font-size: var(--text-2xl);
+  font-variation-settings: var(--wonk-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+.trips__lede {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: var(--text-md);
+  max-width: var(--measure);
+}
+.trips__new { flex: 0 0 auto; }
+
+/* ─── THE DRAWER ─────────────────────────────────────────────────────────
+   One form, in a closed drawer. The disclosure's own summary is never shown:
+   the primary button above is the single control that opens and closes it,
+   so the page keeps one control per fact. */
+/* Scoped to this view: the Data page hosts the SAME drawer and there the
+   summary is its only handle. */
+.view--trips .trips__drawer > .trips__drawersum { display: none; }
+.view--trips .trips__drawer:not([open]) { display: none; }
+.view--trips .trips__drawer[open] {
+  max-width: min(100%, 34rem);
+  padding: var(--s5);
+  background: var(--surface);
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+/* The form is already laid out by 38-view-data.css (.trip__form and friends);
+   only its top margin belongs to this host. */
+.view--trips .trips__drawer > .trip__form { margin-top: 0; }
+
+/* ─── THE GRID OF TRIP CARDS ─────────────────────────────────────────────── */
+.trips__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: var(--s4);
+}
+.trips__cell { min-width: 0; display: flex; }
+.trips__empty { margin: 0; color: var(--ink-muted); font-size: var(--text-md); }
+
+.tripcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--surface);
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--dur-2) var(--ease-out),
+              border-color var(--dur-2) var(--ease-out),
+              transform var(--dur-2) var(--ease-out);
+}
+@media (hover: hover) {
+  .tripcard:hover { box-shadow: var(--shadow-md); border-color: var(--line-hair); transform: translateY(-1px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tripcard { transition: none; }
+  .tripcard:hover { transform: none; }
+}
+/* The trip you are on is stated, not shouted: a hairline rule and one word. */
+.tripcard--active { border-color: var(--line-strong); }
+
+.tripcard__art {
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--art-paper);
+  border-bottom: var(--hair) solid var(--line);
+}
+.tripcard__art svg { display: block; width: 100%; height: 100%; }
+
+.tripcard__body {
+  display: grid;
+  gap: var(--s1);
+  padding: var(--s4);
+  min-width: 0;
+}
+.tripcard__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2);
+  min-width: 0;
+}
+.tripcard__name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+  line-height: var(--leading-tight);
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.tripcard__open { color: var(--ink); text-decoration: none; }
+.tripcard__open::after { content: ""; position: absolute; inset: 0; }
+.tripcard:hover .tripcard__open { text-decoration: underline; text-underline-offset: 0.15em; }
+/* The stretched link has no box of its own to ring, so the card wears it. */
+.tripcard:has(.tripcard__open:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.tripcard__open:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.tripcard__current {
+  flex: 0 0 auto;
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: var(--weight-medium);
+}
+.tripcard__when,
+.tripcard__budget,
+.tripcard__funnel,
+.tripcard__activity {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+.tripcard__budget { font-variant-numeric: tabular-nums; }
+.tripcard__funnel { color: var(--ink); }
+.tripcard__activity { font-size: var(--text-xs); color: var(--ink-faint); }
+
+.tripcard__acts {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: auto;
+  padding: var(--s2) var(--s4) var(--s4);
+}
+.tripcard__confirm {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--s2);
+  justify-items: start;
+  padding: var(--s3) var(--s4) var(--s4);
+  border-top: var(--hair) solid var(--line);
+  background: var(--surface-alt);
+}
+.tripcard__confirmtext { margin: 0; font-size: var(--text-sm); color: var(--ink-muted); }
+.tripcard__confirm > .btn { display: inline-flex; }
+
+/* 20-comp-shell.css paints every `.btn--quiet` in the accent and flushes its
+   left padding — right for a link in the chrome, wrong here: this page spends
+   the accent once, on "New trip". The detail view already makes the same
+   correction for its own utility row (31-view-detail.css §45). */
+.view--trips .btn--quiet {
+  color: var(--ink-muted);
+  padding-left: var(--s3);
+  padding-right: var(--s3);
+  text-decoration: none;
+}
+.view--trips .btn--quiet:hover {
+  color: var(--ink);
+  background: var(--surface-alt);
+  border-color: var(--line);
+  text-decoration: none;
+}
+
+/* ─── ARCHIVED ───────────────────────────────────────────────────────────── */
+.trips__archived { font-size: var(--text-sm); }
+.trips__archivedsum {
+  min-height: 30px;
+  cursor: pointer;
+  color: var(--ink-muted);
+}
+.trips__archlist { display: grid; gap: var(--s1); padding-top: var(--s2); }
+.triparch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  padding: var(--s2) 0;
+  border-top: var(--hair) solid var(--line);
+}
+.triparch__name { font-size: var(--text-sm); color: var(--ink-muted); }
+
+/* ─── THE DATA PAGE'S POINTER BACK HERE ──────────────────────────────────
+   The Trips section on #/data is where a trip's settings are changed; the
+   catalog is where they are seen. One quiet line joins the two (the rule
+   lives with the catalog so the Data page's own sheet stays untouched). */
+.trips__manage { margin: var(--s3) 0 0; font-size: var(--text-sm); color: var(--ink-muted); }
+
+/* ─── NARROW ─────────────────────────────────────────────────────────────── */
+@media (max-width: 599px) {
+  .view--trips { padding-top: var(--s5); gap: var(--s4); }
+  .trips__head { align-items: flex-start; }
+  .trips__new { width: 100%; justify-content: center; }
+  .trips__grid { grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+}
+@media (min-width: 768px) {
+  .view--trips { gap: var(--s6); }
+  .trips__title { font-size: var(--text-3xl); }
+}
+@media (min-width: 1024px) {
+  .view--trips { padding-top: var(--s7); }
+}
 /* ==== src/css/40-view-home.css ==== */
 /* 40-view-home.css — HOME (screen S1). OWNER: IMPL-1 (pairs with 20-view-home.js).
  *
@@ -9114,10 +9421,8 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   max-width: 26ch;
   text-wrap: balance;
 }
-/* The trip line (dates · nights) is sub-copy, exactly like the status line
-   beside it — same size, same muted ink, same tabular figures. */
-.home__sub,
-.home__tripline {
+/* Sub-copy under the headline — the status line. */
+.home__sub {
   color: var(--ink-muted);
   font-size: var(--text-md);
   font-variant-numeric: tabular-nums;
@@ -9693,7 +9998,7 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .view--home { max-width: 1200px; padding-top: 2.5rem; gap: 2.75rem; }
 .home__masthead { gap: .5rem; padding: 0; }
 .home__headline { font-size: clamp(1.75rem, 3vw, 2.4rem); }
-.home__sub, .home__tripline { font-size: .875rem; }
+.home__sub { font-size: .875rem; }
 .home .panel { border-radius: 1rem; box-shadow: none; }
 .home .panel__title { font-size: 1.125rem; letter-spacing: -.02em; text-transform: none; color: var(--ink); }
 .home .panel__head { margin-bottom: 1rem; }
@@ -9808,17 +10113,7 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .view--home { padding-top: 1.5rem; gap: 1.5rem; }
 .home__masthead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .5rem 1.5rem; }
 .home__headline { font-size: clamp(1.4rem, 2.2vw, 1.8rem); max-width: none; }
-.home__sub, .home__tripline { font-size: .875rem; }
-/* From 768px up the masthead is a two-ended `space-between` row (headline
-   left, status line right). The trip line is a third child, so it takes the
-   whole width and drops to its own line instead of pushing those two apart.
-   Below 768px the masthead is a grid again and source order already reads
-   headline → trip line → status, so neither rule applies there. */
-@media (min-width: 768px) {
-  /* `max-width` is the prose measure every <p> inherits from the base sheet;
-     it would cap the basis below and leave the line sharing the row. */
-  .home__tripline { flex-basis: 100%; max-width: none; order: 1; }
-}
+.home__sub { font-size: .875rem; }
 .home .panel--locations .panel__head { align-items: center; gap: .75rem; margin-bottom: .75rem; }
 .home .panel--locations .panel__title { font-size: 1.125rem; }
 .locationflow__toolbar { margin: 0; justify-content: flex-end; gap: .5rem; }
@@ -10425,7 +10720,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 (function (T) {
   'use strict';
 
-  T.version = '0.18.1';
+  T.version = '0.19.0';
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 2;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs)
@@ -12509,6 +12804,62 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   /** version() — bumped by every trips upsert/delete and every setActive. */
   TR.version = function () { return P.tripsVersion(); };
 
+  /* ---- what a trip has actually decided (NAV_SPEC §3) ------------------- */
+  /* The catalog has to say, in one line, how far each trip has got — and it
+     has to say it about EVERY trip while you are standing on one of them. So
+     this reads the RAW sub-records (`records[id].trips[tripId]`) rather than
+     the facade `P.get`, which is always the active trip's, and it never
+     switches the active trip to look. A row that the workbook no longer lists
+     is not counted: the decision survives as planning state (nothing is ever
+     deleted) but it is not a hotel you can still book.
+     Memoized on P.version() + the trip id + how many rows research holds —
+     the two things that can change the answer. */
+  var STAT_MEMO = Object.create(null);
+  var STAT_KEYS = ['interested', 'shortlist', 'finalist', 'rejected'];
+
+  function emptyStats(id) {
+    return { id: id, interested: 0, shortlist: 0, finalist: 0, rejected: 0,
+      booked: [], favorites: 0, decided: 0, lastAt: null };
+  }
+
+  TR.stats = function (id, st) {
+    var s = appState(st);
+    if (!id) return emptyStats(id);
+    var recs = (s.planning && s.planning.records) || {};
+    /* appState() can hand back a planning-only state (a caller passing
+       `state.planning`); the workbook side always comes from the store. */
+    if (!s.research) s = { planning: s.planning, research: store.getState().research };
+    var byId = s.research && s.research.byId;
+    var rcount = byId && typeof byId.size === 'number' ? byId.size
+      : ((s.research && s.research.records) || []).length;
+    var key = P.version() + '|' + id + '|' + rcount;
+    var hit = STAT_MEMO[key];
+    if (hit && hit[id]) return hit[id];
+    if (!hit) { STAT_MEMO = Object.create(null); hit = STAT_MEMO[key] = Object.create(null); }
+
+    var out = emptyStats(id);
+    Object.keys(recs).forEach(function (rid) {
+      var rec = recs[rid];
+      var sub = rec && rec.trips && rec.trips[id];
+      if (!sub) return;
+      /* Only rows the live workbook still lists. */
+      var research = byId && byId.get ? byId.get(rid) : null;
+      if (!research) return;
+      if (sub.updatedAt && (out.lastAt == null || sub.updatedAt > out.lastAt)) out.lastAt = sub.updatedAt;
+      if (sub.favorite) out.favorites++;
+      var stat = sub.status;
+      if (stat === 'booked') {
+        var f = research.f || {};
+        var nm = f.hotel == null || f.hotel === '' ? rid : String(f.hotel).trim();
+        out.booked.push(nm || rid);
+      } else if (STAT_KEYS.indexOf(stat) >= 0) out[stat]++;
+    });
+    out.booked.sort(function (a, b) { return a < b ? -1 : (a > b ? 1 : 0); });
+    out.decided = out.interested + out.shortlist + out.finalist + out.rejected + out.booked.length;
+    hit[id] = out;
+    return out;
+  };
+
   /** The id a newly created trip gets from its name. `trips/upsert` also
       publishes the id it actually wrote as TR.lastUpsertId, which is what the
       Data page reads before dispatching `trips/setActive`. */
@@ -13935,23 +14286,34 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
  * parallel without touching a shared file.
  *
  * Route grammar:  #/<name>[/<param>][?<k>=<v>&...]
- *   #/                       -> Home (the default route renders as a bare '#/')
+ *   #/                       -> the trips catalog (the default route)
+ *   #/trips                  -> the trips catalog
+ *   #/trips/<tripId>         -> that trip's HOME (see "trip home" below)
  *   #/explore?status=shortlist
  *   #/trip/<stableId>
  *   #/compare?ids=a,b,c
- * The authoritative screen/route map is docs/UX_SPEC.md §1.2.
+ * The authoritative screen/route map is docs/UX_SPEC.md §1.2 + NAV_SPEC §1.
  * Stable ids contain "~" and "-" but never "/" or "?", so they are safe as a
  * single path segment once encodeURIComponent'd.
+ *
+ * TRIP HOME (v0.19.0). `#/trips/<id>` is a URL the router resolves in two
+ * steps: it makes <id> the active trip (a plain `trips/setActive` when it is
+ * not already), then it renders the EXISTING `home` view in place — same view
+ * def, same `class="view view--home" data-view="home"` section, plus a
+ * `data-trip` attribute. The view is handed a route object that says
+ * `name:'home'`, so nothing inside Home has to know the URL changed shape;
+ * the URL itself is never rewritten, so the address bar keeps naming the trip.
+ * `#/home` is the same rendering path with no id — the active trip's home.
  */
 (function (T) {
   'use strict';
   var store = T.store;
   var R = T.router = {};
 
-  /* Route names are owned by docs/UX_SPEC.md (WS-C). The default route is
-     rendered as a bare '#/' so Home has the clean URL that spec asks for. */
-  R.DEFAULT = 'home';
-  R.FALLBACK = 'home';
+  /* Route names are owned by docs/UX_SPEC.md (WS-C). v0.19.0 — the front door
+     is the trips catalog, not a trip: '#/' opens the list you choose from. */
+  R.DEFAULT = 'trips';
+  R.FALLBACK = 'trips';
 
   R.parse = function (hash) {
     var h = String(hash || '').replace(/^#/, '');
@@ -13974,9 +14336,23 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     return { name: segs[0] || R.DEFAULT, params: segs.slice(1), query: query, raw: hash };
   };
 
+  /** The active trip's id, defensively: 05b-trips.js is parsed before this
+   *  file, but `build('home')` can be called from a module's parse-time code
+   *  before the store has any planning state. */
+  function activeTripId() {
+    try { return (T.trips && T.trips.activeId && T.trips.activeId()) || null; }
+    catch (e) { return null; }
+  }
+
   R.build = function (name, params, query) {
+    /* 'home' is an ALIAS, not a URL. Every `href('home')` in the app — the nav
+       link, the tab bar, "Back to Home" — resolves to the active trip's own
+       address, so a copied link still means that trip tomorrow. */
+    if (name === 'home') {
+      var id = activeTripId();
+      if (id) return R.build('trips', [id], query);
+    }
     var p = (params || []).map(encodeURIComponent).join('/');
-    if (name === R.DEFAULT && !p && (!query || !Object.keys(query).length)) return '#/';
     var q = query ? Object.keys(query).filter(function (k) { return query[k] != null && query[k] !== ''; })
       .map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(query[k]); }).join('&') : '';
     return '#/' + name + (p ? '/' + p : '') + (q ? '?' + q : '');
@@ -13995,15 +14371,44 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
   /* ---- view lifecycle --------------------------------------------------- */
   var mountEl = null;
-  var current = null;          // {name, def, el, route}
+  var current = null;          // {name, tripId, def, el, route}
   var unsub = null;
 
   R.mountPoint = function (el) { mountEl = el; return R; };
 
+  /**
+   * resolve(route) — turn a parsed URL into what actually gets mounted.
+   * Returns {name, tripId, route} where `route` is the object the VIEW sees,
+   * or {redirect:'trips'} when the URL names a trip that is not there any more.
+   * Only `#/trips/<id>` is rewritten; every other route passes straight through.
+   */
+  function resolve(route) {
+    if (route.name !== 'trips' || !route.params[0]) {
+      return { name: route.name, tripId: null, route: route };
+    }
+    var id = String(route.params[0]);
+    var trip = T.trips && T.trips.get ? T.trips.get(id) : null;
+    if (!trip) {
+      T.diag.note('router', 'no trip "' + id + '" — opening the trips list instead');
+      return { redirect: true };
+    }
+    if (T.trips.activeId() !== id) store.dispatch('trips/setActive', { id: id });
+    /* The view is told it is Home, because it is: same def, same section, same
+       mount/update logic. The URL keeps saying which trip, and is not touched. */
+    return {
+      name: 'home',
+      tripId: id,
+      route: { name: 'home', params: [], query: route.query, raw: route.raw, tripId: id }
+    };
+  }
+
   R.render = function () {
     if (!mountEl) return;
-    var route = R.parse(window.location.hash);
-    var def = T.views.get(route.name);
+    var parsed = R.parse(window.location.hash);
+    var hit = resolve(parsed);
+    if (hit.redirect) return R.replace(R.FALLBACK);
+    var route = hit.route;
+    var def = T.views.get(hit.name);
     if (!def) {
       if (route.name !== R.FALLBACK && T.views.has(R.FALLBACK)) {
         T.diag.note('router', 'unknown route "' + route.name + '"; falling back');
@@ -14016,14 +14421,20 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       return;
     }
 
-    var sameView = current && current.name === route.name;
-    store.dispatch('ui/set', { route: route });
+    /* A different trip is a different screen, even though the view name and
+       the section element are identical — Home must be torn down and rebuilt,
+       not `update`d, or a stale trip's cards would be patched in place. */
+    var sameView = current && current.name === hit.name && current.tripId === hit.tripId;
+    /* The STORE gets the URL as parsed, params and all: the shell decides the
+       trip bar's visibility from `route.name === 'trips' && !params[0]`, which
+       only the un-rewritten route can answer. */
+    store.dispatch('ui/set', { route: parsed });
 
     if (sameView) {
       current.route = route;
       if (def.update) {
         try { def.update(current.el, { route: route, changed: new Set(['route']) }); }
-        catch (e) { R.fail(route.name, e); }
+        catch (e) { R.fail(hit.name, e); }
       }
       return;
     }
@@ -14037,24 +14448,27 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     }
 
     var el = T.util.el('section', {
-      class: 'view view--' + route.name,
-      dataset: { view: route.name },
+      class: 'view view--' + hit.name,
+      dataset: { view: hit.name },
       tabindex: '-1'
     });
+    /* Which trip this screen is about, for CSS, for e2e, and for anyone
+       reading the DOM. Home always carries it; the catalog never does. */
+    if (hit.name === 'home') el.dataset.trip = hit.tripId || activeTripId() || '';
     mountEl.appendChild(el);
-    current = { name: route.name, def: def, el: el, route: route };
+    current = { name: hit.name, tripId: hit.tripId, def: def, el: el, route: route };
 
     try {
       def.mount(el, { route: route, store: store });
-    } catch (e) { return R.fail(route.name, e); }
+    } catch (e) { return R.fail(hit.name, e); }
 
     /* One subscription per mounted view; the view decides what to redraw. */
     if (def.update) {
       unsub = store.subscribe(function (state, changed) {
-        if (!current || current.name !== route.name) return;
+        if (!current || current.name !== hit.name) return;
         try { def.update(current.el, { route: current.route, changed: changed, state: state }); }
-        catch (e) { T.diag.note('view', 'update ' + route.name + ': ' + ((e && e.message) || e)); }
-      }, { id: 'view:' + route.name });
+        catch (e) { T.diag.note('view', 'update ' + hit.name + ': ' + ((e && e.message) || e)); }
+      }, { id: 'view:' + hit.name });
     }
 
     if (def.title) { try { document.title = def.title; } catch (e) {} }
@@ -14103,7 +14517,13 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     return R;
   };
 
+  /** currentName() answers with the name of the view actually on screen, so
+   *  `#/trips/<id>` reports 'home' — which is what every `[data-route]`
+   *  aria-current, tab-bar highlight and title lookup means by it. */
   R.currentName = function () { return current && current.name; };
+  /** currentTripId() — the trip named in the URL, or null on every other
+   *  route (including `#/home`, which follows the active trip instead). */
+  R.currentTripId = function () { return (current && current.tripId) || null; };
 })(window.TRIP);
 /* ==== src/js/10-artwork.js ==== */
 /* 10-artwork.js — generative destination artwork + the icon set.
@@ -17543,7 +17963,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
    *  accepted or dismissed here, and not already in planning by either of them. */
   I.pending = function () {
     var p = I.prefs.read();
+    /* A batch is evidence for ONE date window. Offer it only while the active
+       trip is on that window — October replies have nothing to say on a
+       December trip's home (v0.19.0). */
+    var activeWindow = (T.trips && T.trips.active) ? T.trips.active().windowKey : null;
     return BATCHES.filter(function (batch) {
+      if (batch.window && activeWindow && batch.window !== activeWindow) return false;
       var f = flagsFor(p, batch);
       if (f.acceptedAt || f.dismissedAt) return false;   // rule: once only, per batch
       var present = false;
@@ -18791,6 +19216,387 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   };
 })(window.TRIP);
 
+/* ==== src/js/20-view-trips.js ==== */
+/* 20-view-trips.js — THE TRIPS CATALOG (#/trips). OWNER: WS-B (NAV_SPEC §1, §3).
+ *
+ * v0.18.0 put the trip switcher in the masthead's subline and Solomon's verdict
+ * was "not clear in the slightest". So the front door became a page: `#/trips`
+ * is the default route, it lists the trips as cards, and `#/trips/<id>` is that
+ * trip's home. Everything else in the app stays a global route acting on the
+ * active trip.
+ *
+ * This file paints and dispatches; it computes nothing. `T.trips` (05b-trips.js)
+ * owns the reads and the three actions, `T.trips.stats` owns the funnel counts,
+ * and `T.tripForm` (36-comp-tripform.js) owns the one form — the same form, with
+ * the same ids, that the Data page's Trips section uses.
+ *
+ * The card's whole surface opens the trip, using the stretched-link pattern the
+ * Explore cards already use (`.tripcard__name a::after { inset: 0 }`): one real
+ * link, no nested interactive elements, and the two card actions simply sit
+ * above it. Solomon's taste, applied: one surface style (the card), the accent
+ * only on "New trip", no figure printed twice, the archived disclosure hides
+ * itself at zero, and the form lives in a closed drawer.
+ */
+(function (T) {
+  'use strict';
+  var U = T.util, F = T.fmt, store = T.store;
+
+  /* `trips/delete` tombstones an entry and a tombstone may not carry the trip's
+     fields. What we archived in THIS session is remembered so "Restore" puts
+     the name and dates back verbatim; after a reload we fall back to whatever
+     the tombstone kept, then to the id itself. (Same stopgap as the Data page —
+     the two pages keep their own memo rather than share a mutable global.) */
+  var ARCHIVE_MEMO = Object.create(null);
+
+  /* Every read goes through T.trips and is wrapped: this page must still paint
+     if that module ever throws. */
+  function TR() { return T.trips || null; }
+  function liveTrips() {
+    var tr = TR();
+    try { return (tr && tr.all ? tr.all() : []) || []; } catch (e) { return []; }
+  }
+  function activeTripId() {
+    var tr = TR();
+    try { return tr && tr.activeId ? tr.activeId() : null; } catch (e) { return null; }
+  }
+  function tripById(id) {
+    var tr = TR();
+    try { return tr && tr.get ? tr.get(id) : null; } catch (e) { return null; }
+  }
+  function tripLabel(t) {
+    var tr = TR();
+    try { if (tr && tr.label) return tr.label(t); } catch (e) {}
+    return 'No dates yet';
+  }
+  function isResearchWindow(t) {
+    var tr = TR();
+    try { return tr && tr.isResearchWindow ? !!tr.isResearchWindow(t) : true; } catch (e) { return true; }
+  }
+  function statsOf(id) {
+    var tr = TR();
+    try { if (tr && tr.stats) return tr.stats(id); } catch (e) {}
+    return { interested: 0, shortlist: 0, finalist: 0, rejected: 0, booked: [], favorites: 0, lastAt: null };
+  }
+  function archivedTrips() {
+    var tr = TR();
+    try { if (tr && tr.archived) return tr.archived() || []; } catch (e) {}
+    var s = store.getState();
+    var bag = (s.planning && s.planning.global && s.planning.global.trips) || {}, out = [];
+    Object.keys(bag).forEach(function (id) { if (bag[id] && bag[id].deleted) out.push(bag[id]); });
+    out.sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
+    return out;
+  }
+  function titleize(id) {
+    return String(id || '').split('-').map(function (w) {
+      return w ? w.charAt(0).toUpperCase() + w.slice(1) : w;
+    }).join(' ').trim();
+  }
+  /** The workbook's own whole-trip figure — the budget a trip on the workbook's
+      own dates is measured against when it has set none of its own. */
+  function workbookFigure() {
+    var s = store.getState();
+    var env = s.research && s.research.envelope;
+    var c = env && env.meta && env.meta.constants && env.meta.constants.budgetTotal;
+    return c && c.value != null && isFinite(c.value) ? Number(c.value) : null;
+  }
+  /* Budgets are typed, stored and shown in USD; the display currency is a
+     reading aid for prices, never for the figure you set yourself. */
+  function usd(v) { return F.money(v, { convert: false }); }
+
+  /** The link to a trip's home. S1 teaches the router `#/trips/<id>`; until
+      that lands (and if it ever regresses) the literal hash is the same. */
+  function tripHref(id) {
+    try {
+      var h = T.router.build('trips', [id]);
+      if (h && h.indexOf('#/trips/') === 0) return h;
+    } catch (e) {}
+    return '#/trips/' + encodeURIComponent(id);
+  }
+  function goTrip(id) {
+    try { T.router.go('trips', [id]); return; } catch (e) {}
+    try { window.location.hash = tripHref(id); } catch (e2) {}
+  }
+
+  /* ---- the plate --------------------------------------------------------
+     A trip's picture is the hotel it has actually decided on: the booked one,
+     else one it has favourited. With nothing decided yet the plate is drawn
+     from the trip itself — decorative artwork, never a photograph of a place
+     nobody has chosen. */
+  function faceRow(id) {
+    var s = store.getState();
+    var recs = (s.planning && s.planning.records) || {};
+    var byId = s.research && s.research.byId;
+    if (!byId || !byId.get) return null;
+    var booked = null, fav = null;
+    Object.keys(recs).forEach(function (rid) {
+      var sub = recs[rid] && recs[rid].trips && recs[rid].trips[id];
+      if (!sub) return;
+      var rec = byId.get(rid);
+      if (!rec) return;
+      if (sub.status === 'booked' && !booked) booked = { id: rid, rec: rec };
+      else if (sub.favorite && !fav) fav = { id: rid, rec: rec };
+    });
+    return booked || fav || null;
+  }
+
+  function plate(host, trip) {
+    var row = faceRow(trip.id);
+    var rec = row ? row.rec : { id: 'trip:' + trip.id, f: { hotel: trip.name } };
+    try { host.innerHTML = T.artwork.render(rec, { w: 320, h: 180, variant: 'thumb' }); }
+    catch (e) { T.diag.note('trips', 'artwork failed for ' + trip.id); }
+    if (row && T.photos) T.photos.attach(host, row, { lazy: true, size: 'card' });
+  }
+
+  /* ---- the one-line funnel ---------------------------------------------- */
+  function funnelWords(st) {
+    var parts = [];
+    if (st.interested) parts.push(F.num(st.interested) + ' interested');
+    if (st.shortlist) parts.push(F.num(st.shortlist) + ' shortlisted');
+    if (st.finalist) parts.push(F.plural(st.finalist, 'finalist'));
+    if (st.booked && st.booked.length) parts.push('booked: ' + st.booked.join(', '));
+    if (!parts.length && st.rejected) parts.push(F.num(st.rejected) + ' set aside');
+    if (!parts.length) return 'Nothing marked yet';
+    return parts.join(' · ');
+  }
+
+  function budgetWords(t) {
+    var wb = workbookFigure();
+    if (t.budget != null) return usd(t.budget);
+    if (isResearchWindow(t) && wb != null) return usd(wb) + ' · workbook';
+    return 'No budget yet';
+  }
+
+  /* ===================================================================== */
+  /* The view                                                              */
+  /* ===================================================================== */
+
+  T.views.register('trips', {
+    title: 'The Trip List',
+
+    mount: function (el, ctx) {
+      el.classList.add('trips');
+
+      /* ---- header: what this page is, and the one primary action ------ */
+      var head = U.el('header', { class: 'trips__head' });
+      var headMain = U.el('div', { class: 'trips__headmain' });
+      headMain.appendChild(U.el('h1', { class: 'trips__title', text: 'Your trips' }));
+      headMain.appendChild(U.el('p', { class: 'trips__lede', text:
+        'Opinions about a place are shared; each trip keeps its own shortlist, quotes and budget.' }));
+      head.appendChild(headMain);
+
+      var newBtn = U.el('button', { type: 'button', class: 'btn btn--primary trips__new',
+        'aria-expanded': 'false', 'aria-controls': 'trips-drawer', text: 'New trip' });
+      head.appendChild(newBtn);
+      el.appendChild(head);
+
+      /* ---- the drawer: ONE form, closed, opened by the one button ------
+         The disclosure's summary is present for structure but never shown —
+         the primary button above is the only control, so the page keeps one
+         control per fact. */
+      var drawer = U.el('details', { class: 'trips__drawer', id: 'trips-drawer' });
+      var drawerSum = U.el('summary', { class: 'trips__drawersum', text: 'New trip' });
+      drawer.appendChild(drawerSum);
+      el.appendChild(drawer);
+
+      var form = T.tripForm.build({
+        host: drawer,
+        onDone: function (id, isNew) {
+          paint();
+          syncDrawerBtn();
+          if (isNew) goTrip(id);
+        },
+        onCancel: function () { syncDrawerBtn(); try { newBtn.focus(); } catch (e) {} },
+        onLabel: function (text) { U.setText(drawerSum, text); }
+      });
+      drawer.appendChild(form);
+      el._form = form;
+
+      /* One primary action on screen at a time: while the drawer is open the
+         form's own "Create trip" / "Save changes" is it, so this button steps
+         aside rather than sit next to it in the same accent. */
+      function syncDrawerBtn() {
+        newBtn.setAttribute('aria-expanded', String(!!drawer.open));
+        newBtn.hidden = !!drawer.open;
+      }
+      newBtn.addEventListener('click', function () {
+        form.openNew();
+        syncDrawerBtn();
+        window.setTimeout(function () { form.focusName(); }, 0);
+      });
+
+      el._openNew = function () {
+        form.openNew(); syncDrawerBtn();
+        window.setTimeout(function () { form.focusName(); }, 0);
+      };
+      el._syncDrawerBtn = syncDrawerBtn;
+
+      /* ---- the cards --------------------------------------------------- */
+      var grid = U.el('ul', { class: 'trips__grid', role: 'list' });
+      el.appendChild(grid);
+
+      var empty = U.el('p', { class: 'trips__empty', hidden: true,
+        text: 'No trips yet — start one above.' });
+      el.appendChild(empty);
+
+      /* ---- archived, out of the way but never out of reach ------------- */
+      var arch = U.el('details', { class: 'trips__archived', hidden: true });
+      var archSum = U.el('summary', { class: 'trips__archivedsum' });
+      arch.appendChild(archSum);
+      var archList = U.el('div', { class: 'trips__archlist' });
+      arch.appendChild(archList);
+      el.appendChild(arch);
+
+      function tripCard(t, isActive, liveCount) {
+        var li = U.el('li', { class: 'trips__cell' });
+        var art = U.el('article', { class: 'tripcard' + (isActive ? ' tripcard--active' : ''),
+          dataset: { trip: t.id } });
+
+        var art0 = U.el('span', { class: 'tripcard__art', 'aria-hidden': 'true', role: 'presentation' });
+        plate(art0, t);
+        art.appendChild(art0);
+
+        var body = U.el('div', { class: 'tripcard__body' });
+
+        var headRow = U.el('div', { class: 'tripcard__head' });
+        var h2 = U.el('h2', { class: 'tripcard__name' });
+        h2.appendChild(U.el('a', { class: 'tripcard__open', href: tripHref(t.id) },
+          t.name || titleize(t.id)));
+        headRow.appendChild(h2);
+        if (isActive) headRow.appendChild(U.el('span', { class: 'tripcard__current', text: 'Current' }));
+        body.appendChild(headRow);
+
+        body.appendChild(U.el('p', { class: 'tripcard__when', text: tripLabel(t) }));
+        body.appendChild(U.el('p', { class: 'tripcard__budget', text: budgetWords(t) }));
+
+        var st = statsOf(t.id);
+        body.appendChild(U.el('p', { class: 'tripcard__funnel', text: funnelWords(st) }));
+
+        var act = U.el('p', { class: 'tripcard__activity' });
+        if (st.lastAt) U.setText(act, 'last change ' + F.ago(st.lastAt));
+        else act.hidden = true;
+        body.appendChild(act);
+        art.appendChild(body);
+
+        /* Card actions sit above the stretched link. */
+        var acts = U.el('div', { class: 'tripcard__acts' });
+        var ed = U.el('button', { type: 'button', class: 'btn btn--sm btn--quiet tripcard__edit',
+          text: 'Edit' });
+        ed.setAttribute('aria-label', 'Edit ' + (t.name || titleize(t.id)));
+        ed.addEventListener('click', function () {
+          form.editTrip(tripById(t.id) || t);
+          syncDrawerBtn();
+          try { drawer.scrollIntoView({ block: 'nearest', behavior: 'auto' }); } catch (e) {}
+        });
+        var archBtn = U.el('button', { type: 'button', class: 'btn btn--sm btn--quiet tripcard__archive',
+          text: 'Archive' });
+        archBtn.setAttribute('aria-label', 'Archive ' + (t.name || titleize(t.id)));
+        /* The last trip cannot be archived — the app has to be on one. Rather
+           than refuse after the click, the button simply is not offered. */
+        archBtn.hidden = liveCount <= 1;
+        acts.appendChild(ed); acts.appendChild(archBtn);
+        art.appendChild(acts);
+
+        /* Inline confirmation — never window.confirm. */
+        var conf = U.el('div', { class: 'tripcard__confirm', hidden: true });
+        conf.appendChild(U.el('p', { class: 'tripcard__confirmtext', text:
+          'Archive ' + (t.name || titleize(t.id)) + '? Nothing is thrown away — its shortlist, ' +
+          'checklist and quotes wait here until you restore it.' }));
+        var yes = U.el('button', { type: 'button', class: 'btn btn--sm tripcard__confirmyes', text: 'Archive it' });
+        var no = U.el('button', { type: 'button', class: 'btn btn--sm btn--quiet tripcard__confirmno', text: 'Keep it' });
+        conf.appendChild(yes); conf.appendChild(no);
+        art.appendChild(conf);
+
+        archBtn.addEventListener('click', function () {
+          conf.hidden = false; archBtn.hidden = true;
+          try { yes.focus(); } catch (e) {}
+        });
+        no.addEventListener('click', function () {
+          conf.hidden = true; archBtn.hidden = liveTrips().length <= 1;
+          try { archBtn.focus(); } catch (e) {}
+        });
+        yes.addEventListener('click', function () {
+          if (liveTrips().length <= 1) { conf.hidden = true; return; }
+          ARCHIVE_MEMO[t.id] = { name: t.name, start: t.start, end: t.end, budget: t.budget,
+            currencyMode: t.currencyMode, manualRate: t.manualRate, note: t.note };
+          store.dispatch('trips/delete', { entryId: t.id });
+          try { T.notify.toast({ text: (t.name || 'That trip') + ' archived. Restore it whenever you like.' }); } catch (e) {}
+          paint();
+        });
+
+        li.appendChild(art);
+        return li;
+      }
+
+      function archRow(e) {
+        var memo = ARCHIVE_MEMO[e.id] || {};
+        var lab = e.name || memo.name || titleize(e.id);
+        var r = U.el('div', { class: 'triparch', dataset: { trip: e.id } });
+        r.appendChild(U.el('span', { class: 'triparch__name', text: lab }));
+        var btn = U.el('button', { type: 'button', class: 'btn btn--sm btn--quiet tripcard__restore',
+          text: 'Restore' });
+        btn.addEventListener('click', function () {
+          store.dispatch('trips/upsert', { entryId: e.id, value: {
+            name: lab,
+            start: e.start != null ? e.start : (memo.start != null ? memo.start : null),
+            end: e.end != null ? e.end : (memo.end != null ? memo.end : null),
+            budget: e.budget != null ? e.budget : (memo.budget != null ? memo.budget : null),
+            currencyMode: e.currencyMode || memo.currencyMode || null,
+            manualRate: e.manualRate != null ? e.manualRate : (memo.manualRate != null ? memo.manualRate : null),
+            note: e.note || memo.note || ''
+          } });
+          try { T.notify.toast({ text: lab + ' is back.' }); } catch (e2) {}
+          paint();
+        });
+        r.appendChild(btn);
+        return r;
+      }
+
+      function paint() {
+        var trips = liveTrips();
+        var activeId = activeTripId();
+        U.clear(grid);
+        trips.forEach(function (t) { grid.appendChild(tripCard(t, t.id === activeId, trips.length)); });
+        grid.hidden = !trips.length;
+        empty.hidden = trips.length > 0;
+
+        var list = archivedTrips();
+        arch.hidden = !list.length;
+        if (list.length) {
+          U.setText(archSum, F.plural(list.length, 'archived trip'));
+          U.clear(archList);
+          list.forEach(function (e) { archList.appendChild(archRow(e)); });
+        }
+        form.refresh();
+      }
+      el._paint = paint;
+      paint();
+      syncDrawerBtn();
+      openIfAsked(el, ctx.route);
+    },
+
+    update: function (el, ctx) {
+      var changed = ctx.changed;
+      if (!changed) return;
+      if (changed.has('route')) { openIfAsked(el, ctx.route); return; }
+      var touches = changed.has('planning') || changed.has('planning:trips') ||
+        changed.has('ui:tripId') || changed.has('research') ||
+        (store.touches && (store.touches(changed, 'planning') || store.touches(changed, 'research')));
+      if (touches && el._paint) { el._paint(); if (el._syncDrawerBtn) el._syncDrawerBtn(); }
+    },
+
+    unmount: function (el) {
+      el._paint = null; el._form = null; el._openNew = null; el._syncDrawerBtn = null;
+    }
+  });
+
+  /** `#/trips?new=1` — the tripbar's "New trip…" lands here. */
+  function openIfAsked(el, route) {
+    var q = (route && route.query) || {};
+    if (q['new'] !== '1' && q['new'] !== 'true') return;
+    if (!el._openNew) return;
+    el._openNew();
+  }
+})(window.TRIP);
 /* ==== src/js/20-view-home.js ==== */
 /* 20-view-home.js — HOME (screen S1, docs/UX_SPEC.md §2). OWNER: IMPL-1.
  *
@@ -19546,17 +20352,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       /* ---- 1. the brief: headline + status line ---------------------- */
       var head = U.el('header', { class: 'home__masthead' });
       var h1 = U.el('h1', { class: 'home__headline' });
-      /* v0.18.0 — the active trip's dates, one quiet line (§7 TRIPS_SPEC):
-         "Oct 15–22, 2026 · 7 nights", never the budget — that already lives
-         in the money strip below. */
-      var tripLine = U.el('p', { class: 'home__tripline' });
       var sub = U.el('p', { class: 'home__sub' });
       head.appendChild(h1);
-      head.appendChild(tripLine);
       head.appendChild(sub);
       el.appendChild(head);
       painters.push(function () { paintHeadline(h1, sub); });
-      painters.push(function () { U.setText(tripLine, T.trips.label(T.trips.active())); });
 
       var locationPanel = panel('home-locations', 'Where do you want to go?', { key: 'locations', class: 'panel--locations' });
       el.appendChild(locationPanel);
@@ -31137,15 +31937,6 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     try { if (tr && tr.label) return tr.label(t); } catch (e) {}
     return 'No dates yet';
   }
-  function nightsBetween(a, b) {
-    var tr = TR();
-    try { if (tr && tr.nightsOf) return tr.nightsOf(a, b); } catch (e) {}
-    /* Only for the case where 05b-trips.js is not there at all — the live
-       hint should still count nights rather than call good dates wrong. */
-    var ta = Date.parse(a + 'T00:00:00Z'), tb = Date.parse(b + 'T00:00:00Z');
-    if (!isFinite(ta) || !isFinite(tb)) return null;
-    return Math.round((tb - ta) / 86400000);
-  }
   function researchWindow() {
     var tr = TR();
     try { return tr && tr.researchWindow ? tr.researchWindow() : null; } catch (e) { return null; }
@@ -31201,176 +31992,34 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     archDet.appendChild(archList);
     box.appendChild(archDet);
 
-    /* ---- ONE form, in a closed drawer, for both new and edit --------- */
-    var editing = null;               // trip id being edited, or null for new
-    var segMode = 'quoted';
-
+    /* ---- ONE form, in a closed drawer, for both new and edit ---------
+       Since v0.19.0 the form itself belongs to `T.tripForm` (36-comp-tripform
+       .js) because the trips catalog at #/trips offers the same one. Same ids,
+       same classes, same validation, same dispatches — it was lifted out of
+       this file, not rewritten. What stays here is the drawer it sits in and
+       the list beneath it. */
     var drawer = U.el('details', { class: 'trips__drawer' });
     var sum = U.el('summary', { class: 'sync__advsum trips__drawersum', text: 'New trip' });
     drawer.appendChild(sum);
-    var form = U.el('form', { class: 'trip__form', novalidate: true });
+    var form = T.tripForm.build({
+      host: drawer,
+      onDone: function () { paint(); },
+      onLabel: function (text) { U.setText(sum, text); }
+    });
     drawer.appendChild(form);
     box.appendChild(drawer);
 
-    function row(labelText, forId, control, cls) {
-      var r = U.el('div', { class: 'trip__row' + (cls ? ' ' + cls : '') });
-      r.appendChild(U.el('label', { class: 'sync__label', for: forId, text: labelText }));
-      r.appendChild(control);
-      return r;
-    }
+    /* The catalog is the front door (NAV_SPEC §1); this section is where a
+       trip's settings are changed. One quiet line joins the two. */
+    var manage = U.el('p', { class: 'trips__manage' });
+    manage.appendChild(document.createTextNode('Every trip, as a card, with what each one has decided: '));
+    manage.appendChild(U.el('a', { class: 'trips__manage-link',
+      href: T.router.build('trips'), text: 'the trip list' }));
+    manage.appendChild(document.createTextNode('.'));
+    box.appendChild(manage);
 
-    var name = U.el('input', { type: 'text', id: 'trip-name', class: 'input trip__input',
-      maxlength: '60', autocomplete: 'off', placeholder: 'December Getaway' });
-    form.appendChild(row('What are you calling it', 'trip-name', name));
-
-    var dates = U.el('div', { class: 'trip__dates' });
-    var start = U.el('input', { type: 'date', id: 'trip-start', class: 'input trip__input trip__date' });
-    var end = U.el('input', { type: 'date', id: 'trip-end', class: 'input trip__input trip__date' });
-    dates.appendChild(row('Arrive', 'trip-start', start));
-    dates.appendChild(row('Leave', 'trip-end', end));
-    form.appendChild(dates);
-
-    var nights = U.el('p', { class: 'trip__nights' });
-    form.appendChild(nights);
-
-    var budget = U.el('input', { type: 'number', id: 'trip-budget', class: 'input trip__input trip__money',
-      step: '100', min: '500', max: '100000', inputmode: 'numeric' });
-    form.appendChild(row('Whole-trip budget, USD — leave it blank to follow the workbook', 'trip-budget', budget));
-
-    var segWrap = U.el('div', { class: 'trip__row' });
-    segWrap.appendChild(U.el('span', { class: 'sync__label', text: 'Show this trip’s prices in' }));
-    var seg = U.el('div', { class: 'segmented trip__seg', role: 'radiogroup', 'aria-label': 'Show this trip’s prices in' });
-    (T.currency && T.currency.MODES ? T.currency.MODES : ['USD', 'EUR', 'quoted']).forEach(function (m) {
-      var b = U.el('button', {
-        type: 'button', class: 'segmented__opt', role: 'radio',
-        dataset: { mode: m }, 'aria-checked': 'false',
-        text: (T.currency && T.currency.LABELS ? T.currency.LABELS[m] : MODE_WORDS[m]) || m
-      });
-      b.addEventListener('click', function () { segMode = m; paintSeg(); });
-      seg.appendChild(b);
-    });
-    segWrap.appendChild(seg);
-    form.appendChild(segWrap);
-
-    var note = U.el('textarea', { id: 'trip-note', class: 'textarea trip__note', rows: '2',
-      placeholder: 'Anything you want to remember about this one' });
-    form.appendChild(row('Note', 'trip-note', note));
-
-    var err = U.el('p', { class: 'field__error trip__error' });
-    form.appendChild(err);
-
-    var acts = U.el('div', { class: 'trip__formacts' });
-    var save = U.el('button', { type: 'submit', class: 'btn btn--primary btn--sm trips__save', text: 'Create trip' });
-    var cancel = U.el('button', { type: 'button', class: 'btn btn--sm btn--quiet trips__cancel', text: 'Cancel' });
-    acts.appendChild(save); acts.appendChild(cancel);
-    form.appendChild(acts);
-
-    function paintSeg() {
-      U.qsa('.segmented__opt', seg).forEach(function (b) {
-        b.setAttribute('aria-checked', String(b.dataset.mode === segMode));
-      });
-    }
-
-    function paintNights() {
-      var a = start.value, b = end.value;
-      if (!a && !b) { U.setText(nights, 'No dates yet — you can add them later.'); return; }
-      if (!a || !b) { U.setText(nights, 'Both dates, or neither.'); return; }
-      var n = nightsBetween(a, b);
-      if (n == null || n <= 0) { U.setText(nights, 'end must be after start'); return; }
-      if (n > 60) { U.setText(nights, F.plural(n, 'night') + ' — sixty is the most one trip can hold.'); return; }
-      U.setText(nights, F.plural(n, 'night'));
-    }
-    [start, end].forEach(function (i) {
-      i.addEventListener('change', paintNights);
-      i.addEventListener('input', paintNights);
-    });
-
-    /** Load the one form for a new trip (null) or an existing one. */
-    function fill(trip) {
-      editing = trip ? trip.id : null;
-      name.value = trip ? (trip.name || '') : '';
-      start.value = trip && trip.start ? trip.start : '';
-      end.value = trip && trip.end ? trip.end : '';
-      budget.value = trip && trip.budget != null ? String(trip.budget) : '';
-      note.value = trip && trip.note ? trip.note : '';
-      segMode = (trip && trip.currencyMode) || 'quoted';
-      paintSeg();
-      U.setText(err, '');
-      U.setText(save, trip ? 'Save changes' : 'Create trip');
-      U.setText(sum, trip ? 'Edit ' + (trip.name || 'trip') : 'New trip');
-      paintNights();
-    }
-
-    function openNew() { fill(null); drawer.open = true; }
-    function focusNew() {
-      try { name.focus({ preventScroll: true }); } catch (e) { try { name.focus(); } catch (e2) {} }
-    }
-
-    function readForm() {
-      var nm = String(name.value || '').trim();
-      var a = String(start.value || '').trim() || null;
-      var b = String(end.value || '').trim() || null;
-      if (!nm) return { error: 'Give the trip a name.' };
-      if ((a && !b) || (b && !a)) return { error: 'Give both dates, or neither.' };
-      if (a && b) {
-        var n = nightsBetween(a, b);
-        if (n == null || n <= 0) return { error: 'The end date has to come after the start date.' };
-        if (n > 60) return { error: 'Sixty nights is the most one trip can hold.' };
-      }
-      var bud = null;
-      var raw = String(budget.value || '').replace(/[^0-9.]/g, '').trim();
-      if (raw !== '') {
-        var num = Number(raw);
-        if (!isFinite(num) || num < 500 || num > 100000) {
-          return { error: 'Leave the budget blank, or enter a whole-trip figure between $500 and $100,000.' };
-        }
-        bud = Math.round(num);
-      }
-      return { value: { name: nm, start: a, end: b, budget: bud, currencyMode: segMode,
-        note: String(note.value || '').trim() } };
-    }
-
-    /** U.slug(name), with a short suffix when that id is already spoken for
-        (tombstones included — an id is never reused for a different trip). */
-    function newId(nm) {
-      var base = U.slug(nm) || 'trip';
-      var bag = rawTrips();
-      if (!bag[base]) return base;
-      for (var i = 2; i < 60; i++) { if (!bag[base + '-' + i]) return base + '-' + i; }
-      return base + '-' + U.uid('').slice(-4);
-    }
-
-    function submit() {
-      var r = readForm();
-      if (r.error) {
-        U.setText(err, r.error);
-        if (!String(name.value || '').trim()) { try { name.focus(); } catch (e) {} }
-        return;
-      }
-      var value = r.value;
-      var wasEditing = editing;
-      var prev = wasEditing ? tripById(wasEditing) : null;
-      var id = wasEditing || newId(value.name);
-      /* Never clobber a rate the two of you agreed on while renaming a trip. */
-      value.manualRate = prev && prev.manualRate != null ? prev.manualRate : null;
-      store.dispatch('trips/upsert', { entryId: id, value: value });
-      /* The action validates too; if it refused, say so instead of closing
-         the drawer on a trip that was never written. */
-      if (TR() && !tripById(id)) {
-        U.setText(err, 'That trip could not be saved — check the name and the dates.');
-        return;
-      }
-      if (!wasEditing) store.dispatch('trips/setActive', { id: id });
-      drawer.open = false;
-      fill(null);
-      try {
-        T.notify.toast({ text: wasEditing ? 'Saved ' + value.name + '.' : 'Created ' + value.name + ' — you are on it now.' });
-      } catch (e) {}
-      paint();
-    }
-    form.addEventListener('submit', function (ev) { ev.preventDefault(); submit(); });
-    save.addEventListener('click', function (ev) { ev.preventDefault(); submit(); });
-    cancel.addEventListener('click', function () { fill(null); drawer.open = false; });
+    function openNew() { form.openNew(); }
+    function focusNew() { form.focusName(); }
 
     /* ---- the list ---------------------------------------------------- */
     function tripCard(t, isActive, liveCount) {
@@ -31402,11 +32051,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       sw.hidden = isActive;
       sw.addEventListener('click', function () { store.dispatch('trips/setActive', { id: t.id }); });
       var ed = U.el('button', { type: 'button', class: 'btn btn--sm btn--quiet trip__edit', text: 'Edit' });
-      ed.addEventListener('click', function () {
-        fill(tripById(t.id) || t);
-        drawer.open = true;
-        try { name.focus({ preventScroll: true }); } catch (e) {}
-      });
+      ed.addEventListener('click', function () { form.editTrip(tripById(t.id) || t); });
       var arch = U.el('button', { type: 'button', class: 'btn btn--sm btn--quiet trip__archive', text: 'Archive' });
       /* The last trip cannot be archived — the app has to be on one. Rather
          than refuse after the click, the button simply is not offered. */
@@ -31435,7 +32080,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       yes.addEventListener('click', function () {
         if (liveTrips().length <= 1) {
           conf.hidden = true;
-          U.setText(err, 'This is the only trip left — make another one first.');
+          form.setError('This is the only trip left — make another one first.');
           return;
         }
         ARCHIVE_MEMO[t.id] = { name: t.name, start: t.start, end: t.end, budget: t.budget,
@@ -31485,17 +32130,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
         arch.forEach(function (e) { archList.appendChild(archRow(e)); });
       }
 
-      var wb = workbookFigure();
-      budget.placeholder = wb != null ? String(wb) : '7500';
-      /* A trip renamed elsewhere while its form is open keeps the summary honest. */
-      if (editing) {
-        var cur = tripById(editing);
-        if (!cur) { fill(null); }
-        else U.setText(sum, 'Edit ' + (cur.name || 'trip'));
-      }
+      /* The workbook placeholder, and a trip renamed elsewhere while its form
+         is open — both belong to the form now. */
+      form.refresh();
     }
 
-    fill(null);
     paint();
     sec._paintTrips = paint;
     sec._openNewTrip = openNew;
@@ -36919,6 +37558,282 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     });
   };
 })(window.TRIP);
+/* ==== src/js/36-comp-tripform.js ==== */
+/* 36-comp-tripform.js — THE trip form. OWNER: WS-B (NAV_SPEC §3).
+ *
+ * There is exactly one form for making and editing a trip, and from v0.19.0
+ * two screens ask for it: the Data page's Trips section (where it has always
+ * been) and the new catalog at `#/trips`. Rather than let the two drift, the
+ * form was lifted out of 29-view-data.js verbatim — same ids, same classes,
+ * same validation, same dispatches — and lives here.
+ *
+ *   T.tripForm.build(opts) -> form.trip__form
+ *
+ *   opts.trip      a normalized trip (T.trips.get) to pre-fill, or null/absent
+ *                  for a new one
+ *   opts.host      the element to close when the form is done (the enclosing
+ *                  `details.trips__drawer`, normally); `.open` is set on it
+ *   opts.onDone    fn(id, isNew, value) — after a trip was actually written
+ *   opts.onCancel  fn() — after Cancel (the form has already reset itself)
+ *   opts.onLabel   fn(text) — 'New trip' / 'Edit <name>', for the host's summary
+ *
+ * The returned element carries the small API both callers need:
+ *   form.fill(trip|null)   load the form (null = a new trip)
+ *   form.openNew()         fill(null) + open the host
+ *   form.editTrip(trip)    fill(trip) + open the host + focus the name
+ *   form.focusName()       focus the name field without scrolling
+ *   form.refresh()         re-read the workbook placeholder and, if the trip
+ *                          being edited was renamed or archived elsewhere,
+ *                          keep the label honest (call it from your paint)
+ *   form.editingId()       the trip id being edited, or null
+ *   form.setError(text)    put a sentence in `.trip__error`
+ *
+ * NOTHING HERE COMPUTES ANYTHING. `T.trips` (05b-trips.js) owns the reads and
+ * the three actions; this component reads the form, validates it exactly as
+ * `trips/upsert` does, and dispatches.
+ */
+(function (T) {
+  'use strict';
+  var U = T.util, F = T.fmt, store = T.store;
+  var TF = T.tripForm = {};
+
+  var MODE_WORDS = { USD: 'US dollars', EUR: 'Euros', quoted: 'As quoted' };
+
+  /* Every read goes through T.trips and is wrapped: the page that hosts this
+     form must still paint (and still let you load a workbook) if that module
+     ever throws. Same guard rails 29-view-data.js has always used. */
+  function TR() { return T.trips || null; }
+  function tripById(id) {
+    var tr = TR();
+    try { return tr && tr.get ? tr.get(id) : null; } catch (e) { return null; }
+  }
+  function rawTrips() {
+    var s = store.getState();
+    return (s.planning && s.planning.global && s.planning.global.trips) || {};
+  }
+  function nightsBetween(a, b) {
+    var tr = TR();
+    try { if (tr && tr.nightsOf) return tr.nightsOf(a, b); } catch (e) {}
+    /* Only for the case where 05b-trips.js is not there at all — the live
+       hint should still count nights rather than call good dates wrong. */
+    var ta = Date.parse(a + 'T00:00:00Z'), tb = Date.parse(b + 'T00:00:00Z');
+    if (!isFinite(ta) || !isFinite(tb)) return null;
+    return Math.round((tb - ta) / 86400000);
+  }
+  /** The workbook's own whole-trip figure — the placeholder in the form. */
+  function workbookFigure() {
+    var s = store.getState();
+    var env = s.research && s.research.envelope;
+    var c = env && env.meta && env.meta.constants && env.meta.constants.budgetTotal;
+    return c && c.value != null && isFinite(c.value) ? Number(c.value) : null;
+  }
+
+  TF.MODE_WORDS = MODE_WORDS;
+
+  TF.build = function (opts) {
+    opts = opts || {};
+    var host = opts.host || null;
+    var onDone = typeof opts.onDone === 'function' ? opts.onDone : null;
+    var onCancel = typeof opts.onCancel === 'function' ? opts.onCancel : null;
+    var onLabel = typeof opts.onLabel === 'function' ? opts.onLabel : null;
+
+    var editing = null;               // trip id being edited, or null for new
+    var segMode = 'quoted';
+
+    var form = U.el('form', { class: 'trip__form', novalidate: true });
+
+    function row(labelText, forId, control, cls) {
+      var r = U.el('div', { class: 'trip__row' + (cls ? ' ' + cls : '') });
+      r.appendChild(U.el('label', { class: 'sync__label', for: forId, text: labelText }));
+      r.appendChild(control);
+      return r;
+    }
+
+    var name = U.el('input', { type: 'text', id: 'trip-name', class: 'input trip__input',
+      maxlength: '60', autocomplete: 'off', placeholder: 'December Getaway' });
+    form.appendChild(row('What are you calling it', 'trip-name', name));
+
+    var dates = U.el('div', { class: 'trip__dates' });
+    var start = U.el('input', { type: 'date', id: 'trip-start', class: 'input trip__input trip__date' });
+    var end = U.el('input', { type: 'date', id: 'trip-end', class: 'input trip__input trip__date' });
+    dates.appendChild(row('Arrive', 'trip-start', start));
+    dates.appendChild(row('Leave', 'trip-end', end));
+    form.appendChild(dates);
+
+    var nights = U.el('p', { class: 'trip__nights' });
+    form.appendChild(nights);
+
+    var budget = U.el('input', { type: 'number', id: 'trip-budget', class: 'input trip__input trip__money',
+      step: '100', min: '500', max: '100000', inputmode: 'numeric' });
+    form.appendChild(row('Whole-trip budget, USD — leave it blank to follow the workbook', 'trip-budget', budget));
+
+    var segWrap = U.el('div', { class: 'trip__row' });
+    segWrap.appendChild(U.el('span', { class: 'sync__label', text: 'Show this trip’s prices in' }));
+    var seg = U.el('div', { class: 'segmented trip__seg', role: 'radiogroup', 'aria-label': 'Show this trip’s prices in' });
+    (T.currency && T.currency.MODES ? T.currency.MODES : ['USD', 'EUR', 'quoted']).forEach(function (m) {
+      var b = U.el('button', {
+        type: 'button', class: 'segmented__opt', role: 'radio',
+        dataset: { mode: m }, 'aria-checked': 'false',
+        text: (T.currency && T.currency.LABELS ? T.currency.LABELS[m] : MODE_WORDS[m]) || m
+      });
+      b.addEventListener('click', function () { segMode = m; paintSeg(); });
+      seg.appendChild(b);
+    });
+    segWrap.appendChild(seg);
+    form.appendChild(segWrap);
+
+    var note = U.el('textarea', { id: 'trip-note', class: 'textarea trip__note', rows: '2',
+      placeholder: 'Anything you want to remember about this one' });
+    form.appendChild(row('Note', 'trip-note', note));
+
+    var err = U.el('p', { class: 'field__error trip__error' });
+    form.appendChild(err);
+
+    var acts = U.el('div', { class: 'trip__formacts' });
+    var save = U.el('button', { type: 'submit', class: 'btn btn--primary btn--sm trips__save', text: 'Create trip' });
+    var cancel = U.el('button', { type: 'button', class: 'btn btn--sm btn--quiet trips__cancel', text: 'Cancel' });
+    acts.appendChild(save); acts.appendChild(cancel);
+    form.appendChild(acts);
+
+    function paintSeg() {
+      U.qsa('.segmented__opt', seg).forEach(function (b) {
+        b.setAttribute('aria-checked', String(b.dataset.mode === segMode));
+      });
+    }
+
+    function paintNights() {
+      var a = start.value, b = end.value;
+      if (!a && !b) { U.setText(nights, 'No dates yet — you can add them later.'); return; }
+      if (!a || !b) { U.setText(nights, 'Both dates, or neither.'); return; }
+      var n = nightsBetween(a, b);
+      if (n == null || n <= 0) { U.setText(nights, 'end must be after start'); return; }
+      if (n > 60) { U.setText(nights, F.plural(n, 'night') + ' — sixty is the most one trip can hold.'); return; }
+      U.setText(nights, F.plural(n, 'night'));
+    }
+    [start, end].forEach(function (i) {
+      i.addEventListener('change', paintNights);
+      i.addEventListener('input', paintNights);
+    });
+
+    function label(text) { if (onLabel) { try { onLabel(text); } catch (e) {} } }
+
+    /** Load the one form for a new trip (null) or an existing one. */
+    function fill(trip) {
+      editing = trip ? trip.id : null;
+      name.value = trip ? (trip.name || '') : '';
+      start.value = trip && trip.start ? trip.start : '';
+      end.value = trip && trip.end ? trip.end : '';
+      budget.value = trip && trip.budget != null ? String(trip.budget) : '';
+      note.value = trip && trip.note ? trip.note : '';
+      segMode = (trip && trip.currencyMode) || 'quoted';
+      paintSeg();
+      U.setText(err, '');
+      U.setText(save, trip ? 'Save changes' : 'Create trip');
+      label(trip ? 'Edit ' + (trip.name || 'trip') : 'New trip');
+      paintNights();
+    }
+
+    function openHost() { if (host) host.open = true; }
+    function closeHost() { if (host) host.open = false; }
+    function openNew() { fill(null); openHost(); }
+    function focusName() {
+      try { name.focus({ preventScroll: true }); } catch (e) { try { name.focus(); } catch (e2) {} }
+    }
+
+    function readForm() {
+      var nm = String(name.value || '').trim();
+      var a = String(start.value || '').trim() || null;
+      var b = String(end.value || '').trim() || null;
+      if (!nm) return { error: 'Give the trip a name.' };
+      if ((a && !b) || (b && !a)) return { error: 'Give both dates, or neither.' };
+      if (a && b) {
+        var n = nightsBetween(a, b);
+        if (n == null || n <= 0) return { error: 'The end date has to come after the start date.' };
+        if (n > 60) return { error: 'Sixty nights is the most one trip can hold.' };
+      }
+      var bud = null;
+      var raw = String(budget.value || '').replace(/[^0-9.]/g, '').trim();
+      if (raw !== '') {
+        var num = Number(raw);
+        if (!isFinite(num) || num < 500 || num > 100000) {
+          return { error: 'Leave the budget blank, or enter a whole-trip figure between $500 and $100,000.' };
+        }
+        bud = Math.round(num);
+      }
+      return { value: { name: nm, start: a, end: b, budget: bud, currencyMode: segMode,
+        note: String(note.value || '').trim() } };
+    }
+
+    /** U.slug(name), with a short suffix when that id is already spoken for
+        (tombstones included — an id is never reused for a different trip). */
+    function newId(nm) {
+      var base = U.slug(nm) || 'trip';
+      var bag = rawTrips();
+      if (!bag[base]) return base;
+      for (var i = 2; i < 60; i++) { if (!bag[base + '-' + i]) return base + '-' + i; }
+      return base + '-' + U.uid('').slice(-4);
+    }
+
+    function submit() {
+      var r = readForm();
+      if (r.error) {
+        U.setText(err, r.error);
+        if (!String(name.value || '').trim()) { try { name.focus(); } catch (e) {} }
+        return;
+      }
+      var value = r.value;
+      var wasEditing = editing;
+      var prev = wasEditing ? tripById(wasEditing) : null;
+      var id = wasEditing || newId(value.name);
+      /* Never clobber a rate the two of you agreed on while renaming a trip. */
+      value.manualRate = prev && prev.manualRate != null ? prev.manualRate : null;
+      store.dispatch('trips/upsert', { entryId: id, value: value });
+      /* The action validates too; if it refused, say so instead of closing
+         the drawer on a trip that was never written. */
+      if (TR() && !tripById(id)) {
+        U.setText(err, 'That trip could not be saved — check the name and the dates.');
+        return;
+      }
+      if (!wasEditing) store.dispatch('trips/setActive', { id: id });
+      closeHost();
+      fill(null);
+      try {
+        T.notify.toast({ text: wasEditing ? 'Saved ' + value.name + '.' : 'Created ' + value.name + ' — you are on it now.' });
+      } catch (e) {}
+      if (onDone) { try { onDone(id, !wasEditing, value); } catch (e2) {} }
+    }
+    form.addEventListener('submit', function (ev) { ev.preventDefault(); submit(); });
+    save.addEventListener('click', function (ev) { ev.preventDefault(); submit(); });
+    cancel.addEventListener('click', function () {
+      fill(null); closeHost();
+      if (onCancel) { try { onCancel(); } catch (e) {} }
+    });
+
+    /* The host's paint calls this: the placeholder follows the workbook, and a
+       trip renamed (or archived) elsewhere while its form is open keeps the
+       drawer's summary honest. */
+    function refresh() {
+      var wb = workbookFigure();
+      budget.placeholder = wb != null ? String(wb) : '7500';
+      if (!editing) return;
+      var cur = tripById(editing);
+      if (!cur) fill(null);
+      else label('Edit ' + (cur.name || 'trip'));
+    }
+
+    form.fill = fill;
+    form.openNew = openNew;
+    form.editTrip = function (trip) { fill(trip); openHost(); focusName(); };
+    form.focusName = focusName;
+    form.refresh = refresh;
+    form.editingId = function () { return editing; };
+    form.setError = function (text) { U.setText(err, text); };
+
+    fill(opts.trip || null);
+    refresh();
+    return form;
+  };
+})(window.TRIP);
 /* ==== src/js/36-comp-checks.js ==== */
 /* 36-comp-checks.js — the research checklist model, Booking Readiness, and the
  * shared widgets both of them render into. OWNER: IMPL-3 (trip workspace).
@@ -38888,7 +39803,16 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   /* 1. The route table (docs/UX_SPEC.md §1.1/§1.2)                        */
   /* ==================================================================== */
 
+  /* v0.19.0 — `group` places a route in the TRIP BAR's nav (row 2), not the
+     masthead's top row: 'primary' is a plain link, 'labs'/'more' are the two
+     dropdowns, 'none' is reachable some other way. `data` moved to 'none'
+     because Settings is now a permanent row-1 link (it is app-wide, not
+     trip-scoped, and burying it in More made it the hardest thing to find);
+     `map` and `responses` came up into the row because More lost its longest
+     tail and they are two of the trip's real sections. */
   SH.ROUTES = [
+    { name: 'trips', label: 'All trips', group: 'none', title: 'The Trip List',
+      line: 'The trips list is being built right now. Until it lands, the trip you were last on is still the one every screen is about.' },
     { name: 'home', label: 'Home', group: 'primary', tab: 'Home', glyph: '⌂',
       title: 'The Trip List' },
     { name: 'explore', label: 'Explore', group: 'primary', tab: 'Explore', glyph: '▦',
@@ -38897,30 +39821,30 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     { name: 'collections', label: 'Collections', group: 'primary', tab: 'Collections', glyph: '❑',
       title: 'Collections',
       line: 'Editorial collections arrive in a later wave — Islands, Mountain Spa, All Inclusive and the rest are already planned.' },
-    { name: 'compare', label: 'Compare', group: 'more', tab: 'Compare', glyph: '⊞',
-      title: 'Compare',
-      line: 'Compare arrives in a later wave — your selections are already being kept.' },
+    { name: 'map', label: 'Map', group: 'primary',
+      title: 'Map',
+      line: 'Every option where it actually is — the same filters as Explore, on one map.' },
+    { name: 'responses', label: 'Responses', group: 'primary',
+      title: 'Resort responses' },
     { name: 'budget', label: 'Budget Lab', group: 'labs',
       title: 'Budget Lab',
       line: 'Try nights, airfare and a trip budget, then save your scenarios.' },
     { name: 'decision', label: 'Decision Lab', group: 'labs',
       title: 'Decision Lab',
       line: 'Your priorities, your weighted ranking, beside the workbook’s.' },
-    { name: 'responses', label: 'Responses', group: 'more',
-      title: 'Resort responses' },
+    { name: 'compare', label: 'Compare', group: 'more', tab: 'Compare', glyph: '⊞',
+      title: 'Compare',
+      line: 'Compare arrives in a later wave — your selections are already being kept.' },
     { name: 'changed', label: 'What Changed', group: 'more',
       title: 'What Changed',
       line: 'The movement digest arrives in a later wave. Until then, Home keeps the biggest movers where you can see them.' },
-    { name: 'map', label: 'Map', group: 'more',
-      title: 'Map',
-      line: 'Every option where it actually is — the same filters as Explore, on one map.' },
     { name: 'tasks', label: 'Loose ends', group: 'more',
       title: 'Loose ends',
       line: 'The full loose-ends list arrives in a later wave. Home already shows what’s still open on your shortlist.' },
     { name: 'archive', label: 'The No Pile', group: 'more',
       title: 'The No Pile',
       line: 'The archive arrives in a later wave — nothing you reject is ever thrown away, so it will all be here.' },
-    { name: 'data', label: 'Workbook & Settings', group: 'more',
+    { name: 'data', label: 'Workbook & Settings', group: 'none',
       title: 'Workbook & Settings' },
     { name: 'trip', label: 'Trip detail', group: 'none', title: 'Trip detail',
       line: 'The full trip page arrives in a later wave — everything the workbook knows about one option, plus what you two have said about it.' }
@@ -39103,13 +40027,17 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
 
   var nodes = {};   // long-lived shell nodes, built once
 
-  /* ---- trip switcher (§7 TRIPS_SPEC) -----------------------------------
-   * The nameplate's old, static "October 2026" subline is now a live
-   * control: a `button.nameplate__when.tripswitch` naming the active trip,
-   * opening a `navmenu navmenu--trip` built with the same `dropdown()`
-   * helper/markup as the device chip. Picking a trip dispatches
-   * `trips/setActive` and remounts the current view so every piece of
-   * chrome and content that reads the active trip repaints in one pass. */
+  /* ---- trip switcher (§7 TRIPS_SPEC, NAV_SPEC §2) ----------------------
+   * v0.18.0 hid this in the nameplate's dateline, and Solomon could not find
+   * it ("not clear in the slightest"). v0.19.0 promotes it to the trip bar —
+   * row 2 of the masthead — where it is the page's own name in the display
+   * face, at the size a headline gets, with the caret it always had. Same
+   * `dropdown()` helper, same `navmenu navmenu--trip` markup, same
+   * `button.tripswitch` hook: only its address and its type size changed.
+   * Picking a trip dispatches `trips/setActive`, then either walks to that
+   * trip's home (when the home screen is what you are looking at, so the URL
+   * keeps naming the trip) or remounts in place, so every piece of chrome and
+   * content that reads the active trip repaints in one pass. */
   function tripMenuItems() {
     var activeId = T.trips.activeId();
     var items = T.trips.all().map(function (trip) {
@@ -39125,24 +40053,28 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
       b.addEventListener('click', function () {
         if (T.trips.activeId() === trip.id) return;
         store.dispatch('trips/setActive', { id: trip.id });
-        T.router.remount({ keepScroll: false });
+        /* On a trip's home the URL names the trip, so switching has to walk
+           there; everywhere else the route is trip-agnostic and a remount is
+           both enough and less jarring (you stay on Explore, in Explore). */
+        if (T.router.currentName() === 'home') T.router.go('trips', [trip.id]);
+        else T.router.remount({ keepScroll: false });
       });
       return { node: b, liDataset: { trip: trip.id }, liCurrent: isActive };
     });
     items.push({ sep: true });
     items.push({ node: U.el('a', {
-      class: 'navmenu__link', href: href('data', [], { section: 'trips', new: '1' })
+      class: 'navmenu__link', href: href('trips', [], { new: '1' })
     }, 'New trip…') });
     items.push({ node: U.el('a', {
-      class: 'navmenu__link', href: href('data', [], { section: 'trips' })
-    }, 'Manage trips') });
+      class: 'navmenu__link', href: href('trips')
+    }, 'All trips') });
     return items;
   }
 
   function buildTripSwitch() {
     var menu = dropdown('', tripMenuItems(), { class: 'navmenu--trip', haspopup: 'menu' });
     var btn = U.qs('.navmenu__button', menu);
-    btn.classList.add('nameplate__when', 'tripswitch');
+    btn.classList.add('tripbar__name', 'tripswitch');
     var labelSpan = U.qs('.navmenu__label', btn);
     U.clear(labelSpan);
     nodes.tripName = U.el('span', { class: 'tripswitch__name' });
@@ -39159,41 +40091,137 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     U.setText(nodes.tripName, active.name);
     nodes.tripswitchButton.setAttribute('aria-label',
       'Switch trip — currently ' + active.name + '. ' + T.trips.label(active) + '.');
+    if (nodes.tripFacts) U.setText(nodes.tripFacts, T.trips.label(active));
     if (nodes.tripMenu && nodes.tripMenu._setItems) nodes.tripMenu._setItems(tripMenuItems());
+    paintHomeLinks();
   }
 
+  /** Every "Home" in the chrome is really "this trip's home" — `#/trips/<id>`
+   *  — so its href has to follow the active trip. The links are built once and
+   *  live for the session, so switching trips repoints them rather than
+   *  rebuilding the nav. */
+  function paintHomeLinks() {
+    var to = href('home');
+    (nodes.roots || [nodes.masthead]).forEach(function (rootNode) {
+      if (!rootNode) return;
+      U.qsa('a[data-route="home"]', rootNode).forEach(function (a) { a.setAttribute('href', to); });
+    });
+  }
+
+  /** The trip bar is the whole of row 2, so it is hidden as one thing: on the
+   *  catalog there is no active trip being looked at, only a list of them.
+   *  `#/trips/<id>` HAS a param and so keeps the bar — the parsed route in the
+   *  store is the only thing that can tell those two URLs apart, since both
+   *  render under the name 'trips'. */
+  function paintTripBar() {
+    if (!nodes.tripbar) return;
+    var r = store.getState().ui.route;
+    if (!r) { try { r = T.router.parse(window.location.hash); } catch (e) { r = { name: '', params: [] }; } }
+    var params = r.params || [];
+    nodes.tripbar.hidden = (r.name === 'trips' && !params[0]);
+  }
+
+  /* ---- the two rows (NAV_SPEC §2) --------------------------------------
+   * ONE sticky `header.masthead`, two lines inside it, and the split is the
+   * whole point: row 1 is the APP (who we are, search, this device, settings,
+   * the workbook's health) and never changes; row 2 is the TRIP (which trip,
+   * its dates, its sections) and disappears on the catalog, where no single
+   * trip is being looked at. v0.18.0 put the trip in row 1's dateline and
+   * every reviewer read it as decoration.
+   *
+   * The old "exactly five / four children" invariant is GONE with the grid it
+   * was written for: both rows are plain flex lines with a gap, the search
+   * takes the slack, and the responsive queries below shrink controls to
+   * glyphs rather than counting columns. */
   function buildMasthead() {
     var head = U.el('header', { class: 'masthead', role: 'banner' });
-    var inner = U.el('div', { class: 'masthead__inner' });
+    head.appendChild(buildGlobalRow());
+    head.appendChild(buildTripBar());
+    nodes.masthead = head;
+    return head;
+  }
+
+  function buildGlobalRow() {
+    var inner = U.el('div', { class: 'masthead__inner masthead__global' });
 
     /* Nameplate — a publication masthead, not a logo. The typographic
        treatment is WS-D's (05-chrome.css, `.nameplate*`); the `masthead__*`
-       classes stay for the shell's own layout and for the Home-link test.
-       v0.18.0 — the nameplate is no longer a single `<a>`: the trip switcher
-       (below) is a `<button>`, and a button cannot live inside an anchor, so
-       the wrapper is now a plain `div.masthead__nameplate.nameplate` holding
-       TWO children — the Home link (title only) and the subline (who + dot +
-       switcher). It is still exactly ONE flex child of `.masthead__inner`. */
-    var nameLink = U.el('a', {
-      class: 'nameplate__link', href: href('home'), 'aria-label': 'The Trip List — go Home'
+       classes stay for the shell's own layout. v0.19.0 — the trip switcher
+       left for row 2, which makes the nameplate a single `<a>` again (nothing
+       interactive is nested inside it any more), and it points at the trips
+       list: the publication's front page is the list of trips. */
+    var plate = U.el('a', {
+      class: 'masthead__nameplate nameplate nameplate__link',
+      href: href('trips'), 'aria-label': 'The Trip List — see all your trips'
     }, U.el('span', { class: 'masthead__title nameplate__title' }, [
         U.el('span', { class: 'nameplate__article', text: 'The' }),
         U.el('span', { class: 'nameplate__name', text: 'Trip List' })
       ]));
-    var subline = U.el('span', { class: 'masthead__sub nameplate__sub' }, [
-      U.el('span', { class: 'nameplate__who', text: 'Solomon & Roni' }),
-      U.el('span', { class: 'nameplate__dot', 'aria-hidden': 'true', text: '·' }),
-      buildTripSwitch()
-    ]);
-    var plate = U.el('div', { class: 'masthead__nameplate nameplate' }, [nameLink, subline]);
     inner.appendChild(plate);
 
-    /* Primary navigation. */
-    var nav = U.el('nav', { class: 'masthead__nav', 'aria-label': 'Primary' });
-    var navList = U.el('ul', { class: 'masthead__navlist' });
-    ['home', 'explore', 'collections'].forEach(function (name) {
-      var r = route(name);
-      var a = U.el('a', { class: 'masthead__link', href: href(name), dataset: { route: name } }, r.label);
+    /* Search entry. The overlay/dropdown is the search agent's; this is the
+       always-present entry point plus an honest fallback. It also holds the
+       row open: the search is the flexible track, so the nameplate sits left
+       and the controls sit right at every width. */
+    inner.appendChild(buildSearch());
+
+    /* Device identity (§7.4) — three states, one control. */
+    inner.appendChild(buildDeviceChip());
+
+    /* Settings, in the open. It used to be the last item of the More menu,
+       which made the one screen that owns the workbook, sync, currency and
+       the trips themselves the hardest thing in the app to reach. It keeps
+       `data-route="data"` so it lights up like any other nav link. */
+    nodes.settingsLink = U.el('a', {
+      class: 'masthead__settings', href: href('data'), dataset: { route: 'data' },
+      'aria-label': 'Workbook & Settings'
+    }, [
+      U.el('span', { class: 'masthead__settingsglyph', 'aria-hidden': 'true', text: '⚙' }),
+      U.el('span', { class: 'masthead__settingstext', text: 'Settings' })
+    ]);
+    inner.appendChild(nodes.settingsLink);
+
+    /* Workbook health chip (§16.1) — name, count, health glyph, links to #/data. */
+    nodes.wbChip = U.el('a', { class: 'masthead__chip', href: href('data') }, [
+      U.el('span', { class: 'masthead__chipdot', 'aria-hidden': 'true', text: '○' }),
+      U.el('span', { class: 'masthead__chiptext', text: 'Workbook' })
+    ]);
+    /* Sharing chip (82-sync.js) — are the two laptops looking at the same list?
+       The two chips stay glued into one wrapper: they are one thought ("is the
+       data here, and is it the same data as over there"), and they go
+       glyph-only together below 1024. */
+    nodes.syncChip = U.el('a', { class: 'masthead__chip masthead__chip--sync', href: href('data', [], { section: 'sync' }) }, [
+      U.el('span', { class: 'masthead__chipdot', 'aria-hidden': 'true', text: '○' }),
+      U.el('span', { class: 'masthead__chiptext', text: 'Not sharing' })
+    ]);
+    var chips = U.el('div', { class: 'masthead__chips' });
+    chips.appendChild(nodes.wbChip);
+    chips.appendChild(nodes.syncChip);
+    inner.appendChild(chips);
+
+    nodes.globalRow = inner;
+    return inner;
+  }
+
+  /** Row 2: which trip, when it is, and where you can go inside it. */
+  function buildTripBar() {
+    var bar = U.el('div', { class: 'masthead__inner masthead__trip tripbar', hidden: true });
+
+    /* The facts node is created before the switcher because building the
+       switcher paints it: name and dates are one statement, painted together. */
+    nodes.tripFacts = U.el('span', { class: 'tripbar__facts' });
+    bar.appendChild(buildTripSwitch());
+    bar.appendChild(nodes.tripFacts);
+
+    /* The trip's sections. Same links, same `[data-route]` + aria-current
+       convention and the same dropdown helper as the old `.masthead__nav` —
+       it simply moved down a line, to sit under the name of the trip they all
+       belong to. `.masthead__navlist`/`.masthead__link` stay as the class
+       hooks so the link styling is unchanged. */
+    var nav = U.el('nav', { class: 'tripbar__nav', 'aria-label': 'This trip' });
+    var navList = U.el('ul', { class: 'masthead__navlist tripbar__navlist' });
+    SH.ROUTES.filter(function (r) { return r.group === 'primary'; }).forEach(function (r) {
+      var a = U.el('a', { class: 'masthead__link', href: href(r.name), dataset: { route: r.name } }, r.label);
       navList.appendChild(U.el('li', {}, a));
     });
 
@@ -39210,37 +40238,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     navList.appendChild(U.el('li', {}, more));
 
     nav.appendChild(navList);
-    inner.appendChild(nav);
+    bar.appendChild(nav);
 
-    /* Search entry. The overlay/dropdown is the search agent's; this is the
-       always-present entry point plus an honest fallback. */
-    inner.appendChild(buildSearch());
-
-    /* Device identity (§7.4) — three states, one control. */
-    inner.appendChild(buildDeviceChip());
-
-    /* Workbook health chip (§16.1) — name, count, health glyph, links to #/data. */
-    nodes.wbChip = U.el('a', { class: 'masthead__chip', href: href('data') }, [
-      U.el('span', { class: 'masthead__chipdot', 'aria-hidden': 'true', text: '○' }),
-      U.el('span', { class: 'masthead__chiptext', text: 'Workbook' })
-    ]);
-    /* Sharing chip (82-sync.js) — are the two laptops looking at the same list?
-       Both chips share ONE grid cell: the masthead's column templates (desktop,
-       tablet, phone) are sized for exactly five / four children, and a sixth
-       would wrap onto a second row. */
-    nodes.syncChip = U.el('a', { class: 'masthead__chip masthead__chip--sync', href: href('data', [], { section: 'sync' }) }, [
-      U.el('span', { class: 'masthead__chipdot', 'aria-hidden': 'true', text: '○' }),
-      U.el('span', { class: 'masthead__chiptext', text: 'Not sharing' })
-    ]);
-    var chips = U.el('div', { class: 'masthead__chips' });
-    chips.appendChild(nodes.wbChip);
-    chips.appendChild(nodes.syncChip);
-    inner.appendChild(chips);
-
-    head.appendChild(inner);
-    nodes.masthead = head;
+    nodes.tripbar = bar;
     nodes.navList = navList;
-    return head;
+    return bar;
   }
 
   function buildSearch() {
@@ -39694,8 +40696,11 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   function paintBarVisibility() {
     if (!nodes.tabbar) return;
     // §1.4: hidden on Trip Detail (its action bar replaces it) and on the
-    // full-screen search overlay; present everywhere else.
-    var hiddenByRoute = T.router.currentName() === 'trip';
+    // full-screen search overlay; present everywhere else. v0.19.0 adds the
+    // trips catalog: its tabs would all point INTO a trip you have not picked
+    // yet, and the whole screen is one list of ways onward.
+    var here = T.router.currentName();
+    var hiddenByRoute = here === 'trip' || here === 'trips';
     var hidden = hiddenByRoute || Object.keys(barHiders).length > 0;
     nodes.tabbar.hidden = hidden;
     document.documentElement.classList.toggle('has-tabbar', !hidden);
@@ -39713,8 +40718,12 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
   };
 
   function paintCurrentRoute() {
-    var name = T.router.currentName() || 'home';
+    var name = T.router.currentName() || 'trips';
     (nodes.roots || []).forEach(function (n) { n.dataset.route = name; });
+    /* Row 2 first: it changes the masthead's height, and everything below
+       reads that height. `#/trips/<id>` reports itself as 'home' here — only
+       the parsed route in the store separates the catalog from a trip. */
+    paintTripBar();
 
     (nodes.roots || []).forEach(function (rootNode) {
       U.qsa('[data-route]', rootNode).forEach(function (a) {
@@ -39786,8 +40795,8 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     if (!app || !main) return SH;     // 90-app.js has not built the mount point yet
     inited = true;
 
-    var root = U.el('div', { class: 'shell shell--top', dataset: { route: T.router.currentName() || 'home' } });
-    var bottom = U.el('div', { class: 'shell shell--bottom', dataset: { route: T.router.currentName() || 'home' } });
+    var root = U.el('div', { class: 'shell shell--top', dataset: { route: T.router.currentName() || 'trips' } });
+    var bottom = U.el('div', { class: 'shell shell--bottom', dataset: { route: T.router.currentName() || 'trips' } });
     nodes.root = root;
     nodes.bottom = bottom;
     nodes.roots = [root, bottom];
@@ -39843,6 +40852,7 @@ window.TRIP.EMBEDDED_SNAPSHOT = {"envelopeVersion":1,"meta":{"workbookName":"Oct
     paintCompareBadge();
     paintCurrentRoute();
     paintDevice();
+    paintHomeLinks();
 
     store.subscribe(function (state, changed) {
       if (changed.has('ui:route')) {
