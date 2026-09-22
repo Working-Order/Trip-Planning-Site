@@ -12265,7 +12265,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
 (function (T) {
   'use strict';
 
-  T.version = '0.28.2';   // Settings organization, visible planning, published-site sign-in
+  T.version = '0.28.3';   // Remove stale sign-in form after authentication
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -63264,11 +63264,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       U.clear(introHost);
       introHost.appendChild(planningIntro(host));
 
-      /* Identity card â€” replaced the same way, on a firebase/prep touch,
-         and never while its sign-in form has focus or typed text. */
+      /* Preserve a draft only while genuinely signed out. Enter-submit or
+         restored authentication may leave a cleared password field focused;
+         that focus must never keep the obsolete sign-in card on screen. */
       var idCard = U.qs('.sync__card--identity', host);
-      if (!identityFormBusy(idCard)) {
-        var hidden = describeIdentity().hidden;
+      var hidden = describeIdentity().hidden;
+      var authenticated = !!(T.firebase && T.firebase.user && T.firebase.user());
+      if (hidden || authenticated || !identityFormBusy(idCard)) {
         if (hidden) { if (idCard) U.clear(identityHost); }
         else if (!idCard) { var first = identityCard(); if (first) identityHost.appendChild(first); }
         else {
