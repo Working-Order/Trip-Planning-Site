@@ -9105,7 +9105,7 @@ header.masthead {
   line-height: var(--leading-body);
 }
 
-/* The jump list. A row of quiet links on a phone, a rail on a wide screen. */
+/* Settings categories are real links; one persistent group is visible. */
 .view--data .datapane__jump {
   max-width: var(--page-max);
   margin: 0 auto var(--s4);
@@ -9114,26 +9114,102 @@ header.masthead {
 .datapane__jumplist {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--s1) var(--s4);
+  gap: var(--s2);
   margin: 0;
-  padding: var(--s2) 0;
+  padding: 0;
   list-style: none;
-  border-top: var(--hair) solid var(--line);
-  border-bottom: var(--hair) solid var(--line);
 }
-.datapane__jumplink {
+.settings__navlink {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: var(--tap-min);
-  font-size: var(--text-xs);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
+  padding: var(--s2) var(--s4);
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: var(--text-sm);
   font-weight: var(--weight-semi);
   color: var(--ink-muted);
   text-decoration: none;
 }
-.datapane__jumplink:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 0.2em; }
-.datapane__jumplink:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.settings__navlink:hover { color: var(--accent); border-color: var(--accent); }
+.settings__navlink[aria-current="page"] {
+  color: var(--accent-on-soft);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.settings__navlink:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+.settings__group {
+  max-width: var(--page-max);
+  margin: 0 auto var(--s6);
+  padding-inline: var(--gutter);
+  min-width: 0;
+}
+.view--data .settings__group[hidden],
+.view--data .datapane__section[hidden] { display: none !important; }
+.view--data:not([data-settings-group="tools"]) > .collmiss { display: none; }
+.settings__group > .datapane__section {
+  margin: 0 0 var(--s3);
+  padding: var(--s4);
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  min-width: 0;
+}
+.settings__group .datapane__h {
+  margin: 0 0 var(--s2);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  line-height: 1.3;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--ink);
+}
+.settings__group .datapane__lede {
+  margin: 0 0 var(--s3);
+  max-width: var(--measure);
+  font-size: var(--text-sm);
+}
+.settings__group .curr { margin-bottom: 0; }
+/* Account content already has its own planning and research cards. Keep a
+   readable form width and avoid putting another bordered box around them. */
+.settings__group[data-group="account"] > .datapane__section {
+  max-width: 42rem;
+  border: 0;
+  padding: 0;
+  background: none;
+}
+.settings__group[data-group="account"] .sync { margin-bottom: 0; }
+.settings__group[data-group="account"] .sync__form,
+.settings__group[data-group="account"] .sync__field { min-width: 0; }
+.settings__group[data-group="account"] .sync__input { min-width: 0; max-width: 100%; }
+.settings__group:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.settings__related {
+  display: inline-block;
+  margin-bottom: var(--s3);
+  font-size: var(--text-sm);
+  text-underline-offset: 0.2em;
+}
+.settings__disclosure { border-top: var(--hair) solid var(--line); margin-top: var(--s3); }
+.settings__disclosure > summary {
+  min-height: var(--tap-min);
+  padding-block: var(--s3);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+}
+.settings__disclosure > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.settings__disclosure .transfer--in { border: 0; padding-top: var(--s2); }
+.settings__group .trips__manage { margin-bottom: 0; font-size: var(--text-sm); }
+
+@media (max-width: 599px) {
+  .settings__nav .datapane__jumplist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .settings__navlink { width: 100%; padding-inline: var(--s2); font-size: var(--text-xs); }
+  .settings__group > .datapane__section { padding: var(--s3); }
+}
 
 .view--data .datapane__section:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
 
@@ -9388,6 +9464,28 @@ header.masthead {
 .curr__hint { margin: var(--s1) 0 0; }
 .curr__hint:empty { display: none; }
 /* ==== src/css/39-view-sync.css ==== */
+.sync__planning { min-width: 0; border: var(--hair) solid var(--line-hair); border-radius: var(--radius-md); background: var(--surface); padding: var(--s4); display: grid; gap: var(--s3); }
+.sync__planintro { display: grid; gap: var(--s3); }
+.sync__planheading { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+.sync__plantitle { font-size: var(--text-lg); margin: 0; color: var(--ink); }
+.sync__planning .sync__card { border: 0; border-top: var(--hair) solid var(--line-hair); border-radius: 0; padding: var(--s3) 0 0; }
+.sync__identity:empty, .sync__imports:empty { display: none; }
+.sync__research { min-width: 0; border: var(--hair) solid var(--line-hair); border-radius: var(--radius-md); background: var(--surface); }
+.sync__researchsummary { min-height: var(--tap-min); padding: var(--s3) var(--s4); cursor: pointer; color: var(--ink); }
+.sync__researchtitle { font-weight: var(--weight-semi); }
+.sync__researchstate { display: block; color: var(--ink-muted); font-size: var(--text-xs); padding-top: var(--s1); }
+.sync__github { min-width: 0; display: grid; gap: var(--s3); padding: 0 var(--s4) var(--s4); }
+.sync__help > p { padding-bottom: var(--s2); }
+.sync__account[open] { display: grid; gap: var(--s3); }
+.sync__account > summary, .sync__research > summary { outline-offset: 3px; }
+.sync__planning .sync__actions .btn { white-space: normal; text-align: center; }
+@media (max-width: 479px) {
+  .sync__planning { padding: var(--s3); }
+  .sync__researchsummary { padding: var(--s3); }
+  .sync__github { padding-inline: var(--s3); }
+  .sync__actions { align-items: stretch; }
+  .sync__activity li { flex-wrap: wrap; gap: var(--s1); }
+}
 .fbsettings { min-width: 0; }
 .fbsettings[open] { display: grid; gap: var(--s3); }
 .fbsettings__form { margin-top: var(--s3); }
@@ -11211,6 +11309,28 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
 }
+.plan__gate--setup {
+  max-width: 56rem;
+  padding: var(--s5);
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.plan__setupkicker { margin: 0; color: var(--accent); font-size: var(--text-xs); font-weight: var(--weight-semi); }
+.plan__setupheading { margin: 0; font-size: var(--text-xl); color: var(--ink); }
+.plan__gate--setup .plan__gateline { max-width: var(--measure); font-size: var(--text-sm); }
+.plan__setupaction { justify-self: start; }
+.plan__features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s4); margin: var(--s3) 0 0; padding: var(--s4) 0 0; list-style: none; border-top: var(--hair) solid var(--line); }
+.plan__feature { min-width: 0; }
+.plan__featuretitle { margin: 0 0 var(--s1); color: var(--ink); font-size: var(--text-sm); font-weight: var(--weight-semi); }
+.plan__featureline { margin: 0; color: var(--ink-muted); font-size: var(--text-xs); line-height: var(--leading-body); }
+@media (max-width: 767px) {
+  .plan__gate--setup { padding: var(--s4); }
+  .plan__features { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4) var(--s3); }
+}
+@media (max-width: 359px) {
+  .plan__features { grid-template-columns: 1fr; }
+}
 .plan__hint { margin: var(--s1) 0 0; color: var(--ink-faint); font-size: var(--text-xs); }
 .plan__status, .dates__status {
   margin: 0;
@@ -12145,7 +12265,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 (function (T) {
   'use strict';
 
-  T.version = '0.28.1';   // Local follow-ups 2026-09-21: importer safeguards and extensions, device settings, assistant controls; unpublished
+  T.version = '0.28.2';   // Settings organization, visible planning, published-site sign-in
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -45427,11 +45547,37 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       gate.appendChild(buildStartDrawer(tripId));
       return gate;
     }
-    gate.appendChild(U.el('p', { class: 'plan__gateline', text: GATE_TEXT[state] || 'That didn’t work.' }));
     if (GATE_LINK_STATES[state]) {
-      gate.appendChild(U.el('a', { class: 'plan__gatelink',
-        href: T.router.build('data', [], { section: 'sync' }) }, 'Open Stay in sync'));
+      gate.classList.add('plan__gate--setup');
+      gate.appendChild(U.el('p', { class: 'plan__setupkicker', text: 'Planning & tracking' }));
+      gate.appendChild(U.el('h2', { class: 'plan__setupheading', text: 'Your whole trip, in one place.' }));
+      var nextStep = state === 'off'
+        ? 'Connect this browser, then sign in to start a plan or import your Travel Tracker trip.'
+        : state === 'signedout'
+          ? 'Sign in to open a shared plan, start a new one or import your Travel Tracker trip.'
+          : 'The connection is unavailable. Check your settings to reopen your plan.';
+      gate.appendChild(U.el('p', { class: 'plan__gateline', text: nextStep }));
+      gate.appendChild(U.el('a', { class: 'btn btn--primary plan__setupaction',
+        href: T.router.build('data', [], { section: 'sync' }) },
+        state === 'off' ? 'Set up planning' : state === 'signedout' ? 'Sign in to plan' : 'Check connection'));
+      var features = U.el('ul', { class: 'plan__features', 'aria-label': 'Planning tools' });
+      [
+        ['Dates', 'Propose dates and agree on a time to go.'],
+        ['Budget & expenses', 'Set a budget, split costs and track payments.'],
+        ['Bookings', 'Keep flights, stays and insurance together.'],
+        ['Checklist & packing', 'Track what needs doing and what to bring.'],
+        ['Itinerary', 'Arrange bookings and activities day by day.'],
+        ['Assistant', 'Ask for ideas and review suggested changes.']
+      ].forEach(function (feature) {
+        features.appendChild(U.el('li', { class: 'plan__feature' }, [
+          U.el('h3', { class: 'plan__featuretitle', text: feature[0] }),
+          U.el('p', { class: 'plan__featureline', text: feature[1] })
+        ]));
+      });
+      gate.appendChild(features);
+      return gate;
     }
+    gate.appendChild(U.el('p', { class: 'plan__gateline', text: GATE_TEXT[state] || 'That didn’t work.' }));
     return gate;
   }
 
@@ -45623,9 +45769,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     wrap.appendChild(U.el('h1', { class: 'plan__title', text: titleWord + ' — ' + tripName }));
 
     var nav = U.el('nav', { class: 'plan__nav', 'aria-label': 'Plan sections' });
-    [['dates', 'Dates'], ['budget', 'Budget'], ['bookings', 'Bookings'], ['prepare', 'Prepare'], ['itinerary', 'Itinerary']].forEach(function (pair) {
+    [['overview', 'Overview'], ['dates', 'Dates'], ['budget', 'Budget'], ['bookings', 'Bookings'], ['prepare', 'Prepare'], ['itinerary', 'Itinerary']].forEach(function (pair) {
       var link = U.el('a', { class: 'plan__navlink', dataset: { section: pair[0] },
-        href: T.router.build('plan', [pair[0]]) }, pair[1]);
+        href: T.router.build('plan', pair[0] === 'overview' ? [] : [pair[0]]) }, pair[1]);
       if (section === pair[0]) link.setAttribute('aria-current', 'page');
       nav.appendChild(link);
     });
@@ -48958,24 +49104,18 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   };
 })(window.TRIP);
 /* ==== src/js/29-view-data.js ==== */
-/* 29-view-data.js — WORKBOOK & SETTINGS (#/data). OWNER: IMPL-5.
+/* 29-view-data.js — SETTINGS (#/data). OWNER: IMPL-5.
  *
  * UX_SPEC §16. This is the screen where the app stops being a reader of one
- * frozen snapshot and becomes a thing you can keep feeding. Sections, in
- * the order §16 (+ TRIPS_SPEC §9) sets:
- *
- *   A0 Trips                 the trip list and the one trip form (v0.18.0)
- *   A  The workbook          which copy is live, how healthy it is (80-health.js)
- *   B  Load your spreadsheet the transactional upload flow      (81-reload.js)
- *   C  Notes without a trip  orphan re-attachment, never automatic (§16.3)
- *   D  Your planning data    export / import between two devices   (§16.4)
- *   E  Still to come         the preferences waves that follow
+ * frozen snapshot and becomes a thing you can keep feeding. Settings are
+ * grouped by purpose: account, trips, research, and backup/tools. Each group
+ * stays mounted when hidden so changing category never discards a draft.
  *
  * WHY THE VIEW IS REGISTERED FROM HERE, NUMBERED 29
  * `50-shell.js` registers a fallback #/data at parse time only if nothing has
  * claimed the route yet (`T.views.has('data')`). A file that sorts BEFORE the
  * shell therefore takes ownership cleanly, with no edit to anyone else's file —
- * the same seam every other view uses. Section E keeps
+ * the same seam every other view uses. A hidden direct-child anchor keeps
  * `aria-labelledby="data-later"` because 36-comp-collections.js inserts its
  * "collections this workbook can't build" panel immediately before it.
  *
@@ -49039,19 +49179,18 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     } catch (e) { T.diag.note('dataview', 'device identity not restored: ' + ((e && e.message) || e)); }
   })();
 
-  var SECTIONS = [
+  var GROUPS = [
+    { key: 'account', label: 'Account & sharing' },
     { key: 'trips', label: 'Trips' },
-    { key: 'lists', label: 'Lists' },
-    { key: 'workbook', label: 'The workbook' },
-    { key: 'sync', label: 'Stay in sync' },
-    { key: 'currency', label: 'Currency' },
-    { key: 'budget', label: 'Budget' },
-    { key: 'load', label: 'Load your spreadsheet' },
-    { key: 'orphans', label: 'Notes without a trip' },
-    { key: 'transfer', label: 'Your planning data' }
+    { key: 'research', label: 'Research' },
+    { key: 'tools', label: 'Backup & tools' }
   ];
-
-  function href(section) { return T.router.build('data', [], { section: section }); }
+  var SECTION_GROUPS = {
+    sync: 'account', trips: 'trips', currency: 'trips', budget: 'trips',
+    'budget-scenarios': 'trips', lists: 'research', workbook: 'research',
+    load: 'research', orphans: 'tools', transfer: 'tools',
+    'decision-profiles': 'tools', collections: 'tools'
+  };
 
   function sectionEl(key, title, lede) {
     var sec = U.el('section', {
@@ -49281,9 +49420,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
     if (!live.length && !aside.length) {
       body.appendChild(U.el('p', { class: 'datapane__quiet', text:
-        'Every note, reaction and checklist you have written still matches an option in the ' +
-        'workbook. If a hotel ever disappears from a future file, whatever you wrote about it ' +
-        'will wait here rather than vanish.' }));
+        'All your notes match an option. Notes for removed options will wait here.' }));
       return;
     }
 
@@ -49327,11 +49464,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
   function exportBlock() {
     var box = U.el('div', { class: 'transfer transfer--out' });
-    box.appendChild(U.el('h3', { class: 'transfer__h', text: 'Copy your planning data' }));
+    box.appendChild(U.el('h3', { class: 'transfer__h', text: 'Export decision backup' }));
     box.appendChild(U.el('p', { class: 'transfer__lede', text:
-      'Everything you two have marked, written and decided — reactions, notes, statuses, ' +
-      'checklists, saved views, scenarios, weights. The workbook research isn’t in here; ' +
-      'that lives in the file.' }));
+      'Saves research notes, reactions, shortlists, decision checklists, saved views and scenarios.' }));
 
     /* The bundle is regenerated whenever planning state moves, so what you copy
        is always what you have — a stale textarea would export yesterday. */
@@ -49355,15 +49490,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     box.appendChild(last);
 
     box.appendChild(U.el('p', { class: 'transfer__hint', text:
-      'Paste it somewhere safe — an email to yourselves works. On the other phone or laptop, ' +
-      'open this same page and paste it into the box below.' }));
+      'Keep this copy somewhere private. Restore it on another device using the option below.' }));
 
     /* The textarea is ALWAYS available, not a failure fallback: clipboard APIs
        fail silently in embedded contexts, and a silent failure here loses work. */
     var det = U.el('details', { class: 'transfer__manual' });
-    det.appendChild(U.el('summary', { class: 'transfer__manualsum', text: '…or copy it by hand' }));
+    det.appendChild(U.el('summary', { class: 'transfer__manualsum', text: 'Copy backup text manually' }));
     var ta = U.el('textarea', { class: 'textarea transfer__text', rows: '8', readonly: true,
-      'aria-label': 'Your planning data, as text' });
+      'aria-label': 'Decision backup as text' });
     ta.value = bundle.text;
     det.addEventListener('toggle', function () {
       if (!det.open) return;
@@ -49379,11 +49513,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     copy.addEventListener('click', function () {
       T.plan.copyToClipboard(bundle.text).then(function (res) {
         if (res.ok) {
-          U.setText(status, 'Copied — ' + F.plural(tripCount(), 'trip') + ' worth.');
+          U.setText(status, 'Copied decisions for ' + F.plural(tripCount(), 'option') + '.');
           Prefs.write({ lastCopiedAt: U.now() });
           U.setText(last, 'Last copied just now.');
         } else {
-          U.setText(status, 'This browser wouldn’t let us reach the clipboard. Open “copy it by hand” and select the text.');
+          U.setText(status, 'Clipboard unavailable. Select the backup text below to copy it.');
           det.open = true;
           try { ta.focus(); ta.select(); } catch (e) {}
         }
@@ -49412,16 +49546,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
   function importBlock(refresh) {
     var box = U.el('div', { class: 'transfer transfer--in' });
-    box.appendChild(U.el('h3', { class: 'transfer__h', text: 'Paste planning data' }));
     box.appendChild(U.el('p', { class: 'transfer__lede', text:
-      'Nothing is overwritten without a newer timestamp. Both sets of notes survive, each ' +
-      'still signed by whoever wrote it, and each traveller stays the authority on their own ' +
-      'reaction. You see exactly what will change before anything does.' }));
+      'Paste a decision backup to preview changes before choosing how to restore it.' }));
 
     var id = 'transfer-paste';
-    box.appendChild(U.el('label', { class: 'visually-hidden', for: id, text: 'Paste planning data here' }));
+    box.appendChild(U.el('label', { class: 'visually-hidden', for: id, text: 'Paste decision backup here' }));
     var ta = U.el('textarea', { class: 'textarea transfer__paste', id: id, rows: '5',
-      placeholder: 'Paste here…' });
+      placeholder: 'Paste backup text here…' });
     box.appendChild(ta);
 
     var acts = U.el('div', { class: 'transfer__actions' });
@@ -49725,10 +49856,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     /* The catalog is the front door (NAV_SPEC §1); this section is where a
        trip's settings are changed. One quiet line joins the two. */
     var manage = U.el('p', { class: 'trips__manage' });
-    manage.appendChild(document.createTextNode('Every trip, as a card, with what each one has decided: '));
     manage.appendChild(U.el('a', { class: 'trips__manage-link',
-      href: T.router.build('trips'), text: 'the trip list' }));
-    manage.appendChild(document.createTextNode('.'));
+      href: T.router.build('trips'), text: 'View all trips' }));
     box.appendChild(manage);
 
     function openNew() { form.openNew(); }
@@ -50183,26 +50312,18 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     function paint() {
       var a = anchor(), own = budgetEntry(), wb = workbookFigure();
       var t = activeTrip(), name = tripNameOf(t);
-      var research = isResearchWindow(t), rw = researchWindow();
+      var research = isResearchWindow(t);
       var src = a ? a.source : (own != null ? 'override' : 'none');
       var val = a && a.value != null ? a.value : own;
       var text;
       if (val == null) {
-        text = 'No budget yet for ' + name + '. Set one below and every price, band and headroom ' +
-          'pill on this trip is measured against it.';
+        text = 'No research budget set for ' + name + '.';
       } else if (own != null) {
-        text = 'Every price on ' + name + ' is measured against ' + usd(val) +
-          ' — the figure you set here, for both of you.';
-        if (wb != null) {
-          text += research
-            ? ' The workbook’s own brief says ' + usd(wb) + '.'
-            : ' The workbook’s ' + usd(wb) + ' is for ' + (rw && rw.label ? rw.label : 'the workbook’s own dates') + ', not these.';
-        }
+        text = usd(val) + ' for both travellers · custom budget';
       } else if (src === 'workbook') {
-        text = 'Every price on ' + name + ' is measured against ' + usd(val) + ' — ' + a.label +
-          '. Set your own figure below when this trip needs a different one.';
+        text = usd(val) + ' for both travellers · ' + a.label;
       } else {
-        text = 'Every price on ' + name + ' is measured against ' + usd(val) + ' — ' + (a ? a.label : '') + '.';
+        text = usd(val) + (a && a.label ? ' · ' + a.label : '');
       }
       U.setText(line, text);
       line.dataset.source = src;
@@ -50229,75 +50350,86 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   /* ===================================================================== */
 
   var view = {
-    title: 'Workbook & Settings',
+    title: 'Settings',
 
     mount: function (el, ctx) {
-      el.appendChild(U.el('h1', { class: 'datapane__title', text: 'Workbook & Settings' }));
+      el.appendChild(U.el('h1', { class: 'datapane__title', text: 'Settings' }));
       el.appendChild(U.el('div', { class: 'datapane__stand' },
         U.el('p', { class: 'datapane__standfirst', text:
-          'This is where the app meets your spreadsheet. Load a newer copy whenever you have ' +
-          'one — everything you two have marked, written and decided stays exactly where it is.' })));
+          'Manage your account, trips and research in one place.' })));
 
-      /* Jump list (§16): a real nav on desktop, harmless on a phone. */
-      var jump = U.el('nav', { class: 'datapane__jump', 'aria-label': 'Sections of this page' });
+      /* Real links keep categories bookmarkable and preserve browser Back.
+         The router updates this view in place, leaving every form mounted. */
+      var jump = U.el('nav', { class: 'datapane__jump settings__nav', 'aria-label': 'Settings categories' });
       var jl = U.el('ul', { class: 'datapane__jumplist', role: 'list' });
-      SECTIONS.forEach(function (s) {
-        jl.appendChild(U.el('li', {}, U.el('a', { class: 'datapane__jumplink', href: href(s.key) }, s.label)));
+      el._settingsGroups = {};
+      el._settingsLinks = {};
+      GROUPS.forEach(function (g) {
+        var link = U.el('a', { class: 'settings__navlink', id: 'settings-nav-' + g.key,
+          href: T.router.build('data', [], { group: g.key }),
+          'aria-controls': 'data-group-' + g.key, dataset: { group: g.key }, text: g.label });
+        el._settingsLinks[g.key] = link;
+        jl.appendChild(U.el('li', {}, link));
       });
       jump.appendChild(jl);
       el.appendChild(jump);
+      GROUPS.forEach(function (g) {
+        var panel = U.el('div', { class: 'settings__group', id: 'data-group-' + g.key,
+          role: 'region', 'aria-labelledby': 'settings-nav-' + g.key,
+          tabindex: '-1', hidden: true, dataset: { group: g.key } });
+        el._settingsGroups[g.key] = panel;
+        el.appendChild(panel);
+      });
+      function addTo(group, section) { el._settingsGroups[group].appendChild(section); }
 
       /* ---- A0 · trips (v0.18.0) — first, because the rest is per trip -- */
       var secT = sectionEl('trips', 'Trips',
-        'One list, many trips. Opinions about a place are shared; the shortlist, checklist, ' +
-        'quotes and budget belong to each trip. Trips with the same dates share their quotes.');
+        'Manage names, dates and shortlists. Choose a trip to update its preferences below.');
       secT.appendChild(tripsBlock(secT));
-      el.appendChild(secT);
+      addTo('trips', secT);
       el._secT = secT;
 
       /* ---- A1 · lists (LISTS_SPEC §6) ---------------------------------- */
-      var secL = sectionEl('lists', 'Lists',
-        'The vocabulary each shortlist shops with. A project belongs to exactly one list; ' +
-        'opinions about an option are shared the moment two lists share its id.');
+      var secL = sectionEl('lists', 'Research lists',
+        'Manage the hotels, venues and other options your trips draw from.');
       secL.appendChild(listsBlock(secL));
-      el.appendChild(secL);
+      addTo('research', secL);
       el._secL = secL;
 
       /* ---- A · the workbook — scoped to the active list (LISTS_SPEC §6) */
       var secA = sectionEl('workbook', scopedTitle('The workbook'));
       var health = U.el('div', { class: 'health', id: 'health' });
       secA.appendChild(health);
-      el.appendChild(secA);
+      addTo('research', secA);
       T.health.mount(health);
       el._secA = secA;
 
       /* ---- A2 · stay in sync (82-sync.js / 83-view-sync.js) ------------ */
       if (T.sync && T.sync.mount) {
-        var secS = sectionEl('sync', 'Stay in sync');
+        var secS = sectionEl('sync', 'Account & sharing');
+        U.qs('.datapane__h', secS).classList.add('visually-hidden');
         var syncHost = U.el('div', { class: 'sync', id: 'sync' });
         secS.appendChild(syncHost);
-        el.appendChild(secS);
+        addTo('account', secS);
         T.sync.mount(syncHost);
       }
 
       /* ---- A3 · currency (15-currency.js) ------------------------------ */
       if (T.currency && T.currency.mode) {
         var secCu = sectionEl('currency', 'Display currency — ' + activeTripName(),
-          'One currency for every price on this trip, for both of you. Nothing underneath changes — ' +
-          'the workbook’s figures stay in dollars and each quote in whatever the resort wrote; a ' +
-          'converted figure carries ≈ so it is never mistaken for the number itself.');
+          'Show research prices in your preferred currency. Converted amounts use ≈; original quotes stay unchanged.');
         secCu.appendChild(currencyBlock(secCu));
-        el.appendChild(secCu);
+        addTo('trips', secCu);
         el._secCu = secCu;
       }
 
       /* ---- A4 · budget (v0.17.0; per trip since v0.18.0) --------------- */
-      var secBu = sectionEl('budget', 'Budget — ' + activeTripName(),
-        'The whole-trip figure every price, band and headroom pill on this trip is measured against — ' +
-        'for both of you. Each trip carries its own; the workbook carries one too. Nothing underneath is ' +
-        'recomputed from it: quotes stay quotes and the workbook’s modelled totals stay its own.');
+      var secBu = sectionEl('budget', 'Research budget — ' + activeTripName(),
+        'A whole-trip target for comparing research prices. Track planned costs and actual spending in Plan.');
+      secBu.appendChild(U.el('a', { class: 'settings__related', href: T.router.build('plan', ['budget']),
+        text: 'Open plan budget' }));
       secBu.appendChild(budgetBlock(secBu));
-      el.appendChild(secBu);
+      addTo('trips', secBu);
       el._secBu = secBu;
 
       /* ---- B · load your spreadsheet — scoped to the active list ------
@@ -50306,61 +50438,52 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
          even while this heading names the hotels. Each list's own row on
          the Lists section above targets one list explicitly instead. */
       var secB = sectionEl('load', scopedTitle('Load your spreadsheet'),
-        'Your notes, reactions, statuses and checklists stay put. Only the research updates.' +
+        'Update research from a workbook. Your notes and decisions stay saved.' +
         (T.sync && T.sync.isConfigured && T.sync.isConfigured()
-          ? ' A workbook you load here is shared with the other laptop as well.' : ''));
+          ? ' Connected devices receive the update too.' : ''));
       var upload = U.el('div', { class: 'reload' });
       secB.appendChild(upload);
-      el.appendChild(secB);
+      addTo('research', secB);
       T.reload.mount(upload);
       el._secB = secB;
 
       /* ---- C · notes without a trip ----------------------------------- */
-      var secC = sectionEl('orphans', 'Notes without a trip');
+      var secC = sectionEl('orphans', 'Unmatched research notes');
       secC._count = U.el('span', { class: 'datapane__count', hidden: true });
       U.qs('.datapane__h', secC).appendChild(secC._count);
       secC.appendChild(U.el('p', { class: 'datapane__lede', text:
-        'When a workbook stops listing a hotel, whatever you wrote about it is kept and waits ' +
-        'here. Nothing is ever attached to another trip on your behalf — a wrong guess would ' +
-        'be worse than an orphan.' }));
+        'Notes for removed options stay here until you reattach them or set them aside.' }));
       secC._body = U.el('div', { class: 'orphans__body' });
       secC.appendChild(secC._body);
-      el.appendChild(secC);
       paintOrphans(secC);
       el._secC = secC;
 
       /* ---- D · your planning data ------------------------------------- */
-      var secD = sectionEl('transfer', 'Your planning data',
-        (T.sync && T.sync.isConfigured && T.sync.isConfigured())
-          ? 'Sharing keeps both laptops together on its own. This is the backup path — a copy you can ' +
-            'keep, or paste into a browser that isn’t connected.'
-          : 'Until sharing is set up above, this is how Solomon and Roni stay in sync: ' +
-            'copy it out of one device, paste it into the other.');
+      var secD = sectionEl('transfer', 'Decision backup',
+        'This backup does not include your Firebase plan, itinerary, expenses, private traveller details or workbook file.');
       var refresh = function () { paintOrphans(secC); };
       secD._out = exportBlock();
       secD.appendChild(secD._out);
-      secD.appendChild(importBlock(refresh));
-      el.appendChild(secD);
+      var restore = U.el('details', { class: 'transfer__importdrawer settings__disclosure' });
+      restore.appendChild(U.el('summary', { text: 'Restore decision backup' }));
+      restore.appendChild(importBlock(refresh));
+      secD.appendChild(restore);
+      addTo('tools', secD);
       el._secD = secD;
+      addTo('tools', secC);
 
       var secBudget = sectionEl('budget-scenarios', 'Budget scenarios', 'Save and compare your trip-cost what-ifs in Budget Lab.');
       secBudget.appendChild(U.el('a', { class: 'btn', href: T.router.build('budget'), text: 'Manage budget scenarios' }));
-      el.appendChild(secBudget);
+      addTo('trips', secBudget);
 
       var secDecision = sectionEl('decision-profiles', 'Decision profiles', 'Set priorities and compare your ranking with the workbook.');
       secDecision.appendChild(U.el('a', { class: 'btn', href: T.router.build('decision'), text: 'Manage decision profiles' }));
-      el.appendChild(secDecision);
+      addTo('tools', secDecision);
 
-      /* ---- E · still to come ------------------------------------------
-         Kept as the LAST section and with this exact aria-labelledby:
-         36-comp-collections.js inserts its panel immediately before it. */
-      var secE = U.el('section', { class: 'datapane__section', 'aria-labelledby': 'data-later' });
-      secE.appendChild(U.el('h2', { id: 'data-later', class: 'datapane__h', text: 'Still to come' }));
-      secE.appendChild(U.el('p', { class: 'datapane__lede', text:
-        'Preferences — theme, density, the display names, the ' +
-        'price-staleness window — and the saved-view manager ' +
-        'arrive in a later wave. Nothing you decide before then is at risk: it is ' +
-        'already saved on this device, and you can copy it out above at any time.' }));
+      /* Keep the collections module's insertion hook as a direct child.
+         Its injected panel is shown only in Backup & tools by our CSS. */
+      var secE = U.el('section', { class: 'datapane__section', hidden: true, 'aria-labelledby': 'data-later' });
+      secE.appendChild(U.el('h2', { id: 'data-later', text: 'Additional tools' }));
       el.appendChild(secE);
 
       scrollToSection(el, ctx.route);
@@ -50388,7 +50511,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (tripish || planish) {
         if (el._secT && el._secT._paintTrips) el._secT._paintTrips();
         if (el._secBu) {
-          setHeading(el._secBu, 'Budget — ' + activeTripName());
+          setHeading(el._secBu, 'Research budget — ' + activeTripName());
           if (el._secBu._paintBudget) el._secBu._paintBudget();
         }
         if (el._secCu) {
@@ -50420,6 +50543,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (el._secCu && el._secCu._offRate) el._secCu._offRate();
       el._secC = null; el._secD = null; el._secCu = null; el._secT = null;
       el._secL = null; el._secA = null; el._secB = null;
+      el._settingsGroups = null; el._settingsLinks = null;
     }
   };
 
@@ -50447,11 +50571,28 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   }
 
   function scrollToSection(el, route) {
-    var want = route && route.query && route.query.section;
-    if (!want) return;
-    var node = U.qs('#data-sec-' + want, el);
+    var q = (route && route.query) || {};
+    var want = q.section;
+    var knownSection = Object.prototype.hasOwnProperty.call(SECTION_GROUPS, want);
+    var group = knownSection ? SECTION_GROUPS[want] : null;
+    if (q['new'] === '1' || q['new'] === 'true') group = 'trips';
+    if (!group) group = GROUPS.some(function (g) { return g.key === q.group; }) ? q.group : 'account';
+    var previous = el.dataset.settingsGroup;
+    el.dataset.settingsGroup = group;
+    GROUPS.forEach(function (g) {
+      var selected = g.key === group;
+      el._settingsGroups[g.key].hidden = !selected;
+      if (selected) el._settingsLinks[g.key].setAttribute('aria-current', 'page');
+      else el._settingsLinks[g.key].removeAttribute('aria-current');
+    });
+    /* Only recognized keys become selectors. Old section links take priority
+       over a category so a saved link never opens a hidden target. */
+    var node = knownSection && SECTION_GROUPS[want] === group ? U.qs('#data-sec-' + want, el) : null;
+    if (want === 'collections' && group === 'tools') node = U.qs('.collmiss', el);
+    if (!node && (q.group || (previous && previous !== group))) node = el._settingsGroups[group];
     if (!node) return;
     window.setTimeout(function () {
+      if (!el.isConnected || el.dataset.settingsGroup !== group) return;
       try { node.scrollIntoView({ block: 'start', behavior: 'auto' }); } catch (e) {}
       try { node.focus({ preventScroll: true }); } catch (e) {}
     }, 0);
@@ -58269,7 +58410,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
  *     global search entry, device-identity chip, workbook health chip
  *   - the app-wide band region under the masthead (§16.3 orphans, §16.5 storage,
  *     plus anything pushed through the store's `ui/banner` mutator)
- *   - the mobile 5-tab bottom bar (Home · Explore · Collections · Compare · More)
+ *   - the mobile 5-tab bottom bar (Home · Explore · Plan · Compare · More)
  *     with a live compare badge, and the More bottom sheet
  *   - a polite live region that announces route changes (§18.6)
  *   - DESIGNED PLACEHOLDERS for every route in §1.2 that has no view yet, so a
@@ -58343,7 +58484,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       line: 'Every option where it actually is — the same filters as Explore, on one map.' },
     { name: 'responses', label: 'Responses', group: 'primary',
       title: 'Resort responses' },
-    { name: 'plan', label: 'Plan', group: 'primary', title: 'Plan' },
+    { name: 'plan', label: 'Plan', group: 'primary', title: 'Plan', tab: 'Plan', glyph: '☑' },
     { name: 'budget', label: 'Budget Lab', group: 'labs',
       title: 'Budget Lab', menuDesc: 'Model your nights, airfare, budget',
       line: 'Try nights, airfare and a trip budget, then save your scenarios.' },
@@ -58362,8 +58503,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     { name: 'archive', label: 'The No Pile', group: 'more',
       title: 'The No Pile', menuDesc: 'Rejected options, kept but archived',
       line: 'The archive arrives in a later wave — nothing you reject is ever thrown away, so it will all be here.' },
-    { name: 'data', label: 'Workbook & Settings', group: 'none',
-      title: 'Workbook & Settings' },
+    { name: 'data', label: 'Settings', group: 'none',
+      title: 'Settings' },
     { name: 'trip', label: 'Trip detail', group: 'none', title: 'Trip detail',
       line: 'The full trip page arrives in a later wave — everything the workbook knows about one option, plus what you two have said about it.' }
   ];
@@ -58422,15 +58563,15 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       '. That’s remembered in the address bar, so this link will still mean the same thing later.';
   }
 
-  /* The Workbook & Settings route gets more than a placeholder: it is where the
+  /* The Settings route gets more than a placeholder: it is where the
      health block and the Reload control live (§16.1/§16.2), and both already
      exist. The rest of the screen (export/import, orphan re-attachment,
      preferences) is a later wave, and the page says so plainly. */
   function registerDataView() {
     T.views.register('data', {
-      title: 'Workbook & Settings',
+      title: 'Settings',
       mount: function (el) {
-        el.appendChild(U.el('h1', { class: 'datapane__title', text: 'Workbook & Settings' }));
+        el.appendChild(U.el('h1', { class: 'datapane__title', text: 'Settings' }));
 
         var secA = U.el('section', { class: 'datapane__section', 'aria-labelledby': 'data-workbook' });
         secA.appendChild(U.el('h2', { id: 'data-workbook', class: 'datapane__h', text: 'The workbook' }));
@@ -58825,7 +58966,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
        "Settings" word is gone; the meaning is carried by aria-label). */
     nodes.settingsLink = U.el('a', {
       class: 'masthead__settings', href: href('data'), dataset: { route: 'data' },
-      'aria-label': 'Workbook & Settings'
+      'aria-label': 'Settings'
     }, U.el('span', { class: 'masthead__settingsglyph', 'aria-hidden': 'true', text: '⚙' }));
     inner.appendChild(nodes.settingsLink);
 
@@ -59138,7 +59279,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     nodes.wbChip.dataset.health = status;
     nodes.wbChip.setAttribute('aria-label',
       h.word + '. ' + name + ', ' + F.plural(w.recordCount || 0, 'option') +
-      '. Open Workbook & Settings.');
+      '. Open Settings.');
     nodes.wbChip.setAttribute('title', h.word + ' — ' + name);
   }
 
@@ -59169,8 +59310,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
   /* ---- plan phase gate (PLAN_SPEC §2 "phase gate", §13; Wave 2 §3.1) -----
    * ONE function, ONE source of truth for "is planning usable right now" —
-   * the Plan tab's visibility, the More-sheet entry, and 24b-view-plan.js's
-   * own gate block all call this instead of re-deriving it. Guarded exactly
+   * 24b-view-plan.js's controls call this instead of re-deriving it. The
+   * Plan entry stays visible so setup is discoverable. Guarded exactly
    * like describeIdentity() below: a build with Firebase absent reads as
    * gated, never throws. */
   SH.planGated = function () {
@@ -59240,17 +59381,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     nodes.idChip.setAttribute('title', d.word + (d.detail ? '\n' + d.detail : ''));
   }
 
-  /** Wave 2 §3.2 — the Plan tab's own `li` (not the whole trip bar) hides
-   *  while gated, so the other four tabs and More are never disturbed. Only
-   *  `nodes.roots[0]` (the top masthead) ever has a `.tripbar__nav`; the
-   *  bottom mobile chrome does not, so the query simply finds nothing there. */
+  /** Plan is an entry point even before this browser connects. The route
+   *  explains setup while its existing auth and write gates stay intact. */
   function paintPlanTab() {
-    var gated = SH.planGated();
     (nodes.roots || []).forEach(function (rootNode) {
       if (!rootNode) return;
       U.qsa('.tripbar__nav [data-route="plan"]', rootNode).forEach(function (a) {
         var li = a.closest ? a.closest('li') : null;
-        if (li) li.hidden = gated;
+        if (li) li.hidden = false;
       });
     });
   }
@@ -59269,13 +59407,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       wanted.push({
         id: 'storage-unavailable', kind: 'warn', cls: 'shell__band--storage',
         text: 'We can’t save to this browser right now — anything you change will be lost when you close the tab.',
-        action: { label: 'Workbook & Settings', href: href('data') }
+        action: { label: 'Settings', href: href('data') }
       });
     } else if (m.storage.reason === 'quota') {
       wanted.push({
         id: 'storage-quota', kind: 'warn', cls: 'shell__band--storage',
         text: 'Your last change didn’t save — this browser is out of room.',
-        action: { label: 'Workbook & Settings', href: href('data') }
+        action: { label: 'Settings', href: href('data') }
       });
     }
 
@@ -59321,7 +59459,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   /* 6. Mobile tab bar + More sheet (§1.4)                                */
   /* ==================================================================== */
 
-  var TABS = ['home', 'explore', 'collections', 'compare'];
+  var TABS = ['home', 'explore', 'plan', 'compare'];
 
   function buildTabBar() {
     var nav = U.el('nav', { class: 'tabbar', 'aria-label': 'Sections' });
@@ -59366,6 +59504,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   var lastTab = { name: null, at: 0 };
   function onTabActivate(name) {
     return function (e) {
+      // The primary Plan tab returns from a subsection to its overview.
+      if (name === 'plan' && /^#\/plan\//.test(window.location.hash)) { lastTab = { name: name, at: Date.now() }; return; }
       if (T.router.currentName() !== name) { lastTab = { name: name, at: Date.now() }; return; }
       e.preventDefault();
       var now = Date.now();
@@ -59406,14 +59546,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   function sheetGroups() {
     var counts = T.select.get('counts') || {};
     var open = openTaskCount();
-    /* Wave 2 §3.2 — Plan slots in right after Responses, but ONLY while it is
-       usable (the hand-written list README "Known follow-ups" #2 warns this
-       sheet is not built off SH.ROUTES generically; paintSheet() rebuilds it
-       on every open, so a sign-in or sign-out while the sheet is closed is
-       never stale the next time it opens). */
-    var perspectives = [route('responses')];
-    if (!SH.planGated()) perspectives.push(route('plan'));
-    perspectives.push(route('changed'), route('map'));
+    /* Collections keeps a direct home in More after Plan becomes a primary
+       mobile tab. Plan stays in this list too for existing menu habits. */
+    var perspectives = [route('collections'), route('responses'), route('plan'), route('changed'), route('map')];
     return [
       { title: 'Labs', items: [route('budget'), route('decision')] },
       { title: 'Perspectives', items: perspectives },
@@ -59592,7 +59727,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var r = route(name);
     var inMore = r && r.group === 'more';
     if (nodes.moreMenuButton) U.toggleClass(nodes.moreMenuButton, 'is-current', !!inMore);
-    if (nodes.moreButton) U.toggleClass(nodes.moreButton, 'is-current', !!inMore || name === 'budget' || name === 'decision');
+    if (nodes.moreButton) U.toggleClass(nodes.moreButton, 'is-current', !!inMore || name === 'budget' || name === 'decision' || name === 'collections');
 
     paintBarVisibility();
     SH.closeMore();
@@ -61824,10 +61959,12 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     acts.appendChild(go); if (cancel) acts.appendChild(cancel); acts.appendChild(status);
     box.appendChild(acts);
 
-    box.appendChild(U.el('p', { class: 'sync__hint', text:
-      'The token stays in this browser only — it is never written into the page or the repository. ' +
-      'To make one on GitHub: Settings → Developer settings → Personal access tokens → Fine-grained tokens → ' +
-      'Generate new token → Only select repositories: the data repo → Repository permissions → Contents: Read and write.' }));
+    var help = U.el('details', { class: 'sync__help' });
+    help.appendChild(U.el('summary', { class: 'sync__advsum', text: 'How to create a GitHub token' }));
+    help.appendChild(U.el('p', { class: 'sync__hint', text:
+      'In GitHub Settings, open Developer settings → Personal access tokens → Fine-grained tokens. ' +
+      'Select only your private data repository and allow Contents: Read and write. The token stays in this browser.' }));
+    box.appendChild(help);
 
     if (cancel) cancel.addEventListener('click', function () { if (opts.onCancel) opts.onCancel(); });
 
@@ -61987,7 +62124,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
    *  stored anywhere in this module. */
   function signInDrawer() {
     var details = U.el('details', { class: 'sync__drawer' });
+    details.open = true;
     details.appendChild(U.el('summary', { class: 'sync__advsum', text: 'Sign in' }));
+    details.appendChild(U.el('p', { class: 'sync__hint', text: 'Use your Travel Tracker email and password.' }));
 
     var form = U.el('form', { class: 'sync__form sync__form--signin', novalidate: true });
     var eid = 'identity-email', pid = 'identity-password', tid = 'identity-trust';
@@ -62074,12 +62213,12 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   /** Signed-in body: the uid (for the other person to paste into "add a
    *  member" — Wave 2), copy-id, sign-out, and the per-device trust toggle. */
   function signedInBlock(user) {
-    var wrap = U.el('div', {}, []);
+    var wrap = U.el('details', { class: 'sync__account' }, []);
+    wrap.appendChild(U.el('summary', { class: 'sync__advsum', text: 'Account options' }));
     var uid = user.uid || '';
-    wrap.appendChild(U.el('p', { class: 'sync__row', text: 'You are ' + uid.slice(0, 8) + '…' }));
 
     var acts = U.el('div', { class: 'sync__actions' });
-    var copyBtn = U.el('button', { type: 'button', class: 'btn btn--quiet sync__copyuid' }, 'Copy my id');
+    var copyBtn = U.el('button', { type: 'button', class: 'btn btn--quiet sync__copyuid' }, 'Copy member ID');
     var signOutBtn = U.el('button', { type: 'button', class: 'btn sync__signout' }, 'Sign out');
     var note = U.el('span', { class: 'sync__status', role: 'status', 'aria-live': 'polite' });
     acts.appendChild(copyBtn); acts.appendChild(signOutBtn); acts.appendChild(note);
@@ -62122,6 +62261,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var d = describeIdentity();
     if (d.hidden) return null;
     var card = U.el('div', { class: 'sync__card sync__card--identity', dataset: { state: d.key } });
+    if (d.key === 'signedout') { card.appendChild(signInDrawer()); return card; }
     card.appendChild(U.el('p', { class: 'sync__line' }, [
       U.el('span', { class: 'sync__glyph identity__statusdot', 'aria-hidden': 'true' }),
       U.el('span', { class: 'sync__word', text: d.word })
@@ -62129,7 +62269,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (d.detail) card.appendChild(U.el('p', { class: 'sync__row', text: d.detail }));
 
     var user = T.firebase && typeof T.firebase.user === 'function' ? T.firebase.user() : null;
-    card.appendChild(user ? signedInBlock(user) : signInDrawer());
+    if (user) card.appendChild(signedInBlock(user));
+    else if (d.key === 'signedout') card.appendChild(signInDrawer());
     return card;
   }
 
@@ -62138,8 +62279,20 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   function firebaseSettingsCard() {
     var card = U.el('div', { class: 'sync__card sync__card--settings', 'data-state': 'idle' });
     var drawer = U.el('details', { class: 'fbsettings' });
-    drawer.appendChild(U.el('summary', { class: 'sync__advsum', text: 'Plan sharing settings on this device' }));
-    drawer.appendChild(U.el('p', { class: 'sync__hint', text: 'Enter the Firebase web configuration for your shared plans. It stays in this browser, outside shared files and exports. Saving enables it for your next reload; signing in is a separate step.' }));
+    drawer.appendChild(U.el('summary', { class: 'sync__advsum', text: 'Connection settings' }));
+    if (T.firebase && T.firebase.hasSiteConnection && T.firebase.hasSiteConnection()) {
+      var siteConnect = U.el('button', { type: 'button', class: 'btn', text: 'Use this site’s connection', id: 'fbsettings-site' });
+      siteConnect.addEventListener('click', function () {
+        var result = T.firebase.useSiteConnection();
+        if (result.ok) window.location.reload();
+      });
+      drawer.appendChild(siteConnect);
+    }
+    drawer.appendChild(U.el('p', { class: 'sync__hint', text: 'Use the web app configuration from your Firebase project. Save it here, reload, then sign in.' }));
+    var help = U.el('details', { class: 'sync__help' });
+    help.appendChild(U.el('summary', { class: 'sync__advsum', text: 'Where to find these details' }));
+    help.appendChild(U.el('p', { class: 'sync__hint', text: 'Firebase console → Project settings → General → Your apps → Web app configuration. These connection details stay on this device and are excluded from shared files and backups.' }));
+    drawer.appendChild(help);
     var form = U.el('form', { class: 'sync__form fbsettings__form', autocomplete: 'off', novalidate: true });
     var fields = {};
     [['projectId', 'Project ID', 'text'], ['apiKey', 'Web API key', 'password'], ['authDomain', 'Auth domain', 'text']].forEach(function (spec) {
@@ -62148,8 +62301,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       form.appendChild(U.el('div', { class: 'sync__field' }, [U.el('label', { class: 'sync__label', for: id, text: spec[1] }), input]));
     });
     var actions = U.el('div', { class: 'sync__actions' });
-    var save = U.el('button', { id: 'fbsettings-save', class: 'btn btn--primary', type: 'submit', text: 'Save and enable on this device' });
-    var disable = U.el('button', { id: 'fbsettings-disable', class: 'btn btn--quiet', type: 'button', text: 'Disable and forget configuration' });
+    var save = U.el('button', { id: 'fbsettings-save', class: 'btn btn--primary', type: 'submit', text: 'Save connection' });
+    var disable = U.el('button', { id: 'fbsettings-disable', class: 'btn btn--quiet', type: 'button', text: 'Disconnect this device' });
     var reload = U.el('button', { id: 'fbsettings-reload', class: 'btn', type: 'button', hidden: true, text: 'Reload to connect' });
     var note = U.el('p', { class: 'sync__status fbsettings__status', role: 'status', 'aria-live': 'polite' });
     actions.appendChild(save); actions.appendChild(disable); actions.appendChild(reload);
@@ -62165,8 +62318,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       form.classList.toggle('is-error', !result.ok);
       if (!result.ok) { U.setText(note, errors[result.reason] || 'The configuration could not be saved. Check the fields and try again.'); return; }
       Object.keys(fields).forEach(function (key) { fields[key].value = ''; });
+      card._connectionSaved = true;
       U.setText(note, 'Saved on this device. Reload when you are ready to connect, then sign in.');
       reload.hidden = false;
+      if (SY._repaint) SY._repaint();
     });
     reload.addEventListener('click', function () { window.location.reload(); });
     disable.addEventListener('click', function () {
@@ -62174,13 +62329,58 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (!fb || typeof fb.disable !== 'function') return;
       save.disabled = disable.disabled = true;
       Promise.resolve(fb.disable()).then(function () {
+        card._connectionSaved = false;
         Object.keys(fields).forEach(function (key) { fields[key].value = ''; });
         reload.hidden = true; form.classList.remove('is-error');
         U.setText(note, 'Plan sharing is off on this device. Its saved configuration has been removed.');
         save.disabled = disable.disabled = false;
+        if (SY._repaint) SY._repaint();
       }, function () { save.disabled = disable.disabled = false; form.classList.add('is-error'); U.setText(note, 'Could not disable sharing. Try again.'); });
     });
     return card;
+  }
+
+  /* A stable entry point even before this device is connected. It describes
+     the existing plan capabilities without initializing Firebase or claiming
+     a plan. Only the user's explicit form actions start those operations. */
+  function planningIntro(host) {
+    var fb = T.firebase, st = fb && fb.status ? fb.status() : { state: 'off' };
+    var user = fb && fb.user ? fb.user() : null;
+    var saved = U.qs('.sync__card--settings', host);
+    var pending = !!(saved && saved._connectionSaved);
+    var intro = U.el('div', { class: 'sync__planintro', 'data-state': st.state });
+    var heading = U.el('div', { class: 'sync__planheading' }, [
+      U.el('h3', { class: 'sync__plantitle', text: 'Trip planning' }),
+      U.el('span', { class: 'sync__badge', text: pending ? 'Reload needed' : st.state === 'off' ? 'Not connected' : st.state === 'ready' ? (user ? 'Connected' : 'Ready to sign in') : st.state === 'loading' ? 'Connecting' : 'Connection unavailable' })
+    ]);
+    intro.appendChild(heading);
+    intro.appendChild(U.el('p', { class: 'sync__lede', text: 'Dates, budgets, bookings, preparation and your daily itinerary, together in Plan.' }));
+    var actions = U.el('div', { class: 'sync__actions' });
+    if (pending) {
+      var reload = U.el('button', { type: 'button', class: 'btn btn--primary', text: 'Reload to connect' });
+      reload.addEventListener('click', function () { window.location.reload(); });
+      actions.appendChild(reload);
+    } else if (st.state === 'off') {
+      intro.appendChild(U.el('p', { class: 'sync__row', text: 'Connect this device to start a shared plan or bring in a Travel Tracker trip.' }));
+      var siteReady = !!(fb && fb.hasSiteConnection && fb.hasSiteConnection());
+      var connect = U.el('button', { type: 'button', class: 'btn btn--primary', text: siteReady ? 'Connect planning' : 'Set up planning', id: 'planning-setup' });
+      connect.addEventListener('click', function () {
+        if (siteReady && fb.useSiteConnection().ok) { window.location.reload(); return; }
+        var drawer = U.qs('.fbsettings', host);
+        if (drawer) drawer.open = true;
+        var field = U.qs('#fbsettings-projectId', host);
+        if (field) field.focus();
+      });
+      actions.appendChild(connect);
+    } else if (st.state !== 'ready' && st.state !== 'loading') {
+      intro.appendChild(U.el('p', { class: 'sync__row', text: 'Check your connection settings and reload to try again.' }));
+      var retry = U.el('button', { type: 'button', class: 'btn', text: 'Reload to retry' });
+      retry.addEventListener('click', function () { window.location.reload(); });
+      actions.appendChild(retry);
+    }
+    actions.appendChild(U.el('a', { class: 'btn' + (user ? ' btn--primary' : ' btn--quiet'), href: T.router.build('plan'), text: user ? 'Open Plan' : 'See planning features' }));
+    intro.appendChild(actions);
+    return intro;
   }
 
   /** True while any element inside `card` matching `selector` has focus or
@@ -62970,7 +63170,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     }
     var fresh = ttimportCard(host);
     if (node && node.parentNode) node.parentNode.replaceChild(fresh, node);
-    else if (host.isConnected && shouldShowTTImport()) host.appendChild(fresh);
+    else if (host.isConnected && shouldShowTTImport()) (U.qs('.sync__imports', host) || host).appendChild(fresh);
     return fresh;
   }
 
@@ -62991,42 +63191,53 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     });
   }
   function activityBlock() {
-    var wrap = U.el('div', { class: 'sync__activitywrap' });
-    wrap.appendChild(U.el('h4', { class: 'sync__subh', text: 'Recent saves' }));
+    var wrap = U.el('details', { class: 'sync__activitywrap' });
+    wrap.appendChild(U.el('summary', { class: 'sync__advsum', text: 'Recent saves' }));
     var ul = U.el('ul', { class: 'sync__activity', role: 'list' });
     ul.appendChild(U.el('li', { class: 'sync__quiet', text: 'Loading…' }));
     wrap.appendChild(ul);
-    fillActivity(ul);
+    wrap.addEventListener('toggle', function () { if (wrap.open) fillActivity(ul); });
     return wrap;
   }
 
   /* ---- mount / repaint --------------------------------------------------- */
   SY.mount = function (host) {
-    function paint() {
-      var settings = U.qs('.sync__card--settings', host);
-      U.clear(host);
-      var st = SY.status;
-      host.appendChild(U.el('p', { class: 'sync__lede', text: st.configured
-        ? 'Both laptops read and write one small file in a private GitHub repository. Every change goes up a moment after you make it and comes down when the page is open; if you both change the same thing, the newer one wins and nothing is lost.'
-        : 'Both laptops can read and write one small file in a private GitHub repository — no server, no account needed for the other person. Set it up once here, then hand the other laptop a setup link.' }));
-      if (st.configured) {
-        host.appendChild(statusCard(host, paint));
-        host.appendChild(activityBlock());
-      } else {
-        host.appendChild(connectForm(host, { onDone: paint }));
-      }
-      /* WAVE1_CONTRACT §4.2 — always below the GitHub block, never above it;
-         entirely absent (not just hidden) when Firebase is off. */
-      var idc = identityCard();
-      if (idc) host.appendChild(idc);
+    var planning = U.el('div', { class: 'sync__planning' });
+    var introHost = U.el('div', { class: 'sync__introhost' });
+    var identityHost = U.el('div', { class: 'sync__identity' });
+    var importHost = U.el('div', { class: 'sync__imports' });
+    planning.appendChild(introHost);
+    planning.appendChild(identityHost);
+    planning.appendChild(importHost);
+    planning.appendChild(firebaseSettingsCard());
+    host.appendChild(planning);
 
-      /* WAVE7_CONTRACT §3.1 — a THIRD card, after the identity card, and
-         only once someone is signed in (entirely absent otherwise, same
-         law as the identity card just above). */
-      if (shouldShowTTImport()) host.appendChild(ttimportCard(host));
-      host.appendChild(settings || firebaseSettingsCard());
+    var research = U.el('details', { class: 'sync__research' });
+    research.appendChild(U.el('summary', { class: 'sync__researchsummary' }, [
+      U.el('span', { class: 'sync__researchtitle', text: 'Research & shortlist sharing' }),
+      U.el('span', { class: 'sync__researchstate', text: SY.status.configured ? 'Connected' : 'Optional · GitHub' })
+    ]));
+    var github = U.el('div', { class: 'sync__github' });
+    research.appendChild(github);
+    host.appendChild(research);
+
+    function paint() {
+      U.clear(github);
+      var st = SY.status;
+      U.setText(U.qs('.sync__researchstate', research), st.configured ? 'Connected' : 'Optional · GitHub');
+      github.appendChild(U.el('p', { class: 'sync__lede', text: 'Share workbook research, shortlists and decisions through your private GitHub repository.' }));
+      if (st.configured) {
+        github.appendChild(statusCard(host, paint));
+        github.appendChild(activityBlock());
+      } else {
+        github.appendChild(connectForm(host, { onDone: paint }));
+      }
     }
     paint();
+    introHost.appendChild(planningIntro(host));
+    var firstIdentity = identityCard();
+    if (firstIdentity) identityHost.appendChild(firstIdentity);
+    if (shouldShowTTImport()) importHost.appendChild(ttimportCard(host));
     /* Cheap repaint on status changes: only the card, not the whole section,
        and never while a form is being filled in. */
     SY._repaint = function () {
@@ -63034,32 +63245,41 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       /* GitHub sync card — unchanged, except the selector now excludes the
          identity AND ttimport cards so none of the three `.sync__card`s can
          ever be confused for one another. */
-      var card = U.qs('.sync__card:not(.sync__card--identity):not(.sync__card--ttimport):not(.sync__card--settings)', host);
-      var editing = U.qs('.sync__form--reconnect', host);
+      var card = U.qs('.sync__card', github);
+      var editing = U.qs('.sync__form--reconnect', github);
       if (!editing) {
         var st = SY.status;
-        if (st.configured && !card) { paint(); return; }       // connected since first paint
-        else if (!st.configured && card) { paint(); return; }  // disconnected elsewhere
+        if (st.configured && !card) { paint(); }       // connected since first paint
+        else if (!st.configured && card) { paint(); }  // disconnected elsewhere
         else if (card) {
           card.parentNode.replaceChild(statusCard(host, paint), card);
           /* A save from either side since the list was fetched: refresh it. */
           var r = st.remote || {};
           var newest = Math.max(st.lastPushAt || 0, r.updatedAt || 0);
           var ul = U.qs('.sync__activity', host);
-          if (ul && newest > activityFetchedAt && st.state !== 'syncing') fillActivity(ul);
+          if (ul && ul.parentNode.open && research.open && newest > activityFetchedAt && st.state !== 'syncing') fillActivity(ul);
         }
       }
+
+      U.clear(introHost);
+      introHost.appendChild(planningIntro(host));
 
       /* Identity card — replaced the same way, on a firebase/prep touch,
          and never while its sign-in form has focus or typed text. */
       var idCard = U.qs('.sync__card--identity', host);
       if (!identityFormBusy(idCard)) {
         var hidden = describeIdentity().hidden;
-        if (hidden) { if (idCard) { paint(); return; } }
-        else if (!idCard) { paint(); return; }
+        if (hidden) { if (idCard) U.clear(identityHost); }
+        else if (!idCard) { var first = identityCard(); if (first) identityHost.appendChild(first); }
         else {
           var fresh = identityCard();
-          if (fresh) idCard.parentNode.replaceChild(fresh, idCard);
+          if (fresh) {
+            ['.sync__drawer', '.sync__account'].forEach(function (selector) {
+              var oldDrawer = U.qs(selector, idCard), newDrawer = U.qs(selector, fresh);
+              if (oldDrawer && newDrawer) newDrawer.open = oldDrawer.open;
+            });
+            idCard.parentNode.replaceChild(fresh, idCard);
+          }
         }
       }
 
@@ -63068,10 +63288,12 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
          drawer input has focus or typed text (formBusy, generalised above
          from the identity drawer's own rule). */
       var ttCard = U.qs('.sync__card--ttimport', host);
-      if (!formBusy(ttCard, TTIMPORT_BUSY_SELECTOR)) {
+      var currentUser = T.firebase && T.firebase.user ? T.firebase.user() : null;
+      var sourceAccountChanged = host._ttState && host._ttState.uid !== ((currentUser && currentUser.uid) || null);
+      if (sourceAccountChanged || !formBusy(ttCard, TTIMPORT_BUSY_SELECTOR)) {
         var wantTT = shouldShowTTImport();
-        if (wantTT && !ttCard) { paint(); return; }
-        else if (!wantTT && ttCard) { paint(); return; }
+        if (wantTT && !ttCard) replaceTTCard(host);
+        else if (!wantTT && ttCard) replaceTTCard(host);
         else if (wantTT && ttCard) replaceTTCard(host);
       }
     };
@@ -63102,12 +63324,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
  * src/js file once merged.
  *
  * Ground rules this file exists to uphold (FIREBASE_SPEC §0):
- *   1. Off by default — no device config means no network I/O, no SDK load,
- *      T.firebase.status().state === 'off'.
- *   2. Emulator-only by DEFAULT — Wave 1 adds a live-mode init path (used
- *      only via an explicit human TRIP.firebase.configure() call after the
- *      rules are deployed, WAVE1_CONTRACT §2.1), but nothing in this wave,
- *      no test and no default, ever writes a live config.
+ *   1. Local copies stay off without explicit device configuration.
+ *      v0.28.2: the user authorized the published HTTPS site to load its
+ *      public connection file and offer sign-in immediately.
+ *   2. Stored device configuration takes precedence, including an explicit
+ *      opt-out. Tests use synthetic config, mocked SDKs or local emulators.
  *   3. Fail closed — an unusable config, an unreachable emulator or an SDK
  *      that will not load leaves the app exactly as it is today: one
  *      T.diag.note('firebase', reason, detail), never a throw, never a
@@ -63184,6 +63405,23 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
                                // yet in Wave 0 — signOut() still drains this).
   var readyWaiters = [];
   var swapCount = 0;          // WAVE7_CONTRACT §2.1: test-only, via FB._swapCount().
+  var connectionEpoch = 0;
+
+  /* A published web config supplies connection details only. Firebase still
+     controls authentication and every data permission. Local copies stay off. */
+  FB.hasSiteConnection = function () {
+    return window.location.protocol === 'https:' &&
+      window.location.hostname === 'working-order.github.io' &&
+      /^\/Trip-Planning-Site(?:\/|$)/.test(window.location.pathname);
+  };
+
+  FB.useSiteConnection = function () {
+    if (!FB.hasSiteConnection()) return { ok: false, reason: 'unavailable' };
+    connectionEpoch++;
+    S.removeRaw(KEY);
+    if (status.state === 'loading') setStatus({ state: 'off', reason: null });
+    return { ok: true }; // Explicit reload applies it; no request here.
+  };
 
   var status = {
     state: 'off', mode: null, reason: null, projectId: null,
@@ -63300,6 +63538,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     }
     var wrote = S.writeEnvelope(KEY, FB.CONFIG_VERSION, cfg);
     if (!wrote) return { ok: false, reason: 'storage-write-failed' };
+    connectionEpoch++;
+    if (status.state === 'loading') setStatus({ state: 'off', reason: null });
     return { ok: true };
   };
 
@@ -63462,10 +63702,12 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   }
 
   function startLoading(cfg) {
+    var epoch = connectionEpoch;
     activeCfg = cfg;
     var isLive = cfg.mode === 'live';
     return withTimeout(loadSdkModules(), SDK_TIMEOUT_MS, 'sdk-load-timeout').then(
       function (mods) {
+        if (epoch !== connectionEpoch) return FB.status();
         FB.sdk = Object.freeze({ app: mods[0], auth: mods[1], firestore: mods[2] });
         var isTrusted = !!cfg.trusted;
         try {
@@ -63518,6 +63760,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
             ? authInstance.authStateReady().then(function () {}, function () {})
             : Promise.resolve();
           return readyP.then(function () {
+            if (epoch !== connectionEpoch) return FB.status();
             setStatus({ state: 'ready', reason: null, sdkVersion: FB.SDK_VERSION });
             return FB.status();
           });
@@ -63529,6 +63772,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         if (isLive) return finishReady();
 
         return Promise.all([probeHost(cfg.emulator.auth), probeHost(cfg.emulator.firestore)]).then(function (oks) {
+          if (epoch !== connectionEpoch) return FB.status();
           if (!oks[0] || !oks[1]) {
             T.diag.note('firebase', 'emulator-unreachable', cfg.emulator.auth + ' / ' + cfg.emulator.firestore);
             setStatus({ state: 'unavailable', reason: 'emulator-unreachable' });
@@ -63538,11 +63782,39 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         });
       },
       function (err) {
+        if (epoch !== connectionEpoch) return FB.status();
         T.diag.note('firebase', 'sdk-load-failed', (err && err.message) || String(err));
         setStatus({ state: 'unavailable', reason: 'sdk-load-failed' });
         return FB.status();
       }
     );
+  }
+
+  function loadSiteConnection() {
+    var epoch = ++connectionEpoch;
+    setStatus({ state: 'loading', mode: null, reason: null, projectId: null, sdkVersion: null });
+    return withTimeout(fetch('/Trip-Planning-Site/firebase-config.json', {
+      credentials: 'omit', mode: 'same-origin', cache: 'no-store'
+    }).then(function (response) {
+      if (!response.ok) throw new Error('site-config-unavailable');
+      return response.text();
+    }).then(function (text) {
+      if (text.length > 4096) throw new Error('site-config-invalid');
+      return JSON.parse(text);
+    }), 8000, 'site-config-timeout').then(function (value) {
+      if (epoch !== connectionEpoch) return FB.status();
+      var cfg = { enabled: true, projectId: value && value.projectId,
+        apiKey: value && value.apiKey, authDomain: value && value.authDomain };
+      cfg.mode = 'live';
+      if (!validate(cfg).ok) throw new Error('site-config-invalid');
+      if (!S.writeEnvelope(KEY, FB.CONFIG_VERSION, cfg)) throw new Error('storage-write-failed');
+      setStatus({ state: 'loading', mode: cfg.mode, projectId: cfg.projectId, reason: null });
+      return startLoading(cfg);
+    }).catch(function () {
+      if (epoch !== connectionEpoch) return FB.status();
+      setStatus({ state: 'unavailable', mode: null, reason: 'site-config-unavailable', projectId: null });
+      return FB.status();
+    });
   }
 
   /**
@@ -63556,6 +63828,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     try { env = S.readEnvelope(KEY); } catch (e) { env = null; }
 
     if (!env || env.v !== FB.CONFIG_VERSION) {
+      if (!env && FB.hasSiteConnection()) return loadSiteConnection();
       /* No device config (or an unreadable/future one): off by default,
          ground rule §0.1. Nothing was rejected, so no diag note. */
       setStatus({ state: 'off', mode: null, reason: null, projectId: null, sdkVersion: null });
@@ -63563,6 +63836,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     }
 
     var cfg = env.data || {};
+    if (cfg.enabled === false) {
+      setStatus({ state: 'off', mode: null, reason: null, projectId: null, sdkVersion: null });
+      return Promise.resolve(FB.status());
+    }
     var v = validate(cfg);
     if (!v.ok) {
       /* WAVE7_CONTRACT §2.1 (known gap, closed): drop projectId from the
@@ -63574,6 +63851,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       return Promise.resolve(FB.status());
     }
 
+    connectionEpoch++;
     setStatus({ state: 'loading', mode: cfg.mode, reason: null, projectId: cfg.projectId, sdkVersion: null });
     return startLoading(cfg);
   };
@@ -63708,6 +63986,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   };
 
   FB.disable = function () {
+    connectionEpoch++;
     return FB.signOut().then(function () {
       var app = appInstance;
       appInstance = null; authInstance = null; dbInstance = null;
@@ -63715,7 +63994,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       detachAuthListener = null;
       var sdk = FB.sdk;
       FB.sdk = null;
-      S.removeRaw(KEY);
+      if (FB.hasSiteConnection()) S.writeEnvelope(KEY, FB.CONFIG_VERSION, { enabled: false });
+      else S.removeRaw(KEY);
       setStatus({ state: 'off', mode: null, reason: null, projectId: null, uid: null, email: null, sdkVersion: null });
       if (app && sdk && sdk.app && sdk.app.deleteApp) {
         try { sdk.app.deleteApp(app).catch(function () {}); } catch (e) {}
