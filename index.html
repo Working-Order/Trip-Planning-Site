@@ -6040,6 +6040,24 @@ header.masthead {
 
 /* A sheet is modal: the page behind it does not scroll. */
 .has-sheet { overflow: hidden; }
+
+/* A clearer current destination without changing masthead geometry or
+   moving keyboard focus order. Existing phone safe-area spacing remains. */
+.masthead__link[aria-current="page"] {
+  color: var(--accent);
+  background: var(--surface-alt);
+  box-shadow: 0 0 0 var(--s1) var(--surface-alt);
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-semi);
+}
+.masthead__link[aria-current="page"]::after { bottom: -7px; border-radius: var(--radius-round); }
+.tabbar__tab.is-current, .tabbar__tab[aria-current="page"] { background: var(--surface-alt); color: var(--accent); border-radius: var(--radius-lg); }
+.navmenu__list { border-radius: calc(var(--radius-lg) * 2); box-shadow: var(--shadow-md); }
+@media (max-width: 359px) {
+  .navmenu--device .navmenu__who { display: none; }
+  .navmenu--device .navmenu__button { min-width: var(--tap-min); justify-content: center; padding-inline: var(--s1); }
+  .masthead .masthead__util { gap: var(--s1); }
+}
 /* ==== src/css/30-view-explore.css ==== */
 /* 30-view-explore.css — the Explore screen shell and grid. OWNER: IMPL-2.
  * Grid + density behaviour is UX_SPEC §3.8: card minimum width 300px, and the
@@ -12160,6 +12178,240 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 @media (max-width: 599px) {
   .assist__pick, .assist__meta { align-items: flex-start; }
 }
+
+/* Plan refresh: use the existing warm palette, with a compact navigation
+   rail, useful overview cards and a consistent hierarchy for shared work.
+   Native links, disclosures and form state remain owned by the view. */
+.plan { padding-top: var(--s5); gap: var(--s5); }
+.plan__header { display: grid; gap: var(--s2); min-width: 0; }
+.plan__eyebrow {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  overflow-wrap: anywhere;
+}
+.plan__title {
+  font-family: var(--font-body);
+  font-size: clamp(1.65rem, 3vw, 2rem);
+  font-weight: var(--weight-semi);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.025em;
+}
+.plan__intro { margin: 0; color: var(--ink-muted); font-size: var(--text-sm); line-height: var(--leading-body); }
+.plan__nav {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: stretch;
+  gap: var(--s1);
+  padding: var(--s1);
+  border: var(--hair) solid var(--line);
+  border-radius: calc(var(--radius-lg) * 2);
+  background: var(--surface-alt);
+}
+.plan__navlink {
+  justify-content: center;
+  min-width: 0;
+  padding: var(--s2);
+  border: var(--hair) solid transparent;
+  border-radius: calc(var(--radius-lg) + var(--radius-sm));
+  color: var(--ink-muted);
+  line-height: var(--leading-tight);
+  text-align: center;
+}
+.plan__navlink:hover { color: var(--ink); background: var(--surface); text-decoration: none; }
+.plan__navlink[aria-current="page"] {
+  color: var(--accent);
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: var(--shadow-sm);
+}
+.plan__overview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s4); }
+.plan__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  min-width: 0;
+  padding: var(--s5);
+  border: var(--hair) solid var(--line);
+  border-radius: calc(var(--radius-lg) * 2);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.plan__cardtitle {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semi);
+}
+.plan__card > p {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  gap: var(--s3);
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  overflow-wrap: anywhere;
+}
+.plan__card a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: var(--tap-min);
+  margin-top: auto;
+  color: var(--accent);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+}
+.plan__card a::after { content: '\2192'; }
+.plan__card a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.plan__together { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--s5); align-items: start; }
+.plan__members, .plan__together > .assist {
+  min-width: 0;
+  max-width: none;
+  padding: var(--s5);
+  border: var(--hair) solid var(--line);
+  border-radius: calc(var(--radius-lg) * 2);
+  background: var(--surface);
+}
+.plan .plan__h, .plan .assist__h, .plan .assist__intro h3,
+.plan .prepare__phaseh, .plan .prepare__h, .plan .itin__dayh {
+  font-family: var(--font-body);
+  font-weight: var(--weight-semi);
+}
+.plan__members .plan__drawer { margin-top: var(--s2); }
+.plan .assist { gap: var(--s3); }
+.plan .assist__intro { gap: var(--s3); }
+.plan .assist__intro h3 { font-size: var(--text-sm); }
+.plan .assist__hint { line-height: var(--leading-body); }
+.plan .assist__opener { border-radius: calc(var(--radius-lg) + var(--radius-sm)); background: var(--surface-alt); }
+.plan .assist__foot { line-height: var(--leading-body); }
+.plan .assist__input {
+  padding: var(--s3);
+  border: var(--hair) solid var(--line-strong);
+  border-radius: calc(var(--radius-lg) + var(--radius-sm));
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+.plan .assist__input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.plan .assist__drawer { border-bottom: var(--hair) solid var(--line-hair); }
+.plan .assist__drawer:last-child { border-bottom: 0; }
+.plan .assist__drawer > summary { padding-block: var(--s2); min-height: var(--tap-min); }
+.plan > .dates, .plan > .pbudget, .plan > .bookings, .plan > .prepare, .plan > .itin {
+  width: 100%;
+  min-width: 0;
+  max-width: 64rem;
+  gap: var(--s5);
+}
+.plan > .bookings { max-width: none; }
+.plan .plan__drawer:not(.assist__drawer), .plan .itin__drawer {
+  min-width: 0;
+  width: 100%;
+  max-width: var(--measure);
+  padding: var(--s2) var(--s4);
+  border: var(--hair) solid var(--line);
+  border-radius: calc(var(--radius-lg) + var(--radius-sm));
+  background: var(--surface);
+}
+.plan .plan__drawer > summary, .plan .itin__drawer > summary {
+  min-height: var(--tap-min);
+  padding-block: var(--s2);
+  color: var(--accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+.plan .plan__drawer[open], .plan .itin__drawer[open] { padding-bottom: var(--s4); }
+.plan .input { border-radius: calc(var(--radius-lg) + var(--radius-sm)); min-height: var(--tap-min); }
+.plan textarea.input { line-height: var(--leading-body); }
+.plan .btn { border-radius: calc(var(--radius-lg) + var(--radius-sm)); }
+.plan .dates__proposal, .plan .pbudget__proposal, .plan .prepare__step,
+.plan .prepare__traveler, .plan .itin__entry, .plan .assist__msg {
+  border-radius: calc(var(--radius-lg) * 2);
+}
+.plan .pbudget__summary { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--s3); }
+.plan .pbudget__figure {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s2);
+  min-width: 0;
+  padding: var(--s4);
+  border: var(--hair) solid var(--line);
+  border-radius: calc(var(--radius-lg) * 2);
+  background: var(--surface);
+}
+.plan .pbudget__figure dd { font-size: var(--text-lg); overflow-wrap: anywhere; }
+.plan .pbudget__travelers { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); }
+.plan .bookings__group { gap: var(--s4); padding-bottom: var(--s5); border-bottom: var(--hair) solid var(--line); }
+.plan .bookings__group:last-of-type { padding-bottom: 0; border-bottom: 0; }
+.plan .bookings__item {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s3) var(--s5);
+  padding: var(--s5);
+  border-radius: calc(var(--radius-lg) * 2);
+  box-shadow: var(--shadow-sm);
+}
+.plan .bookings__title { grid-column: 1; overflow-wrap: anywhere; }
+.plan .bookings__amount { grid-column: 2; grid-row: 1; font-size: var(--text-lg); font-weight: var(--weight-semi); text-align: right; }
+.plan .bookings__meta, .plan .bookings__deposit { grid-column: 1 / -1; }
+.plan .bookings__meta { max-width: var(--measure); line-height: var(--leading-body); }
+.plan .bookings__actions { grid-column: 1 / -1; border-top: var(--hair) solid var(--line-hair); padding-top: var(--s2); gap: var(--s2); }
+.plan .bookings__actions .btn { padding-inline: var(--s3); }
+.plan .bookings__group { min-width: 0; }
+.plan .plan__drawer.bookings__details {
+  grid-column: 1 / -1;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.plan .bookings__details > summary { cursor: pointer; }
+.bookings__facts { display: grid; gap: var(--s3); margin: var(--s2) 0 var(--s3); }
+.bookings__fact { display: grid; gap: var(--s1); min-width: 0; }
+.bookings__fact dt { font-size: var(--text-xs); color: var(--ink-muted); }
+.bookings__fact dd { margin: 0; font-size: var(--text-sm); line-height: var(--leading-body); color: var(--ink); white-space: pre-line; overflow-wrap: anywhere; }
+.plan .prepare__tabs { gap: var(--s2); }
+.plan .prepare__tab { padding: 0 var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-round); color: var(--ink-muted); }
+.plan .prepare__tab[aria-current="page"] { background: var(--surface); color: var(--accent); border-color: var(--line-strong); }
+.plan .prepare__step { padding: var(--s4); }
+.plan .itin__day { padding-block: var(--s4); gap: var(--s3); }
+.plan .itin__entry { padding: var(--s4); }
+
+@media (min-width: 1100px) {
+  .plan > .bookings { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+  .plan .bookings__note, .plan .bookings__status { grid-column: 1 / -1; }
+  .plan .bookings__group { padding-bottom: 0; border-bottom: 0; }
+  .plan .bookings__item { grid-template-columns: minmax(0, 1fr); padding: var(--s4); }
+  .plan .bookings__amount { grid-column: 1; grid-row: auto; text-align: left; }
+}
+@media (max-width: 899px) {
+  .plan__overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .plan__together { grid-template-columns: 1fr; }
+}
+@media (max-width: 599px) {
+  .plan { padding-top: var(--s4); gap: var(--s4); }
+  .plan__nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .plan__overview { gap: var(--s3); }
+  .plan__card { padding: var(--s4); gap: var(--s2); }
+  .plan__card > p { font-size: var(--text-xs); gap: var(--s2); }
+  .plan__cardtitle { font-size: var(--text-sm); }
+  .plan__members, .plan__together > .assist { padding: var(--s4); }
+  .plan .bookings__item { padding: var(--s4); }
+  .plan .bookings__amount { grid-column: 1 / -1; grid-row: auto; text-align: left; }
+  .plan .pbudget__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .plan .pbudget__figure { padding: var(--s3); }
+}
+@media (max-width: 359px) {
+  .plan__overview { grid-template-columns: 1fr; }
+}
 /* ==== src/css/90-utilities.css ==== */
 /* 90-utilities.css — last layer. OWNER: WS-D.
  * Single-purpose helpers only. If something here needs three declarations to
@@ -12265,7 +12517,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 (function (T) {
   'use strict';
 
-  T.version = '0.28.3';   // Remove stale sign-in form after authentication
+  T.version = '0.28.4';   // Plan overview and navigation refresh
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -41829,6 +42081,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var text = locked
       ? 'Budget: ' + moneyFormat(budgetTotalOf(plan), (plan.budget && plan.budget.currency) || 'USD') + ' — locked.'
       : 'No budget locked yet.';
+    var proposalCount = Object.keys((plan.budget && plan.budget.proposals) || {}).length;
+    if (!locked && proposalCount) text += ' ' + proposalCount + (proposalCount === 1 ? ' proposal' : ' proposals') + ' to review.';
     line.appendChild(document.createTextNode(text + ' '));
     line.appendChild(U.el('a', { class: 'plan__budgetlink',
       href: T.router.build('plan', ['budget']) }, 'Open Budget'));
@@ -41858,11 +42112,47 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var summary = prepareSummaryOf(tripId);
     var count = (summary && summary.itinerary && summary.itinerary.count) || 0;
     var line = U.el('p', { class: 'plan__itinline' });
-    var text = count > 0 ? ('Itinerary: ' + count + ' entries.') : 'Nothing on the itinerary yet.';
+    var view = count ? null : itineraryViewOf(tripId);
+    var hasBookings = !!(view && view.derived && view.derived.length);
+    var text = count > 0 ? ('Itinerary: ' + count + ' entries.')
+      : hasBookings ? 'Your bookings are on the itinerary.' : 'Nothing on the itinerary yet.';
     line.appendChild(document.createTextNode(text + ' '));
     line.appendChild(U.el('a', { class: 'plan__itinlink',
       href: T.router.build('plan', ['itinerary']) }, 'Open Itinerary'));
     return line;
+  }
+
+  /* A read-only overview of the same records shown in the six Plan
+     sections. Existing summary helpers remain the authority for dates,
+     budget and preparation; no new readiness or money rules live here. */
+  function buildOverview(tripId, plan) {
+    var section = U.el('section', { class: 'plan__overview', 'aria-label': 'Trip at a glance' });
+    function card(key, title, line) {
+      var item = U.el('article', { class: 'plan__card', dataset: { section: key } });
+      item.appendChild(U.el('h2', { class: 'plan__cardtitle', text: title }));
+      item.appendChild(line);
+      section.appendChild(item);
+    }
+    function bookingsLine(kind) {
+      var records = (plan.bookings && plan.bookings[kind]) || {};
+      var count = Object.keys(records).length;
+      var isFlight = kind === 'flights';
+      var word = isFlight ? 'flight booking' : 'stay';
+      var line = U.el('p', { class: 'plan__bookingline' });
+      line.appendChild(document.createTextNode(count
+        ? (count + ' ' + word + (count === 1 ? '' : 's') + ' saved. ')
+        : (isFlight ? 'No flights added yet. ' : 'No stays added yet. ')));
+      line.appendChild(U.el('a', { class: 'plan__bookinglink',
+        href: T.router.build('plan', ['bookings']) }, isFlight ? 'Open flights' : 'Open stays'));
+      return line;
+    }
+    card('dates', 'Dates', buildDatesLine(plan));
+    card('budget', 'Budget', buildBudgetLine(plan));
+    card('flights', 'Flights', bookingsLine('flights'));
+    card('lodging', 'Stays', bookingsLine('lodging'));
+    card('prepare', 'Preparation', buildPrepLine(tripId));
+    card('itinerary', 'Itinerary', buildItinLine(tripId));
+    return section;
   }
 
   function buildMembers(tripId, plan) {
@@ -41881,10 +42171,6 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     sec.appendChild(ul);
 
     sec.appendChild(buildAddDrawer(tripId));
-    sec.appendChild(buildDatesLine(plan));
-    sec.appendChild(buildBudgetLine(plan));
-    sec.appendChild(buildPrepLine(tripId));
-    sec.appendChild(buildItinLine(tripId));
     return sec;
   }
 
@@ -43046,6 +43332,53 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     return parts3.join(' · ');
   }
 
+  function buildBookingDetails(kind, id, entry, members) {
+    var details = U.el('details', { class: 'plan__drawer bookings__details',
+      dataset: { drawer: 'booking-details-' + kind + '-' + id } });
+    details.appendChild(U.el('summary', { text: 'Booking details' }));
+    var facts = U.el('dl', { class: 'bookings__facts' });
+    function fact(label, value) {
+      if (typeof value !== 'string' || !value.trim()) return;
+      facts.appendChild(U.el('div', { class: 'bookings__fact' }, [
+        U.el('dt', { text: label }), U.el('dd', { text: value })
+      ]));
+    }
+    if (kind === 'flights') {
+      fact('Booked through', entry.bookingSource);
+      fact('Ticket', entry.ticketType);
+      orderedSegmentsOf(entry).forEach(function (segment, index) {
+        var name = ((segment.airline || '') + ' ' + (segment.flightNumber || '')).trim() || ('Flight ' + (index + 1));
+        function moment(day, time, zone) {
+          return [day || '', time ? time.slice(0, 5) : '', zone || ''].filter(Boolean).join(' · ');
+        }
+        fact(name + ' departure', moment(segment.departsOn, segment.departsAt, segment.originTimeZone));
+        fact(name + ' arrival', moment(segment.arrivesOn, segment.arrivesAt, segment.destinationTimeZone));
+        var seats = segment.seats || {};
+        fact(name + ' seats', Object.keys(seats).map(function (uid) {
+          return nameFor(uid, members) + ': ' + seats[uid];
+        }).join(' · '));
+        fact(name + ' notes', segment.notes);
+      });
+    } else if (kind === 'lodging') {
+      fact('Room', entry.roomType);
+      fact('Address', entry.address);
+      fact('Booked through', entry.bookingProvider);
+      fact('Check-in time', entry.checkInTime ? entry.checkInTime.slice(0, 5) : '');
+      fact('Check-out time', entry.checkOutTime ? entry.checkOutTime.slice(0, 5) : '');
+      fact('Cancellation deadline', entry.cancellationDeadline);
+      fact('Cancellation terms', entry.cancellationNotes);
+      if (entry.mealsIncluded) fact('Meals', 'Included');
+    } else {
+      fact('Contact', entry.contactPhone);
+      fact('Claims website', entry.contactUrl);
+      fact('Claim reference', entry.claimReference);
+    }
+    fact('Notes', entry.notes);
+    if (!facts.children.length) return null;
+    details.appendChild(facts);
+    return details;
+  }
+
   function buildBookingItem(tripId, kind, id, entry, currency, members, statusLine, drawer) {
     var isForeign = (entry.currency || currency) !== currency;
     var li = U.el('li', { class: 'bookings__item', dataset: { id: id, kind: kind, foreign: isForeign ? 'true' : 'false' } });
@@ -43064,6 +43397,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         text: 'deposit ' + moneyFormat(entry.depositMinorUnits, entry.currency || currency) + ' paid · ' +
           moneyFormat(lodgingRemainingOf(entry), entry.currency || currency) + ' remaining' }));
     }
+
+    var details = buildBookingDetails(kind, id, entry, members);
+    if (details) li.appendChild(details);
 
     var actions = U.el('div', { class: 'bookings__actions' });
     var editBtn = U.el('button', { type: 'button', class: 'btn btn--quiet bookings__edit', text: 'Edit' });
@@ -43321,7 +43657,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var nightsLine = U.el('p', { class: 'bookings__nights' });
     form.appendChild(nightsLine);
     var roomsInput = field('plan-lo-rooms', 'Rooms', { type: 'text', inputmode: 'numeric', placeholder: '1' });
-    var rateInput = field('plan-lo-rate', 'Room rate', { type: 'text', inputmode: 'decimal', placeholder: '0.00' });
+    var rateInput = field('plan-lo-rate', 'Room cost for the whole stay', { type: 'text', inputmode: 'decimal', placeholder: '0.00' });
     var taxesInput = field('plan-lo-taxes', 'Taxes', { type: 'text', inputmode: 'decimal', placeholder: '0.00' });
     var feesInput = field('plan-lo-fees', 'Resort fees', { type: 'text', inputmode: 'decimal', placeholder: '0.00' });
     var depositInput = field('plan-lo-deposit', 'Deposit', { type: 'text', inputmode: 'decimal', placeholder: '0.00' });
@@ -44822,12 +45158,19 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var li = U.el('li', { class: 'itin__entry', dataset: dataset });
 
     var timeText = allDay ? 'All day' : (item.endTime ? (timeShort(item.startTime) + '–' + timeShort(item.endTime)) : timeShort(item.startTime));
+    var staySpan = derived && item.kind === 'lodging' && span && span.count > 1;
+    if (staySpan) {
+      timeText = span.index === 1 && item.startTime ? timeShort(item.startTime)
+        : span.index === span.count && item.endTime ? timeShort(item.endTime) : 'All day';
+    }
     li.appendChild(U.el('span', { class: 'itin__time', text: timeText }));
     li.appendChild(U.el('span', { class: 'itin__title', text: item.title || '' }));
     var kindWords = itinKindWords();
     li.appendChild(U.el('span', { class: 'itin__kind', text: kindWords[item.kind] || item.kind }));
     if (span && span.count > 1) {
-      li.appendChild(U.el('span', { class: 'itin__span', text: 'day ' + span.index + ' of ' + span.count }));
+      var spanText = staySpan ? (span.index === 1 ? 'Check-in' : span.index === span.count ? 'Check-out' : 'During your stay')
+        : 'day ' + span.index + ' of ' + span.count;
+      li.appendChild(U.el('span', { class: 'itin__span', text: spanText }));
     }
     li.appendChild(U.el('span', { class: 'itin__where', hidden: U.isBlank(item.location), text: item.location || '' }));
     li.appendChild(U.el('span', { class: 'itin__conf', hidden: U.isBlank(item.confirmation),
@@ -44882,7 +45225,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (hasRange) {
       var r = view.range;
       var storedCount = (view.entries && view.entries.length) || 0;
-      var entriesPhrase = storedCount > 0 ? (storedCount + ' entries') : 'no entries yet';
+      var derivedCount = (view.derived && view.derived.length) || 0;
+      var entriesPhrase = storedCount > 0 ? (storedCount + ' entries')
+        : derivedCount ? 'no added activities yet' : 'no entries yet';
+      if (derivedCount) entriesPhrase += ' · ' + derivedCount + ' from bookings';
       U.setText(stateP, dayShort(r.start) + ' – ' + dayShort(r.end) + ' · ' + r.days + ' days · ' + entriesPhrase + '.');
     } else {
       U.setText(stateP, 'No dates and no entries yet — add the first entry and the calendar grows around it.');
@@ -45484,8 +45830,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var trip = prep.trip || (T.trips && T.trips.get ? T.trips.get(tripId) : null);
     var sec = U.el('section', { class: 'assist' });
     sec.appendChild(U.el('h2', { class: 'assist__h', text: 'Assistant' }));
-    sec.appendChild(U.el('p', { class: 'assist__hint', text: 'Its dates, bookings, budget and outstanding ' +
-      'steps go with every question; nothing changes until you tick it. Nothing from anyone’s documents is ever sent.' }));
+    sec.appendChild(U.el('p', { class: 'assist__hint', text: 'Ask about your dates, bookings, budget and next steps. ' +
+      'Review suggestions before applying them. Personal documents are never sent.' }));
 
     var threadsList = assistThreadsOf(tripId);
     var hasThreads = threadsList.length > 0;
@@ -45543,8 +45889,12 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   function buildGate(state, tripId) {
     var gate = U.el('div', { class: 'plan__gate', dataset: { state: state } });
     if (state === 'absent') {
+      gate.classList.add('plan__gate--setup');
+      gate.appendChild(U.el('h2', { class: 'plan__setupheading', text: 'Start your shared plan' }));
       gate.appendChild(U.el('p', { class: 'plan__gateline', text: 'This trip doesn’t have a plan yet.' }));
       gate.appendChild(buildStartDrawer(tripId));
+      gate.appendChild(U.el('a', { class: 'plan__gatelink',
+        href: T.router.build('data', [], { section: 'sync' }) }, 'Import an existing Travel Tracker trip'));
       return gate;
     }
     if (GATE_LINK_STATES[state]) {
@@ -45688,7 +46038,12 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   }
   function reopenDrawers(wrap, prevOpen, prep) {
     prevOpen.forEach(function (item) {
-      var d = wrap.querySelector('details.plan__drawer[data-drawer="' + item.name + '"]');
+      var d = null;
+      U.qsa('details.plan__drawer[data-drawer]', wrap).some(function (candidate) {
+        if (candidate.dataset.drawer !== item.name) return false;
+        d = candidate;
+        return true;
+      });
       if (!d) return;
       if (item.editingId) {
         var entry = findEntryFor(item.name, item.editingId, prep);
@@ -45765,8 +46120,20 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
     var prevOpen = collectOpenDrawers(el);
     U.clear(el);
-    var wrap = U.el('div', { class: 'plan' });
-    wrap.appendChild(U.el('h1', { class: 'plan__title', text: titleWord + ' — ' + tripName }));
+    var wrap = U.el('div', { class: 'plan', dataset: { section: section } });
+    var header = U.el('header', { class: 'plan__header' });
+    header.appendChild(U.el('p', { class: 'plan__eyebrow', text: tripName || 'Your trip' }));
+    header.appendChild(U.el('h1', { class: 'plan__title', text: section === 'overview' ? 'Your trip at a glance' : titleWord }));
+    var descriptions = {
+      overview: 'The decisions, details and next steps, together.',
+      dates: 'Find a time that works for everyone.',
+      budget: 'Agree on a budget and keep track of every cost.',
+      bookings: 'Your flights, places to stay and travel insurance.',
+      prepare: 'Know what is done and what still needs your attention.',
+      itinerary: 'See how each day comes together.'
+    };
+    header.appendChild(U.el('p', { class: 'plan__intro', text: descriptions[section] }));
+    wrap.appendChild(header);
 
     var nav = U.el('nav', { class: 'plan__nav', 'aria-label': 'Plan sections' });
     [['overview', 'Overview'], ['dates', 'Dates'], ['budget', 'Budget'], ['bookings', 'Bookings'], ['prepare', 'Prepare'], ['itinerary', 'Itinerary']].forEach(function (pair) {
@@ -45799,8 +46166,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     } else if (section === 'itinerary') {
       wrap.appendChild(buildItinerarySection(tripId, prep));
     } else {
-      wrap.appendChild(buildMembers(tripId, prep.plan || {}));
-      wrap.appendChild(buildAssistantSection(tripId, prep, route));
+      wrap.appendChild(buildOverview(tripId, prep.plan || {}));
+      var together = U.el('div', { class: 'plan__together' });
+      together.appendChild(buildMembers(tripId, prep.plan || {}));
+      together.appendChild(buildAssistantSection(tripId, prep, route));
+      wrap.appendChild(together);
     }
 
     el.appendChild(wrap);
