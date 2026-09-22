@@ -3347,6 +3347,30 @@ input[type="file"]:focus-visible::file-selector-button {
   background: var(--surface);
 }
 
+
+/* Wedding research: a small set of practical choices, secondary details on demand. */
+.filters--venue { gap: 8px; }
+.filters--venue > .fgroup { padding: 4px 0; }
+.filters--venue .fgroup__head { text-transform: none; letter-spacing: 0; font-size: var(--text-sm); font-weight: var(--weight-medium); min-height: 46px; }
+.filters--venue .fgroup__hint { font-style: normal; color: var(--ink-muted); }
+.filters--venue .fgroup__section { display: grid; gap: 8px; padding-block: 8px; }
+.filters--venue .fgroup__subheading { font-family: var(--font-body); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--ink-muted); margin: 0; }
+.filters--venue .fgroup__body { gap: 12px; }
+.filters--venue .chip--toggle { min-height: 36px; max-width: 100%; white-space: normal; text-align: left; }
+.filters--venue .chip__label { white-space: normal; overflow-wrap: anywhere; }
+.filters--venue .chip__count { flex-shrink: 0; }
+.filters--venue [data-group="venue-more"] { border-top: 1px solid var(--line); margin-top: 6px; }
+.filters--venue [data-group^="venue-more-"] > .fgroup__head { font-size: var(--text-xs); }
+.fguests { display: grid; gap: 12px; padding: 4px 0 12px; }
+.fguests__value { font-size: var(--text-lg); color: var(--ink); font-weight: var(--weight-medium); }
+.fguests__slider { width: 100%; min-width: 0; min-height: 32px; accent-color: var(--accent); cursor: pointer; }
+.fguests__numberrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--ink-muted); font-size: var(--text-xs); }
+.fguests__number { width: 100px; min-height: 44px; padding: 8px; font-size: var(--text-sm); }
+.fguests__unknown { display: flex; align-items: center; gap: 8px; font-size: var(--text-xs); min-height: 44px; color: var(--ink); cursor: pointer; }
+.fguests__unknown input { width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--accent); }
+.fguests__note, .fguests__basis { margin: 0; font-size: var(--text-xs); line-height: 1.5; color: var(--ink-muted); }
+.fguests__basis { font-size: 11px; }
+.filters--venue input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* ==== src/css/12-comp-search.css ==== */
 /* 12-comp-search.css â€” the desktop dropdown and the mobile full-screen
  * overlay. OWNER: IMPL-2. UX_SPEC Â§4.7.
@@ -12544,7 +12568,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
 (function (T) {
   'use strict';
 
-  T.version = '0.28.5';   // Username sharing and 12-hour itinerary times
+  T.version = '0.28.6';   // Streamlined wedding filters and stable scrolling
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -51254,6 +51278,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   Q.FACETS = [];
   /** The sortable spec fields of the list on screen: [{key,sort,label,type}]. */
   Q.SORTABLES = [];
+  Q.GUEST_PARAMS = ['guests', 'guestunknown'];
+  Q.GUESTS_ENABLED = false;
 
   function activeSpec() {
     try {
@@ -51301,6 +51327,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     Q.FACETS = facets;
     Q.SORTABLES = sortables;
     var facetParams = facets.map(function (f) { return f.param; });
+    Q.GUESTS_ENABLED = fields.some(function (fd) {
+      return fd && ['capacityLow', 'capacityHigh', 'woodlandCapacity'].indexOf(fd.key) >= 0;
+    });
+    var guestParams = Q.GUESTS_ENABLED ? Q.GUEST_PARAMS : [];
 
     /* -- bands ---------------------------------------------------------- */
     var bands = (spec && spec.bands && spec.bands.length) ? spec.bands.slice() : BASE.bands.slice();
@@ -51320,14 +51350,15 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     var order = [];
     BASE.order.forEach(function (k) {
       order.push(k);
+      if (k === 'budgetmax') guestParams.forEach(function (p) { order.push(p); });
       /* After `source`: the last of the data-derived groups. Every base param
          keeps its position relative to every other one, so an existing URL
          serialises to exactly the same string it always did. */
       if (k === 'source') facetParams.forEach(function (p) { order.push(p); });
     });
     Q.PARAM_ORDER = order;
-    Q.FILTER_KEYS = (BASE.filterKeys || []).concat(facetParams);
-    Q.TEST_KEYS = (BASE.testKeys || []).concat(facetParams);
+    Q.FILTER_KEYS = (BASE.filterKeys || []).concat(guestParams).concat(facetParams);
+    Q.TEST_KEYS = (BASE.testKeys || []).concat(Q.GUESTS_ENABLED ? ['guests'] : []).concat(facetParams);
     Q.SORTS = BASE.sorts.concat(sortables.map(function (s) { return s.sort; }));
 
     /* -- the matching + sorting these params need ------------------------ */
@@ -51336,6 +51367,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       if (!TESTS[f.param]) TESTS[f.param] = makeFacetTest(f.key);
       if (T.filters && !T.filters.has(f.param)) registerParam(f.param);
     });
+    if (Q.GUESTS_ENABLED && T.filters && !T.filters.has('guests')) registerParam('guests');
     sortables.forEach(function (s) {
       var rankish = s.type === 'rank';
       Q.SORT_LABELS[s.sort] = [s.label, rankish ? 'Low to high.' : 'High to low.'];
@@ -51388,6 +51420,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       mode: 'gallery', sort: 'rank', dir: null, q: '', view: null, collection: null,
       stage: null, status: [], agreement: [], outreach: [], reaction: [], budget: [],
       budgetmin: null, budgetmax: null,
+      guests: null, guestunknown: false,
       region: [], country: [], terrain: [], weather: [], board: [],
       exp: [], expmode: 'any', stops: [], friction: [], source: [],
       flags: [], showrejected: false,
@@ -51430,6 +51463,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     var n = parseFloat(String(raw).replace(/[^0-9.\-]/g, ''));
     return isFinite(n) ? n : null;
   }
+  /* A guest count is an exact positive integer, not a best-effort extraction
+     from arbitrary text. Zero is the UI's "Any" position. */
+  function guestCount(raw) {
+    if (raw == null || !/^[0-9]+$/.test(String(raw))) return null;
+    var n = Number(raw);
+    return isFinite(n) && n >= 1 && n <= 100000 && Math.floor(n) === n ? n : null;
+  }
+  Q.guestCount = guestCount;
 
   /**
    * parse(query) -> view state.
@@ -51485,6 +51526,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     vs.expmode = (String(qy.expmode || '').toLowerCase() === 'all') ? 'all' : 'any';
     vs.budgetmin = numOrNull(qy.budgetmin);
     vs.budgetmax = numOrNull(qy.budgetmax);
+    if (Q.GUESTS_ENABLED) {
+      vs.guests = guestCount(qy.guests);
+      vs.guestunknown = vs.guests != null && (qy.guestunknown === '1' || qy.guestunknown === 1 || qy.guestunknown === true);
+    }
     if (vs.budgetmin != null && vs.budgetmax != null && vs.budgetmin > vs.budgetmax) {
       var t0 = vs.budgetmin; vs.budgetmin = vs.budgetmax; vs.budgetmax = t0;
     }
@@ -51506,6 +51551,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       if (k === 'dir') { if (v && v !== Q.DEFAULT_DIR[vs.sort || 'rank']) out.dir = v; return; }
       if (k === 'expmode') { if (v === 'all' && vs.exp && vs.exp.length) out.expmode = 'all'; return; }
       if (k === 'showrejected') { if (v) out.showrejected = '1'; return; }
+      if (k === 'guests') { var n = guestCount(v); if (n != null) out.guests = String(n); return; }
+      if (k === 'guestunknown') { if (v && guestCount(vs.guests) != null) out.guestunknown = '1'; return; }
       if (k === 'budgetmin' || k === 'budgetmax') { if (v != null) out[k] = String(v); return; }
       if (Array.isArray(v)) { if (v.length) out[k] = v.join(','); return; }
       if (v != null && v !== '') out[k] = String(v);
@@ -51563,6 +51610,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   Q.set = function (vs, key, value) {
     var next = Q.clone(vs);
     next[key] = value;
+    if (key === 'guests') {
+      next.guests = guestCount(value);
+      if (next.guests == null) next.guestunknown = false;
+    }
+    if (key === 'guestunknown') next.guestunknown = next.guests != null && !!value;
     if ((key === 'budgetmin' || key === 'budgetmax') && (next.budgetmin != null || next.budgetmax != null)) {
       next.budget = [];
     }
@@ -51778,6 +51830,70 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   /* ===================================================================== */
   /* 3. DERIVATION â€” read the workbook, never guess                        */
   /* ===================================================================== */
+
+  /** Capacity support is deliberately three-valued. The newer 350-person
+      assessment supersedes the earlier numeric reading wherever present.
+      A capacity class is not approval of a complete wedding layout, and an
+      open-ended claim is not evidence for every count above its lower bound.
+      Never parse numbers out of capacity prose: ceremony, dinner and standing
+      capacities often differ within the same sentence. */
+  Q.guestFit = function (row, count) {
+    count = guestCount(count);
+    if (count == null) return 'unknown';
+    var f = row && row.rec && row.rec.f ? row.rec.f : {};
+    var cls = String(f.woodlandCapacity || '').trim().toUpperCase().replace(/\s+/g, '');
+    if (cls) {
+      if (cls === 'VERIFIED350+') return count <= 350 ? 'supported' : 'unknown';
+      if (cls === '300â€“349' || cls === '300-349') {
+        return count <= 300 ? 'supported' : (count >= 350 ? 'too-small' : 'unknown');
+      }
+      if (cls === 'UNDER300') return count >= 300 ? 'too-small' : 'unknown';
+      /* PROBABLE, UNKNOWN and unrecognised future classes do not become a
+         numeric promise, nor do they revive superseded earlier evidence. */
+      return 'unknown';
+    }
+    var lo = num(f.capacityLow), hi = num(f.capacityHigh);
+    if (lo != null && (lo <= 0 || Math.floor(lo) !== lo)) lo = null;
+    if (hi != null && (hi <= 0 || Math.floor(hi) !== hi)) hi = null;
+    if (lo != null && hi != null && lo > hi) return 'unknown';
+    /* An explicitly probable earlier reading remains unconfirmed. */
+    if (/^\s*P\s*\d/i.test(String(f.capacityText || '')) || /probable/i.test(String(f.capNote || ''))) return 'unknown';
+    if (hi != null && count > hi) return 'too-small';
+    if (lo != null) return count <= lo ? 'supported' : 'unknown';
+    return hi != null ? 'supported' : 'unknown';
+  };
+
+  /** Slider travel is a convenience, never a claim that a venue holds its
+      maximum value. The exact-number input can exceed this observed scale. */
+  Q.guestBounds = function (ctx) {
+    if (!Q.GUESTS_ENABLED || (ctx.profile && !ctx.profile.showVenueFacts)) return null;
+    if (!['capacityLow', 'capacityHigh', 'woodlandCapacity'].some(function (k) { return Q.hasField(ctx, k); })) return null;
+    if (ctx._cache.guestBounds) return ctx._cache.guestBounds;
+    var max = 500;
+    ctx.records.forEach(function (r) {
+      ['capacityLow', 'capacityHigh'].forEach(function (k) {
+        var v = num(r.f[k]);
+        if (v != null && v > max && v <= 100000) max = v;
+      });
+    });
+    return (ctx._cache.guestBounds = { min: 0, max: Math.ceil(max / 50) * 50, step: 1 });
+  };
+
+  /** Count each evidence state after every other constraint. The UI can keep
+      unknowns visible without describing them as capacity-confirmed matches. */
+  Q.guestSummary = function (vs, ctx, rows) {
+    rows = rows || (T.select && T.select.get('rows')) || [];
+    var matchIds = vs.q ? Q.searchIds(vs.q, ctx, rows) : null;
+    var other = Q.predicate(vs, ctx, { skip: 'guests', matchIds: matchIds });
+    var out = { supported: 0, unknown: 0, tooSmall: 0, total: 0 };
+    rows.forEach(function (row) {
+      if (!other(row)) return;
+      out.total++;
+      var fit = Q.guestFit(row, vs.guests);
+      if (fit === 'too-small') out.tooSmall++; else out[fit]++;
+    });
+    return out;
+  };
 
   /**
    * The workbook's own modelled total, whatever trip is open. It prices the
@@ -52201,6 +52317,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     var out = [];
     var add = function (g) { if (g.options ? g.options.length : true) out.push(g); };
 
+    var guestBounds = Q.guestBounds(ctx);
+    if (guestBounds) out.push({
+      id: 'guests', param: 'guests', label: 'Guests', kind: 'guests',
+      bounds: guestBounds, range: guestBounds,
+      hint: 'Based on capacity research; layout still needs confirmation.'
+    });
+
     /* 1 â€” Budget. The bands are UX constants; the range is derived. */
     if (ctx.priceKey || ctx.research === false) {
       var totals = [];
@@ -52412,6 +52535,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
 
   /** The per-group tests. Each returns true when the group does not constrain. */
   var TESTS = {
+    guests: function (row, vs) {
+      if (vs.guests == null) return true;
+      var fit = Q.guestFit(row, vs.guests);
+      return fit === 'supported' || (fit === 'unknown' && !!vs.guestunknown);
+    },
     stage: function (row, vs) {
       if (!vs.stage) return true;
       return STAGE_MEMBERS[vs.stage].indexOf(row.status) >= 0;
@@ -52621,20 +52749,20 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   /* Memoised on (view state, research, planning): Explore paints twice per
      navigation (mount, then the route notification) and the rail's 494 chip
      counts at 500 options are the single most expensive thing on the screen. */
-  var COUNTS_MEMO = { key: null, rows: null, value: null };
+  var COUNTS_MEMO = { key: null, rows: null, ctx: null, value: null };
   Q.optionCounts = function (vs, ctx, rows) {
     rows = rows || (T.select && T.select.get('rows')) || [];
     var memoKey = null;
     try {
       /* planningVersion carries T.trips.version(); the window is here too because
          it decides WHICH price every band counts against. */
-      memoKey = Q.serialize(vs) + '|' + T.select.researchVersion() + '|' + T.select.planningVersion() +
+      memoKey = U.stableStringify(Q.serialize(vs)) + '|' + T.select.researchVersion() + '|' + T.select.planningVersion() +
         '|' + (ctx && ctx.window ? ctx.window : '') +
         '|' + (ctx && ctx.budget ? ctx.budget.value + ':' + ctx.budget.source : '') + '|' + (ctx && ctx.scenario ? 'scn' : '');
-      if (COUNTS_MEMO.key === memoKey && COUNTS_MEMO.rows === rows) return COUNTS_MEMO.value;
+      if (COUNTS_MEMO.key === memoKey && COUNTS_MEMO.rows === rows && COUNTS_MEMO.ctx === ctx) return COUNTS_MEMO.value;
     } catch (e) { memoKey = null; }
     var out = Q._optionCountsRaw(vs, ctx, rows);
-    if (memoKey) { COUNTS_MEMO.key = memoKey; COUNTS_MEMO.rows = rows; COUNTS_MEMO.value = out; }
+    if (memoKey) { COUNTS_MEMO.key = memoKey; COUNTS_MEMO.rows = rows; COUNTS_MEMO.ctx = ctx; COUNTS_MEMO.value = out; }
     return out;
   };
   Q._optionCountsRaw = function (vs, ctx, rows) {
@@ -52722,6 +52850,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     if (vs.collection) {
       push('collection', 'collection', vs.collection, 'Collection: ' + vs.collection.replace(/-/g, ' '),
         Q.set(vs, 'collection', null));
+    }
+    if (vs.guests != null) {
+      push('range', 'guests', String(vs.guests), 'Guests: ' + vs.guests +
+        (vs.guestunknown ? ' Â· including unconfirmed' : ' Â· recorded capacity'), Q.set(vs, 'guests', null));
     }
     var groups = Q.groups(ctx);
     var groupLabelByParam = {};
@@ -53098,6 +53230,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
      that is the unit the table, the map and Collections will want: one label,
      one option list derived from the data, one predicate. */
   Q.PARAM_LABELS = {
+    guests: 'Guests',
     stage: 'Funnel stage', status: 'Planning state', agreement: 'Where you two stand',
     reaction: 'A travelerâ€™s reaction', budget: 'Budget', collection: 'Collection',
     region: 'Region', country: 'Country', terrain: 'Terrain', weather: 'Weather',
@@ -53136,7 +53269,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       test: function (row, tokens, ctx) {
         var probe = Q.blank();
         /* `stage` and `collection` are scalars in the grammar; the rest are lists. */
-        if (param === 'stage' || param === 'collection') {
+        if (param === 'stage' || param === 'collection' || param === 'guests') {
           probe[param] = Array.isArray(tokens) ? tokens[0] : tokens;
         } else {
           probe[param] = Array.isArray(tokens) ? tokens : [tokens];
@@ -54459,20 +54592,23 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
    * api: { getVs(), setVs(next), getCtx(), getRows(), count(vs) }
    */
   P.create = function (api, opts) {
-    var compact = !!(opts && opts.compact), activeGroup = 'budget';
+    var compact = !!(opts && opts.compact), activeGroup = isVenue() ? 'guests' : 'budget';
     var root = U.el('div', { class: 'filters' + (compact ? ' filters--compact' : '') });
     var sheetEl = null, slideEl = null, scrimEl = null;
-    var openGroups = null;     // group id -> true; lazy-read from prefs
+    var openGroups = null, openScope = null; // separate venue and hotel disclosure preferences
     var finders = {};          // facet key -> current find text (survives repaints)
     var showAll = {};          // facet key -> true while its scrollbox is open
     var focusKey = null;       // the finder that should regain focus after a repaint
     var rangeOpen = null;      // budget disclosure: null = auto (open while active)
     var detent = 'half';
 
+    function isVenue() { return !!(T.profile && T.profile.active && T.profile.active().showVenueFacts); }
     function openMap() {
-      if (!openGroups) {
-        openGroups = { budget: true };
-        var saved = prefsRead().filtersOpen;
+      var scope = isVenue() ? 'venueFiltersOpen' : 'filtersOpen';
+      if (!openGroups || openScope !== scope) {
+        openScope = scope;
+        openGroups = isVenue() ? { guests: true } : { budget: true };
+        var saved = prefsRead()[scope];
         if (saved && typeof saved === 'object') {
           openGroups = {};
           for (var k in saved) { if (saved[k]) openGroups[k] = true; }
@@ -54480,11 +54616,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       }
       return openGroups;
     }
-    function isOpen(id) { return compact ? id === activeGroup : !!openMap()[id]; }
+    function isOpen(id) { return compact && id.indexOf('venue-more-') !== 0 ? id === activeGroup : !!openMap()[id]; }
     function setOpen(id, on) {
       var m = openMap();
       if (on) m[id] = true; else delete m[id];
-      prefsWrite({ filtersOpen: m });
+      var patch = {}; patch[openScope] = m; prefsWrite(patch);
     }
 
     /* ---- one group's control block ------------------------------------ */
@@ -54519,7 +54655,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       Q.chips(api.getVs(), ctx).forEach(function (chip) {
         if (chip.kind === 'search' || chip.param === param) return;
         var without = Q.toggle(probe, chip.param, chip.token);
-        if (chip.kind === 'range' || chip.kind === 'switch') without = chip.next;
+        if (chip.kind === 'range' || chip.kind === 'switch') without = Q.toggle(chip.next, param, token);
         var n = Q.count(without, ctx, rows);
         if (n > 0 && (!best || n > best.n)) best = { chip: chip, n: n };
       });
@@ -54544,6 +54680,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     function groupParams(g) {
       var params = [g.param].concat((g.subgroups || []).map(function (s) { return s.param || g.param; }));
       if (g.id === 'planning') params = ['status', 'flags'];
+      if (g.groups) g.groups.forEach(function (child) { params = params.concat(groupParams(child)); });
+      if (g.categories) g.categories.forEach(function (child) { params = params.concat(groupParams(child)); });
+      params = params.filter(function (p) { return p !== 'guests'; });
       var seen = {}, out = [];
       params.forEach(function (p) { if (p && !seen[p]) { seen[p] = 1; out.push(p); } });
       return out;
@@ -54566,8 +54705,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
           labels.push((meta && meta.label) || Q.fallbackLabel(p, token));
         });
       });
+      if (g.id === 'guests' && vs.guests != null) labels.push(vs.guests + ' guests' + (vs.guestunknown ? ' Â· include unconfirmed' : ' Â· recorded capacity'));
       if (g.id === 'budget' && (vs.budgetmin != null || vs.budgetmax != null)) labels.push(rangeText(vs));
-      if (g.id === 'planning' && vs.showrejected) labels.push('Showing rejected');
+      if ((g.id === 'planning' || g.id === 'venue-more' || g.id === 'venue-more-shortlist') && vs.showrejected) labels.push('Showing rejected');
       return { count: labels.length, labels: labels };
     }
 
@@ -54576,9 +54716,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       return labels.slice(0, 2).join(', ') + ' +' + (labels.length - 2) + ' more';
     }
 
-    function groupBlock(g, counts) {
+    function groupBlock(g, counts, forcedOpen) {
       var vs = api.getVs();
-      var open = isOpen(g.id);
+      var open = forcedOpen === undefined ? isOpen(g.id) : forcedOpen;
       var info = activeInfo(g);
 
       var section = U.el('section', {
@@ -54593,10 +54733,26 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       head.appendChild(U.el('span', { class: 'fgroup__label' }, g.label));
       if (info.count) head.appendChild(U.el('span', { class: 'fgroup__badge' }, String(info.count)));
       head.appendChild(U.el('span', { class: 'fgroup__chev', 'aria-hidden': 'true' }, open ? 'â–¾' : 'â–¸'));
-      head.addEventListener('click', function () {
-        setOpen(g.id, !open);
-        render();
-      });
+      /* Disclosure state does not change the query. Keep the live header and
+         every sibling control in place; lazily build only this group's body. */
+      function toggleGroup(on) {
+        var position = capturePosition();
+        setOpen(g.id, on);
+        section.classList.toggle('is-open', on);
+        head.setAttribute('aria-expanded', on ? 'true' : 'false');
+        head.querySelector('.fgroup__chev').textContent = on ? 'â–¾' : 'â–¸';
+        while (section.lastChild !== head) section.removeChild(section.lastChild);
+        if (on) {
+          var updated = groupBlock(g, counts);
+          while (updated.children.length > 1) section.appendChild(updated.children[1]);
+        } else if (info.count) {
+          var line = U.el('p', { class: 'fgroup__values', title: info.labels.join(', ') }, summaryText(info.labels));
+          line.addEventListener('click', function () { toggleGroup(true); });
+          section.appendChild(line);
+        }
+        restorePosition(position);
+      }
+      head.addEventListener('click', function () { toggleGroup(!isOpen(g.id)); });
       section.appendChild(head);
 
       /* A collapsed group with an active filter shows its VALUES, not a count â€”
@@ -54605,7 +54761,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         if (info.count) {
           var line = U.el('p', { class: 'fgroup__values', title: info.labels.join(', ') },
             summaryText(info.labels));
-          line.addEventListener('click', function () { setOpen(g.id, true); render(); });
+          line.addEventListener('click', function () { toggleGroup(true); });
           section.appendChild(line);
         }
         return section;
@@ -54613,6 +54769,22 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
 
       var body = U.el('div', { class: 'fgroup__body', id: bodyId });
       if (g.hint) body.appendChild(U.el('p', { class: 'fgroup__hint' }, g.hint));
+      if (g.kind === 'guests') {
+        body.appendChild(guestBlock(g, vs)); section.appendChild(body); return section;
+      }
+      if (g.categories) {
+        g.categories.forEach(function (child) { body.appendChild(groupBlock(child, counts)); });
+        section.appendChild(body); return section;
+      }
+      if (g.groups) {
+        g.groups.forEach(function (child) {
+          var sub = U.el('div', { class: 'fgroup__section' });
+          sub.appendChild(U.el('h3', { class: 'fgroup__subheading' }, child.label));
+          var block = groupBlock(child, counts, true);
+          block.removeChild(block.firstChild); sub.appendChild(block); body.appendChild(sub);
+        });
+        section.appendChild(body); return section;
+      }
 
       /* One facet's chips. Small facets are plain chips; long ones get the
          finder. `name` only seasons the placeholder. */
@@ -54770,7 +54942,17 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       head.appendChild(U.el('span', { class: 'frange__chev', 'aria-hidden': 'true' }, open ? 'â–¾' : 'â–¸'));
       head.appendChild(U.el('span', { class: 'frange__label' },
         active ? 'Custom range: ' + rangeText(vs) : 'Custom rangeâ€¦'));
-      head.addEventListener('click', function () { rangeOpen = !open; render(); });
+      head.addEventListener('click', function () {
+        var position = capturePosition();
+        rangeOpen = !(rangeOpen == null ? active : rangeOpen);
+        var updated = rangeBlock(g, api.getVs());
+        box.className = updated.className;
+        head.setAttribute('aria-expanded', rangeOpen ? 'true' : 'false');
+        head.querySelector('.frange__chev').textContent = rangeOpen ? 'â–¾' : 'â–¸';
+        while (box.lastChild !== row) box.removeChild(box.lastChild);
+        while (updated.children.length > 1) box.appendChild(updated.children[1]);
+        restorePosition(position);
+      });
       row.appendChild(head);
       if (active) {
         var x = U.el('button', {
@@ -54877,6 +55059,88 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       return box;
     }
 
+    /* Venue controls follow the decisions people make, while every original
+       query parameter stays available (including older shared/saved views). */
+    function panelGroups(ctx) {
+      var groups = Q.groups(ctx);
+      if (!isVenue()) return groups;
+      var byId = {}, used = {};
+      groups.forEach(function (g) { byId[g.id] = g; });
+      function take(id, label) {
+        var g = byId[id]; if (!g) return null; used[id] = true;
+        var copy = {}; Object.keys(g).forEach(function (key) { copy[key] = g[key]; });
+        if (label) copy.label = label;
+        return copy;
+      }
+      function section(id, label, children) {
+        children = children.filter(Boolean);
+        return children.length ? { id: id, label: label, groups: children } : null;
+      }
+      var out = [], guest = take('guests'), where = take('where'), state = take('f_stateCode', 'State');
+      if (guest) { guest.hint = ''; out.push(guest); }
+      var location = [];
+      if (state) location.push({ param: state.param, label: 'State', options: state.options });
+      (where && where.subgroups || []).forEach(function (sub) {
+        var active = api.getVs()[sub.param] || [];
+        if (sub.options.length > 1 || active.length) location.push(sub);
+      });
+      if (location.length) out.push({ id: 'venue-location', label: 'Location', subgroups: location });
+      out.push(section('venue-setting', 'Venue & ceremony', [take('board', 'Venue type'), take('f_trees', 'Woodland setting'), take('f_chuppah', 'Open-sky chuppah'), take('f_fire', 'Fire permission')]));
+      out.push(section('venue-essentials', 'Catering & layout', [take('f_outsideCatering', 'Outside catering'), take('f_kosherOps', 'Kosher catering setup'), take('f_rainPlan', 'Rain backup'), take('f_separateDance', 'Separate dancing'), take('f_flow', 'Space & flow')]));
+      var budget = take('budget', 'Venue fee');
+      if (budget) { budget.hint = 'Recorded site fees, not the full wedding cost.'; out.push(budget); }
+      var shortlist = section('venue-more-shortlist', 'Your shortlist', [take('planning', 'Your decisions'), take('agreement', 'Your reactions')]);
+      var research = section('venue-more-research', 'Research & outreach', [take('f_woodlandCoverage', 'Research coverage'), take('f_woodlandStatus', '350-guest research status'), take('f_woodlandTier', '350-guest research priority'), take('f_woodlandStage', '350-guest screening'), take('f_woodlandCapacity', '350-guest capacity evidence'), take('outreach', 'Your outreach')]);
+      var earlier = groups.filter(function (g) { return !used[g.id]; });
+      var details = section('venue-more-earlier', 'Earlier research & details', earlier);
+      var categories = [shortlist, research, details].filter(Boolean);
+      if (categories.length) out.push({ id: 'venue-more', label: 'More filters', categories: categories });
+      return out.filter(Boolean);
+    }
+
+    /* Dragging previews the number locally. Release/change applies one query,
+       so hundreds of venues are not repainted for every pointer movement. */
+    function guestBlock(g, vs) {
+      var box = U.el('div', { class: 'fguests' });
+      var bounds = g.bounds || g.range || { min: 0, max: 500, step: 1 };
+      var value = vs.guests == null ? 0 : vs.guests;
+      var display = U.el('output', { class: 'fguests__value', for: 'filter-guests-range filter-guests-number', text: value ? value + ' guests' : 'Any guest count' });
+      var slider = U.el('input', { type: 'range', id: 'filter-guests-range', class: 'fguests__slider', min: '0', max: String(Math.max(bounds.max, value)), step: '1', value: String(value), 'aria-label': 'Number of guests', 'aria-valuetext': value ? value + ' guests' : 'Any guest count' });
+      var field = U.el('div', { class: 'fguests__numberrow' });
+      var number = U.el('input', { type: 'number', id: 'filter-guests-number', class: 'input fguests__number', min: '1', max: '100000', step: '1', inputmode: 'numeric', placeholder: 'Any', value: value ? String(value) : '' });
+      field.appendChild(U.el('label', { for: 'filter-guests-number', text: 'Exact number' })); field.appendChild(number);
+      var include = U.el('input', { type: 'checkbox', id: 'filter-guests-unknown' });
+      include.checked = vs.guests == null ? true : !!vs.guestunknown;
+      var unknown = U.el('label', { class: 'fguests__unknown', for: 'filter-guests-unknown' });
+      unknown.appendChild(include); unknown.appendChild(document.createTextNode('Include unconfirmed capacity'));
+      var note = U.el('p', { class: 'fguests__note', role: 'status', 'aria-live': 'polite' });
+      var caption = U.el('p', { class: 'fguests__basis', text: 'Capacity research is a starting point; the full wedding layout still needs confirmation.' });
+      function preview(n) { U.setText(display, n ? n + ' guests' : 'Any guest count'); slider.setAttribute('aria-valuetext', n ? n + ' guests' : 'Any guest count'); }
+      var committing = false;
+      function commit(n) {
+        if (committing) return;
+        if (!Number.isInteger(n) || n < 0 || n > 100000) { U.setText(note, 'Enter a whole number from 1 to 100,000, or leave it blank.'); return; }
+        var current = api.getVs();
+        var next = Q.set(current, 'guests', n || null);
+        next = Q.set(next, 'guestunknown', n ? include.checked : false);
+        if (current.guests === next.guests && current.guestunknown === next.guestunknown) return;
+        // Removing the focused number field can fire change again during repaint.
+        committing = true;
+        try { api.setVs(next); } finally { committing = false; }
+      }
+      slider.addEventListener('input', function () { var n = Number(slider.value); number.value = n ? String(n) : ''; preview(n); });
+      slider.addEventListener('change', function () { commit(Number(slider.value)); });
+      number.addEventListener('change', function () { commit(number.value.trim() === '' ? 0 : Number(number.value)); });
+      number.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); number.dispatchEvent(new Event('change')); } });
+      include.addEventListener('change', function () { if (api.getVs().guests != null) commit(api.getVs().guests); });
+      if (value && Q.guestSummary) {
+        var summary = Q.guestSummary(vs, api.getCtx(), api.getRows());
+        U.setText(note, summary.supported + ' with supporting capacity research' + (include.checked ? ' Â· ' + summary.unknown + ' still need confirmation' : '. Unconfirmed capacity is hidden.'));
+      } else U.setText(note, 'Slide to your guest count, or enter an exact number.');
+      box.appendChild(display); box.appendChild(slider); box.appendChild(field); box.appendChild(unknown); box.appendChild(note); box.appendChild(caption);
+      return box;
+    }
+
     /* ---- the whole panel ---------------------------------------------- */
     function buildCompact(ctx, vs, counts) {
       var frag = document.createDocumentFragment();
@@ -54891,7 +55155,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       head.appendChild(close);
       frag.appendChild(head);
 
-      var groups = Q.groups(ctx);
+      var groups = panelGroups(ctx);
       if (!groups.some(function (g) { return g.id === activeGroup; })) activeGroup = groups[0].id;
       var workspace = U.el('div', { class: 'filters__workspace' });
       var nav = U.el('nav', { class: 'filters__categories', 'aria-label': 'Filter categories' });
@@ -54924,7 +55188,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         content.appendChild(U.el('p', { class: 'filters__applied-label' }, 'Applied filters'));
         content.appendChild(applied);
       }
-      content.appendChild(U.el('p', { class: 'filters__semantics' }, 'Any within a group Â· all across groups.'));
+      if (!isVenue()) content.appendChild(U.el('p', { class: 'filters__semantics' }, 'Any within a group Â· all across groups.'));
       workspace.appendChild(content);
       frag.appendChild(workspace);
       var foot = U.el('div', { class: 'filters__footer' });
@@ -54939,6 +55203,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
 
     function build() {
       var ctx = api.getCtx(), rows = api.getRows(), vs = api.getVs();
+      root.classList.toggle('filters--venue', isVenue());
       var counts = Q.optionCounts(vs, ctx, rows);
       if (compact) return buildCompact(ctx, vs, counts);
       var frag = document.createDocumentFragment();
@@ -54951,16 +55216,38 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       head.appendChild(clear);
       frag.appendChild(head);
 
-      Q.groups(ctx).forEach(function (g) { frag.appendChild(groupBlock(g, counts)); });
+      panelGroups(ctx).forEach(function (g) { frag.appendChild(groupBlock(g, counts)); });
 
-      frag.appendChild(U.el('p', { class: 'filters__semantics' },
+      if (!isVenue()) frag.appendChild(U.el('p', { class: 'filters__semantics' },
         'Any within a group Â· all across groups.'));
       return frag;
     }
 
+    /* A full query repaint still rebuilds controls. Snapshot each scrolling
+       ancestor before removing children, including the rail, sheet or page.
+       Otherwise the temporarily empty subtree clamps its scrollTop to zero. */
+    function capturePosition() {
+      var ancestors = [], node = root;
+      while (node) {
+        if (node.nodeType === 1) ancestors.push({ node: node, top: node.scrollTop, left: node.scrollLeft });
+        node = node.parentNode;
+      }
+      return { ancestors: ancestors, x: window.scrollX, y: window.scrollY };
+    }
+    function restorePosition(position) {
+      position.ancestors.forEach(function (entry) {
+        entry.node.scrollTop = entry.top;
+        entry.node.scrollLeft = entry.left;
+      });
+      if (window.scrollX !== position.x || window.scrollY !== position.y)
+        window.scrollTo(position.x, position.y);
+    }
+
     function restoreFinder() {
       if (!focusKey) return;
-      var el = root.querySelector('.fgroup__find[data-key="' + focusKey + '"]');
+      var el = U.qsa('.fgroup__find', root).filter(function (n) {
+        return n.getAttribute('data-key') === focusKey;
+      })[0];
       if (!el) return;
       el.value = finders[focusKey] || '';
       try {
@@ -54971,26 +55258,44 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     }
 
     function render() {
-      var focused = compact && root.contains(document.activeElement) ? document.activeElement : null;
-      var content = compact && root.querySelector('.filters__content');
-      var scroll = content ? content.scrollTop : 0;
+      var focused = root.contains(document.activeElement) ? document.activeElement : null;
+      var position = capturePosition();
+      var scrollers = U.qsa('.filters__content, .filters__categories, .fgroup__chips--all', root).map(function (n, i) {
+        var group = n.closest('.fgroup');
+        return { kind: n.className, group: group && group.dataset.group, index: i, top: n.scrollTop, left: n.scrollLeft };
+      });
+      var next = build();
       U.clear(root);
-      root.appendChild(build());
-      if (compact) {
-        content = root.querySelector('.filters__content');
-        if (content) content.scrollTop = scroll;
-        if (focused) {
-          var match = U.qsa('button, select, input', root).filter(function (n) {
-            return ['data-category', 'data-action', 'data-token'].some(function (key) {
-              return focused.hasAttribute(key) && n.getAttribute(key) === focused.getAttribute(key) &&
-                (key !== 'data-token' || n.getAttribute('data-param') === focused.getAttribute('data-param'));
-            });
-          })[0];
-          if (match) try { match.focus({ preventScroll: true }); } catch (e) {}
-        }
+      root.appendChild(next);
+      var currentScrollers = U.qsa('.filters__content, .filters__categories, .fgroup__chips--all', root);
+      scrollers.forEach(function (saved) {
+        var matches = currentScrollers.filter(function (n) {
+          var group = n.closest('.fgroup');
+          return n.className === saved.kind && (group && group.dataset.group) === saved.group;
+        });
+        var match = matches.length === 1 ? matches[0] : currentScrollers[saved.index];
+        if (match && match.className === saved.kind) { match.scrollTop = saved.top; match.scrollLeft = saved.left; }
+      });
+      if (focused) {
+        var focusedGroup = focused.closest('.fgroup');
+        var match = U.qsa('button, select, input, textarea', root).filter(function (n) {
+          if (focused.id) return n.id === focused.id;
+          if (focused.hasAttribute('data-token')) return n.getAttribute('data-token') === focused.getAttribute('data-token') &&
+            n.getAttribute('data-param') === focused.getAttribute('data-param');
+          if (focused.hasAttribute('data-key')) return n.getAttribute('data-key') === focused.getAttribute('data-key');
+          if (['data-category', 'data-action', 'aria-label'].some(function (key) {
+            return focused.hasAttribute(key) && n.tagName === focused.tagName && n.getAttribute(key) === focused.getAttribute(key);
+          })) return true;
+          var group = n.closest('.fgroup');
+          return focusedGroup && group && focusedGroup.dataset.group === group.dataset.group &&
+            n.tagName === focused.tagName && n.className === focused.className && n.type === focused.type &&
+            n.textContent === focused.textContent;
+        })[0];
+        if (match) try { match.focus({ preventScroll: true }); } catch (e) {}
       }
       restoreFinder();
       if (sheetEl) paintSheetFooter();
+      restorePosition(position);
       return root;
     }
 
@@ -55020,7 +55325,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     function paintSheetFooter() {
       if (!footerBtn) return;
       var n = api.count(api.getVs());
-      U.setText(footerBtn, 'Show ' + F.plural(n, 'trip'));
+      U.setText(footerBtn, 'Show ' + F.plural(n, isVenue() ? 'venue' : 'trip'));
     }
 
     /** The mobile sheet: three detents, live filtering, one dismissing footer. */
@@ -55210,7 +55515,6 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     return el;
   };
 })(window.TRIP);
-
 /* ==== src/js/33-comp-search.js ==== */
 /* 33-comp-search.js â€” global search: desktop dropdown + mobile overlay.
  * OWNER: IMPL-2 (Explore).
