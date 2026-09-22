@@ -12770,7 +12770,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
 (function (T) {
   'use strict';
 
-  T.version = '0.28.8';   // Remember browser connections and retry incomplete GitHub sync
+  T.version = '0.28.9';   // Remember browser connections and retry incomplete GitHub sync
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -47193,11 +47193,18 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
 
   /* Pure preview: one native checklist task per source task. The original
      substeps stay nested and keep their individual completion states. */
-  I.preview = function (tasks, existingItems) {
+  I.preview = function (tasks, existingItems, confirmed) {
     var existing = existingItems || {}, seen = Object.create(null), rows = [], steps = 0, completed = 0, secured = 0;
     Object.keys(existing).forEach(function (id) {
       var source = existing[id] && existing[id].importSource;
       if (source && source.app === 'october-dashboard') seen[source.taskId] = id;
+    });
+    /* A successful transaction can resolve before its listener snapshot.
+       Receipts are used only for that operation's final preview; future file
+       selections and imports still read current state and dedupe on-server. */
+    var awaitingSnapshot = 0;
+    (confirmed || []).forEach(function (receipt) {
+      if (!seen[receipt.taskId]) { seen[receipt.taskId] = receipt.id; awaitingSnapshot++; }
     });
     tasks.forEach(function (task) {
       var source = sourceFor(task);
@@ -47213,7 +47220,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       rows.push({ fields: fields, taskId: task.id, original: source.original, isDone: done, existingId: seen[task.id] || null });
     });
     var additions = rows.filter(function (r) { return !r.existingId; }).length;
-    var count = Object.keys(existing).length;
+    var count = Object.keys(existing).length + awaitingSnapshot;
     return { rows: rows, tasks: rows.length, steps: steps, completed: completed, secured: secured,
       additions: additions, skipped: rows.length - additions, existingCount: count,
       capacity: (PR.CAPS && PR.CAPS.checklist) || 200, fits: count + additions <= ((PR.CAPS && PR.CAPS.checklist) || 200) };
@@ -47234,15 +47241,16 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     catch (e) { return Promise.resolve({ ok: false, code: 'invalid-import', added: 0, skipped: 0 }); }
     if (!preview.fits) return Promise.resolve({ ok: false, code: 'cap-reached', added: 0, skipped: 0 });
     applying[tripId] = true;
-    var result = { ok: true, added: 0, skipped: 0 }, index = 0;
+    var result = { ok: true, added: 0, skipped: 0, confirmed: [] }, index = 0;
     function next() {
       if (index >= preview.rows.length) return Promise.resolve(result);
       if (!editable(tripId)) { result.ok = false; result.code = 'not-editor'; return Promise.resolve(result); }
       var row = preview.rows[index++];
-      if (row.existingId) { result.skipped++; return next(); }
+      if (row.existingId) { result.skipped++; result.confirmed.push({ taskId: row.taskId, id: row.existingId }); return next(); }
       return Promise.resolve(PR.checklist.add(tripId, row.fields)).then(function (res) {
         if (!res || !res.ok) { result.ok = false; result.code = res && res.code || 'unavailable'; return result; }
         if (res.unchanged) result.skipped++; else result.added++;
+        result.confirmed.push({ taskId: row.taskId, id: res.id });
         if (onProgress) onProgress({ added: result.added, skipped: result.skipped, total: preview.tasks });
         return next();
       });
@@ -47322,9 +47330,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     footer.appendChild(close); footer.appendChild(apply);
     close.addEventListener('click', function () { T.modal.close(); });
     if (!editable(tripId)) status.textContent = 'Sign in with permission to edit this trip to import tasks.';
-    function drawPreview() {
+    function drawPreview(confirmed) {
       output.textContent = '';
-      var preview = I.preview(selected, itemsFor(tripId));
+      var preview = I.preview(selected, itemsFor(tripId), confirmed);
       output.appendChild(U.el('p', {}, preview.tasks + ' tasks Â· ' + preview.steps + ' nested next steps Â· ' + preview.completed + ' completed tasks'));
       output.appendChild(U.el('p', {}, preview.additions + ' new tasks will be added. ' + preview.skipped + ' previously imported tasks will be kept as they are.'));
       output.appendChild(U.el('p', {}, 'Secured means booked or arranged; those tasks stay open. Source dates are retained as plan dates, not deadlines.'));
@@ -47365,7 +47373,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       I.apply(tripId, selected, function (progress) { status.textContent = progress.added + ' tasks addedâ€¦'; }).then(function (result) {
         busy = false; input.disabled = false;
         if (result.ok) {
-          drawPreview(); status.textContent = result.added + ' tasks imported. ' + result.skipped + ' existing tasks kept.';
+          drawPreview(result.confirmed); status.textContent = result.added + ' tasks imported. ' + result.skipped + ' existing tasks kept.';
           if (T.notify && T.notify.toast) T.notify.toast({ text: 'Plan tasks imported.' });
         } else {
           apply.disabled = !editable(tripId); apply.textContent = 'Continue import';
