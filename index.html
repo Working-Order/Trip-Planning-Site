@@ -9719,6 +9719,16 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .ttimport__left { margin: 0; padding-left: var(--s4); display: grid; gap: 0.2em; font-size: var(--text-sm); color: var(--ink-muted); }
 .ttimport__changes { margin: 0; font-size: var(--text-sm); color: var(--ink-muted); max-width: var(--measure); }
 .ttimport__verdict { margin: 0; font-weight: var(--weight-semi); color: var(--ink); }
+
+/* Findable usernames sit above the quieter device/account options. */
+.sync__username { display: grid; gap: var(--s2); padding-block: var(--s3); }
+.sync__usernametitle { margin: 0; font-size: var(--text-xs); color: var(--ink-muted); }
+.sync__usernamevalue { margin: 0; color: var(--ink); font-size: var(--text-lg); font-weight: var(--weight-semi); overflow-wrap: anywhere; }
+.sync__usernamedrawer { margin-top: var(--s1); }
+.sync__usernamedrawer .sync__form { margin-top: var(--s3); }
+.sync__usernameform { max-width: 30rem; }
+.sync__usernameform .sync__hint { margin: 0; }
+.sync__usernameform [hidden] { display: none; }
 /* ==== src/css/40-view-trips.css ==== */
 /* 40-view-trips.css — THE TRIPS CATALOG (#/trips). OWNER: WS-B.
  *
@@ -12416,6 +12426,19 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 @media (max-width: 359px) {
   .plan__overview { grid-template-columns: 1fr; }
 }
+
+/* A bounded username picker, with the same targets for mouse and keyboard. */
+.plan__personfield { position: relative; min-width: 0; }
+.plan__people { display: grid; gap: var(--s1); list-style: none; margin: 0; padding: var(--s1); max-height: 18rem; overflow-y: auto; border: var(--hair) solid var(--line-strong); border-radius: var(--radius-md); background: var(--surface); box-shadow: var(--shadow-sm); }
+.plan__people[hidden], .plan__personselected[hidden] { display: none; }
+.plan__person { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1) var(--s2); min-height: 44px; padding: var(--s2) var(--s3); border-radius: var(--radius-sm); cursor: pointer; overflow-wrap: anywhere; }
+.plan__person:hover, .plan__person[aria-selected="true"] { background: var(--surface-alt); outline: 2px solid var(--accent); outline-offset: -2px; }
+.plan__person[aria-disabled="true"] { color: var(--ink-muted); }
+.plan__personname { font-weight: var(--weight-medium); }
+.plan__personmeta { font-size: var(--text-xs); color: var(--ink-muted); }
+.plan__personselected { margin: 0; font-size: var(--text-sm); font-weight: var(--weight-medium); overflow-wrap: anywhere; }
+.plan__form--add .plan__hint { margin: 0; }
+.itin__time { white-space: normal; }
 /* ==== src/css/90-utilities.css ==== */
 /* 90-utilities.css — last layer. OWNER: WS-D.
  * Single-purpose helpers only. If something here needs three declarations to
@@ -12521,7 +12544,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 (function (T) {
   'use strict';
 
-  T.version = '0.28.4';   // Plan overview and navigation refresh
+  T.version = '0.28.5';   // Username sharing and 12-hour itinerary times
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -42007,60 +42030,128 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     return details;
   }
 
+  var memberUiUid = null, memberUiEpoch = 0, memberAuthApi = null;
+  function memberAccount() {
+    if (T.firebase && T.firebase !== memberAuthApi && T.firebase.onAuthChanging) {
+      memberAuthApi = T.firebase;
+      memberAuthApi.onAuthChanging(function () { memberUiEpoch++; });
+    }
+    var user = T.firebase && T.firebase.user ? T.firebase.user() : null;
+    var uid = user && user.uid || null;
+    if (uid !== memberUiUid) { memberUiUid = uid; memberUiEpoch++; }
+    return uid;
+  }
   function buildAddDrawer(tripId) {
     var details = U.el('details', { class: 'plan__drawer plan__drawer--add', dataset: { drawer: 'add' } });
-    details.appendChild(U.el('summary', { class: 'sync__advsum', text: 'Add someone by id' }));
-
+    details.appendChild(U.el('summary', { class: 'sync__advsum', text: 'Add a person' }));
     var form = U.el('form', { class: 'plan__form plan__form--add', novalidate: true });
-    var uidInput = U.el('input', { class: 'input sync__input', id: 'plan-member-uid', type: 'text',
-      autocomplete: 'off', spellcheck: 'false', placeholder: 'paste their id' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-member-uid', text: 'Their id' }),
-      uidInput
+    var input = U.el('input', { class: 'input sync__input', id: 'plan-member-handle', type: 'text',
+      role: 'combobox', 'aria-autocomplete': 'list', 'aria-expanded': 'false', 'aria-controls': 'plan-member-results',
+      'aria-describedby': 'plan-member-hint', autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false',
+      maxlength: '21', placeholder: '@username' });
+    var results = U.el('ul', { class: 'plan__people', id: 'plan-member-results', role: 'listbox', 'aria-label': 'People', hidden: true });
+    var selectedLine = U.el('p', { class: 'plan__personselected', hidden: true });
+    var status = U.el('p', { class: 'plan__status', role: 'status', 'aria-live': 'polite' });
+    var addBtn = U.el('button', { type: 'submit', class: 'btn btn--primary plan__add', text: 'Add to plan', disabled: true });
+    form.appendChild(U.el('div', { class: 'sync__field plan__personfield' }, [
+      U.el('label', { class: 'sync__label', for: 'plan-member-handle', text: 'Find by username' }), input, results
     ]));
-    var labelInput = U.el('input', { class: 'input sync__input', id: 'plan-member-label', type: 'text',
-      autocomplete: 'off', maxlength: '40' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-member-label', text: 'Their label' }),
-      labelInput
-    ]));
-
-    var acts = U.el('div', { class: 'sync__actions' });
-    var addBtn = U.el('button', { type: 'submit', class: 'btn btn--primary plan__add', text: 'Add' });
-    var status = U.el('span', { class: 'plan__status', role: 'status', 'aria-live': 'polite' });
-    acts.appendChild(addBtn); acts.appendChild(status);
-    form.appendChild(acts);
-
-    form.addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      var uid = String(uidInput.value || '').trim();
-      var label = String(labelInput.value || '').trim();
-      addBtn.disabled = true;
-      U.setText(status, 'Adding…');
-      var p = (PR && PR.members && typeof PR.members.add === 'function')
-        ? PR.members.add(tripId, uid, label)
-        : Promise.resolve({ ok: false, code: 'unavailable' });
-      p.then(function (r) {
-        addBtn.disabled = false;
-        if (r && r.ok) {
-          /* Neither field is ever prefilled, so `.defaultValue` was already
-             '' — reset here anyway, purely so every drawer in this file
-             resyncs both together the same way (defensive, formBusy() below
-             would already read this correctly without it). */
-          uidInput.value = ''; uidInput.defaultValue = '';
-          labelInput.value = ''; labelInput.defaultValue = '';
-          details.open = false;
-          U.setText(status, '');
-          try { T.notify.toast({ text: 'Added ' + label + '.' }); } catch (e) {}
-          /* REPAIR CYCLE 3 — see buildStartDrawer's identical call. */
-          repaintNow();
-          return;
-        }
-        setAddStatus(status, r && r.code);
+    form.appendChild(U.el('p', { class: 'plan__hint', id: 'plan-member-hint', text: 'Search at least 2 letters. They choose their username in Settings.' }));
+    form.appendChild(selectedLine);
+    form.appendChild(U.el('p', { class: 'plan__hint', text: 'Adding someone gives them access to this trip’s shared plan and lets them edit it.' }));
+    form.appendChild(U.el('div', { class: 'sync__actions' }, [addBtn]));
+    form.appendChild(status); details.appendChild(form);
+    var uid = memberAccount(), epoch = memberUiEpoch, timer = null, serial = 0, rows = [], active = -1, selected = null, busy = false;
+    function current() { return details.isConnected && memberAccount() === uid && memberUiEpoch === epoch && T.trips.activeId() === tripId; }
+    function isMember(person) {
+      var prep = PR && PR.get ? PR.get(tripId) : null;
+      return person.uid === uid || !!(prep && prep.plan && (prep.plan.memberUids || []).indexOf(person.uid) !== -1);
+    }
+    function canAdd() { var prep = PR && PR.get ? PR.get(tripId) : null; return !!(prep && prep.plan && prep.plan.members && prep.plan.members[uid]); }
+    function closeList() { results.hidden = true; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); active = -1; }
+    function markActive(index) {
+      active = index;
+      U.qsa('[role="option"]', results).forEach(function (node, n) { node.setAttribute('aria-selected', n === active ? 'true' : 'false'); });
+      if (active >= 0) input.setAttribute('aria-activedescendant', 'plan-person-' + active);
+      else input.removeAttribute('aria-activedescendant');
+    }
+    function pick(index) {
+      if (!current() || busy || !rows[index]) return;
+      selected = rows[index]; input.value = '@' + selected.username;
+      selectedLine.hidden = false; U.setText(selectedLine, '@' + selected.username + (isMember(selected) ? ' is already in this plan.' : ' is ready to add.'));
+      addBtn.disabled = isMember(selected); closeList(); U.setText(status, ''); input.focus();
+    }
+    function showRows(found) {
+      rows = found.slice(0, 8); U.clear(results); active = -1;
+      rows.forEach(function (person, index) {
+        var option = U.el('li', { class: 'plan__person', id: 'plan-person-' + index, role: 'option', 'aria-selected': 'false',
+          'aria-disabled': isMember(person) ? 'true' : 'false' });
+        option.appendChild(U.el('span', { class: 'plan__personname', text: '@' + person.username }));
+        if (isMember(person)) option.appendChild(U.el('span', { class: 'plan__personmeta', text: person.uid === uid ? 'You · already in plan' : 'Already in plan' }));
+        option.addEventListener('mousedown', function (event) { event.preventDefault(); });
+        option.addEventListener('click', function () { pick(index); });
+        results.appendChild(option);
       });
+      results.hidden = !rows.length; input.setAttribute('aria-expanded', rows.length ? 'true' : 'false');
+      input.removeAttribute('aria-activedescendant');
+      U.setText(status, rows.length ? rows.length + (rows.length === 1 ? ' person found. Choose them below.' : ' people found. Choose a person below.') : 'No usernames found. Check the spelling or ask them to set one in Settings.');
+    }
+    function search() {
+      serial++; var request = serial;
+      if (timer) window.clearTimeout(timer);
+      selected = null; selectedLine.hidden = true; addBtn.disabled = true; rows = []; closeList(); U.clear(results);
+      var query = input.value.trim().replace(/^@/, '');
+      if (query.length < 2) { U.setText(status, 'Type at least 2 letters to search.'); return; }
+      if (!/^[a-z][a-z0-9_]{1,19}$/i.test(query)) { U.setText(status, 'Use letters, numbers or underscores, starting with a letter.'); return; }
+      U.setText(status, 'Searching…');
+      timer = window.setTimeout(function () {
+        if (!current() || request !== serial) return;
+        var api = T.firebase && T.firebase.profile;
+        Promise.resolve(api && api.search ? api.search(query) : { ok: false }).then(function (result) {
+          if (!current() || request !== serial) return;
+          if (result && result.ok) showRows(result.results || []);
+          else U.setText(status, 'Couldn’t search usernames. Check your connection and try again.');
+        }, function () { if (current() && request === serial) U.setText(status, 'Couldn’t search usernames. Check your connection and try again.'); });
+      }, 250);
+    }
+    input.addEventListener('input', search);
+    input.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') { event.preventDefault(); serial++; if (timer) window.clearTimeout(timer); closeList(); return; }
+      if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && rows.length && !busy) {
+        event.preventDefault(); results.hidden = false; input.setAttribute('aria-expanded', 'true');
+        markActive(event.key === 'ArrowDown' ? (active + 1) % rows.length : (active < 1 ? rows.length - 1 : active - 1));
+      } else if (event.key === 'Enter') {
+        event.preventDefault(); if (!results.hidden && active >= 0) pick(active);
+        else if (selected && !addBtn.disabled) addBtn.focus();
+      }
     });
-
-    details.appendChild(form);
+    form.addEventListener('focusout', function () { window.setTimeout(function () { if (!form.contains(document.activeElement)) closeList(); }, 0); });
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); if (!current() || busy || !selected || isMember(selected) || !canAdd()) return;
+      var person = selected, api = T.firebase && T.firebase.profile;
+      busy = true; addBtn.disabled = true; input.disabled = true; serial++; closeList(); U.setText(status, 'Adding @' + person.username + '…');
+      /* Re-resolve the selected handle at the explicit Add action so a
+         changed/released username never grants a different account access. */
+      Promise.resolve(api && api.resolve ? api.resolve(person.username) : { ok: false }).then(function (result) {
+        if (!current()) return null;
+        if (!result || !result.ok) return result || { ok: false };
+        if (!result.profile || result.profile.uid !== person.uid) return { ok: false, code: 'username-changed' };
+        if (!canAdd()) return { ok: false, code: 'not-a-member' };
+        if (isMember(person)) return { ok: false, code: 'already-member' };
+        return PR && PR.members && PR.members.add ? PR.members.add(tripId, person.uid, result.profile.username) : { ok: false };
+      }).then(function (result) {
+        if (!current()) return;
+        busy = false; input.disabled = false; addBtn.disabled = !selected || isMember(selected);
+        if (result && result.ok) {
+          input.value = input.defaultValue = ''; selected = null; details.open = false;
+          try { T.notify.toast({ text: 'Added @' + person.username + ' to the plan.' }); } catch (e) {}
+          repaintNow();
+        } else if (result && result.code === 'username-changed') {
+          selected = null; addBtn.disabled = true; selectedLine.hidden = true;
+          U.setText(status, 'That username changed. Search again before adding someone.'); input.focus();
+        } else { setAddStatus(status, result && result.code); }
+      }, function () { if (current()) { busy = false; input.disabled = false; addBtn.disabled = false; U.setText(status, 'Couldn’t add this person. Try again.'); } });
+    });
     return details;
   }
 
@@ -43353,7 +43444,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       orderedSegmentsOf(entry).forEach(function (segment, index) {
         var name = ((segment.airline || '') + ' ' + (segment.flightNumber || '')).trim() || ('Flight ' + (index + 1));
         function moment(day, time, zone) {
-          return [day || '', time ? time.slice(0, 5) : '', zone || ''].filter(Boolean).join(' · ');
+          return [day || '', timeDisplay(time), zone || ''].filter(Boolean).join(' · ');
         }
         fact(name + ' departure', moment(segment.departsOn, segment.departsAt, segment.originTimeZone));
         fact(name + ' arrival', moment(segment.arrivesOn, segment.arrivesAt, segment.destinationTimeZone));
@@ -43367,8 +43458,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       fact('Room', entry.roomType);
       fact('Address', entry.address);
       fact('Booked through', entry.bookingProvider);
-      fact('Check-in time', entry.checkInTime ? entry.checkInTime.slice(0, 5) : '');
-      fact('Check-out time', entry.checkOutTime ? entry.checkOutTime.slice(0, 5) : '');
+      fact('Check-in time', timeDisplay(entry.checkInTime));
+      fact('Check-out time', timeDisplay(entry.checkOutTime));
       fact('Cancellation deadline', entry.cancellationDeadline);
       fact('Cancellation terms', entry.cancellationNotes);
       if (entry.mealsIncluded) fact('Meals', 'Included');
@@ -45009,8 +45100,16 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   /** 'HH:mm' from a 'HH:mm:ss' (or 'HH:mm') string; '' when unparsable. */
   function timeShort(s) {
     if (typeof s !== 'string') return '';
-    var m = /^(\d{2}):(\d{2})/.exec(s);
-    return m ? (m[1] + ':' + m[2]) : '';
+    var m = /^(\d{2}):(\d{2})(?::\d{2})?$/.exec(s);
+    return m && +m[1] < 24 && +m[2] < 60 ? (m[1] + ':' + m[2]) : '';
+  }
+
+  /* Display only: retain HH:mm values for native time inputs and writes. */
+  function timeDisplay(s) {
+    var value = timeShort(s);
+    if (!value) return '';
+    var hour = +value.slice(0, 2);
+    return (hour % 12 || 12) + value.slice(2) + (hour < 12 ? ' AM' : ' PM');
   }
 
   function confirmRemoveItin(tripId, id, statusLine) {
@@ -45161,11 +45260,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (span && span.count > 1) dataset.span = span.index + '/' + span.count;
     var li = U.el('li', { class: 'itin__entry', dataset: dataset });
 
-    var timeText = allDay ? 'All day' : (item.endTime ? (timeShort(item.startTime) + '–' + timeShort(item.endTime)) : timeShort(item.startTime));
+    var timeText = allDay ? 'All day' : (item.endTime ? (timeDisplay(item.startTime) + '–' + timeDisplay(item.endTime)) : timeDisplay(item.startTime));
     var staySpan = derived && item.kind === 'lodging' && span && span.count > 1;
     if (staySpan) {
-      timeText = span.index === 1 && item.startTime ? timeShort(item.startTime)
-        : span.index === span.count && item.endTime ? timeShort(item.endTime) : 'All day';
+      timeText = span.index === 1 && item.startTime ? timeDisplay(item.startTime)
+        : span.index === span.count && item.endTime ? timeDisplay(item.endTime) : 'All day';
     }
     li.appendChild(U.el('span', { class: 'itin__time', text: timeText }));
     li.appendChild(U.el('span', { class: 'itin__title', text: item.title || '' }));
@@ -46107,6 +46206,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   }
 
   function paint(el, route) {
+    el._memberUiUid = memberAccount(); el._memberUiEpoch = memberUiEpoch;
     var tripId = null;
     try { tripId = T.trips && T.trips.activeId ? T.trips.activeId() : null; } catch (e) { tripId = null; }
     var trip = (tripId && T.trips && T.trips.get) ? T.trips.get(tripId) : null;
@@ -46293,7 +46393,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         if (summary.itinerary && summary.itinerary.next) {
           var nx = summary.itinerary.next;
           var itinText = 'Itinerary: ' + (nx.title || '') + ' · ' + dayShort(nx.date);
-          if (nx.startTime) itinText += ' ' + timeShort(nx.startTime);
+          if (nx.startTime) itinText += ' ' + timeDisplay(nx.startTime);
           itinText += '.';
           lines.push({ key: 'itinerary', text: itinText, href: T.router.build('plan', ['itinerary']) });
         }
@@ -46372,7 +46472,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       mountedEl = el; mountedRoute = ctx.route;
       var changed = ctx && ctx.changed;
       if (!changed) return;
-      if (changed.has('route')) { paint(el, ctx.route); return; }
+      var uid = memberAccount();
+      if (changed.has('route') || el._memberUiUid !== uid || el._memberUiEpoch !== memberUiEpoch || changed.has('ui:tripId')) {
+        paint(el, ctx.route); return;
+      }
       if (formBusy(el)) return;
       if (store.touches(changed, 'prep') || changed.has('firebase') ||
           changed.has('planning:trips') || changed.has('ui:tripId')) {
@@ -62584,6 +62687,92 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     return details;
   }
 
+  /* Account usernames are discoverable by other signed-in travelers. Only
+     an explicit Save claims a name; rendering never changes the account. */
+  var profileUiUid = null, profileUiEpoch = 0, profileAuthApi = null;
+  function profileAccount() {
+    if (T.firebase && T.firebase !== profileAuthApi && T.firebase.onAuthChanging) {
+      profileAuthApi = T.firebase;
+      profileAuthApi.onAuthChanging(function () { profileUiEpoch++; });
+    }
+    var user = T.firebase && T.firebase.user ? T.firebase.user() : null;
+    var uid = user && user.uid || null;
+    if (uid !== profileUiUid) { profileUiUid = uid; profileUiEpoch++; }
+    return uid;
+  }
+  function usernameError(code) {
+    var words = {
+      'invalid-username': 'Use 3–20 letters, numbers or underscores, starting with a letter.',
+      'reserved-username': 'That username is reserved. Choose another.',
+      'username-taken': 'That username is taken. Try another.',
+      'signed-out': 'Sign in to choose your username.',
+      'stale-session': 'Your account changed. Try again.',
+      'permission-denied': 'Username settings are unavailable. Please try again later.'
+    };
+    return words[code] || 'Couldn’t save your username. Check your connection and try again.';
+  }
+  function usernameBlock(user) {
+    var wrap = U.el('section', { class: 'sync__username', 'aria-label': 'Your username' });
+    var uid = profileAccount(), epoch = profileUiEpoch, busy = false, loaded = false;
+    var heading = U.el('p', { class: 'sync__usernametitle', text: 'Your username' });
+    var current = U.el('p', { class: 'sync__usernamevalue', text: 'Loading username…' });
+    wrap.appendChild(heading); wrap.appendChild(current);
+    wrap.appendChild(U.el('p', { class: 'sync__hint', text: 'Friends can find this username and add you to their trip group. Your email stays private.' }));
+    var drawer = U.el('details', { class: 'sync__usernamedrawer' });
+    var summary = U.el('summary', { class: 'sync__advsum', text: 'Choose a username' });
+    drawer.appendChild(summary);
+    var form = U.el('form', { class: 'sync__form sync__usernameform', novalidate: true });
+    var input = U.el('input', { id: 'identity-username', class: 'input sync__input', type: 'text',
+      autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', maxlength: '21',
+      placeholder: '@yourname', 'aria-describedby': 'identity-username-hint' });
+    form.appendChild(U.el('div', { class: 'sync__field' }, [
+      U.el('label', { class: 'sync__label', for: 'identity-username', text: 'Username' }), input,
+      U.el('p', { id: 'identity-username-hint', class: 'sync__hint', text: '3–20 letters, numbers or underscores. Start with a letter.' })
+    ]));
+    var save = U.el('button', { type: 'submit', class: 'btn btn--primary', text: 'Save username' });
+    var status = U.el('p', { class: 'sync__status', role: 'status', 'aria-live': 'polite' });
+    var retry = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Try again', hidden: true });
+    form.appendChild(U.el('div', { class: 'sync__actions' }, [save, retry]));
+    form.appendChild(status); drawer.appendChild(form); wrap.appendChild(drawer);
+    function validSession() { return profileAccount() === uid && profileUiEpoch === epoch && wrap.isConnected; }
+    function apply(profile) {
+      var name = profile && profile.username || '';
+      U.setText(current, name ? '@' + name : 'Choose a username to plan with friends.');
+      U.setText(summary, name ? 'Change username' : 'Choose a username');
+      input.value = input.defaultValue = name ? '@' + name : '';
+      drawer.open = !name;
+    }
+    function load() {
+      var api = T.firebase && T.firebase.profile;
+      busy = true; save.disabled = true; input.disabled = true; retry.hidden = true;
+      Promise.resolve(api && api.get ? api.get() : { ok: false }).then(function (result) {
+        if (!validSession()) return;
+        busy = false; save.disabled = false; input.disabled = false;
+        if (result && result.ok) { loaded = true; apply(result.profile); U.setText(status, ''); }
+        else { U.setText(current, 'Username unavailable'); U.setText(status, 'Couldn’t load your username. Try again.'); retry.hidden = false; drawer.open = true; }
+      }, function () { if (validSession()) { busy = false; save.disabled = false; input.disabled = false; U.setText(current, 'Username unavailable'); retry.hidden = false; drawer.open = true; } });
+    }
+    wrap._usernameBusy = function () { return busy || document.activeElement === input || input.value !== input.defaultValue; };
+    retry.addEventListener('click', load);
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); if (busy || !validSession()) return;
+      var api = T.firebase && T.firebase.profile;
+      var checked = api && api.validate ? api.validate(input.value) : { ok: false, code: 'unavailable' };
+      if (!checked.ok) { U.setText(status, usernameError(checked.code)); input.focus(); return; }
+      busy = true; save.disabled = true; input.disabled = true; retry.hidden = true;
+      U.setText(status, 'Saving username…');
+      Promise.resolve(api.setUsername(input.value)).then(function (result) {
+        if (!validSession()) return;
+        busy = false; save.disabled = false; input.disabled = false;
+        if (result && result.ok) { loaded = true; apply(result.profile); U.setText(status, 'Username saved.'); drawer.open = true; input.focus(); }
+        else { U.setText(status, usernameError(result && result.code)); input.focus(); }
+      }, function () { if (validSession()) { busy = false; save.disabled = false; input.disabled = false; U.setText(status, usernameError()); } });
+    });
+    /* Wait until the card is mounted so stale/detached reads cannot paint. */
+    window.setTimeout(function () { if (validSession() && !loaded) load(); }, 0);
+    return wrap;
+  }
+
   /** Signed-in body: the uid (for the other person to paste into "add a
    *  member" — Wave 2), copy-id, sign-out, and the per-device trust toggle. */
   function signedInBlock(user) {
@@ -62634,7 +62823,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   function identityCard() {
     var d = describeIdentity();
     if (d.hidden) return null;
-    var card = U.el('div', { class: 'sync__card sync__card--identity', dataset: { state: d.key } });
+    var card = U.el('div', { class: 'sync__card sync__card--identity', dataset: { state: d.key, uid: profileAccount() || '', profileEpoch: String(profileUiEpoch) } });
     if (d.key === 'signedout') { card.appendChild(signInDrawer()); return card; }
     card.appendChild(U.el('p', { class: 'sync__line' }, [
       U.el('span', { class: 'sync__glyph identity__statusdot', 'aria-hidden': 'true' }),
@@ -62643,7 +62832,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (d.detail) card.appendChild(U.el('p', { class: 'sync__row', text: d.detail }));
 
     var user = T.firebase && typeof T.firebase.user === 'function' ? T.firebase.user() : null;
-    if (user) card.appendChild(signedInBlock(user));
+    if (user) { card.appendChild(usernameBlock(user)); card.appendChild(signedInBlock(user)); }
     else if (d.key === 'signedout') card.appendChild(signInDrawer());
     return card;
   }
@@ -63643,10 +63832,21 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
          that focus must never keep the obsolete sign-in card on screen. */
       var idCard = U.qs('.sync__card--identity', host);
       var hidden = describeIdentity().hidden;
-      var authenticated = !!(T.firebase && T.firebase.user && T.firebase.user());
+      var uid = profileAccount();
+      var authenticated = !!uid;
+      var sameAccount = !!(idCard && authenticated && idCard.dataset.uid === uid && idCard.dataset.profileEpoch === String(profileUiEpoch));
       if (hidden || authenticated || !identityFormBusy(idCard)) {
         if (hidden) { if (idCard) U.clear(identityHost); }
         else if (!idCard) { var first = identityCard(); if (first) identityHost.appendChild(first); }
+        else if (sameAccount) {
+          /* Patch status in place. Moving a focused input into a fresh card
+             loses focus even if the input node itself survives. */
+          var identity = describeIdentity();
+          idCard.dataset.state = identity.key;
+          U.setText(U.qs('.sync__word', idCard), identity.word);
+          var identityDetail = U.qs('.sync__row', idCard);
+          if (identityDetail) U.setText(identityDetail, identity.detail || '');
+        }
         else {
           var fresh = identityCard();
           if (fresh) {
@@ -63685,6 +63885,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
      already lives inside `SY._repaint` itself; it is a no-op whenever the
      panel is not mounted (`SY._repaint` is null then). */
   store.subscribe(function (state, changed) {
+    profileAccount();
     if (SY._repaint && (changed.has('firebase') || store.touches(changed, 'prep'))) SY._repaint();
   }, { id: 'sync:identity' });
 })(window.TRIP);
@@ -63989,6 +64190,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   function swapFirestoreCache(toPersistent) {
     if (!FB.sdk || !appInstance || !dbInstance) return Promise.resolve();
     if (toPersistent === dbIsPersistent) return Promise.resolve();
+    profileEpoch++;
     var oldDb = dbInstance;
     return FB.sdk.firestore.terminate(oldDb).then(function () {}, function () {}).then(function () {
       var clearP = Promise.resolve();
@@ -64347,6 +64549,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
    * path is byte-for-byte the Wave 0 behaviour.
    */
   FB.signOut = function () {
+    profileEpoch++;
     while (sessionUnsubs.length) {
       var un = sessionUnsubs.pop();
       try { un(); } catch (e) {}
@@ -64378,6 +64581,150 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       }
       return FB.status();
     });
+  };
+
+  /* ---- public usernames (compatible with Travel Tracker's registry) ----
+   * The registry document ID owns identity, never a profile's editable
+   * username fields. Only these public fields leave this API; there is no
+   * email lookup or private-profile read, and blank searches never query.
+   * No profile/result cache survives an auth or Firestore-instance change. */
+  var profileEpoch = 0;
+  FB.onAuthChanging(function () { profileEpoch++; });
+  var HANDLE_RE = /^[A-Za-z][A-Za-z0-9_]{2,19}$/;
+  var HANDLE_PREFIX_RE = /^[a-z][a-z0-9_]{1,19}$/;
+  var RESERVED_HANDLES = ('admin administrator root system support help about settings profile trips trip invitations invite login logout signin signup register account api null undefined travel traveltracker me you owner everyone moderator staff security billing official').split(' ');
+
+  function handleText(value) {
+    return typeof value === 'string' ? value.trim().replace(/^@/, '') : '';
+  }
+  function handleCheck(value) {
+    var name = handleText(value), key = name.toLowerCase();
+    if (!HANDLE_RE.test(name)) return { ok: false, code: 'invalid-username' };
+    if (RESERVED_HANDLES.indexOf(key) >= 0) return { ok: false, code: 'reserved-username' };
+    return { ok: true, username: name, usernameKey: key };
+  }
+  function profileFailure(code) { var error = new Error(code); error.code = code; return error; }
+  function profileSession() {
+    if (!status.uid || !authInstance || !authInstance.currentUser) throw profileFailure('signed-out');
+    if (status.state !== 'ready' || !dbInstance || !FB.sdk) throw profileFailure('unavailable');
+    if (authInstance.currentUser.uid !== status.uid) throw profileFailure('stale-session');
+    return { uid: status.uid, db: dbInstance, sdk: FB.sdk.firestore, epoch: profileEpoch, connection: connectionEpoch };
+  }
+  function profileCurrent(session) {
+    return session.epoch === profileEpoch && session.connection === connectionEpoch &&
+      session.db === dbInstance && status.state === 'ready' && status.uid === session.uid &&
+      authInstance && authInstance.currentUser && authInstance.currentUser.uid === session.uid;
+  }
+  function requireProfileSession(session) {
+    if (!profileCurrent(session)) throw profileFailure('stale-session');
+  }
+  function publicClaim(snap) {
+    if (!snap || !snap.exists()) return null;
+    var data = snap.data() || {}, key = snap.id;
+    if (typeof key !== 'string' || !HANDLE_RE.test(key) || key !== key.toLowerCase() ||
+      typeof data.username !== 'string' || !HANDLE_RE.test(data.username) || data.username.toLowerCase() !== key ||
+      typeof data.uid !== 'string' || !data.uid || data.uid.length > 128 || /[\s/]/.test(data.uid)) return null;
+    return { uid: data.uid, username: data.username, usernameKey: key };
+  }
+  function profileOperation(work) {
+    var session;
+    try { session = profileSession(); }
+    catch (error) { return Promise.resolve({ ok: false, code: (error && error.code) || 'unavailable' }); }
+    return Promise.resolve().then(function () {
+      requireProfileSession(session);
+      return work(session);
+    }).then(function (value) {
+      requireProfileSession(session);
+      return value;
+    }).catch(function (error) {
+      if (session && !profileCurrent(session)) return { ok: false, code: 'stale-session' };
+      return { ok: false, code: (error && error.code) || 'unavailable' };
+    });
+  }
+
+  FB.profile = {
+    validate: handleCheck,
+    get: function () {
+      return profileOperation(function (session) {
+        var F = session.sdk;
+        return F.getDocFromServer(F.doc(session.db, 'users', session.uid)).then(function (snap) {
+          requireProfileSession(session);
+          var data = snap.exists() ? snap.data() : {}, key = data && data.usernameKey;
+          var empty = { uid: session.uid, username: '', usernameKey: '' };
+          if (typeof key !== 'string' || !HANDLE_RE.test(key) || key !== key.toLowerCase()) return { ok: true, profile: empty };
+          return F.getDocFromServer(F.doc(session.db, 'usernames', key)).then(function (claim) {
+            requireProfileSession(session);
+            var profile = publicClaim(claim);
+            return { ok: true, profile: profile && profile.uid === session.uid ? profile : empty };
+          });
+        });
+      });
+    },
+    setUsername: function (value) {
+      var checked = handleCheck(value);
+      if (!checked.ok) return Promise.resolve(checked);
+      return profileOperation(function (session) {
+        var F = session.sdk, ownRef = F.doc(session.db, 'users', session.uid);
+        var nextRef = F.doc(session.db, 'usernames', checked.usernameKey);
+        return F.runTransaction(session.db, function (tx) {
+          requireProfileSession(session);
+          return tx.get(ownRef).then(function (ownSnap) {
+            requireProfileSession(session);
+            var previous = ownSnap.exists() ? ownSnap.data() : {};
+            return tx.get(nextRef).then(function (nextSnap) {
+              requireProfileSession(session);
+              var existing = publicClaim(nextSnap);
+              if (nextSnap.exists() && (!existing || existing.uid !== session.uid)) throw profileFailure('username-taken');
+              /* Registry updates are forbidden by the deployed rules. A
+                 same-key save therefore retains its original display case. */
+              var profile = existing || { uid: session.uid, username: checked.username, usernameKey: checked.usernameKey };
+              var oldKey = previous.usernameKey;
+              var oldRef = typeof oldKey === 'string' && HANDLE_RE.test(oldKey) && oldKey === oldKey.toLowerCase() && oldKey !== profile.usernameKey
+                ? F.doc(session.db, 'usernames', oldKey) : null;
+              return (oldRef ? tx.get(oldRef) : Promise.resolve(null)).then(function (oldSnap) {
+                requireProfileSession(session);
+                var now = new Date().toISOString();
+                if (!nextSnap.exists()) tx.set(nextRef, { uid: session.uid, username: profile.username, usernameKey: profile.usernameKey, claimedUtc: now });
+                var patch = { uid: session.uid, username: profile.username, usernameKey: profile.usernameKey, updatedUtc: now };
+                if (!ownSnap.exists()) patch.createdUtc = now;
+                tx.set(ownRef, patch, { merge: true });
+                if (oldSnap && oldSnap.exists() && oldSnap.data().uid === session.uid) tx.delete(oldRef);
+                return { ok: true, profile: profile };
+              });
+            });
+          });
+        });
+      });
+    },
+    search: function (value) {
+      var prefix = handleText(value).toLowerCase();
+      return profileOperation(function (session) {
+        if (!HANDLE_PREFIX_RE.test(prefix)) return { ok: true, results: [] };
+        var F = session.sdk;
+        var q = F.query(F.collection(session.db, 'usernames'), F.orderBy(F.documentId()),
+          F.startAt(prefix), F.endAt(prefix + '\uf8ff'), F.limit(8));
+        return F.getDocsFromServer(q).then(function (snap) {
+          requireProfileSession(session);
+          var results = [];
+          snap.forEach(function (row) {
+            var profile = publicClaim(row);
+            if (profile && profile.usernameKey.indexOf(prefix) === 0) results.push(profile);
+          });
+          return { ok: true, results: results };
+        });
+      });
+    },
+    resolve: function (value) {
+      var name = handleText(value);
+      if (!HANDLE_RE.test(name)) return Promise.resolve({ ok: false, code: 'invalid-username' });
+      return profileOperation(function (session) {
+        var F = session.sdk;
+        return F.getDocFromServer(F.doc(session.db, 'usernames', name.toLowerCase())).then(function (snap) {
+          requireProfileSession(session);
+          return { ok: true, profile: publicClaim(snap) };
+        });
+      });
+    }
   };
 
   FB.db = function () { return dbInstance || null; };
