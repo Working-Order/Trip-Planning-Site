@@ -9506,6 +9506,8 @@ header.masthead {
 .curr__hint { margin: var(--s1) 0 0; }
 .curr__hint:empty { display: none; }
 /* ==== src/css/39-view-sync.css ==== */
+.sync__remembered { display: grid; gap: var(--s2); margin-block: var(--s3); padding: var(--s3); border: var(--hair) solid var(--line-hair); border-radius: var(--radius-md); }
+.sync__everyday-url { overflow-wrap: anywhere; }
 .sync__planning { min-width: 0; border: var(--hair) solid var(--line-hair); border-radius: var(--radius-md); background: var(--surface); padding: var(--s4); display: grid; gap: var(--s3); }
 .sync__planintro { display: grid; gap: var(--s3); }
 .sync__planheading { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
@@ -9753,6 +9755,7 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .sync__usernameform { max-width: 30rem; }
 .sync__usernameform .sync__hint { margin: 0; }
 .sync__usernameform [hidden] { display: none; }
+
 /* ==== src/css/40-view-trips.css ==== */
 /* 40-view-trips.css — THE TRIPS CATALOG (#/trips). OWNER: WS-B.
  *
@@ -12568,7 +12571,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 (function (T) {
   'use strict';
 
-  T.version = '0.28.6';   // Streamlined wedding filters and stable scrolling
+  T.version = '0.28.7';   // Remember browser connections and retry incomplete GitHub sync
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -61786,6 +61789,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   SY.POLL_MS = 60 * 1000;
   SY.PUSH_DEBOUNCE_MS = 1500;
   SY.MAX_ATTEMPTS = 4;
+  SY.REQUEST_TIMEOUT_MS = 25000;
 
   /* Observable status — the masthead chip and the Data page paint from here. */
   SY.status = {
@@ -61803,12 +61807,15 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     workbook: { sha: null, name: null, uploadedBy: null, uploadedAt: null, exists: null },
     workbooks: {},         // per list: {listId: {sha,name,uploadedBy,uploadedAt,exists}}
     repoInfo: null,        // {private, canPush, fullName}
+    connectionSaved: false, // this connection was saved to durable browser storage
+    restored: false,        // recovered from storage, without a setup link
     joinedViaLink: false
   };
 
   /* ---- config + cursors (persisted) ------------------------------------ */
   var cfg = null;          // {repo, branch, token}
   var cur = null;          // {stateSha, workbookSha, dirEtag, lastFingerprint}
+  var session = 0, activeRequests = [], persistenceFailed = false;
   var remoteSnapshot = null;   // last planning state known to be in the repo
   var pendingWorkbooks = {};   // listId -> {bytes, name, mtimeMs, size, profile} waiting for a connection
 
@@ -61840,33 +61847,71 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     return c;
   }
 
-  function readPersisted() {
+  function sameConfig(a, b) {
+    return (!a && !b) || !!(a && b && a.repo === b.repo &&
+      (a.branch || 'main') === (b.branch || 'main') && a.token === b.token);
+  }
+  function superseded() {
+    var e = new Error('The connection changed while syncing.');
+    e.syncCanceled = true;
+    return e;
+  }
+  function resetSession() {
+    session++;
+    activeRequests.slice().forEach(function (cancel) { cancel(); });
+    syncing = null; again = false; remoteSnapshot = null;
+  }
+  function storageError() {
+    return { code: 'storage', message: 'This browser could not save the connection. Allow site storage and reconnect here; the setup link has not been saved for reopening.' };
+  }
+  function readPersisted(force) {
     var env = S.readEnvelope(S.KEYS.sync);
     var d = (env && env.data) || {};
-    cfg = d.config && d.config.repo && d.config.token ? d.config : null;
-    cur = d.cursors || {};
+    var next = d.config && d.config.repo && d.config.token ? d.config : null;
+    if (next) next.branch = next.branch || 'main';
+    if (!force && sameConfig(cfg, next)) return false;
+    resetSession();
+    cfg = next;
+    cur = cfg ? (d.cursors || {}) : {};
+    // A directory ETag does not prove this tab has absorbed its file bodies.
+    cur.dirEtag = null;
+    SY.status.configured = !!cfg;
+    SY.status.repo = cfg ? cfg.repo : null;
+    SY.status.branch = cfg ? cfg.branch : null;
+    SY.status.state = cfg ? 'idle' : 'off';
+    SY.status.phase = null;
+    SY.status.pending = false;
+    SY.status.error = null;
+    SY.status.lastSyncAt = null;
+    SY.status.lastPullAt = null;
+    SY.status.lastPushAt = null;
+    SY.status.remote = { updatedAt: null, updatedBy: null, recordCount: null, exists: null };
+    SY.status.workbook = { sha: null, name: null, uploadedBy: null, uploadedAt: null, exists: null };
+    SY.status.workbooks = {};
+    SY.status.repoInfo = cfg ? (d.repoInfo || null) : null;
+    SY.status.connectionSaved = !!cfg && !persistenceFailed && !(S.health && S.health.available === false);
+    SY.status.restored = SY.status.connectionSaved && !SY.status.joinedViaLink;
     if (cfg) {
-      cfg.branch = cfg.branch || 'main';
-      SY.status.configured = true;
-      SY.status.repo = cfg.repo;
-      SY.status.branch = cfg.branch;
-      SY.status.state = 'idle';
-      SY.status.lastSyncAt = cur.lastSyncAt || null;
       SY.status.workbook.sha = cur.workbookSha || null;
       SY.status.workbook.name = cur.workbookName || null;
       SY.status.workbook.uploadedBy = cur.workbookBy || null;
       SY.status.workbook.uploadedAt = cur.workbookAt || null;
-      SY.status.workbooks = {};
       Object.keys(cur.wb || {}).forEach(function (listId) {
         var c = cur.wb[listId] || {};
         SY.status.workbooks[listId] = { sha: c.sha || null, name: c.name || null,
           uploadedBy: c.by || null, uploadedAt: c.at || null, exists: c.sha ? true : null };
       });
-      SY.status.repoInfo = d.repoInfo || null;
+      if (persistenceFailed) { SY.status.state = 'error'; SY.status.error = storageError(); }
     }
+    return true;
   }
   function persist() {
-    S.writeEnvelope(S.KEYS.sync, 1, { config: cfg, cursors: cur, repoInfo: SY.status.repoInfo });
+    if (!cfg) return false;
+    var saved = S.writeEnvelope(S.KEYS.sync, 1, { config: cfg, cursors: cur, repoInfo: SY.status.repoInfo }) !== false;
+    persistenceFailed = !saved;
+    SY.status.connectionSaved = saved;
+    if (!saved) SY.status.restored = false;
+    return saved;
   }
 
   function touch() { store.touch(['sync']); }
@@ -61949,7 +61994,19 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       headers['Content-Type'] = 'application/json';
       init.body = JSON.stringify(opts.body);
     }
-    return fetch(SY.API + path, init).then(function (res) {
+    var requestSession = session;
+    var controller = typeof AbortController === 'function' ? new AbortController() : null;
+    if (controller) init.signal = controller.signal;
+    var timer, cancel;
+    var canceled = new Promise(function (resolve, reject) {
+      cancel = function () { if (controller) controller.abort(); reject(superseded()); };
+      activeRequests.push(cancel);
+      timer = window.setTimeout(function () {
+        if (controller) controller.abort();
+        resolve({ status: 0, ok: false, code: 'timeout' });
+      }, SY.REQUEST_TIMEOUT_MS);
+    });
+    var work = Promise.resolve().then(function () { return fetch(SY.API + path, init); }).then(function (res) {
       var out = { status: res.status, ok: res.ok, headers: res.headers, json: null, bytes: null, text: null };
       if (res.status === 304 || res.status === 204) return out;
       if (opts.raw) {
@@ -61960,18 +62017,29 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         try { out.json = t ? JSON.parse(t) : null; } catch (e) { out.json = null; }
         return out;
       });
-    }, function (e) {
-      return { status: 0, ok: false, code: 'offline', message: String((e && e.message) || e) };
+    }, function () {
+      return { status: 0, ok: false, code: 'offline' };
     });
+    function cleanup() {
+      window.clearTimeout(timer);
+      var i = activeRequests.indexOf(cancel);
+      if (i >= 0) activeRequests.splice(i, 1);
+    }
+    return Promise.race([work, canceled]).then(function (r) {
+      cleanup();
+      if (requestSession !== session) throw superseded();
+      return r;
+    }, function (e) { cleanup(); throw e; });
   }
 
   function classify(res) {
+    if (res.code === 'timeout') return { code: 'timeout', message: 'GitHub took too long to respond. Your changes are saved here; sync will retry.' };
     if (res.status === 0) return { code: 'offline', message: 'Can’t reach GitHub right now. Your changes are saved on this device and will sync when you’re back online.' };
     if (res.status === 401) return { code: 'auth', message: 'GitHub rejected the token — it may have expired or been revoked. Paste a fresh one under Stay in sync.' };
     if (res.status === 403) {
       var remaining = res.headers && res.headers.get && res.headers.get('x-ratelimit-remaining');
       if (remaining === '0') return { code: 'ratelimit', message: 'GitHub’s hourly request limit is used up. Sync will resume on its own.' };
-      return { code: 'forbidden', message: 'The token can read this repo but not write to it. It needs “Contents: Read and write” on ' + (cfg ? cfg.repo : 'the data repo') + '.' };
+      return { code: 'forbidden', message: 'GitHub denied access. Check the token’s repository access, “Contents: Read and write” permission, and any required approval.' };
     }
     if (res.status === 404) return { code: 'missing', message: 'GitHub can’t find ' + (cfg ? cfg.repo : 'that repo') + ' with this token. Check the owner/name, and that the token was granted access to it.' };
     if (res.status === 409 || res.status === 422) return { code: 'conflict', message: 'The other device saved first — merging.' };
@@ -62142,7 +62210,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         /* Nothing moved in the repo. Still worth checking whether WE moved. */
         return { needPush: SY.fingerprint(localState()) !== cur.lastFingerprint };
       }
-      cur.dirEtag = dir.etag;
+      // Acknowledge the directory only after every needed file was absorbed.
+      var nextEtag = dir.etag;
       var entries = dir.entries || {};
       var stateEntry = entries[SY.STATE_PATH] || null;
       var wbEntry = entries[SY.WORKBOOK_PATH] || null;
@@ -62200,10 +62269,17 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         if (wb.sha === c.sha && (!man || man.sha === c.manifestSha)) return;
         chain = chain.then(function (r) {
           if (r.error) return r;
-          return adoptRemoteWorkbook(listId, wb.sha, man ? man.sha : null).then(function () { return r; });
+          return adoptRemoteWorkbook(listId, wb.sha, man ? man.sha : null).then(function (w) {
+            // Workbook trouble must stay visible without withholding independent planning saves.
+            if (w && w.error) r.workbookError = w.error;
+            return r;
+          });
         });
       });
-      return chain;
+      return chain.then(function (r) {
+        if (!r.error && !r.workbookError) cur.dirEtag = nextEtag;
+        return r;
+      });
     });
   }
 
@@ -62235,7 +62311,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         cur.dirEtag = null;
         return pullOnce().then(function (p) {
           if (p.error) return { error: p.error };
-          return pushOnce(attempt + 1);
+          return pushOnce(attempt + 1).then(function (r) {
+            if (p.workbookError && !r.workbookError) r.workbookError = p.workbookError;
+            return r;
+          });
         });
       }
       if (r.error) return { error: r.error };
@@ -62267,9 +62346,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   }
 
   function cycle(reason) {
+    var cycleSession = session, workbookError = null;
     setStatus({ state: 'syncing', phase: 'pull', error: null });
     return ensureRepoInfo().then(pullOnce).then(function (p) {
       if (p.error) return { error: p.error };
+      workbookError = p.workbookError || null;
       if (!p.needPush) {
         /* Nothing to send: local and shared agree. Record that, or a later
            planning tick would read as "pending" against a stale fingerprint. */
@@ -62281,28 +62362,33 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       return pushOnce(1);
     }).then(function (r) {
       if (r.error) return finish(r.error);
-      return uploadPendingWorkbook().then(function () { return finish(null); });
+      workbookError = r.workbookError || workbookError;
+      return uploadPendingWorkbook().then(function (w) { return finish((w && w.error) || workbookError); });
     })['catch'](function (e) {
+      if (e.syncCanceled || cycleSession !== session) return { ok: false, error: { code: 'superseded', message: 'The connection changed while syncing.' } };
       return finish({ code: 'exception', message: String((e && e.message) || e) });
     });
   }
 
   function finish(error) {
+    if (!error) {
+      cur.lastSyncAt = U.now();
+      if (!persist()) error = storageError();
+    }
     if (error) {
-      var offline = error.code === 'offline' || error.code === 'server' || error.code === 'ratelimit';
+      cur.dirEtag = null; // retry failed bodies even if GitHub's directory is unchanged
+      var offline = error.code === 'timeout' || error.code === 'offline' || error.code === 'server' || error.code === 'ratelimit';
       setStatus({ state: offline ? 'offline' : 'error', phase: null, error: error });
       if (!offline) {
         T.diag.note('sync', error.message, error.code);
         store.dispatch('ui/banner', { id: 'sync-error', kind: 'warn',
           text: 'Sharing paused: ' + error.message, dismissible: true });
       }
-      persist();
+      if (error.code !== 'storage') persist();
       return { ok: false, error: error };
     }
-    cur.lastSyncAt = U.now();
     setStatus({ state: 'ok', phase: null, error: null, lastSyncAt: cur.lastSyncAt, lastPullAt: cur.lastSyncAt });
     store.dispatch('ui/dismissBanner', 'sync-error');
-    persist();
     return { ok: true };
   }
 
@@ -62313,7 +62399,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   SY.sync = function (reason) {
     if (!cfg) return Promise.resolve({ ok: false, error: { code: 'off', message: 'Sharing is not set up on this device.' } });
     if (syncing) { again = true; return syncing; }
+    var syncSession = session;
     syncing = cycle(reason).then(function (r) {
+      if (syncSession !== session) return r;
       syncing = null;
       if (again) { again = false; return SY.sync('queued'); }
       return r;
@@ -62323,14 +62411,16 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
   /* ---- WORKBOOK: pull ---------------------------------------------------- */
   function adoptRemoteWorkbook(listId, sha, manifestSha) {
+    var workbookSession = session;
     var A = T.adapter, RL = T.reload;
     var TL = T.lists;
     listId = listId || SY.DEFAULT_LIST_ID;
     setStatus({ phase: 'workbook' });
     return getJsonFile(SY.manifestPath(listId)).then(function (m) {
+      if (m.error) return { error: m.error };
       var manifest = null;
       if (m && m.text) { try { manifest = JSON.parse(m.text); } catch (e) { manifest = null; } }
-      setWbCur(listId, { manifestSha: manifestSha || (m && m.sha) || null });
+      var nextManifestSha = manifestSha || (m && m.sha) || null;
       /* A workbook for a list this device has never heard of: the planning
          merge brings the list itself over on the same cycle, so the file is
          left alone and picked up on the next pass rather than adopted into a
@@ -62338,6 +62428,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var list = TL ? TL.get(listId) : null;
       if (!list && listId !== SY.DEFAULT_LIST_ID) {
         T.diag.note('sync', 'a shared workbook arrived for a list this device does not have yet: ' + listId);
+        // Archived/deleted lists retain remote workbook files; they must not block other changes.
         return;
       }
       /* Never let a STALE shared file replace newer research already live
@@ -62349,17 +62440,19 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var live = bucket && bucket.envelope;
       var liveAt = live && live.meta && live.meta.parsedAt;
       if (manifest && manifest.uploadedAt && liveAt && manifest.uploadedAt < liveAt - 5 * 60 * 1000) {
-        setWbCur(listId, { sha: sha, name: manifest.name || null,
+        setWbCur(listId, { sha: sha, manifestSha: nextManifestSha, name: manifest.name || null,
           by: manifest.uploadedBy || null, at: manifest.uploadedAt || null, skippedOlder: true });
         touch();
         return;
       }
       return getBytesFile(SY.workbookPath(listId)).then(function (f) {
-        if (f.error || f.absent) return;
+        if (f.error) return { error: f.error };
+        if (f.absent) return { error: { code: 'workbook', message: 'A shared workbook moved during sync. Sync will retry.' } };
         var name = (manifest && manifest.name) || 'workbook.xlsx';
         var wait = (RL && RL.waitForEngine) ? RL.waitForEngine(8000) : Promise.resolve(A.sheetjsReady());
         return wait.then(function (ready) {
-          if (!ready) { T.diag.note('sync', 'spreadsheet engine not ready; shared workbook deferred'); return; }
+          if (workbookSession !== session) throw superseded();
+          if (!ready) return { error: { code: 'workbook', message: 'The spreadsheet reader is still loading. Sync will retry.' } };
           var env;
           try {
             env = A.parseArrayBuffer(f.bytes, {
@@ -62374,14 +62467,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
           } catch (e) { env = null; }
           if (!env || env.health.status === 'error' || !(env.records || []).length) {
             T.diag.note('sync', 'shared workbook could not be parsed; keeping the current one');
-            return;
+            return { error: { code: 'workbook', message: 'The shared workbook could not be read. Your current workbook was kept; sync will retry.' } };
           }
           /* Same transactional swap a hand-loaded file gets (digest, orphans,
              cache, the Changed badge) — just without a File behind it, and
              WITHOUT moving whoever is reading to another list. */
           if (RL && RL.commit) RL.commit(env, null, { listId: listId });
           else { A.adopt(env, 'reload', 'shared workbook', listId); A.cacheReload(env, listId); }
-          setWbCur(listId, { sha: sha, name: name,
+          setWbCur(listId, { sha: sha, manifestSha: nextManifestSha, name: name,
             by: (manifest && manifest.uploadedBy) || null,
             at: (manifest && manifest.uploadedAt) || null });
           touch();
@@ -62453,7 +62546,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (s.error) return s;
       return attempt(s.sha || null, 0);
     }).then(function (r) {
-      if (r.error) { T.diag.note('sync', 'workbook not shared: ' + r.error.message); return; }
+      if (r.error) { T.diag.note('sync', 'workbook not shared: ' + r.error.message); return r; }
       setWbCur(listId, { sha: r.sha });
       /* The manifest says which list and which profile these bytes are for, so
          the other laptop parses them with the right spec and files them in the
@@ -62462,8 +62555,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         listId: listId, profile: wb.profile || null,
         uploadedBy: who, uploadedAt: U.now(), uploadedAtISO: new Date().toISOString() };
       return findSha(manPath).then(function (s2) {
+        if (s2.error) return s2;
         return putFile(manPath, utf8ToB64(JSON.stringify(manifest, null, 2)), s2.sha || null, msg + ' (manifest)');
       }).then(function (mr) {
+        if (mr && mr.error) return mr;
         setWbCur(listId, { manifestSha: (mr && mr.sha) || null, name: wb.name,
           by: who, at: manifest.uploadedAt });
         cur.dirEtag = null;
@@ -62483,7 +62578,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     setStatus({ phase: 'workbook' });
     /* One at a time: two PUTs into the same directory race on the tree SHA. */
     return ids.reduce(function (chain, id) {
-      return chain.then(function () {
+      return chain.then(function (r) {
+        if (r && r.error) return r;
         var wb = pendingWorkbooks[id];
         return wb ? uploadOne(wb) : null;
       });
@@ -62535,6 +62631,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var j = res.json || {};
       var info = { fullName: j.full_name || full, private: !!j.private, canPush: !!(j.permissions && j.permissions.push), defaultBranch: j.default_branch || 'main' };
       return { ok: true, info: info };
+    })['catch'](function (e) {
+      return { ok: false, error: { code: e.syncCanceled ? 'superseded' : 'offline', message: e.syncCanceled ? 'The connection changed. Try connecting again.' : 'GitHub could not be reached. Try again.' } };
     });
   };
 
@@ -62543,18 +62641,30 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var token = String(opts.token || '').trim();
     return SY.test(full, token).then(function (r) {
       if (!r.ok) return r;
+      resetSession();
+      SY.status.joinedViaLink = false;
+      SY.status.restored = false;
       cfg = { repo: r.info.fullName, branch: opts.branch || r.info.defaultBranch || 'main', token: token };
       cur = {};
       remoteSnapshot = null;
       SY.status.repoInfo = r.info;
       setStatus({ configured: true, repo: cfg.repo, branch: cfg.branch, state: 'idle', error: null, pending: false, lastSyncAt: null });
-      persist();
+      if (!persist()) {
+        var error = storageError();
+        setStatus({ state: 'error', error: error });
+        return { ok: false, error: error, info: r.info };
+      }
       installTriggers();
       return SY.sync('connect').then(function (s) { return { ok: s.ok, error: s.error || null, info: r.info }; });
     });
   };
 
   SY.disconnect = function () {
+    resetSession();
+    persistenceFailed = false;
+    SY.status.connectionSaved = false;
+    SY.status.restored = false;
+    SY.status.joinedViaLink = false;
     cfg = null; cur = {}; remoteSnapshot = null;
     SY.status.repoInfo = null;
     setStatus({ configured: false, repo: null, branch: null, state: 'off', phase: null, error: null, pending: false, lastSyncAt: null,
@@ -62589,15 +62699,15 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       cfg = { repo: full, branch: obj.branch || 'main', token: String(obj.token) };
       cur = {};
       var env = S.readEnvelope(S.KEYS.sync);
-      S.writeEnvelope(S.KEYS.sync, 1, { config: cfg, cursors: cur, repoInfo: (env && env.data && env.data.repoInfo) || null });
+      persistenceFailed = S.writeEnvelope(S.KEYS.sync, 1, { config: cfg, cursors: cur, repoInfo: (env && env.data && env.data.repoInfo) || null }) === false;
       SY.status.joinedViaLink = true;
-    } catch (e) { T.diag.note('sync', 'setup link could not be read: ' + ((e && e.message) || e)); }
+    } catch (e) { T.diag.note('sync', 'setup link could not be read'); }
   })();
 
   /* Read the persisted config at PARSE time, not boot: the router mounts
      #/data before 90-app.js reaches sync.init(), and that screen must know
      whether this browser is connected on its very first paint. */
-  readPersisted();
+  readPersisted(true);
 
   /* ---- ACTIVITY (best effort, for the Data page) ------------------------- */
   SY.activity = function (limit) {
@@ -62609,7 +62719,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
           var d = c.commit && c.commit.author && c.commit.author.date;
           return { at: d ? Date.parse(d) : null, message: (c.commit && c.commit.message) || '', sha: c.sha };
         });
-      });
+      })['catch'](function () { return []; });
   };
 
   /* ---- TRIGGERS ---------------------------------------------------------- */
@@ -62633,12 +62743,21 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
     function wake(reason) {
       return function () {
-        if (!cfg || document.hidden) return;
+        if (document.hidden) return;
+        if (readPersisted()) touch();
+        if (!cfg) return;
         SY.sync(reason);
       };
     }
     document.addEventListener('visibilitychange', function () { if (!document.hidden) wake('visible')(); });
     window.addEventListener('focus', wake('focus'));
+    window.addEventListener('pageshow', wake('pageshow'));
+    window.addEventListener('storage', function (event) {
+      if (event.key != null && event.key !== S.KEYS.sync) return;
+      if (!readPersisted()) return;
+      touch();
+      if (cfg && !document.hidden) SY.sync('storage');
+    });
     window.addEventListener('online', wake('online'));
     window.addEventListener('pagehide', function () {
       if (cfg && SY.status.pending && !syncing) SY.sync('pagehide');
@@ -62671,6 +62790,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     return listId ? !!pendingWorkbooks[listId] : Object.keys(pendingWorkbooks).length > 0;
   };
 })(window.TRIP);
+
 /* ==== src/js/83-view-sync.js ==== */
 /* 83-view-sync.js — "Stay in sync" on #/data. OWNER: sync wave (2026-08-30).
  *
@@ -62700,13 +62820,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   SY.describe = function () {
     var st = SY.status;
     /* `word` is the full phrase (Data page); `short` fits the masthead chip. */
-    if (!st.configured) return { glyph: GLYPH.off, word: 'Not sharing', short: 'Not shared', detail: 'This browser keeps its own copy.', key: 'off' };
+    if (!st.configured) return { glyph: GLYPH.off, word: 'Connect this browser', short: 'Not shared', detail: 'Open your setup link once in this browser, or paste the shared token below. After setup, use the ordinary website link.', key: 'off' };
     if (st.state === 'syncing') return { glyph: GLYPH.syncing, word: st.phase === 'workbook' ? 'Sharing the workbook…' : st.phase === 'push' ? 'Saving…' : 'Checking…', short: st.phase === 'push' || st.phase === 'workbook' ? 'Saving…' : 'Syncing…', detail: '', key: 'syncing' };
     if (st.state === 'offline') return { glyph: GLYPH.offline, word: 'Offline', short: 'Offline', detail: 'Changes are saved on this device and will go up when GitHub is reachable again.', key: 'offline' };
     if (st.state === 'error') return { glyph: GLYPH.error, word: 'Sharing paused', short: 'Paused', detail: (st.error && st.error.message) || '', key: 'error' };
     if (st.pending) return { glyph: GLYPH.syncing, word: 'Saving…', short: 'Saving…', detail: 'A change on this device is on its way up.', key: 'pending' };
-    if (st.lastSyncAt) return { glyph: GLYPH.ok, word: 'Synced ' + F.ago(st.lastSyncAt), short: 'Synced', detail: '', key: 'ok' };
-    return { glyph: GLYPH.idle, word: 'Connected', short: 'Connected', detail: 'Waiting for the first sync.', key: 'idle' };
+    if (st.state === 'ok' && st.lastSyncAt && U.now() - st.lastSyncAt < 150000) return { glyph: GLYPH.ok, word: 'This browser synced ' + F.ago(st.lastSyncAt), short: 'Synced', detail: 'Research and shortlist changes match GitHub. Each person’s browser connects separately.', key: 'ok' };
+    if (st.lastSyncAt && st.state === 'ok') return { glyph: GLYPH.idle, word: 'Last checked ' + F.ago(st.lastSyncAt), short: 'Check needed', detail: 'Sync now to check for changes from the other browser.', key: 'idle' };
+    return { glyph: GLYPH.idle, word: 'Checking saved connection', short: 'Checking…', detail: 'Waiting for a successful check with GitHub in this session.', key: 'idle' };
   };
 
   /* ---- connect form ------------------------------------------------------ */
@@ -62715,15 +62836,17 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var box = U.el('form', { class: 'sync__form' + (opts.reconnect ? ' sync__form--reconnect' : ''), novalidate: true });
     var rid = 'sync-repo', tid = 'sync-token', bid = 'sync-branch';
 
+    box.appendChild(U.el('p', { class: 'sync__hint', text: 'Connect once in the regular browser you use for The Trip List. The shared token works with the private data repository shown below.' }));
+
     var repoField = U.el('div', { class: 'sync__field' }, [
       U.el('label', { class: 'sync__label', for: rid, text: 'Private data repository (owner/name)' }),
       U.el('input', { class: 'input sync__input', id: rid, type: 'text', autocomplete: 'off', spellcheck: 'false',
-        placeholder: 'your-github-name/october-list-data', value: opts.repo || '' })
+        placeholder: 'Szmjuly/Trip-Planning', value: opts.repo || 'Szmjuly/Trip-Planning' })
     ]);
     var tokenField = U.el('div', { class: 'sync__field' }, [
       U.el('label', { class: 'sync__label', for: tid, text: 'Fine-grained token for that repository' }),
       U.el('input', { class: 'input sync__input', id: tid, type: 'password', autocomplete: 'off', spellcheck: 'false',
-        placeholder: 'github_pat_…' })
+        placeholder: 'github_pat_…', autocapitalize: 'none', autocorrect: 'off' })
     ]);
     var adv = U.el('details', { class: 'sync__advanced' });
     adv.appendChild(U.el('summary', { class: 'sync__advsum', text: 'Branch (usually main)' }));
@@ -62744,7 +62867,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     help.appendChild(U.el('summary', { class: 'sync__advsum', text: 'How to create a GitHub token' }));
     help.appendChild(U.el('p', { class: 'sync__hint', text:
       'In GitHub Settings, open Developer settings → Personal access tokens → Fine-grained tokens. ' +
-      'Select only your private data repository and allow Contents: Read and write. The token stays in this browser.' }));
+      'For this shared list, the token’s resource owner is Szmjuly, its selected repository is Trip-Planning, and Contents must be Read and write. Roni can use the shared token; she does not need to create a GitHub account. The token stays in this browser.' }));
     box.appendChild(help);
 
     if (cancel) cancel.addEventListener('click', function () { if (opts.onCancel) opts.onCancel(); });
@@ -62763,7 +62886,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         }
         box.classList.remove('is-error');
         U.setText(status, 'Connected to ' + r.info.fullName + '.');
-        try { T.notify.toast({ text: 'Sharing is on. Both laptops now see the same list.' }); } catch (x) {}
+        try { T.notify.toast({ text: 'This browser is connected. Check the saved connection below before closing it.' }); } catch (x) {}
         if (opts.onDone) opts.onDone();
       });
     });
@@ -62778,14 +62901,40 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var line = U.el('p', { class: 'sync__line' }, [
       U.el('span', { class: 'sync__glyph', 'aria-hidden': 'true', text: d.glyph }),
       U.el('span', { class: 'sync__word', text: d.word }),
-      U.el('span', { class: 'sync__repo', text: '· ' + st.repo })
+      U.el('span', { class: 'sync__repo', text: '· ' + st.repo + ' · ' + (st.branch || 'main') })
     ]);
     if (st.repoInfo) {
       line.appendChild(U.el('span', { class: 'sync__badge', text: st.repoInfo.private ? 'private' : 'PUBLIC' }));
-      if (st.repoInfo.canPush === false) line.appendChild(U.el('span', { class: 'sync__badge sync__badge--warn', text: 'read-only token' }));
     }
     card.appendChild(line);
     if (d.detail) card.appendChild(U.el('p', { class: d.key === 'error' ? 'sync__error' : 'sync__row', text: d.detail }));
+
+    var remembered = st.connectionSaved === true;
+    var saved = U.el('div', { class: 'sync__remembered' });
+    saved.appendChild(U.el('p', { class: 'sync__row', text: remembered
+      ? (st.restored ? 'Saved connection restored in this browser.' : 'Connection saved in this browser. Check it once by reopening below.')
+      : 'This connection has not been saved for reopening. Allow this site to store data in your regular browser.' }));
+    var everyday = window.location.href.split('#')[0].split('?')[0];
+    saved.appendChild(U.el('p', { class: 'sync__hint' }, [
+      U.el('span', { text: 'Your everyday link: ' }),
+      U.el('a', { class: 'sync__everyday-url', href: everyday, text: everyday })
+    ]));
+    var checkSaved = U.el('button', { class: 'btn sync__verify', type: 'button' }, 'Check saved connection');
+    checkSaved.disabled = !remembered || st.pending || st.state !== 'ok';
+    checkSaved.addEventListener('click', function () {
+      window.history.replaceState(null, '', everyday + '#/data?section=sync');
+      window.location.reload();
+    });
+    var copyEveryday = U.el('button', { class: 'btn btn--quiet sync__everyday' , type: 'button' }, 'Copy everyday link');
+    var everydayNote = U.el('span', { class: 'sync__status', role: 'status', 'aria-live': 'polite' });
+    copyEveryday.addEventListener('click', function () {
+      T.plan.copyToClipboard(everyday).then(function (res) {
+        U.setText(everydayNote, res.ok ? 'Everyday link copied. Bookmark it in this browser.' : 'Copy the everyday link shown above.');
+      });
+    });
+    saved.appendChild(U.el('div', { class: 'sync__actions' }, [checkSaved, copyEveryday, everydayNote]));
+    saved.appendChild(U.el('p', { class: 'sync__hint', text: 'A setup link is only needed once per browser profile. Private browsing, clearing site data, or switching browsers can remove or separate the saved connection.' }));
+    card.appendChild(saved);
 
     /* The other side, in one sentence. */
     var r = st.remote || {};
@@ -62797,7 +62946,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         (r.recordCount ? ' · ' + F.plural(r.recordCount, 'trip') + ' with something marked' : '') + '.' }));
     }
     if (st.joinedViaLink) {
-      card.appendChild(U.el('p', { class: 'sync__row', text: 'This laptop was connected with a setup link. Pick whose device this is in the masthead so your reactions carry your name.' }));
+      card.appendChild(U.el('p', { class: 'sync__row', text: 'Setup link opened. Pick whose device this is in the masthead, then check the saved connection above. After that, use the everyday link.' }));
     }
 
     /* Workbook line. */
@@ -62824,8 +62973,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     card.appendChild(acts);
 
     var linkHint = U.el('p', { class: 'sync__hint', hidden: true, text:
-      'The link carries the key, so send it somewhere private (a text message is fine) and open it once on the other laptop. ' +
-      'It connects that browser and then scrubs itself from the address bar.' });
+      'Send this link privately. Open it once in the regular browser used for The Trip List, then choose Check saved connection. ' +
+      'Use Copy everyday link for the bookmark. The setup link carries the key and removes it from the address bar after opening.' });
     card.appendChild(linkHint);
 
     now.addEventListener('click', function () {
@@ -64080,9 +64229,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     host.appendChild(planning);
 
     var research = U.el('details', { class: 'sync__research' });
+    research.open = SY.status.joinedViaLink || SY.status.state === 'error' || /[?&]section=sync(?:&|$)/.test(window.location.hash);
     research.appendChild(U.el('summary', { class: 'sync__researchsummary' }, [
       U.el('span', { class: 'sync__researchtitle', text: 'Research & shortlist sharing' }),
-      U.el('span', { class: 'sync__researchstate', text: SY.status.configured ? 'Connected' : 'Optional · GitHub' })
+      U.el('span', { class: 'sync__researchstate', text: SY.describe().short })
     ]));
     var github = U.el('div', { class: 'sync__github' });
     research.appendChild(github);
@@ -64091,7 +64241,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     function paint() {
       U.clear(github);
       var st = SY.status;
-      U.setText(U.qs('.sync__researchstate', research), st.configured ? 'Connected' : 'Optional · GitHub');
+      U.setText(U.qs('.sync__researchstate', research), SY.describe().short);
       github.appendChild(U.el('p', { class: 'sync__lede', text: 'Share workbook research, shortlists and decisions through your private GitHub repository.' }));
       if (st.configured) {
         github.appendChild(statusCard(host, paint));
@@ -64109,6 +64259,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
        and never while a form is being filled in. */
     SY._repaint = function () {
       if (!host.isConnected) { SY._repaint = null; return; }
+      U.setText(U.qs('.sync__researchstate', research), SY.describe().short);
       /* GitHub sync card — unchanged, except the selector now excludes the
          identity AND ttimport cards so none of the three `.sync__card`s can
          ever be confused for one another. */
@@ -64193,6 +64344,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (SY._repaint && (changed.has('firebase') || store.touches(changed, 'prep'))) SY._repaint();
   }, { id: 'sync:identity' });
 })(window.TRIP);
+
 /* ==== src/js/84-firebase.js ==== */
 /* 84-firebase.js — Firestore + Firebase Auth device config and SDK loader.
  * Wave 0 implementer module, extended in Wave 1. Spec: dev/FIREBASE_SPEC.md
