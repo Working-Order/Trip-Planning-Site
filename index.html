@@ -12466,6 +12466,205 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .plan__personselected { margin: 0; font-size: var(--text-sm); font-weight: var(--weight-medium); overflow-wrap: anywhere; }
 .plan__form--add .plan__hint { margin: 0; }
 .itin__time { white-space: normal; }
+
+/* Prepare dashboard — the October reference, connected to the saved plan.
+   All selectors are scoped so the rest of the trip keeps its own layout. */
+.plan[data-section="prepare"]:has(.prepboard) > .plan__header { display: none; }
+.plan .prepare[data-tab="checklist"] { max-width: none; width: 100%; }
+.plan .prepare > .prepboard { display: grid; gap: 26px; min-width: 0; }
+.prepboard { --prep-green: var(--ok); --prep-soft: var(--ok-soft); font-family: var(--font-body); }
+.prepboard *, .prepboard *::before, .prepboard *::after { box-sizing: border-box; }
+.prepboard h1, .prepboard h2, .prepboard h3 { font-family: var(--font-body); }
+.prepboard button, .prepboard summary, .prepboard select, .prepboard input { min-height: 44px; }
+.prepboard button, .prepboard summary, .prepboard a, .prepboard input, .prepboard select { touch-action: manipulation; }
+.prepboard [hidden] { display: none !important; }
+.prepboard__hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; min-width: 0; }
+.prepboard__intro { position: relative; display: grid; gap: 3px; min-width: 0; }
+.prepboard__intro > div:first-child { flex: 1; min-width: min(100%, 230px); }
+.prepboard__eyebrow { font-size: 10px; font-weight: 650; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted); }
+.prepboard__title { font-size: clamp(26px, 3.3vw, 38px); letter-spacing: -.045em; line-height: 1.18; font-weight: 600; margin: 5px 0 8px; }
+.prepboard__subtitle { color: var(--ink-muted); font-size: 13px; line-height: 1.6; }
+.prepboard .prepboard__add { min-height: 44px; padding: 10px 17px; border-radius: 10px; background: var(--prep-green); color: var(--surface); border: 1px solid transparent; font-size: 12px; font-weight: 650; white-space: nowrap; }
+.prepboard .prepboard__add:hover { filter: brightness(.93); }
+.prepboard__intro-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.prepboard__import { min-height: 44px; padding: 10px 13px; font-size: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.prepboard__overview { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 18px; }
+.prepboard__tripcard, .prepboard__focus { min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 18px; }
+.prepboard__tripcard { background: var(--prep-soft); display: grid; gap: 10px; align-content: start; }
+.prepboard__trip-title { font-size: 24px; letter-spacing: -.035em; line-height: 1.25; font-weight: 600; overflow-wrap: anywhere; }
+.prepboard__trip-dates { font-size: 12px; font-weight: 550; color: var(--ink-muted); }
+.prepboard .prepare__scopewrap { gap: 4px; }
+.prepboard .prepare__scope { font-size: 12px; line-height: 1.65; max-width: 55ch; color: var(--ink-muted); }
+.prepboard .prepare__homeedit { min-height: 44px; border: 0; padding: 0; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; font-size: 11px; }
+.prepboard__progresslabel { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px; color: var(--ink-muted); font-size: 11px; margin-top: 4px; }
+.prepboard__progress { display: block; width: 100%; height: 5px; border: none; border-radius: 9px; overflow: hidden; background: color-mix(in srgb, var(--prep-green) 16%, transparent); accent-color: var(--prep-green); }
+.prepboard__progress > span, .prepboard__progress::-webkit-progress-value { display: block; height: 100%; border-radius: 9px; background: var(--prep-green); }
+.prepboard__progress::-webkit-progress-bar { background: color-mix(in srgb, var(--prep-green) 16%, transparent); border-radius: 9px; }
+.prepboard__progress::-moz-progress-bar { background: var(--prep-green); }
+.prepboard__focus { background: var(--surface); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.prepboard__focus .prepboard__eyebrow { color: var(--warn); }
+.prepboard__focus-title { font-size: 17px; line-height: 1.4; letter-spacing: -.02em; font-weight: 600; overflow-wrap: anywhere; }
+.prepboard__focus-copy { flex: 1; font-size: 12px; line-height: 1.6; color: var(--ink-muted); }
+.prepboard__focus-open { color: var(--prep-green); font-size: 12px; font-weight: 650; text-align: left; text-underline-offset: 4px; }
+.prepboard__focus-open:hover { text-decoration: underline; }
+.prepboard__metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.prepboard__metric { display: grid; grid-template-columns: 36px 1fr; grid-template-rows: auto auto; align-items: center; gap: 4px 13px; padding: 18px; border: 1px solid var(--line); background: var(--surface); border-radius: 13px; text-align: left; min-width: 0; }
+.prepboard__metric:hover, .prepboard__metric[aria-pressed="true"] { border-color: var(--prep-green); }
+.prepboard__metric[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--prep-green); }
+.prepboard__metric-icon { grid-row: 1 / 3; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--prep-soft); color: var(--prep-green); font-size: 17px; }
+.prepboard__metric[data-filter="attention"] .prepboard__metric-icon { color: var(--warn); background: var(--warn-soft); }
+.prepboard__metric[data-filter="upcoming"] .prepboard__metric-icon { color: var(--info); background: var(--info-soft); }
+.prepboard__metric-value { font-size: 27px; line-height: 1.1; font-weight: 550; letter-spacing: -.04em; }
+.prepboard__metric-label { color: var(--ink-muted); font-size: 11px; line-height: 1.4; }
+.prepboard__timeline { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.prepboard__phase { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; text-align: left; min-width: 0; padding: 3px 4px; border-radius: 8px; }
+.prepboard__phase::before { content: ""; position: absolute; top: 16px; left: 35px; right: -4px; height: 1px; background: var(--line); }
+.prepboard__phase:last-child::before { display: none; }
+.prepboard__phase-dot { display: grid; place-items: center; border: 1px solid var(--line-strong); background: var(--bg); color: var(--ink-muted); width: 27px; height: 27px; border-radius: 50%; font-size: 11px; }
+.prepboard__phase[aria-pressed="true"] .prepboard__phase-dot, .prepboard__phase[data-current="true"] .prepboard__phase-dot { background: var(--prep-green); color: var(--surface); border-color: var(--prep-green); }
+.prepboard__phase:hover { background: var(--surface-alt); }
+.prepboard__phase-title { color: var(--ink); font-size: 11px; font-weight: 550; line-height: 1.5; }
+.prepboard__phase-count { color: var(--ink-muted); font-size: 10px; }
+.prepboard__workspace { display: grid; gap: 15px; min-width: 0; scroll-margin-top: 95px; }
+.prepboard__workspace-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.prepboard__workspace-head h2 { display: inline; font-size: 21px; letter-spacing: -.03em; font-weight: 600; }
+.prepboard__result-count { display: inline-flex; margin-left: 9px; font-size: 11px; color: var(--ink-muted); border-radius: 6px; background: var(--surface-inset); padding: 3px 7px; }
+.prepboard__views { display: flex; gap: 3px; background: var(--surface-inset); padding: 3px; border-radius: 10px; }
+.prepboard__views button { padding: 7px 13px; min-width: 55px; border-radius: 8px; color: var(--ink-muted); font-size: 11px; }
+.prepboard__views button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+.prepboard__filters { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; min-width: 0; }
+.prepboard__search { flex: 1 1 230px; min-width: 0; width: auto; }
+.prepboard__filters input[type="search"], .prepboard__filters select { border: 1px solid var(--line-strong); border-radius: 9px; background: var(--surface); padding: 9px 12px; font-size: 12px; color: var(--ink); }
+.prepboard__filters select { max-width: 100%; min-width: 130px; }
+.prepboard__hide { display: flex; align-items: center; gap: 7px; min-height: 44px; font-size: 11px; color: var(--ink-muted); cursor: pointer; }
+.prepboard__hide input, .prepboard input[type="checkbox"] { accent-color: var(--prep-green); min-height: 18px; width: 18px; height: 18px; }
+.prepboard__reset { color: var(--prep-green); font-size: 11px; padding: 6px 10px; text-decoration: underline; text-underline-offset: 3px; }
+.prepboard__results { display: grid; gap: 15px; min-width: 0; }
+.prepboard__group { min-width: 0; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); overflow: clip; }
+.prepboard__group-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 17px; min-height: 50px; cursor: pointer; list-style: none; }
+.prepboard__group-header::-webkit-details-marker, .prepboard__task-open::-webkit-details-marker { display: none; }
+.prepboard__group-header::after { content: "⌄"; color: var(--ink-muted); font-size: 16px; }
+.prepboard__group:not([open]) > .prepboard__group-header::after { content: "›"; }
+.prepboard__group[open] > .prepboard__group-header { border-bottom: 1px solid var(--line); }
+.prepboard__group-title { flex: 1; font-size: 12px; font-weight: 650; }
+.prepboard__group-count { color: var(--ink-muted); font-size: 10px; }
+.prepboard .prepare__steps { display: grid; gap: 0; }
+.plan .prepboard .prepboard__row { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 0; padding: 0 8px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; opacity: 1; min-width: 0; }
+.plan .prepboard .prepboard__row:last-child { border-bottom: 0; }
+.prepboard__row:hover { background: var(--surface-alt); }
+.prepboard__check-wrap { align-self: start; justify-content: center; margin-top: 12px; cursor: pointer; }
+.prepboard__check-wrap input { margin: 0; }
+.prepboard__task { min-width: 0; }
+.prepboard__task-open { list-style: none; display: flex; align-items: center; gap: 16px; min-height: 74px; padding: 13px 9px 13px 3px; cursor: pointer; }
+.prepboard__task-copy { flex: 1; min-width: 0; }
+.prepboard__task-title, .prepboard .prepare__steptitle { display: block; font-size: 12px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.prepboard__task-summary { display: block; color: var(--ink-muted); font-size: 11px; line-height: 1.5; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prepboard__task-meta { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.prepboard__status { display: inline-flex; align-items: center; gap: 4px; padding: 4px 7px; border-radius: 6px; background: var(--surface-inset); color: var(--ink-muted); font-size: 10px; line-height: 1.5; white-space: nowrap; }
+.prepboard__status[data-status="done"], .prepboard__row[data-done="true"] .prepboard__status { color: var(--prep-green); background: var(--prep-soft); }
+.prepboard__status[data-status="attention"], .prepboard__row[data-action="true"] .prepboard__status, .prepboard__row[data-overdue="true"] .prepboard__status { color: var(--warn); background: var(--warn-soft); }
+.prepboard__due { font-size: 10px; color: var(--ink-muted); white-space: nowrap; }
+.prepboard__chevron { color: var(--ink-muted); font-size: 18px; transition: transform .15s; }
+.prepboard__task[open] .prepboard__chevron { transform: rotate(90deg); }
+.prepboard__task-body { border-top: 1px solid var(--line); padding: 14px 12px 15px 3px; display: grid; gap: 10px; }
+.prepboard__task-body p, .prepboard .prepare__stepdetail { font-size: 12px; color: var(--ink-muted); line-height: 1.65; white-space: pre-line; overflow-wrap: anywhere; }
+.prepboard__task-body .prepare__stepactions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.prepboard__task-body .btn { min-height: 44px; border-radius: 8px; font-size: 12px; padding: 8px 12px; }
+.prepboard__task-body .prepare__link { min-height: 44px; display: inline-flex; align-items: center; font-size: 12px; }
+.prepboard__board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; min-width: 0; }
+.prepboard__column { min-width: 0; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); overflow: clip; }
+.prepboard__column-head { display: flex; align-items: center; gap: 8px; justify-content: space-between; padding: 15px; background: var(--surface-alt); border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 600; }
+.prepboard__column-head h3 { font-size: 12px; }
+.prepboard__column-head span { font-size: 10px; color: var(--ink-muted); }
+.prepboard__column .prepboard__task-open { flex-wrap: wrap; gap: 7px; }
+.prepboard__column .prepboard__task-copy { flex-basis: 100%; }
+.prepboard__column .prepboard__task-meta { flex: 1; flex-wrap: wrap; gap: 8px; }
+.prepboard__column .prepboard__task-summary { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.prepboard__empty { display: grid; justify-items: start; gap: 10px; padding: 32px; border: 1px dashed var(--line-strong); border-radius: 13px; background: var(--surface); color: var(--ink-muted); font-size: 13px; }
+.prepboard__empty h3 { font-size: 17px; color: var(--ink); }
+.prepboard__column .prepboard__empty { padding: 22px 15px; border: 0; font-size: 12px; }
+.prepboard__footer { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; color: var(--ink-muted); font-size: 11px; }
+.prepboard__footer .prepare__seed { min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--ink-muted); font-size: 11px; }
+.prepboard__footer p { font-size: 11px; line-height: 1.6; }
+.prepboard .prepare__status { font-size: 12px; }
+.prepboard .prepare__status:empty { min-height: 0; }
+.prepboard .prepare__drawer { scroll-margin-top: 100px; }
+.prepboard > .prepare__drawer:not([open]) { display: none; }
+.prepboard__hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.prepboard__metric-copy { display: grid; gap: 5px; min-width: 0; }
+.prepboard__metric-icon { grid-row: auto; }
+.prepboard__metric { grid-template-rows: auto; }
+.prepboard__timeline { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+.prepboard__hide-done { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; font-size: 11px; color: var(--ink-muted); cursor: pointer; }
+.prepboard__group-header::after { display: none !important; }
+.prepboard__group:not([open]) > .prepboard__group-header .prepboard__chevron { transform: rotate(-90deg); }
+.prepboard__pill, .prepboard__source-status { display: inline-flex; align-items: center; gap: 4px; padding: 4px 7px; border-radius: 6px; background: var(--surface-inset); color: var(--ink-muted); font-size: 10px; line-height: 1.5; white-space: nowrap; }
+.prepboard__pill[data-status="done"], .prepboard__source-status[data-status="secured"] { color: var(--prep-green); background: var(--prep-soft); }
+.prepboard__pill[data-status="attention"], .prepboard__source-status[data-status="waiting"], .prepboard__source-status[data-status="review"] { color: var(--warn); background: var(--warn-soft); }
+.prepboard__source-status[data-status="progress"] { color: var(--info); background: var(--info-soft); }
+.prepboard .prepboard__task-due { font-size: 10px; color: var(--ink-muted); white-space: nowrap; }
+.prepboard__column-empty { font-size: 12px; color: var(--ink-muted); padding: 22px 15px; }
+.prepboard__substeps { font-size: 10px; color: var(--ink-muted); white-space: nowrap; }
+.prep-import { display: grid; gap: 18px; min-width: 0; }
+.prep-import > p, .prep-import__preview p { font-size: 13px; line-height: 1.65; color: var(--ink-muted); }
+.prep-import input[type="file"] { width: 100%; min-width: 0; padding: 12px; border: 1px dashed var(--line-strong); border-radius: 10px; background: var(--surface-alt); font-size: 12px; }
+.prep-import input[type="file"]::file-selector-button { padding: 9px 12px; border: 1px solid var(--line); border-radius: 7px; margin-right: 12px; color: var(--ink); background: var(--surface); min-height: 44px; cursor: pointer; }
+.prep-import__preview { display: grid; gap: 12px; min-width: 0; }
+.prep-import__preview > p:first-child { color: var(--ink); font-size: 16px; font-weight: 600; }
+.prep-import__preview details > summary { min-height: 44px; padding: 12px 0; font-size: 13px; color: var(--accent); cursor: pointer; }
+.prep-import__preview ol { padding-left: 22px; }
+.prep-import__preview ol > li { padding-bottom: 15px; border-bottom: 1px solid var(--line); font-size: 13px; }
+.prep-import-details { display: grid; gap: 10px; min-width: 0; padding-top: 8px; }
+.prep-import-details p { font-size: 12px; line-height: 1.65; color: var(--ink-muted); }
+.prep-import-details strong { font-weight: 600; color: var(--ink); }
+.prep-import-details h4 { font-family: var(--font-body); font-size: 12px; font-weight: 650; color: var(--ink); padding-top: 6px; }
+.prep-import-details__sources { display: grid; gap: 6px; list-style: none; }
+.prep-import-details__sources a { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; color: var(--accent); overflow-wrap: anywhere; }
+.prep-import-details__steps { display: grid; gap: 3px; }
+.prep-import-details__step { min-height: 44px; display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); font-size: 12px; line-height: 1.65; cursor: pointer; }
+.prep-import-details__step input { flex-shrink: 0; width: 18px; height: 18px; min-height: 18px; margin: 2px 0 0; accent-color: var(--ok); }
+.prep-import-details__step span { min-width: 0; overflow-wrap: anywhere; }
+.prep-import-details__step:has(input:checked) span { color: var(--ink-muted); text-decoration: line-through; }
+.prep-import-details [role="status"]:empty { display: none; }
+@media (max-width: 899px) {
+  .prepboard__overview { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+  .prepboard__metric { padding: 14px; gap: 5px 9px; grid-template-columns: 30px 1fr; }
+  .prepboard__metric-icon { width: 30px; height: 30px; }
+  .prepboard__timeline { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 8px; }
+  .prepboard__phase:nth-child(4)::before { display: none; }
+  .prepboard__board { grid-template-columns: 1fr; }
+  .prepboard__task-meta { gap: 8px; }
+}
+@media (max-width: 599px) {
+  .plan .prepare > .prepboard { gap: 21px; }
+  .prepboard__hero { grid-template-columns: 1fr; }
+  .prepboard__overview { grid-template-columns: 1fr; gap: 12px; }
+  .prepboard__tripcard, .prepboard__focus { padding: 20px; border-radius: 14px; }
+  .prepboard__title { font-size: 29px; }
+  .prepboard__trip-title { font-size: 22px; }
+  .prepboard__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .prepboard__metric { padding: 13px; }
+  .prepboard__metric-value { font-size: 25px; }
+  .prepboard__metric-label { font-size: 10px; }
+  .prepboard__timeline { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .prepboard__phase:nth-child(4)::before { display: block; }
+  .prepboard__phase:nth-child(3n)::before { display: none; }
+  .prepboard__filters { gap: 8px; }
+  .prepboard__search { flex-basis: 100%; width: 100%; }
+  .prepboard__filters select { flex: 1; min-width: 0; width: calc(50% - 4px); }
+  .prepboard__filters input[type="search"], .prepboard__filters select { font-size: 16px; }
+  .prepboard__hide { flex: 1; font-size: 12px; }
+  .prepboard__workspace-head h2 { font-size: 19px; }
+  .prepboard__task-open { flex-wrap: wrap; gap: 6px; padding-block: 13px; }
+  .prepboard__task-copy { flex-basis: 100%; }
+  .prepboard__task-meta { flex: 1; flex-wrap: wrap; }
+  .prepboard__task-title, .prepboard .prepare__steptitle { font-size: 13px; }
+  .prepboard__task-summary { font-size: 11px; }
+  .prepboard__group-header { padding-inline: 13px; }
+  .prepboard__group-count { font-size: 10px; }
+  .prepboard__empty { padding: 23px; }
+  .prepboard__footer { gap: 5px; }
+}
 /* ==== src/css/90-utilities.css ==== */
 /* 90-utilities.css — last layer. OWNER: WS-D.
  * Single-purpose helpers only. If something here needs three declarations to
@@ -12571,7 +12770,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 (function (T) {
   'use strict';
 
-  T.version = '0.28.7';   // Remember browser connections and retry incomplete GitHub sync
+  T.version = '0.28.8';   // Remember browser connections and retry incomplete GitHub sync
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -16721,6 +16920,31 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   /* ==== WAVE4_CONTRACT §2.3 — T.prep.checklist (ChecklistTemplates.cs) ==== */
   /* ======================================================================= */
   PR.checklist = {};
+  /* Optional private source record for a runtime October dashboard import.
+     Kept with its checklist task so details and substeps sync with the plan. */
+  PR.checklist.validateImportSource = function (value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+    if (Object.keys(value).some(function (k) { return ['v', 'app', 'taskId', 'original'].indexOf(k) < 0; })) return false;
+    if (value.v !== 1 || value.app !== 'october-dashboard' || typeof value.taskId !== 'string' || !value.taskId || value.taskId.length > 120) return false;
+    var task = value.original;
+    if (!task || typeof task !== 'object' || Array.isArray(task) || task.id !== value.taskId) return false;
+    var fields = 'id title category status originalStatus summary details steps date endDate priority notes basis sources createdAt updatedAt previousStatus'.split(' ');
+    if (Object.keys(task).some(function (k) { return fields.indexOf(k) < 0; })) return false;
+    if (typeof task.title !== 'string' || !task.title.trim() || task.title.length > 2000) return false;
+    var strings = 'category status originalStatus summary details date endDate priority notes basis previousStatus'.split(' ');
+    if (strings.some(function (k) { return task[k] !== undefined && (typeof task[k] !== 'string' || task[k].length > 12000); })) return false;
+    if (['date', 'endDate'].some(function (k) { return !!task[k] && !PR.dates.validateDay(task[k]); })) return false;
+    if (['createdAt', 'updatedAt'].some(function (k) { return task[k] !== undefined && task[k] !== null && (typeof task[k] !== 'string' || task[k].length > 100); })) return false;
+    if (task.steps !== undefined && (!Array.isArray(task.steps) || task.steps.length > 100 || task.steps.some(function (s) {
+      return !s || typeof s !== 'object' || Array.isArray(s) || Object.keys(s).some(function (k) { return ['id', 'text', 'done'].indexOf(k) < 0; }) ||
+        (s.id !== undefined && (typeof s.id !== 'string' || s.id.length > 120)) || typeof s.text !== 'string' || !s.text.trim() || s.text.length > 4000 || typeof s.done !== 'boolean';
+    }))) return false;
+    if (task.sources !== undefined && (!Array.isArray(task.sources) || task.sources.length > 30 || task.sources.some(function (s) {
+      return !s || typeof s !== 'object' || Array.isArray(s) || Object.keys(s).some(function (k) { return ['label', 'url'].indexOf(k) < 0; }) ||
+        typeof s.label !== 'string' || s.label.length > 1000 || typeof s.url !== 'string' || s.url.length > 2000 || !/^https?:\/\/[^\s<>]+$/i.test(s.url);
+    }))) return false;
+    try { return JSON.stringify(value).length <= 24000; } catch (e) { return false; }
+  };
   PR.checklist.CATEGORIES = ['basics', 'documents', 'booking', 'money', 'health', 'tech', 'home', 'arrival'];
   PR.checklist.REQUIREMENTS = ['none', 'passportValidity', 'visaEntry', 'healthAdvisories'];
 
@@ -16903,6 +17127,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
   /** dueDate(item, departure, planningStart) -> Trip.cs:222-238. */
   PR.checklist.dueDate = function (item, departure, planningStart) {
+    /* Imported dashboard dates describe events, not established deadlines.
+       All consumers (including assistant briefings) must keep that meaning. */
+    if (item && item.importSource && PR.checklist.validateImportSource(item.importSource)) return null;
     if (!departure) return null;
     var ideal = PR.prepare.addDays(departure, item.dueOffsetDays);
     if (!planningStart || item.dueOffsetDays >= 0) return ideal;
@@ -19912,7 +20139,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (typeof dueOffsetDays === 'number') {
         if (dueOffsetDays > 400) { dueOffsetDays = 400; offC.n++; } else if (dueOffsetDays < -400) { dueOffsetDays = -400; offC.n++; }
       }
-      var ckRes = validateChecklistCore({ title: ci.title, category: ci.category, notes: ci.notes, dueOffsetDays: dueOffsetDays }, null);
+      var ckRes = validateChecklistCore({ title: ci.title, category: ci.category, notes: ci.notes, dueOffsetDays: dueOffsetDays, importSource: ci.importSource }, null);
       clipped.checklist += offC.n;
       if (!ckRes.ok) { dropped.checklist++; continue; }
       var ckRow = {
@@ -19922,6 +20149,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         fromTemplate: !!ci.fromTemplate, requirement: (PR.checklist.REQUIREMENTS.indexOf(ci.requirement) >= 0) ? ci.requirement : 'none',
         linkRoute: (typeof ci.linkRoute === 'string') ? ci.linkRoute : '', _t: now, _by: by, _rev: 1
       };
+      if (ckRes.fields.importSource) ckRow.importSource = ckRes.fields.importSource;
       mergedChecklist[ci.id] = ckRow;
       pathUpdate['checklist.items.' + ci.id] = ckRow;
     }
@@ -22070,7 +22298,19 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       return { ok: false, code: 'invalid-offset' };
     }
 
-    return { ok: true, fields: { title: title, category: category, notes: notes, dueOffsetDays: dueOffsetDays } };
+    var fields = { title: title, category: category, notes: notes, dueOffsetDays: dueOffsetDays };
+    var source = p.importSource !== undefined ? p.importSource : (existing && existing.importSource);
+    if (source !== undefined && source !== null) {
+      if (!PR.checklist.validateImportSource(source)) return { ok: false, code: 'invalid-import-source' };
+      if (existing && existing.importSource && source.taskId !== existing.importSource.taskId) return { ok: false, code: 'invalid-import-source' };
+      fields.importSource = deepClone(source);
+    } else if (p.importSource === null && existing && existing.importSource) return { ok: false, code: 'invalid-import-source' };
+    if (p.importStep !== undefined) {
+      var step = p.importStep, original = fields.importSource && fields.importSource.original;
+      if (!step || Object.keys(step).some(function (k) { return ['index', 'done'].indexOf(k) < 0; }) || typeof step.index !== 'number' || Math.floor(step.index) !== step.index || typeof step.done !== 'boolean' || !original || !original.steps || !original.steps[step.index]) return { ok: false, code: 'invalid-import-step' };
+      original.steps[step.index].done = step.done;
+    }
+    return { ok: true, fields: fields };
   }
 
   PR.reduce.checklist.add = function (doc, p) {
@@ -22080,6 +22320,15 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var v = validateChecklistCore(p, null);
     if (!v.ok) return v;
     var items = (doc.checklist && doc.checklist.items) || {};
+    /* The transaction rechecks this key, including across devices. A repeated
+       import never replaces edits, completed state, or saved substeps. */
+    if (v.fields.importSource) {
+      var importedIds = Object.keys(items);
+      for (var n = 0; n < importedIds.length; n++) {
+        var saved = items[importedIds[n]].importSource;
+        if (saved && saved.app === v.fields.importSource.app && saved.taskId === v.fields.importSource.taskId) return { ok: true, unchanged: true, id: importedIds[n] };
+      }
+    }
     if (Object.keys(items).length >= PR.CAPS.checklist) return { ok: false, code: 'cap-reached' };
     if (items[id]) return { ok: false, code: 'duplicate-id' };
     var update = {};
@@ -22088,6 +22337,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       dueOffsetDays: v.fields.dueOffsetDays, completedBy: '', completedAt: null, fromTemplate: false,
       requirement: 'none', linkRoute: '', _t: now, _by: by, _rev: 1
     };
+    if (v.fields.importSource) {
+      var added = update['checklist.items.' + id];
+      added.importSource = v.fields.importSource;
+      if (['done', 'completed'].indexOf(v.fields.importSource.original.status) >= 0) {
+        added.isDone = true; added.completedBy = by; added.completedAt = now;
+      }
+    }
     update.updatedAt = now;
     update.updatedBy = by;
     return { ok: true, update: update };
@@ -23640,8 +23896,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (f.category !== undefined) args.category = f.category;
     if (f.notes !== undefined) args.notes = f.notes;
     if (f.dueOffsetDays !== undefined) args.dueOffsetDays = f.dueOffsetDays;
+    if (f.importSource !== undefined) args.importSource = f.importSource;
     return runPlanOp(tripId, PR.reduce.checklist.add, args).then(function (res) {
-      if (res.ok) res.id = id;
+      if (res.ok && !res.id) res.id = id;
       return res;
     });
   };
@@ -23651,6 +23908,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (p.category !== undefined) args.category = p.category;
     if (p.notes !== undefined) args.notes = p.notes;
     if (p.dueOffsetDays !== undefined) args.dueOffsetDays = p.dueOffsetDays;
+    if (p.importSource !== undefined) args.importSource = p.importSource;
+    if (p.importStep !== undefined) args.importStep = p.importStep;
     return runPlanOp(tripId, PR.reduce.checklist.edit, args);
   };
   PR.checklist.remove = function (tripId, id) {
@@ -25228,7 +25487,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (!row || row.id !== id || mxForbidden(row)) return { ok: false };
     var section = kind === 'planStep' ? 'checklist' : kind === 'packingItem' ? 'packing' : kind === 'activity' ? 'itinerary' : null;
     if (!section) return { ok: false };
-    var schema = section === 'checklist' ? 'id title category isDone notes dueOffsetDays completedBy completedUtc fromTemplate requirement linkRoute hasLink'
+    var schema = section === 'checklist' ? 'id title category isDone notes dueOffsetDays completedBy completedUtc fromTemplate requirement linkRoute hasLink importSource'
       : section === 'packing' ? 'id name category quantity isPacked notes owner fromTemplate'
       : 'id title kind date startTime endTime endDate location notes confirmation createdBy isAllDay';
     if (Object.keys(row).some(function (key) { return schema.split(' ').indexOf(key) < 0; })) return { ok: false };
@@ -25303,7 +25562,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (mxCanonical(current, true) !== mxCanonical(expected, true)) return { ok: false, code: 'stale', reason: 'This row changed after the imported action. Nothing was restored.' };
       if (target) {
         if (target.id !== match[2]) return { ok: false, code: 'imported-batch' };
-        var allowed = match[1] === 'checklist' ? 'id title category isDone notes dueOffsetDays completedBy completedAt fromTemplate requirement linkRoute _t _by _rev'
+        var allowed = match[1] === 'checklist' ? 'id title category isDone notes dueOffsetDays completedBy completedAt fromTemplate requirement linkRoute importSource _t _by _rev'
           : match[1] === 'packing' ? 'id name category quantity isPacked notes owner fromTemplate _t _by _rev'
           : 'id title kind date startTime endTime endDate location notes confirmation createdBy _t _by _rev';
         if (Object.keys(target).some(function (k) { return allowed.split(' ').indexOf(k) < 0; })) return { ok: false, code: 'imported-batch' };
@@ -44194,6 +44453,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   }
 
   function stepOverdue(step, today) {
+    if (step && boardOriginal(step.item)) return false;
     return !!(step && step.due && today && step.due < today && !step.isDone);
   }
 
@@ -44214,21 +44474,78 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     T.modal.open({ title: 'Remove this step?', body: body, footer: foot });
   }
 
-  function buildStepRow(tripId, step, statusLine, drawer, today) {
-    var item = step.item || {};
-    var overdue = stepOverdue(step, today);
-    var li = U.el('li', { class: 'prepare__step', dataset: {
+  /* View preferences stay in this session and never touch the plan doc. */
+  var prepareBoardSessions = Object.create(null);
+  function prepareBoardState(tripId) {
+    if (!prepareBoardSessions[tripId]) prepareBoardSessions[tripId] = {
+      search: '', category: 'all', status: 'all', phase: 'all', hideDone: false,
+      view: 'list', collapsed: Object.create(null), opened: Object.create(null)
+    };
+    return prepareBoardSessions[tripId];
+  }
+  function stepAttention(step, today) {
+    var original = boardOriginal(step.item);
+    if (original) return !!(!step.isDone && (step.needsAction || original.status === 'review' ||
+      (original.priority === 'high' && original.status !== 'secured')));
+    return !!(!step.isDone && (step.needsAction || (step.due && step.due <= today)));
+  }
+  function stepUpcoming(step, today) {
+    var original = boardOriginal(step.item), date = original ? original.date : step.due;
+    return !!(!step.isDone && date && date > today);
+  }
+  function boardStatus(step, today) { return step.isDone ? 'done' : (stepAttention(step, today) ? 'attention' : 'todo'); }
+  var IMPORT_CHAPTER_WORDS = { travel: 'Flights & documents', italy: 'Italy getaway', dc: 'DC handover', florida: 'Florida move' };
+  var IMPORT_STATUS_WORDS = { secured: 'Secured', todo: 'To do', progress: 'In progress', waiting: 'Waiting', review: 'Review', done: 'Done' };
+  function boardOriginal(item) { return item && item.importSource && item.importSource.original || null; }
+  function boardCategory(item) {
+    var original = boardOriginal(item);
+    return original && original.category ? 'chapter:' + original.category : item.category || 'other';
+  }
+  function boardCategoryTitle(key) {
+    if (key.indexOf('chapter:') === 0) return IMPORT_CHAPTER_WORDS[key.slice(8)] || key.slice(8);
+    return CHECKLIST_CATEGORY_WORDS[key] || key;
+  }
+  function boardFocus(el) {
+    var node = document.activeElement;
+    if (!node || !el.contains(node) || !node.dataset || !node.dataset.prepFocus) return null;
+    return { key: node.dataset.prepFocus, start: node.selectionStart, end: node.selectionEnd };
+  }
+  function restoreBoardFocus(el, snapshot) {
+    if (!snapshot) return;
+    var target = null;
+    U.qsa('[data-prep-focus]', el).some(function (node) {
+      if (node.dataset.prepFocus === snapshot.key) { target = node; return true; }
+      return false;
+    });
+    if (!target) target = el.querySelector('.prepboard__workspace-title');
+    if (!target) return;
+    try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
+    if (snapshot.start != null && typeof target.setSelectionRange === 'function') {
+      try { target.setSelectionRange(snapshot.start, snapshot.end); } catch (e) {}
+    }
+  }
+  function rememberBoardDetails(el, ui) {
+    U.qsa('.prepboard__task[data-task-id]', el).forEach(function (d) { ui.opened[d.dataset.taskId] = d.open; });
+    U.qsa('.prepboard__group[data-group]', el).forEach(function (d) { ui.collapsed[d.dataset.group] = !d.open; });
+  }
+  function buildStepRow(tripId, step, statusLine, drawer, today, ui, onChange) {
+    var item = step.item || {}, overdue = stepOverdue(step, today);
+    var original = boardOriginal(item);
+    var state = boardStatus(step, today), title = step.title || item.title || 'Untitled step';
+    var li = U.el('li', { class: 'prepare__step prepboard__row', dataset: {
       id: item.id, done: step.isDone ? 'true' : 'false', auto: step.isAutoSatisfied ? 'true' : 'false',
       action: step.needsAction ? 'true' : 'false', overdue: overdue ? 'true' : 'false',
-      requirement: item.requirement || 'none', template: item.fromTemplate ? 'true' : 'false'
+      requirement: item.requirement || 'none', template: item.fromTemplate ? 'true' : 'false', status: state
     } });
-
-    var label = U.el('label', { class: 'prepare__checklabel' });
-    var checkbox = U.el('input', { class: 'prepare__check', type: 'checkbox' });
+    var label = U.el('label', { class: 'prepare__checklabel prepboard__check-wrap' });
+    var checkbox = U.el('input', { class: 'prepare__check', type: 'checkbox',
+      'aria-label': (step.isDone ? 'Mark incomplete: ' : 'Complete: ') + title,
+      dataset: { prepFocus: 'check:' + item.id } });
     checkbox.checked = !!step.isDone;
     if (step.isAutoSatisfied) {
       checkbox.disabled = true;
       checkbox.title = 'Satisfied by the documents on file';
+      checkbox.setAttribute('aria-label', title + ': satisfied by documents on file');
     }
     checkbox.addEventListener('change', function () {
       var next = checkbox.checked;
@@ -44236,63 +44553,70 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       callChecklist('toggle', [tripId, item.id, next]).then(function (r) {
         checkbox.disabled = !!step.isAutoSatisfied;
         if (!r || !r.ok) { checkbox.checked = !next; setPrepareStatus(statusLine, r && r.code); }
-        else U.setText(statusLine, '');
+        else { U.setText(statusLine, ''); if (onChange) onChange(); }
       });
     });
-    label.appendChild(checkbox);
-    label.appendChild(U.el('span', { class: 'prepare__steptitle', text: step.title || item.title || '' }));
-    li.appendChild(label);
-
-    var detailText = step.detail || item.notes || '';
-    li.appendChild(U.el('p', { class: 'prepare__stepdetail', hidden: U.isBlank(detailText), text: detailText }));
-
-    var due = step.due || null;
-    var dueText = due ? ((overdue ? 'was due ' : 'due ') + dayShort(due)) : '';
-    li.appendChild(U.el('p', { class: 'prepare__due', dataset: { due: due || '' }, hidden: !due, text: dueText }));
-
+    label.appendChild(checkbox); li.appendChild(label);
+    var details = U.el('details', { class: 'prepboard__task', dataset: { taskId: item.id } });
+    details.open = !!ui.opened[item.id];
+    details.addEventListener('toggle', function () { if (details.isConnected) ui.opened[item.id] = details.open; });
+    var summary = U.el('summary', { class: 'prepboard__task-open', dataset: { prepFocus: 'task:' + item.id } });
+    var copy = U.el('span', { class: 'prepboard__task-copy' });
+    copy.appendChild(U.el('span', { class: 'prepare__steptitle prepboard__task-title', text: title }));
+    var detailText = original ? item.notes || original.summary || '' : step.detail || item.notes || '';
+    copy.appendChild(U.el('span', { class: 'prepboard__task-summary', text: detailText ||
+      (CHECKLIST_CATEGORY_WORDS[item.category] || item.category || 'Trip preparation') }));
+    summary.appendChild(copy);
+    var meta = U.el('span', { class: 'prepboard__task-meta' });
+    meta.appendChild(U.el('span', { class: 'prepboard__pill', dataset: { status: state },
+      text: step.isAutoSatisfied ? 'Verified' : state === 'done' ? 'Done' : state === 'attention' ? 'Needs attention' : 'To do' }));
+    if (original && original.status && original.status !== 'todo' && original.status !== 'done') {
+      meta.appendChild(U.el('span', { class: 'prepboard__pill prepboard__source-status', dataset: { status: original.status },
+        text: IMPORT_STATUS_WORDS[original.status] || original.status }));
+    }
+    if (original && original.steps && original.steps.length) {
+      meta.appendChild(U.el('span', { class: 'prepboard__substeps', text:
+        original.steps.filter(function (substep) { return substep.done; }).length + '/' + original.steps.length + ' next steps' }));
+    }
+    var due = original ? null : step.due || null;
+    var dueText = original && original.date ? 'Plan date · ' + dayShort(original.date) : due ?
+      (overdue ? 'Overdue · ' + dayShort(due) : due === today ? 'Due today' : dayShort(due)) : 'No due date';
+    meta.appendChild(U.el('span', { class: 'prepare__due prepboard__task-due', dataset: { due: due || '' }, text: dueText }));
+    summary.appendChild(meta);
+    summary.appendChild(U.el('span', { class: 'prepboard__chevron', 'aria-hidden': 'true', text: '›' }));
+    details.appendChild(summary);
+    var body = U.el('div', { class: 'prepboard__task-body' });
+    body.appendChild(U.el('p', { class: 'prepare__stepdetail', text:
+      original && item.notes && item.notes !== original.summary ? 'Notes: ' + item.notes : detailText || 'Add a note to keep the details with this step.' }));
+    if (!original && item.notes && item.notes !== detailText) body.appendChild(U.el('p', { class: 'prepboard__task-notes', text: item.notes }));
+    body.appendChild(U.el('p', { class: 'prepboard__task-source', text:
+      (CHECKLIST_CATEGORY_WORDS[item.category] || item.category || 'Preparation') + ' · ' +
+      (item.fromTemplate ? 'From your trip checklist' : 'Added to this trip') + (due ? ' · Due ' + dayShort(due) : '') }));
+    if (step.isAutoSatisfied) body.appendChild(U.el('p', { class: 'prepboard__task-verified',
+      text: 'Completed automatically from the documents on file. Update those documents if anything changes.' }));
+    if (original && T.prepareImport && typeof T.prepareImport.renderDetails === 'function') {
+      var importedDetails = T.prepareImport.renderDetails(tripId, item);
+      if (importedDetails) body.appendChild(importedDetails);
+    }
     var href = linkRouteHref(item.linkRoute);
-    if (href) li.appendChild(U.el('a', { class: 'prepare__link', href: href }, linkRouteText(item.linkRoute)));
-
+    if (href) body.appendChild(U.el('a', { class: 'prepare__link', href: href }, linkRouteText(item.linkRoute)));
+    else if (step.isAutoSatisfied) body.appendChild(U.el('a', { class: 'prepare__link',
+      href: T.router.build('plan', ['prepare'], { tab: 'documents' }) }, 'Open documents'));
     var actions = U.el('div', { class: 'prepare__stepactions' });
-    var editBtn = U.el('button', { type: 'button', class: 'btn btn--quiet prepare__edit', text: 'Edit' });
-    editBtn.addEventListener('click', function () { if (drawer.openForEdit) drawer.openForEdit(item); });
+    var editBtn = U.el('button', { type: 'button', class: 'btn btn--quiet prepare__edit', text: 'Edit step',
+      dataset: { prepFocus: 'edit:' + item.id } });
+    editBtn.addEventListener('click', function () {
+      if (drawer.openForEdit) drawer.openForEdit(item);
+      var field = drawer.querySelector('#plan-step-title'); if (field) field.focus();
+    });
     actions.appendChild(editBtn);
-    var removeBtn = U.el('button', { type: 'button', class: 'btn btn--quiet prepare__remove', text: 'Remove' });
+    var removeBtn = U.el('button', { type: 'button', class: 'btn btn--quiet prepare__remove', text: 'Remove',
+      dataset: { prepFocus: 'remove:' + item.id } });
     removeBtn.addEventListener('click', function () { confirmRemoveChecklist(tripId, item.id, statusLine); });
-    actions.appendChild(removeBtn);
-    li.appendChild(actions);
-
+    actions.appendChild(removeBtn); body.appendChild(actions); details.appendChild(body); li.appendChild(details);
     return li;
   }
 
-  /* ORCHESTRATOR-FACING NOTE (found during D2's own design pass, WAVE4_
-     CONTRACT §3.8): `PR.timeline.groupSteps` (dev/src/05d-prep.js:1395-1408)
-     returns `{ phase: p, steps: matched }` — the phase is the FULL phase
-     object `{key,title,min,max}` (not a string key) and the step array is
-     keyed `steps`, not `items` (unlike the sibling `PR.timeline.group`, whose
-     `{phase,items,doneCount,allDone}` shape WAVE4_CONTRACT §2.3 says
-     `groupSteps` mirrors "same"). Read literally against the real function,
-     not the contract's summary of it. `doneCount`/`allDone` are absent from
-     `groupSteps`' rows entirely, so this view computes `doneCount` itself
-     (already did, defensively) and never reads `allDone`. Reported in
-     D2-report.md for D1/the orchestrator to reconcile the contract text. */
-  function buildPhaseSection(tripId, group, currentPhase, statusLine, drawer, today) {
-    var steps = group.steps || group.items || [];
-    var phaseObj = group.phase;
-    var phaseKey = (phaseObj && phaseObj.key) || String(phaseObj || '');
-    var phaseTitle = (phaseObj && phaseObj.title) || phaseTitleFor(phaseKey);
-    var doneCount = group.doneCount != null ? group.doneCount : steps.filter(function (s) { return s.isDone; }).length;
-    var isCurrent = !!(currentPhase && phaseObj && ((currentPhase.key || currentPhase) === phaseKey));
-    var sec = U.el('section', { class: 'prepare__phase', dataset: {
-      phase: phaseKey, current: isCurrent ? 'true' : 'false'
-    } });
-    sec.appendChild(U.el('h2', { class: 'prepare__phaseh', dataset: { done: String(doneCount), total: String(steps.length) },
-      text: phaseTitle + ' · ' + doneCount + ' of ' + steps.length }));
-    var ul = U.el('ul', { class: 'prepare__steps' });
-    steps.forEach(function (step) { ul.appendChild(buildStepRow(tripId, step, statusLine, drawer, today)); });
-    sec.appendChild(ul);
-    return sec;
-  }
 
   function buildChecklistDrawer(tripId, statusLine) {
     var details = U.el('details', { class: 'plan__drawer prepare__drawer', dataset: { drawer: 'checklist' } });
@@ -44312,10 +44636,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       U.el('label', { class: 'sync__label', for: 'plan-step-category', text: 'Category' }), categorySelect
     ]));
     var offsetInput = U.el('input', { class: 'input sync__input', id: 'plan-step-offset', type: 'text', inputmode: 'numeric' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
+    var offsetField = U.el('div', { class: 'sync__field' }, [
       U.el('label', { class: 'sync__label', for: 'plan-step-offset',
         text: 'Days before departure (0 = travel day, negative = after)' }), offsetInput
-    ]));
+    ]);
+    form.appendChild(offsetField);
+    var sourceDate = U.el('p', { class: 'prepboard__source-date-field', hidden: true });
+    form.appendChild(sourceDate);
     var notesInput = U.el('textarea', { id: 'plan-step-notes', class: 'textarea sync__input', rows: '2', maxlength: '500' });
     form.appendChild(U.el('div', { class: 'sync__field' }, [
       U.el('label', { class: 'sync__label', for: 'plan-step-notes', text: 'Notes (optional)' }), notesInput
@@ -44337,6 +44664,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       setFieldVal(titleInput, '');
       setSelectVal(categorySelect, checklistCategories()[0]);
       setFieldVal(offsetInput, '');
+      offsetField.hidden = false; offsetInput.disabled = false; sourceDate.hidden = true; U.setText(sourceDate, '');
       setFieldVal(notesInput, '');
       U.setText(errLine, '');
       U.setText(submitBtn, 'Add');
@@ -44350,6 +44678,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       setSelectVal(categorySelect, item.category || checklistCategories()[0]);
       var entered = (typeof item.dueOffsetDays === 'number') ? -item.dueOffsetDays : '';
       setFieldVal(offsetInput, entered === '' ? '' : String(entered));
+      var original = boardOriginal(item);
+      offsetField.hidden = !!original; offsetInput.disabled = !!original; sourceDate.hidden = !original;
+      if (original) U.setText(sourceDate, 'Source plan dates: ' +
+        (original.date ? plainRangeLabel(original.date, original.endDate || original.date) : 'Not specified') + '.');
       setFieldVal(notesInput, item.notes || '');
       U.setText(errLine, '');
       U.setText(submitBtn, 'Save changes');
@@ -44363,6 +44695,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var rawOffset = String(offsetInput.value || '').trim();
       var offset = 0;
       if (rawOffset !== '') {
+        if (!/^-?\d+$/.test(rawOffset)) { setPrepareStatus(errLine, 'invalid-offset'); return; }
         var entered = parseInt(rawOffset, 10);
         if (isNaN(entered)) { setPrepareStatus(errLine, 'invalid-offset'); return; }
         offset = -entered;
@@ -44387,60 +44720,332 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   }
 
   function buildChecklistTab(tripId, prep, view, ctx) {
-    var doc = prep.plan || {};
-    var wrap = U.el('div', {});
-    wrap.appendChild(buildScopeAndHome(tripId, ctx));
-
+    var doc = prep.plan || {}, ui = prepareBoardState(tripId);
+    var wrap = U.el('div', { class: 'prepboard', dataset: { tripId: tripId } });
     var statusLine = U.el('p', { class: 'prepare__status', role: 'status', 'aria-live': 'polite' });
+    var drawer = buildChecklistDrawer(tripId, statusLine);
+    var steps = (view && view.steps) || [], today = (view && view.today) || todayStr();
+    var groups = (view && view.groups) || [];
+    var trip = prep.trip || (T.trips && T.trips.get ? T.trips.get(tripId) : null);
+    function readLive() {
+      var fresh = prepareViewOf(tripId);
+      if (fresh) { steps = fresh.steps || []; groups = fresh.groups || []; today = fresh.today || todayStr(); }
+      syncCategories();
+      syncSourceStatuses();
+    }
+    function openAdd() {
+      drawer.open = true;
+      var input = drawer.querySelector('#plan-step-title'); if (input) input.focus();
+    }
+    var hero = U.el('header', { class: 'prepboard__hero' });
+    var intro = U.el('div', { class: 'prepboard__intro' });
+    intro.appendChild(U.el('p', { class: 'prepboard__eyebrow', text: 'YOUR NEXT CHAPTER' }));
+    intro.appendChild(U.el('h1', { class: 'prepboard__title', text: 'Ready for what’s next.' }));
+    intro.appendChild(U.el('p', { class: 'prepboard__subtitle', text: 'One clear place for every next step.' }));
+    hero.appendChild(intro);
+    var heroActions = U.el('div', { class: 'prepboard__hero-actions' });
+    var importBtn = U.el('button', { type: 'button', class: 'btn btn--quiet prepboard__import',
+      text: 'Import plan', dataset: { prepFocus: 'import' } });
+    importBtn.addEventListener('click', function () {
+      if (T.prepareImport && typeof T.prepareImport.open === 'function') T.prepareImport.open(tripId);
+      else U.setText(statusLine, 'Plan import is not available in this version.');
+    });
+    var add = U.el('button', { type: 'button', class: 'btn btn--primary prepboard__add',
+      text: '+ Add a step', dataset: { prepFocus: 'add' } });
+    add.addEventListener('click', openAdd);
+    heroActions.appendChild(importBtn); heroActions.appendChild(add); hero.appendChild(heroActions); wrap.appendChild(hero);
 
-    var steps = (view && view.steps) || [];
-    var doneN = steps.filter(function (s) { return s.isDone; }).length;
-    var percent = callPure(timelineApi(), 'percentComplete', [steps],
-      steps.length ? Math.round(doneN * 100 / steps.length) : 0);
-    wrap.appendChild(U.el('p', { class: 'prepare__progress', dataset: { percent: String(percent) }, hidden: !steps.length,
-      text: doneN + ' of ' + steps.length + ' done · ' + percent + '%' }));
+    var overview = U.el('div', { class: 'prepboard__overview' });
+    var tripCard = U.el('section', { class: 'prepboard__tripcard', 'aria-label': 'Your trip' });
+    tripCard.appendChild(U.el('p', { class: 'prepboard__eyebrow', text: 'THE PLAN' }));
+    tripCard.appendChild(U.el('h2', { class: 'prepboard__trip-title', text: trip && trip.name || 'Your next trip' }));
+    var dateText = ctx && ctx.departure ? plainRangeLabel(ctx.departure, ctx.returnDate || ctx.departure) : 'Dates to be decided';
+    tripCard.appendChild(U.el('p', { class: 'prepboard__trip-dates', text: dateText }));
+    tripCard.appendChild(buildScopeAndHome(tripId, ctx));
+    var progressLabel = U.el('p', { class: 'prepare__progress prepboard__progresslabel' });
+    var progress = U.el('progress', { class: 'prepboard__progress', max: '100', value: '0', 'aria-label': 'Checklist completed' });
+    tripCard.appendChild(progressLabel); tripCard.appendChild(progress); overview.appendChild(tripCard);
+    var focus = U.el('section', { class: 'prepboard__focus', 'aria-label': 'Next step' });
+    var focusEyebrow = U.el('p', { class: 'prepboard__eyebrow', text: 'YOUR NEXT STEP' });
+    var focusTitle = U.el('h2', { class: 'prepboard__focus-title' });
+    var focusCopy = U.el('p', { class: 'prepboard__focus-copy' });
+    var focusButton = U.el('button', { type: 'button', class: 'prepboard__focus-open', dataset: { prepFocus: 'focus' } });
+    focus.appendChild(focusEyebrow); focus.appendChild(focusTitle); focus.appendChild(focusCopy); focus.appendChild(focusButton);
+    overview.appendChild(focus); wrap.appendChild(overview);
 
+    var metrics = U.el('div', { class: 'prepboard__metrics', 'aria-label': 'Filter by preparation status' });
+    var metricNodes = {};
+    [['all', 'All steps', '≡'], ['attention', 'Need attention', '!'], ['upcoming', 'Upcoming', '↗'], ['done', 'Done', '✓']].forEach(function (entry) {
+      var button = U.el('button', { type: 'button', class: 'prepboard__metric', 'aria-pressed': 'false',
+        dataset: { filter: entry[0], prepFocus: 'metric:' + entry[0] } });
+      button.appendChild(U.el('span', { class: 'prepboard__metric-icon', 'aria-hidden': 'true', text: entry[2] }));
+      var copy = U.el('span', { class: 'prepboard__metric-copy' });
+      var value = U.el('span', { class: 'prepboard__metric-value' });
+      copy.appendChild(value); copy.appendChild(U.el('span', { class: 'prepboard__metric-label', text: entry[1] }));
+      button.appendChild(copy);
+      button.addEventListener('click', function () {
+        ui.status = entry[0]; ui.hideDone = false; syncControls(); renderResults();
+      });
+      metrics.appendChild(button); metricNodes[entry[0]] = { button: button, value: value };
+    });
+    wrap.appendChild(metrics);
+    var timeline = U.el('nav', { class: 'prepboard__timeline', 'aria-label': 'Preparation phases' });
+    wrap.appendChild(timeline);
+    var workspace = U.el('section', { class: 'prepboard__workspace', 'aria-labelledby': 'prepare-workspace-title' });
+    var workspaceHead = U.el('div', { class: 'prepboard__workspace-head' });
+    var headingCopy = U.el('div', {});
+    var heading = U.el('h2', { class: 'prepboard__workspace-title', id: 'prepare-workspace-title',
+      tabindex: '-1', text: 'Your checklist', dataset: { prepFocus: 'workspace' } });
+    var resultCount = U.el('p', { class: 'prepboard__result-count', role: 'status', 'aria-live': 'polite' });
+    headingCopy.appendChild(heading); headingCopy.appendChild(resultCount); workspaceHead.appendChild(headingCopy);
+    var views = U.el('div', { class: 'prepboard__views', 'aria-label': 'Checklist view' });
+    ['list', 'board'].forEach(function (mode) {
+      var button = U.el('button', { type: 'button', class: 'prepboard__view',
+        text: mode === 'list' ? 'List' : 'Board', dataset: { view: mode, prepFocus: 'view:' + mode }, 'aria-pressed': 'false' });
+      button.addEventListener('click', function () { ui.view = mode; renderResults(); });
+      views.appendChild(button);
+    });
+    workspaceHead.appendChild(views); workspace.appendChild(workspaceHead);
+    var filters = U.el('div', { class: 'prepboard__filters' });
+    var search = U.el('input', { type: 'search', id: 'prepare-search', class: 'prepboard__search',
+      placeholder: 'Search your steps…', 'aria-label': 'Search checklist steps', dataset: { prepFocus: 'search' } });
+    var category = U.el('select', { id: 'prepare-category', class: 'prepboard__select', 'aria-label': 'Category',
+      dataset: { prepFocus: 'category' } });
+    category.appendChild(U.el('option', { value: 'all' }, 'All categories'));
+    checklistCategories().forEach(function (key) { category.appendChild(U.el('option', { value: key }, CHECKLIST_CATEGORY_WORDS[key] || key)); });
+    function syncCategories() {
+      var keys = [];
+      steps.forEach(function (step) { var key = boardCategory(step.item); if (keys.indexOf(key) < 0) keys.push(key); });
+      keys.forEach(function (key) {
+        var exists = Array.prototype.some.call(category.options, function (option) { return option.value === key; });
+        if (!exists) category.appendChild(U.el('option', { value: key }, boardCategoryTitle(key)));
+      });
+      category.value = ui.category;
+    }
+    syncCategories();
+    var status = U.el('select', { id: 'prepare-status', class: 'prepboard__select', 'aria-label': 'Status',
+      dataset: { prepFocus: 'status' } });
+    [['all', 'All statuses'], ['todo', 'To do'], ['attention', 'Needs attention'], ['upcoming', 'Upcoming'], ['done', 'Done']].forEach(function (option) {
+      status.appendChild(U.el('option', { value: option[0] }, option[1]));
+    });
+    function syncSourceStatuses() {
+      if (!steps.some(function (step) { return !!boardOriginal(step.item); })) return;
+      ['secured', 'progress', 'waiting', 'review'].forEach(function (key) {
+        var value = 'source:' + key;
+        var exists = Array.prototype.some.call(status.options, function (option) { return option.value === value; });
+        if (!exists) status.appendChild(U.el('option', { value: value }, IMPORT_STATUS_WORDS[key] + ' · source status'));
+      });
+      status.value = ui.status;
+    }
+    syncSourceStatuses();
+    var hideLabel = U.el('label', { class: 'prepboard__hide-done', for: 'prepare-hide-done' });
+    var hide = U.el('input', { type: 'checkbox', id: 'prepare-hide-done', dataset: { prepFocus: 'hide-done' } });
+    hideLabel.appendChild(hide); hideLabel.appendChild(document.createTextNode('Hide done'));
+    var reset = U.el('button', { type: 'button', class: 'prepboard__reset', text: 'Reset filters', dataset: { prepFocus: 'reset' } });
+    function resetFilters() { ui.search = ''; ui.category = 'all'; ui.status = 'all'; ui.phase = 'all'; ui.hideDone = false; syncControls(); renderResults(); }
+    search.addEventListener('input', function () { ui.search = search.value; renderResults(); });
+    category.addEventListener('change', function () { ui.category = category.value; renderResults(); });
+    status.addEventListener('change', function () { ui.status = status.value; if (ui.status === 'done') ui.hideDone = false; syncControls(); renderResults(); });
+    hide.addEventListener('change', function () { ui.hideDone = hide.checked; if (hide.checked && ui.status === 'done') ui.status = 'all'; syncControls(); renderResults(); });
+    reset.addEventListener('click', resetFilters);
+    filters.appendChild(search); filters.appendChild(category); filters.appendChild(status); filters.appendChild(hideLabel); filters.appendChild(reset);
+    workspace.appendChild(filters);
+    var results = U.el('div', { class: 'prepboard__results' }); workspace.appendChild(results); wrap.appendChild(workspace);
+    wrap.appendChild(drawer); wrap.appendChild(statusLine);
     var itemsMap = (doc.checklist && doc.checklist.items) || {};
     var hasTemplateRow = Object.keys(itemsMap).some(function (id) { return itemsMap[id].fromTemplate; });
-    var seedBtn = U.el('button', { type: 'button', class: 'prepare__seed', dataset: { seeded: String(hasTemplateRow) },
-      text: hasTemplateRow ? 'Refresh from the template' : 'Start the checklist' });
-    var drawer = buildChecklistDrawer(tripId, statusLine);
+    var footer = U.el('footer', { class: 'prepboard__footer' });
+    footer.appendChild(U.el('p', { class: 'prepboard__footer-note', text: 'A little structure for the journey ahead. Add your own steps or use the trip checklist.' }));
+    var seedBtn = U.el('button', { type: 'button', class: 'prepare__seed', dataset: { seeded: String(hasTemplateRow), prepFocus: 'seed' },
+      text: hasTemplateRow ? 'Refresh from the template' : 'Start with a trip checklist' });
     seedBtn.addEventListener('click', function () {
       seedBtn.disabled = true;
       callChecklist('seed', [tripId]).then(function (r) {
         seedBtn.disabled = false;
         if (!r || !r.ok) { setPrepareStatus(statusLine, r && r.code, { capN: capsOf().checklist, noun: 'steps' }); return; }
-        if (r.unchanged) U.setText(statusLine, 'Nothing to change.');
-        else U.setText(statusLine, 'Added ' + (r.added || 0) + ' · removed ' + (r.removed || 0));
+        U.setText(statusLine, r.unchanged ? 'Nothing to change.' : 'Added ' + (r.added || 0) + ' · removed ' + (r.removed || 0));
+        refresh();
       });
     });
-    wrap.appendChild(seedBtn);
+    footer.appendChild(seedBtn); wrap.appendChild(footer);
 
-    var groups = (view && view.groups) || [];
-    var today = (view && view.today) || todayStr();
-    var currentPhaseKey = callPure(timelineApi(), 'currentPhase',
-      [ctx && ctx.departure, today, ctx && ctx.returnDate], null);
-    var anyGroup = false;
-    groups.forEach(function (g) {
-      var gsteps = g.steps || g.items;
-      if (!gsteps || !gsteps.length) return;
-      anyGroup = true;
-      wrap.appendChild(buildPhaseSection(tripId, g, currentPhaseKey, statusLine, drawer, today));
-    });
-    if (!anyGroup && steps.length) {
-      /* PLAN-GAP: no timeline module yet (staged build without D1, or every
-         phase legitimately empty) — the steps still render, ungrouped,
-         rather than vanishing (Solomon's "empty panels hide", not "content
-         hides"). */
-      var ul = U.el('ul', { class: 'prepare__steps' });
-      steps.forEach(function (step) { ul.appendChild(buildStepRow(tripId, step, statusLine, drawer, today)); });
-      wrap.appendChild(ul);
+    function syncControls() {
+      search.value = ui.search; category.value = ui.category; status.value = ui.status; hide.checked = ui.hideDone;
     }
-
-    wrap.appendChild(drawer);
-    wrap.appendChild(statusLine);
+    function matchesStatus(step, key) {
+      if (key.indexOf('source:') === 0) {
+        var original = boardOriginal(step.item);
+        return !!(!step.isDone && original && original.status === key.slice(7));
+      }
+      if (key === 'done') return !!step.isDone;
+      if (key === 'attention') return stepAttention(step, today);
+      if (key === 'upcoming') return stepUpcoming(step, today);
+      if (key === 'todo') return boardStatus(step, today) === 'todo';
+      return true;
+    }
+    function filteredSteps() {
+      var query = ui.search.trim().toLowerCase(), inPhase = null;
+      if (ui.phase !== 'all') {
+        inPhase = Object.create(null);
+        if (ui.phase === 'imported') steps.forEach(function (step) { if (boardOriginal(step.item)) inPhase[step.item.id] = true; });
+        groups.forEach(function (group) {
+          var key = group.phase && group.phase.key || String(group.phase || '');
+          if (key === ui.phase) (group.steps || group.items || []).forEach(function (s) { if (!boardOriginal(s.item)) inPhase[s.item.id] = true; });
+        });
+      }
+      return steps.filter(function (step) {
+        var item = step.item || {};
+        if (ui.hideDone && step.isDone) return false;
+        if (ui.category !== 'all' && boardCategory(item) !== ui.category) return false;
+        if (!matchesStatus(step, ui.status)) return false;
+        if (inPhase && !inPhase[item.id]) return false;
+        var original = boardOriginal(item);
+        return !query || [step.title, item.title, step.detail, item.notes, boardCategoryTitle(boardCategory(item)),
+          original && original.summary, original && original.details, original && original.originalStatus].join(' ').toLowerCase().indexOf(query) >= 0;
+      });
+    }
+    function rowList(list) {
+      var ul = U.el('ul', { class: 'prepare__steps prepboard__rows' });
+      list.forEach(function (step) { ul.appendChild(buildStepRow(tripId, step, statusLine, drawer, today, ui, refresh)); });
+      return ul;
+    }
+    function renderTimeline() {
+      U.clear(timeline);
+      var current = callPure(timelineApi(), 'currentPhase', [ctx && ctx.departure, today, ctx && ctx.returnDate], null);
+      var phases = (timelineApi() && timelineApi().PHASES) || [];
+      function phaseButton(key, title, list, index) {
+        var done = list.filter(function (step) { return step.isDone; }).length;
+        var button = U.el('button', { type: 'button', class: 'prepboard__phase', 'aria-pressed': String(ui.phase === key),
+          dataset: { phase: key, current: String(!!current && (current.key || current) === key), done: String(list.length > 0 && done === list.length),
+            prepFocus: 'phase:' + key } });
+        button.appendChild(U.el('span', { class: 'prepboard__phase-dot', 'aria-hidden': 'true', text: key === 'all' ? '•' : done === list.length && list.length ? '✓' : String(index) }));
+        button.appendChild(U.el('span', { class: 'prepboard__phase-title', text: title }));
+        button.appendChild(U.el('span', { class: 'prepboard__phase-count', text: done + '/' + list.length + ' done' }));
+        button.addEventListener('click', function () { ui.phase = key; renderResults(); });
+        timeline.appendChild(button);
+      }
+      phaseButton('all', 'Whole journey', steps, 0);
+      var imported = steps.filter(function (step) { return !!boardOriginal(step.item); });
+      if (imported.length) phaseButton('imported', 'Imported plans', imported, '↗');
+      phases.forEach(function (phase, index) {
+        var list = [];
+        groups.forEach(function (group) { if ((group.phase && group.phase.key || group.phase) === phase.key) {
+          list = (group.steps || group.items || []).filter(function (step) { return !boardOriginal(step.item); });
+        } });
+        phaseButton(phase.key, phase.title, list, index + 1);
+      });
+    }
+    function renderResults() {
+      var focused = boardFocus(wrap);
+      rememberBoardDetails(results, ui);
+      var visible = filteredSteps();
+      U.clear(results); results.dataset.view = ui.view;
+      var filterActive = !!(ui.search || ui.category !== 'all' || ui.status !== 'all' || ui.phase !== 'all' || ui.hideDone);
+      reset.hidden = !filterActive;
+      U.setText(resultCount, visible.length + ' of ' + steps.length + ' steps' + (ui.phase !== 'all' ? ' · ' + (ui.phase === 'imported' ? 'Imported plans' : phaseTitleFor(ui.phase)) : ''));
+      Object.keys(metricNodes).forEach(function (key) { metricNodes[key].button.setAttribute('aria-pressed', String(ui.status === key)); });
+      U.qsa('.prepboard__view', views).forEach(function (button) { button.setAttribute('aria-pressed', String(button.dataset.view === ui.view)); });
+      renderTimeline();
+      if (!visible.length) {
+        var empty = U.el('div', { class: 'prepboard__empty' });
+        empty.appendChild(U.el('h3', { text: steps.length ? 'No steps match just yet.' : 'Make room for a smooth trip.' }));
+        empty.appendChild(U.el('p', { text: steps.length ? 'Try a different search or clear your filters.' : 'Add your first step, import a plan, or start with the trip checklist below.' }));
+        var action = U.el('button', { type: 'button', class: 'btn btn--quiet', text: steps.length ? 'Clear filters' : 'Add your first step',
+          dataset: { prepFocus: 'empty-action' } });
+        action.addEventListener('click', steps.length ? resetFilters : openAdd); empty.appendChild(action); results.appendChild(empty);
+      } else if (ui.view === 'board') {
+        var board = U.el('div', { class: 'prepboard__board' });
+        [['todo', 'To do'], ['attention', 'Needs attention'], ['done', 'Done']].forEach(function (entry) {
+          var list = visible.filter(function (step) { return boardStatus(step, today) === entry[0]; });
+          var column = U.el('section', { class: 'prepboard__column', dataset: { status: entry[0] } });
+          var columnHead = U.el('h3', { class: 'prepboard__column-head', text: entry[1] });
+          columnHead.appendChild(U.el('span', { class: 'prepboard__column-count', text: String(list.length) })); column.appendChild(columnHead);
+          if (list.length) column.appendChild(rowList(list));
+          else column.appendChild(U.el('p', { class: 'prepboard__column-empty', text: 'No steps here.' }));
+          board.appendChild(column);
+        });
+        results.appendChild(board);
+      } else {
+        var categories = ['chapter:travel', 'chapter:italy', 'chapter:dc', 'chapter:florida'].concat(checklistCategories());
+        visible.forEach(function (step) { var key = boardCategory(step.item); if (categories.indexOf(key) < 0) categories.push(key); });
+        categories.forEach(function (key) {
+          var list = visible.filter(function (step) { return boardCategory(step.item) === key; });
+          if (!list.length) return;
+          var group = U.el('details', { class: 'prepboard__group', dataset: { group: key } });
+          group.open = !ui.collapsed[key];
+          var sum = U.el('summary', { class: 'prepboard__group-header', dataset: { prepFocus: 'group:' + key } });
+          sum.appendChild(U.el('span', { class: 'prepboard__group-title', text: boardCategoryTitle(key) }));
+          sum.appendChild(U.el('span', { class: 'prepboard__group-count', text: list.filter(function (s) { return s.isDone; }).length + ' of ' + list.length + ' done' }));
+          sum.appendChild(U.el('span', { class: 'prepboard__chevron', 'aria-hidden': 'true', text: '⌄' }));
+          group.appendChild(sum); group.appendChild(rowList(list));
+          group.addEventListener('toggle', function () { if (group.isConnected) ui.collapsed[key] = !group.open; }); results.appendChild(group);
+        });
+      }
+      restoreBoardFocus(wrap, focused);
+    }
+    var nextStep = null;
+    focusButton.addEventListener('click', function () {
+      if (!nextStep) {
+        if (!steps.length) openAdd();
+        else {
+          ui.search = ''; ui.category = 'all'; ui.phase = 'all';
+          ui.status = steps.some(function (step) { return !step.isDone; }) ? 'all' : 'done';
+          ui.hideDone = false; syncControls(); renderResults(); heading.focus();
+        }
+        return;
+      }
+      ui.search = ''; ui.status = 'all'; ui.phase = 'all'; ui.category = 'all'; ui.hideDone = false;
+      ui.opened[nextStep.item.id] = true; ui.collapsed[boardCategory(nextStep.item)] = false;
+      syncControls(); renderResults();
+      var target = null;
+      U.qsa('.prepboard__task', results).some(function (d) { if (d.dataset.taskId === nextStep.item.id) { target = d; return true; } return false; });
+      if (target) {
+        var group = target.closest('.prepboard__group');
+        if (group) { group.open = true; ui.collapsed[group.dataset.group] = false; }
+        target.open = true; ui.opened[nextStep.item.id] = true;
+        var sum = target.querySelector('summary'); sum.focus(); target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    });
+    function refresh() {
+      if (!wrap.isConnected) return;
+      readLive(); updateSummary(); renderResults();
+    }
+    function updateSummary() {
+      var done = steps.filter(function (step) { return step.isDone; }).length;
+      var percent = callPure(timelineApi(), 'percentComplete', [steps], steps.length ? Math.round(done * 100 / steps.length) : 0);
+      U.setText(progressLabel, done + ' of ' + steps.length + ' steps complete · ' + percent + '%');
+      progressLabel.dataset.percent = String(percent); progress.value = percent;
+      var seeded = steps.some(function (step) { return step.item && step.item.fromTemplate; });
+      seedBtn.dataset.seeded = String(seeded);
+      U.setText(seedBtn, seeded ? 'Refresh from the template' : 'Start with a trip checklist');
+      Object.keys(metricNodes).forEach(function (key) {
+        U.setText(metricNodes[key].value, String(key === 'all' ? steps.length : steps.filter(function (step) { return matchesStatus(step, key); }).length));
+      });
+      var pending = steps.filter(function (step) {
+        if (step.isDone) return false;
+        var original = boardOriginal(step.item);
+        return !original || original.status !== 'secured' || original.priority === 'high' &&
+          (original.steps || []).some(function (substep) { return !substep.done; });
+      }).slice();
+      pending.sort(function (a, b) {
+        var priority = (stepAttention(a, today) ? 0 : 1) - (stepAttention(b, today) ? 0 : 1);
+        if (priority) return priority;
+        var oa = boardOriginal(a.item), ob = boardOriginal(b.item);
+        return String((oa ? oa.date : a.due) || '9999').localeCompare(String((ob ? ob.date : b.due) || '9999'));
+      });
+      nextStep = pending[0] || null;
+      var allComplete = steps.length > 0 && done === steps.length;
+      U.setText(focusEyebrow, nextStep && stepAttention(nextStep, today) ? 'NEEDS YOUR ATTENTION' : 'YOUR NEXT STEP');
+      U.setText(focusTitle, nextStep ? nextStep.title || nextStep.item.title : allComplete ? 'You’re all caught up.' : steps.length ? 'Your plans are taking shape.' : 'Start with one small step.');
+      var nextOriginal = nextStep && boardOriginal(nextStep.item);
+      U.setText(focusCopy, nextStep ? (nextOriginal ? nextStep.item.notes || nextOriginal.summary : nextStep.detail || nextStep.item.notes) || (!nextOriginal && nextStep.due ? 'Due ' + dayShort(nextStep.due) + '. Open this step to see the details.' : 'A little preparation now makes the journey easier.') :
+        allComplete ? 'Every step on your checklist is complete. The details are here whenever you need them.' : steps.length ? 'Your secured plans are here. Review their details and any remaining follow-ups when you need them.' : 'Bring your plans together, then take them one step at a time.');
+      U.setText(focusButton, nextStep ? 'Open this step →' : allComplete ? 'Review completed steps →' : steps.length ? 'Review your plans →' : 'Add your first step →');
+    }
+    syncControls(); updateSummary(); renderResults();
     return wrap;
   }
+
 
   /* -- packing tab --------------------------------------------------------- */
   function ownerSuffix(uid, members) {
@@ -46250,6 +46855,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     try { document.title = titleWord + ' — ' + tripName; } catch (e) {}
 
     var prevOpen = collectOpenDrawers(el);
+    var prepFocus = boardFocus(el);
+    var previousBoard = el.querySelector('.prepboard');
+    if (previousBoard) rememberBoardDetails(previousBoard, prepareBoardState(previousBoard.dataset.tripId));
     U.clear(el);
     var wrap = U.el('div', { class: 'plan', dataset: { section: section } });
     var header = U.el('header', { class: 'plan__header' });
@@ -46293,6 +46901,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     } else if (section === 'bookings') {
       wrap.appendChild(buildBookingsSection(tripId, prep));
     } else if (section === 'prepare') {
+      if (currentPrepareTab(route) === 'checklist') header.hidden = true;
       wrap.appendChild(buildPrepareSection(tripId, prep, route));
     } else if (section === 'itinerary') {
       wrap.appendChild(buildItinerarySection(tripId, prep));
@@ -46306,6 +46915,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
     el.appendChild(wrap);
     if (prevOpen.length) reopenDrawers(wrap, prevOpen, prep);
+    restoreBoardFocus(wrap, prepFocus);
   }
 
   /* ==================================================================== */
@@ -46517,6 +47127,255 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (mountedEl === el) { mountedEl = null; mountedRoute = null; }
     }
   });
+})(window.TRIP);
+/* ==== src/js/24c-prepare-import.js ==== */
+/* Runtime-only task import. No personal source data is shipped in this file. */
+(function (T) {
+  'use strict';
+  var I = T.prepareImport = {}, PR = T.prep, U = T.util, applying = {};
+  var CATEGORIES = { travel: 'documents', italy: 'booking', dc: 'home', florida: 'arrival' };
+  var LABELS = { basics: 'Basics', documents: 'Documents', booking: 'Bookings', home: 'Home', arrival: 'Arrival' };
+  var MAX_FILE = 2 * 1024 * 1024;
+
+  function clone(value) { return JSON.parse(JSON.stringify(value)); }
+  function fail(message) { var e = new Error(message); e.code = 'invalid-import'; throw e; }
+  function cut(value, length) {
+    var text = String(value || '');
+    if (text.length <= length) return text;
+    var end = length - 1;
+    if (/[\uD800-\uDBFF]/.test(text.charAt(end - 1))) end--;
+    return text.slice(0, end) + '…';
+  }
+  function sourceFor(task) { return { v: 1, app: 'october-dashboard', taskId: task.id, original: clone(task) }; }
+  function editable(tripId) {
+    var view = PR.get(tripId), user = T.firebase && T.firebase.user && T.firebase.user();
+    return !!(view.plan && user && PR.canEdit(view.plan, user.uid));
+  }
+  function itemsFor(tripId) {
+    var plan = PR.get(tripId).plan;
+    return plan && plan.checklist && plan.checklist.items || {};
+  }
+
+  /* Parse JSON only. DOMParser's detached document is never inserted into the
+     page; no script, handler, or HTML from the file is evaluated or rendered. */
+  I.parse = function (text, Parser) {
+    if (typeof text !== 'string' || !text.trim()) fail('Choose an October dashboard HTML file or JSON backup.');
+    if (text.length > MAX_FILE) fail('Choose a file smaller than 2 MB.');
+    var data, trimmed = text.trim();
+    if (trimmed.charAt(0) === '[' || trimmed.charAt(0) === '{') {
+      try { data = JSON.parse(trimmed); } catch (e) { fail('This JSON file could not be read.'); }
+    } else {
+      var Constructor = Parser || (typeof DOMParser !== 'undefined' && DOMParser);
+      if (!Constructor) fail('HTML import is unavailable in this browser. Use a JSON backup.');
+      var doc = new Constructor().parseFromString(text, 'text/html');
+      var blocks = doc.querySelectorAll('script[type="application/json"]');
+      for (var i = 0; i < blocks.length; i++) {
+        var candidate;
+        try { candidate = JSON.parse(blocks[i].textContent); } catch (e) { continue; }
+        if (Array.isArray(candidate) || (candidate && Array.isArray(candidate.tasks))) {
+          if (data !== undefined) fail('This HTML contains more than one task dataset. Import its JSON backup instead.');
+          data = candidate;
+        }
+      }
+      if (data === undefined) fail('No October task dataset was found. Choose the original dashboard or a JSON backup.');
+    }
+    var tasks = Array.isArray(data) ? data : data && data.tasks;
+    if (!Array.isArray(tasks) || !tasks.length || tasks.length > 200) fail('The file must contain between 1 and 200 tasks.');
+    var ids = Object.create(null);
+    tasks.forEach(function (task, index) {
+      if (!task || typeof task !== 'object' || typeof task.id !== 'string') fail('Task ' + (index + 1) + ' needs its original task ID.');
+      if (!PR.checklist.validateImportSource(sourceFor(task))) fail('Task ' + (index + 1) + ' has unsupported fields, invalid dates or links, or more than 24,000 characters of source data.');
+      if (ids[task.id]) fail('The file contains the same task ID more than once.');
+      ids[task.id] = true;
+    });
+    return clone(tasks);
+  };
+
+  /* Pure preview: one native checklist task per source task. The original
+     substeps stay nested and keep their individual completion states. */
+  I.preview = function (tasks, existingItems) {
+    var existing = existingItems || {}, seen = Object.create(null), rows = [], steps = 0, completed = 0, secured = 0;
+    Object.keys(existing).forEach(function (id) {
+      var source = existing[id] && existing[id].importSource;
+      if (source && source.app === 'october-dashboard') seen[source.taskId] = id;
+    });
+    tasks.forEach(function (task) {
+      var source = sourceFor(task);
+      if (!PR.checklist.validateImportSource(source)) fail('The task data failed validation. Choose the file again.');
+      var done = task.status === 'done' || task.status === 'completed';
+      var fields = {
+        title: cut(task.title.trim(), 120), category: CATEGORIES[task.category] || 'basics',
+        notes: cut(task.summary || '', 500), dueOffsetDays: 0, importSource: source
+      };
+      steps += (task.steps || []).length;
+      if (done) completed++;
+      if (task.status === 'secured') secured++;
+      rows.push({ fields: fields, taskId: task.id, original: source.original, isDone: done, existingId: seen[task.id] || null });
+    });
+    var additions = rows.filter(function (r) { return !r.existingId; }).length;
+    var count = Object.keys(existing).length;
+    return { rows: rows, tasks: rows.length, steps: steps, completed: completed, secured: secured,
+      additions: additions, skipped: rows.length - additions, existingCount: count,
+      capacity: (PR.CAPS && PR.CAPS.checklist) || 200, fits: count + additions <= ((PR.CAPS && PR.CAPS.checklist) || 200) };
+  };
+
+  I.describe = function (item) {
+    var source = item && item.importSource;
+    if (!source || !PR.checklist.validateImportSource(source)) return null;
+    return { taskId: source.taskId, title: source.original.title, kind: 'task', original: source.original };
+  };
+
+  /* The official add operation rechecks the task ID in its transaction. */
+  I.apply = function (tripId, tasks, onProgress) {
+    if (applying[tripId]) return Promise.resolve({ ok: false, code: 'busy', added: 0, skipped: 0 });
+    if (!editable(tripId)) return Promise.resolve({ ok: false, code: 'not-editor', added: 0, skipped: 0 });
+    var preview;
+    try { preview = I.preview(tasks, itemsFor(tripId)); }
+    catch (e) { return Promise.resolve({ ok: false, code: 'invalid-import', added: 0, skipped: 0 }); }
+    if (!preview.fits) return Promise.resolve({ ok: false, code: 'cap-reached', added: 0, skipped: 0 });
+    applying[tripId] = true;
+    var result = { ok: true, added: 0, skipped: 0 }, index = 0;
+    function next() {
+      if (index >= preview.rows.length) return Promise.resolve(result);
+      if (!editable(tripId)) { result.ok = false; result.code = 'not-editor'; return Promise.resolve(result); }
+      var row = preview.rows[index++];
+      if (row.existingId) { result.skipped++; return next(); }
+      return Promise.resolve(PR.checklist.add(tripId, row.fields)).then(function (res) {
+        if (!res || !res.ok) { result.ok = false; result.code = res && res.code || 'unavailable'; return result; }
+        if (res.unchanged) result.skipped++; else result.added++;
+        if (onProgress) onProgress({ added: result.added, skipped: result.skipped, total: preview.tasks });
+        return next();
+      });
+    }
+    return Promise.resolve().then(next).catch(function () { result.ok = false; result.code = 'unavailable'; return result; })
+      .then(function (res) { delete applying[tripId]; return res; });
+  };
+
+  I.renderDetails = function (tripId, item) {
+    var info = I.describe(item);
+    if (!info) return null;
+    var task = info.original, section = U.el('section', { class: 'prep-import-details', 'aria-label': 'Imported plan details' });
+    function paragraph(label, value) {
+      if (!value) return;
+      var p = U.el('p', { class: 'prep-import-details__text' });
+      p.style.whiteSpace = 'pre-wrap'; p.style.overflowWrap = 'anywhere';
+      if (label) p.appendChild(U.el('strong', {}, label + ' '));
+      p.appendChild(document.createTextNode(value)); section.appendChild(p);
+    }
+    var statusNames = { todo: 'To do', progress: 'In progress', waiting: 'Waiting', review: 'Needs review', secured: 'Secured', done: 'Completed', completed: 'Completed' };
+    if (task.title !== item.title) paragraph('Original title:', task.title);
+    paragraph('Imported status:', [statusNames[task.status] || task.status, task.originalStatus].filter(Boolean).join(' · '));
+    paragraph('Priority:', task.priority ? task.priority.charAt(0).toUpperCase() + task.priority.slice(1) : '');
+    paragraph('Plan dates:', [task.date, task.endDate].filter(Boolean).join(' – '));
+    paragraph('Original summary:', task.summary);
+    paragraph('', task.details);
+    paragraph('Source notes:', task.notes);
+    paragraph('Evidence:', task.basis);
+    paragraph('Source updated:', task.updatedAt || task.createdAt);
+    if ((task.sources || []).length) {
+      var sources = U.el('ul', { class: 'prep-import-details__sources', 'aria-label': 'Sources' });
+      task.sources.forEach(function (source) {
+        var li = U.el('li'), link = U.el('a', { href: source.url, target: '_blank', rel: 'noopener noreferrer' }, source.label || 'Open source');
+        link.style.overflowWrap = 'anywhere'; li.appendChild(link); sources.appendChild(li);
+      });
+      section.appendChild(sources);
+    }
+    if ((task.steps || []).length) {
+      section.appendChild(U.el('h4', {}, 'Next steps'));
+      var list = U.el('div', { class: 'prep-import-details__steps' });
+      var status = U.el('p', { role: 'status', 'aria-live': 'polite' });
+      task.steps.forEach(function (step, index) {
+        var label = U.el('label', { class: 'prep-import-details__step' }), input = U.el('input', { type: 'checkbox', dataset: { prepFocus: 'import-step:' + item.id + ':' + (step.id || index) } });
+        label.style.display = 'flex'; label.style.gap = '10px'; label.style.alignItems = 'flex-start'; label.style.margin = '10px 0'; label.style.minHeight = '44px';
+        input.checked = step.done; input.disabled = !editable(tripId);
+        label.appendChild(input); label.appendChild(U.el('span', {}, step.text));
+        input.addEventListener('change', function () {
+          var desired = input.checked; input.disabled = true; status.textContent = 'Saving step…';
+          /* importStep merges against the transaction's latest task, so two
+             travelers checking different steps do not overwrite each other. */
+          PR.checklist.edit(tripId, item.id, { importStep: { index: index, done: desired } }).then(function (res) {
+            input.disabled = !editable(tripId);
+            if (!res || !res.ok) { input.checked = !desired; status.textContent = 'This step could not be saved. Try again.'; }
+            else { status.textContent = 'Step saved.'; }
+          }).catch(function () { input.checked = !desired; input.disabled = !editable(tripId); status.textContent = 'This step could not be saved. Try again.'; });
+        });
+        list.appendChild(label);
+      });
+      section.appendChild(list); section.appendChild(status);
+    }
+    return section;
+  };
+
+  I.open = function (tripId) {
+    if (!T.modal || !PR) return;
+    var body = U.el('div', { class: 'modal__body prep-import' });
+    var intro = U.el('p', {}, 'Bring an October dashboard HTML file or its JSON backup into this trip. Each task keeps its details, sources, dates and individual next steps.');
+    var input = U.el('input', { type: 'file', accept: '.html,.htm,.json,text/html,application/json', 'aria-label': 'Choose October plan HTML or JSON' });
+    input.style.maxWidth = '100%';
+    var output = U.el('div', { class: 'prep-import__preview' });
+    var status = U.el('p', { role: 'status', 'aria-live': 'polite' });
+    var footer = U.el('div', { class: 'modal__foot' });
+    var close = U.el('button', { type: 'button', class: 'btn' }, 'Close');
+    var apply = U.el('button', { type: 'button', class: 'btn btn--primary', disabled: true }, 'Import tasks');
+    var selected = null, readGeneration = 0, busy = false;
+    body.appendChild(intro); body.appendChild(input); body.appendChild(status); body.appendChild(output);
+    footer.appendChild(close); footer.appendChild(apply);
+    close.addEventListener('click', function () { T.modal.close(); });
+    if (!editable(tripId)) status.textContent = 'Sign in with permission to edit this trip to import tasks.';
+    function drawPreview() {
+      output.textContent = '';
+      var preview = I.preview(selected, itemsFor(tripId));
+      output.appendChild(U.el('p', {}, preview.tasks + ' tasks · ' + preview.steps + ' nested next steps · ' + preview.completed + ' completed tasks'));
+      output.appendChild(U.el('p', {}, preview.additions + ' new tasks will be added. ' + preview.skipped + ' previously imported tasks will be kept as they are.'));
+      output.appendChild(U.el('p', {}, 'Secured means booked or arranged; those tasks stay open. Source dates are retained as plan dates, not deadlines.'));
+      output.appendChild(U.el('p', {}, 'Task titles use up to 120 characters and the list summary uses up to 500. Full original titles, notes, details and source links are retained inside each task.'));
+      var details = U.el('details'), summary = U.el('summary', {}, 'Review all ' + preview.tasks + ' tasks');
+      details.appendChild(summary);
+      var list = U.el('ol');
+      preview.rows.forEach(function (row) {
+        var li = U.el('li'); li.style.margin = '14px 0';
+        li.appendChild(U.el('strong', {}, row.fields.title));
+        li.appendChild(U.el('p', {}, (row.existingId ? 'Already imported' : 'Add to ' + (LABELS[row.fields.category] || row.fields.category)) + ' · ' + (row.isDone ? 'Completed' : 'Open') + ' · ' + (row.original.steps || []).length + ' next steps'));
+        var sourceDetails = I.renderDetails(tripId, { id: '', importSource: row.fields.importSource });
+        if (sourceDetails) {
+          Array.prototype.forEach.call(sourceDetails.querySelectorAll('input'), function (checkbox) { checkbox.disabled = true; });
+          li.appendChild(sourceDetails);
+        }
+        list.appendChild(li);
+      });
+      details.appendChild(list); output.appendChild(details);
+      status.textContent = preview.fits ? '' : 'This import would exceed the trip’s ' + preview.capacity + '-task limit. No tasks have been imported.';
+      apply.textContent = preview.additions ? 'Import ' + preview.additions + ' tasks' : 'Already imported';
+      apply.disabled = busy || !preview.fits || !preview.additions || !editable(tripId);
+    }
+    input.addEventListener('change', function () {
+      var file = input.files && input.files[0], generation = ++readGeneration;
+      selected = null; apply.disabled = true; output.textContent = '';
+      if (!file) { status.textContent = ''; return; }
+      if (file.size > MAX_FILE) { status.textContent = 'Choose a file smaller than 2 MB.'; return; }
+      status.textContent = 'Reading task data…';
+      file.text().then(function (text) {
+        if (generation !== readGeneration) return;
+        selected = I.parse(text); drawPreview();
+      }).catch(function (err) { if (generation === readGeneration) status.textContent = err.message || 'The file could not be read.'; });
+    });
+    apply.addEventListener('click', function () {
+      if (!selected || busy) return;
+      busy = true; apply.disabled = true; input.disabled = true; status.textContent = 'Importing tasks…';
+      I.apply(tripId, selected, function (progress) { status.textContent = progress.added + ' tasks added…'; }).then(function (result) {
+        busy = false; input.disabled = false;
+        if (result.ok) {
+          drawPreview(); status.textContent = result.added + ' tasks imported. ' + result.skipped + ' existing tasks kept.';
+          if (T.notify && T.notify.toast) T.notify.toast({ text: 'Plan tasks imported.' });
+        } else {
+          apply.disabled = !editable(tripId); apply.textContent = 'Continue import';
+          status.textContent = result.added + ' tasks were added before the import stopped. Previously imported tasks will be kept when you retry. ' +
+            (result.code === 'not-editor' ? 'Sign in with edit access to continue.' : result.code === 'cap-reached' ? 'The trip has reached its task limit.' : 'Check your connection and try again.');
+        }
+      });
+    });
+    T.modal.open({ title: 'Import your plan', body: body, footer: footer, variant: 'wide' });
+  };
 })(window.TRIP);
 /* ==== src/js/25-view-budget.js ==== */
 /* Budget Lab — USD what-ifs, isolated from workbook and per-trip quotes. */
