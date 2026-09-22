@@ -12382,6 +12382,10 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .plan .prepare__tab { padding: 0 var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-round); color: var(--ink-muted); }
 .plan .prepare__tab[aria-current="page"] { background: var(--surface); color: var(--accent); border-color: var(--line-strong); }
 .plan .prepare__step { padding: var(--s4); }
+.plan .prepare { margin-top: var(--s4); }
+.plan .prepare > div { display: grid; gap: var(--s4); }
+.plan .plan__drawer.prepare__homedrawer:not([open]),
+.plan .plan__drawer.prepare__docsdrawer:not([open]) { display: none; }
 .plan .itin__day { padding-block: var(--s4); gap: var(--s3); }
 .plan .itin__entry { padding: var(--s4); }
 
