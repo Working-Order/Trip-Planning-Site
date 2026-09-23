@@ -13442,6 +13442,31 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .packdash__progressbar::-webkit-progress-value { background: var(--accent); border-radius: 9px; }
 .packdash__progressbar::-moz-progress-bar { background: var(--accent); }
 .packdash__helper { margin: 0; color: var(--ink-muted); font-size: var(--text-xs); line-height: 1.5; }
+.packdash__planning--simple { grid-template-columns: 1fr; }
+.packdash__planning--simple .packdash__progress { max-width: 420px; }
+.packdash__collection { width: 100%; margin: 6px 0 22px; min-height: 44px; font-size: var(--text-sm); }
+.packdash__rail > label { display: block; }
+.packdash__guidance { color: var(--ink-muted); font-size: var(--text-xs); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.packdash[data-laundry-saving="true"] .packdash__quantity { color: var(--accent); font-weight: 700; }
+.packedit__suggestion { margin: 0 0 18px; padding: 12px; background: var(--accent-soft); border-radius: 8px; font-size: var(--text-sm); line-height: 1.55; color: var(--ink); }
+.modal.packstarter-modal { width: min(850px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; }
+.packstarter { padding: 0 24px 20px; }
+.packstarter__intro, .packstarter__hint { color: var(--ink-muted); font-size: var(--text-sm); line-height: 1.6; margin: 0 0 18px; }
+.packstarter__choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 20px; }
+.packstarter__choice { display: grid; align-content: start; gap: 6px; border: 1px solid var(--line-strong); border-radius: 10px; padding: 15px; text-align: left; background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; }
+.packstarter__choice span { color: var(--ink-muted); font-size: var(--text-xs); line-height: 1.5; }
+.packstarter__choice[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.packstarter__preview h3 { margin: 0 0 8px; font: 600 var(--text-lg) var(--font-body); }
+.packstarter__table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 14px; }
+.packstarter__table th { color: var(--ink-muted); text-align: left; font-size: var(--text-xs); font-weight: 500; text-transform: none; letter-spacing: normal; }
+.packstarter__table th, .packstarter__table td { border-bottom: 1px solid var(--line); padding: 12px 8px; vertical-align: top; }
+.packstarter__table th:not(:first-child), .packstarter__table td:not(:first-child) { width: 78px; text-align: center; font-variant-numeric: tabular-nums; }
+.packstarter__table strong { display: block; font-size: var(--text-sm); }
+.packstarter__table p { font-size: var(--text-xs); line-height: 1.5; color: var(--ink-muted); margin: 5px 0 0; }
+.packstarter__tag { font-size: var(--text-2xs); color: var(--accent); }
+.packstarter__status { font-size: var(--text-sm); line-height: 1.5; }
+.packstarter__footer { position: sticky; bottom: 0; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; background: var(--surface); border-top: 1px solid var(--line); padding: 14px 0; }
+.packstarter :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .packdash__laundry { display: flex; gap: 20px; justify-content: space-between; align-items: center; border-left: 1px solid var(--line); padding-left: 28px; min-width: 0; }
 .packdash__laundry h2 { margin: 0 0 5px; color: var(--ink); font: 600 var(--text-sm) var(--font-body); }
 .packdash__switch { flex: 0 0 auto; display: flex; padding: 4px; gap: 4px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; }
@@ -13540,6 +13565,11 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   .packdash__filters input { grid-column: auto; }
 }
 @media (max-width: 540px) {
+  .packstarter { padding: 0 16px 16px; }
+  .packstarter__choices { gap: 8px; }
+  .packstarter__choice { padding: 10px; }
+  .packstarter__table th:not(:first-child), .packstarter__table td:not(:first-child) { width: 56px; padding-inline: 4px; }
+  .packdash__collection { max-width: 240px; margin-bottom: 12px; font-size: 16px; }
   .packdash__planning { grid-template-columns: 1fr; }
   .packdash__laundry { padding: 16px 0 0; border-left: 0; border-top: 1px solid var(--line); }
   .packdash__switch { justify-self: stretch; }
@@ -13792,7 +13822,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
 (function (T) {
   'use strict';
 
-  T.version = '0.28.15';   // Make the packing dashboard easier to scan and use
+  T.version = '0.28.16';   // Purpose-specific starter lists and live laundry quantities
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -18210,7 +18240,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   PR.packing.CATEGORIES = ['clothing', 'toiletries', 'electronics', 'documents', 'health', 'gear', 'misc'];
   PR.packing.LAUNDRY_CEILING = 8;
   PR.packing.LAUNDRY_MODES = ['none', 'once'];
-  PR.packing.LAUNDRY_KEYS = ['', 'underwear', 'socks', 'tops', 'bottoms', 'sleepwear'];
+  PR.packing.LAUNDRY_KEYS = ['', 'underwear', 'socks', 'tops', 'bottoms', 'sleepwear', 'italy-tees', 'italy-longtops', 'italy-chinos'];
 
   /** laundryKey(item) -> an explicit managed key, or a legacy exact-name
    *  template match when the property has never been stored. An explicit
@@ -18242,9 +18272,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     n = Math.max(0, Math.min(365, Math.floor(n)));
     t = Math.max(1, Math.min(8, Math.floor(t)));
     var days = n + 1, perPerson;
-    if (key === 'underwear' || key === 'socks') perPerson = mode === 'once' ? Math.ceil(days / 2) + 1 : days;
+    if (key === 'underwear' || key === 'socks') perPerson = mode === 'once' ? Math.min(days, Math.ceil(days / 2) + 1) : days;
     else if (key === 'tops') perPerson = mode === 'once' ? Math.ceil(days / 2) : Math.ceil(days * 0.7);
     else if (key === 'bottoms') perPerson = mode === 'once' ? Math.ceil(days / 5) : Math.ceil(days / 4);
+    else if (key === 'italy-tees') perPerson = mode === 'once' ? Math.ceil(days * 0.3) : Math.ceil(days * 0.4);
+    else if (key === 'italy-longtops' || key === 'italy-chinos') perPerson = mode === 'once' ? Math.ceil(days * 0.1) : Math.ceil(days * 0.2);
     else perPerson = mode === 'once' ? 1 : 2;
     return Math.max(1, Math.min(99, perPerson * t));
   };
@@ -18354,6 +18386,206 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     return rows;
   };
 
+  /* Purpose-specific starter catalogs are opt-in and additive. starterKey
+     namespaces every row by its collection so unrelated lists never merge. */
+  PR.packing.STARTER_PROFILES = [
+    { key: 'essentials', title: 'Travel basics', description: 'A general travel checklist.' },
+    { key: 'italy-autumn', title: 'Italy autumn wardrobe', description: 'A compact, adjustable cool-weather clothing capsule.' },
+    { key: 'wedding-planning', title: 'Wedding planning', description: 'A practical kit for venue and vendor planning.' },
+    { key: 'wedding-day', title: 'Wedding day', description: 'A day-of handoff and essentials checklist.' }
+  ];
+  var STARTER_CATALOGS = {
+    'italy-autumn': [
+      ['Underwear', 'clothing', 0, false, 'underwear', 'Underwear'],
+      ['Socks (pairs)', 'clothing', 0, false, 'socks', 'Socks'],
+      ['Short-sleeve tees', 'clothing', 0, false, 'italy-tees', 'Shirts / tops'],
+      ['Long-sleeve jersey / merino tops', 'clothing', 0, false, 'italy-longtops', ''],
+      ['Smart dinner top', 'clothing', 1, true, '', 'One smart outfit|Dinner outfit (sets)'],
+      ['Versatile chinos / trousers', 'clothing', 0, false, 'italy-chinos', 'Trousers / shorts|Trousers / everyday bottoms'],
+      ['Stretch walking trousers', 'clothing', 1, false, '', ''],
+      ['Merino sweater or fleece', 'clothing', 1, false, '', 'Warm layer or jacket|Warm midlayer or jacket'],
+      ['Packable rain jackets', 'clothing', 1, false, '', 'Rain shell or umbrella'],
+      ['Sleepwear (sets)', 'clothing', 0, false, 'sleepwear', 'Sleepwear'],
+      ['Walking shoes (pairs)', 'clothing', 1, false, '', 'Comfortable walking shoes'],
+      ['Swimwear', 'clothing', 1, true, '', ''],
+      ['Spa sandals (pairs)', 'clothing', 1, true, '', ''],
+      ['Light scarf or beanie', 'clothing', 1, true, '', ''],
+      ['Lightweight insulated jacket', 'clothing', 1, true, '', '']
+    ],
+    'wedding-planning': [
+      ['Venue shortlist and appointment details', 'documents', 1, false, '', ''],
+      ['Wedding brief and priorities', 'documents', 1, false, '', ''],
+      ['Budget snapshot', 'documents', 1, false, '', ''],
+      ['Venue comparison sheet', 'documents', 1, false, '', ''],
+      ['Questions for venues and vendors', 'documents', 1, false, '', ''],
+      ['Layout references', 'documents', 1, false, '', ''],
+      ['Inspiration photos', 'documents', 1, true, '', ''],
+      ['Guest needs notes', 'documents', 1, true, '', ''],
+      ['Notes and decision log', 'documents', 1, false, '', ''],
+      ['Measuring tape', 'gear', 1, true, '', '']
+    ],
+    'wedding-day': [
+      ['Day-of timeline and contacts', 'documents', 1, false, '', ''],
+      ['Ceremony cues and readings', 'documents', 1, false, '', ''],
+      ['Guest list and seating plan', 'documents', 1, false, '', ''],
+      ['Vendor handoff packet', 'documents', 1, false, '', ''],
+      ['Ceremony materials', 'gear', 1, true, '', ''],
+      ['Ceremony paperwork', 'documents', 1, true, '', ''],
+      ['Personal essentials pouch', 'gear', 1, true, '', ''],
+      ['Repair kit', 'gear', 1, true, '', ''],
+      ['Weather accessories', 'gear', 1, true, '', ''],
+      ['End-of-event collection list', 'documents', 1, false, '', '']
+    ]
+  };
+  var STARTER_DETAILS = {
+    'italy-autumn:short-sleeve-tees': 'Per person: choose navy, cream and oliveâ€”four tees (2 navy, 1 cream, 1 olive) without a wash, or three (one each) with one wash. Travel-worn items count.',
+    'italy-autumn:long-sleeve-jersey-merino-tops': 'Per person: two (cream and charcoal) without a wash, or one charcoal top with one wash. Travel-worn items count.',
+    'italy-autumn:smart-dinner-top': 'A soft button shirt, blouse or fine knit in muted blue or cream; reuse the trousers rather than packing a separate outfit.',
+    'italy-autumn:versatile-chinos-trousers': 'Per person: two pairs (navy and charcoal) without a wash, or one navy pair with one wash. Travel-worn items count.',
+    'italy-autumn:stretch-walking-trousers': 'Choose comfortable stretch-woven trousers for travel and light walks.',
+    'italy-autumn:merino-sweater-or-fleece': 'A charcoal or olive merino sweater or fleece works as a warm midlayer.',
+    'italy-autumn:packable-rain-jackets': 'A packable navy shell is useful for changeable autumn weather.',
+    'italy-autumn:walking-shoes-pairs': 'Choose dark neutral shoes with good grip and enough room for long walking days.',
+    'italy-autumn:lightweight-insulated-jacket': 'Optional; decide from the forecast and personal cold tolerance.',
+    'italy-autumn:light-scarf-or-beanie': 'Optional lightweight warmth for cool mornings or evenings.',
+    'italy-autumn:spa-sandals-pairs': 'Optional; useful if spa or pool facilities require separate footwear.',
+    'wedding-planning:venue-shortlist-and-appointment-details': 'Keep venue contacts, appointment times, addresses and any access instructions together.',
+    'wedding-planning:wedding-brief-and-priorities': 'Record the date range, guest estimate, style preferences and the decisions that matter most.',
+    'wedding-planning:budget-snapshot': 'Track the current estimate, confirmed costs, deposits and remaining budget.',
+    'wedding-planning:venue-comparison-sheet': 'Compare capacity, availability, inclusions, accessibility, restrictions and total cost.',
+    'wedding-planning:questions-for-venues-and-vendors': 'Keep open questions and answers together so details are easy to compare.',
+    'wedding-planning:layout-references': 'Bring room dimensions, layouts or annotated diagrams for the spaces being considered.',
+    'wedding-planning:inspiration-photos': 'Optional visual references for style, layout or details under consideration.',
+    'wedding-planning:guest-needs-notes': 'Optional notes about access, dietary needs or other guest arrangements to confirm.',
+    'wedding-planning:notes-and-decision-log': 'Record decisions, dates and follow-up actions with enough context to revisit them.',
+    'wedding-day:day-of-timeline-and-contacts': 'Include event times, locations, contact numbers and any confirmed handoffs.',
+    'wedding-day:ceremony-cues-and-readings': 'Keep the order of cues and the final readings or scripts in one place.',
+    'wedding-day:guest-list-and-seating-plan': 'Bring the latest guest count and seating plan, marked with any final changes.',
+    'wedding-day:vendor-handoff-packet': 'Collect schedules, arrival details, setup notes and confirmed points of contact.',
+    'wedding-day:end-of-event-collection-list': 'List items that need to be gathered, returned or handed to someone afterward.',
+    'wedding-planning:measuring-tape': 'Useful for checking room dimensions and layout measurements.',
+    'wedding-day:ceremony-materials': 'Add only the materials needed for your role, such as vows, rings or other assigned items.',
+    'wedding-day:ceremony-paperwork': 'Optional; include only if applicable and assign a responsible person.',
+    'wedding-day:personal-essentials-pouch': 'Optional; adapt contents to your role and personal needs.',
+    'wedding-day:repair-kit': 'Optional small sewing and stain kit.',
+    'wedding-day:weather-accessories': 'Optional; choose based on the forecast.'
+  };
+  PR.packing.starterDetails = function (item) {
+    var key = item && typeof item.starterKey === 'string' ? item.starterKey : '';
+    if (!key || /:custom$/.test(key)) return '';
+    var parts = key.split(':');
+    var stable = parts.slice(1).join(':');
+    return STARTER_DETAILS[parts[0] + ':' + stable] || '';
+  };
+  function starterProfile(key) { return (PR.packing.STARTER_PROFILES || []).some(function (x) { return x.key === key; }); }
+  function starterKeyValid(key) {
+    if (key === undefined) return true;
+    if (typeof key !== 'string' || key.length > 100) return false;
+    if (key === '') return true;
+    var match = /^([a-z][a-z0-9-]{0,30}):([a-z0-9-]{1,60})$/.exec(key);
+    return !!match && starterProfile(match[1]) && (match[2] === 'custom' || (STARTER_CATALOGS[match[1]] || []).some(function (r) { return r[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') === match[2]; }) || match[1] === 'essentials' && PR.packing.build({ scope: 'international', homeCountry: 'US', nights: 9, travelerCount: 1, isInternational: true, isLongTrip: true }).some(function (r) { return starterSlug(r.name) === match[2]; }));
+  }
+  function starterSlug(name) { return String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  PR.packing.starterRows = function (profile, ctx) {
+    var rows = [], mode = ctx && ctx.laundryMode === 'once' ? 'once' : 'none', travelers = Math.max(1, Math.min(8, Math.floor(Number(ctx && ctx.travelerCount) || 1))), nights = Math.max(0, Math.min(365, Math.floor(Number(ctx && ctx.nights) || 0))), catalog, i, r, qty;
+    if (profile === 'essentials') {
+      rows = PR.packing.build(ctx || {});
+      return rows.map(function (row) { var out = Object.assign({}, row); out.starterKey = 'essentials:' + starterSlug(row.name); if (out.laundryKey) out.quantity = PR.packing.laundryQuantity(out.laundryKey, mode, nights, travelers); return out; });
+    }
+    catalog = STARTER_CATALOGS[profile];
+    if (!catalog) return [];
+    for (i = 0; i < catalog.length; i++) {
+      r = catalog[i]; qty = r[2];
+      if (profile === 'italy-autumn') {
+        if (r[4]) qty = PR.packing.laundryQuantity(r[4], mode, nights, travelers);
+        else if (r[0] === 'Smart dinner top' || r[0] === 'Stretch walking trousers' || r[0] === 'Merino sweater or fleece' || r[0] === 'Packable rain jackets' || r[0] === 'Walking shoes (pairs)' || r[0] === 'Swimwear' || r[0] === 'Spa sandals (pairs)' || r[0] === 'Light scarf or beanie' || r[0] === 'Lightweight insulated jacket') qty *= travelers;
+      }
+      rows.push({ name: r[0], category: r[1], quantity: Math.max(1, Math.min(99, qty)), isOptional: r[3], laundryKey: r[4] || '', starterKey: profile + ':' + starterSlug(r[0]), notes: '' });
+    }
+    return rows;
+  };
+  function starterAliases(profile, row) {
+    var catalog = STARTER_CATALOGS[profile] || [], i;
+    for (i = 0; i < catalog.length; i++) if (catalog[i][0] === row.name) return [row.name].concat(catalog[i][5] ? catalog[i][5].split('|') : []);
+    var essentialsAliases = {
+      'Underwear': ['Underwear'], 'Socks': ['Socks', 'Socks (pairs)'], 'Shirts / tops': ['Shirts / tops', 'Short-sleeve tees'],
+      'Trousers / shorts': ['Trousers / shorts', 'Trousers / everyday bottoms', 'Versatile chinos / trousers'], 'Sleepwear': ['Sleepwear', 'Sleepwear (sets)'],
+      'Comfortable walking shoes': ['Comfortable walking shoes', 'Walking shoes (pairs)'], 'Warm layer or jacket': ['Warm layer or jacket', 'Warm midlayer or jacket', 'Merino sweater or fleece'],
+      'Rain shell or umbrella': ['Rain shell or umbrella', 'Packable rain jackets'], 'One smart outfit': ['One smart outfit', 'Dinner outfit (sets)', 'Smart dinner top'],
+      'Toothbrush and toothpaste': ['Toothbrush and toothpaste', 'Toothbrush/toothpaste', 'Toothbrushes'], 'Deodorant': ['Deodorant'], 'Shampoo and body wash': ['Shampoo and body wash', 'Shampoo/body wash', 'Personal shower products (kits)'],
+      'Razor and shaving kit': ['Razor and shaving kit', 'Razor/shaving kit', 'Shaving supplies (kits)'], 'Sunscreen': ['Sunscreen'], 'Lip balm': ['Lip balm'],
+      'Insect repellent': ['Insect repellent'], 'Laundry detergent sheets': ['Laundry detergent sheets'],
+      'Power bank': ['Power bank'], 'Headphones': ['Headphones'], 'Phone charger': ['Phone charger', 'Phone charging plugs'], 'Universal power adapter': ['Universal power adapter', 'Universal adapter', 'Italy-compatible plug adapters'],
+      'Camera and spare cards': ['Camera and spare cards', 'Camera/spare cards'], 'Charging cables': ['Charging cables'], 'Passport': ['Passport'], 'Photo ID': ['Photo ID'],
+      'Boarding passes': ['Boarding passes'], 'Lodging confirmations': ['Lodging confirmations'], 'Travel insurance details': ['Travel insurance details'],
+      'Copies of passport and cards': ['Copies of passport and cards', 'Copies of passport/cards', 'Backup travel documents'], 'Local currency': ['Local currency', 'Payment cards'], 'Prescription medication': ['Prescription medication', 'Personal prescriptions (if used)'],
+      'Pain reliever': ['Pain reliever', 'Usual personal health supplies'], 'Plasters and blister pads': ['Plasters and blister pads', 'Plasters/blister pads', 'Plasters / blister pads', 'Blister pads and small first aid'], 'Motion sickness tablets': ['Motion sickness tablets'],
+      'Hand sanitiser': ['Hand sanitiser', 'Hand sanitizer'], 'Daypack': ['Daypack', 'Day bags'], 'Reusable water bottle': ['Reusable water bottle', 'Reusable water bottles'], 'Packing cubes': ['Packing cubes', 'Packing cubes (sets)'],
+      'Laundry bag': ['Laundry bag'], 'Eye mask and earplugs': ['Eye mask and earplugs', 'Eye mask/earplugs', 'Eye masks and earplugs (sets)'], 'Travel pillow': ['Travel pillow'],
+      'Smart dinner top': ['One smart outfit', 'Dinner outfit (sets)'], 'Versatile chinos / trousers': ['Trousers / everyday bottoms', 'Trousers / shorts']
+    };
+    return essentialsAliases[row.name] || [row.name];
+  }
+  PR.packing.previewStarter = function (doc, profile, ctx) {
+    if (!starterProfile(profile)) return { ok: false, code: 'invalid-starter-profile' };
+    var mode = doc && doc.packing && doc.packing.laundryMode === 'once' ? 'once' : (ctx && ctx.laundryMode === 'once' ? 'once' : 'none');
+    var scale = packingPlanScale(doc, ctx && ctx.nights), nights = scale.nights, travelers = scale.travelerCount;
+    var rows = PR.packing.starterRows(profile, Object.assign({}, ctx || {}, { nights: nights, travelerCount: travelers, laundryMode: mode }));
+    var items = (doc && doc.packing && doc.packing.items) || {}, used = {}, out = [], added = 0, updated = 0, kept = 0;
+    rows.forEach(function (suggested) {
+      var aliases = starterAliases(profile, suggested), ids = Object.keys(items), found = null, id, item, i, exact, crossHold = false;
+      for (i = 0; i < ids.length; i++) {
+        id = ids[i]; item = items[id];
+        if (!item || used[id]) continue;
+        if (item.starterKey === suggested.starterKey) { found = item; break; }
+      }
+      if (!found) for (i = 0; i < ids.length; i++) {
+        id = ids[i]; item = items[id];
+        if (!item || used[id]) continue;
+        exact = aliases.some(function (a) { return String(item.name || '').toLowerCase() === a.toLowerCase(); });
+        if (!exact) continue;
+        var existingProfile = typeof item.starterKey === 'string' && item.starterKey ? item.starterKey.split(':')[0] : '';
+        if (existingProfile && existingProfile !== profile) {
+          if (profile === 'italy-autumn' && existingProfile === 'essentials') { /* refine a travel clothing row */ }
+          else if (profile === 'essentials' && existingProfile === 'italy-autumn') crossHold = true;
+          else continue;
+        }
+        if (profile === 'italy-autumn' && String(item.name || '').toLowerCase() !== suggested.name.toLowerCase()
+            && !(item.fromTemplate === true || PR.packing.laundryKey(item) || existingProfile === 'essentials')) continue;
+        found = item; break;
+      }
+      var result = Object.assign({}, suggested), action = 'add';
+      if (found) {
+        used[found.id] = true; result.id = found.id;
+        var adopted = profile === 'italy-autumn' && found.starterKey !== suggested.starterKey && !crossHold
+          && (found.fromTemplate === true || !!PR.packing.laundryKey(found) || !!(found.starterKey && found.starterKey.split(':')[0] === 'essentials'));
+        if (crossHold) {
+          result = Object.assign({}, found); result.id = found.id;
+          action = 'keep'; kept++;
+          result.action = action; out.push(result); return;
+        }
+        if (adopted) {
+          result.name = suggested.name; result.category = suggested.category;
+          result.quantity = found.laundryKey === '' && Object.prototype.hasOwnProperty.call(found, 'laundryKey') ? found.quantity
+            : (suggested.laundryKey ? PR.packing.laundryQuantity(suggested.laundryKey, mode, nights, found.owner ? 1 : travelers) : suggested.quantity);
+          result.laundryKey = Object.prototype.hasOwnProperty.call(found, 'laundryKey') && found.laundryKey === '' ? '' : suggested.laundryKey;
+        } else {
+          result.name = found.name; result.category = found.category; result.quantity = found.quantity;
+          result.laundryKey = PR.packing.laundryKey(found);
+        }
+        result.isOptional = !!found.isOptional;
+        result.isPacked = !!found.isPacked; result.notes = typeof found.notes === 'string' ? found.notes : '';
+        result.owner = found.owner || ''; result.itineraryDate = found.itineraryDate || '';
+        result.fromTemplate = !!found.fromTemplate;
+        action = found.starterKey === suggested.starterKey && !adopted ? 'keep' : 'update';
+        if (found.name === result.name && found.category === result.category && found.quantity === result.quantity && found.starterKey === result.starterKey && found.isOptional === result.isOptional && PR.packing.laundryKey(found) === result.laundryKey) action = 'keep';
+        if (action === 'keep') kept++; else updated++;
+      } else { result.isPacked = false; result.owner = ''; result.itineraryDate = ''; result.fromTemplate = false; added++; }
+      result.action = action; out.push(result);
+    });
+    return { ok: true, rows: out, added: added, updated: updated, kept: kept };
+  };
+
   PR.packing.regenerate = function (existingArray, ctx) {
     var current = (existingArray || []).slice();
     var previousByName = {}, i, item, key;
@@ -18374,6 +18606,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         r.itineraryDate = previous.itineraryDate || '';
         r.isOptional = !!previous.isOptional;
         r.laundryKey = PR.packing.laundryKey(previous);
+        if (Object.prototype.hasOwnProperty.call(previous, 'starterKey')) r.starterKey = previous.starterKey;
         if (Object.prototype.hasOwnProperty.call(previous, 'laundryKey') && previous.laundryKey === '') r.quantity = previous.quantity;
         if (previous.notes && String(previous.notes).trim()) r.notes = previous.notes;
       }
@@ -21309,7 +21542,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       if (importedLaundryKey === undefined) importedLaundryKey = pk.fromTemplate === true ? PR.packing.laundryKey({ name: pk.name, fromTemplate: true }) : '';
       var pkRes = validatePackingCore(scratchDoc, {
         name: pk.name, category: pk.category, quantity: qty, owner: owner, notes: pk.notes,
-        itineraryDate: pk.itineraryDate, isOptional: pk.isOptional === true, laundryKey: importedLaundryKey
+        itineraryDate: pk.itineraryDate, isOptional: pk.isOptional === true, laundryKey: importedLaundryKey, starterKey: pk.starterKey
       }, null);
       clipped.packing += qtyC.n;
       if (!pkRes.ok) { dropped.packing++; continue; }
@@ -21320,6 +21553,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         laundryKey: pkRes.fields.laundryKey,
         _t: now, _by: by, _rev: 1
       };
+      if (pkRes.fields.starterKey !== undefined) pkRow.starterKey = pkRes.fields.starterKey;
       mergedPacking[pk.id] = pkRow;
       pathUpdate['packing.items.' + pk.id] = pkRow;
     }
@@ -23695,8 +23929,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     else if (existing) laundryKey = PR.packing.laundryKey(existing);
     else laundryKey = '';
     if (PR.packing.LAUNDRY_KEYS.indexOf(laundryKey) < 0) return { ok: false, code: 'invalid-laundry-key' };
-
-    return { ok: true, fields: { name: name, category: category, quantity: quantity, owner: owner, notes: notes, itineraryDate: itineraryDate, isOptional: isOptional, laundryKey: laundryKey } };
+    var starterKey;
+    if (p.starterKey !== undefined) starterKey = p.starterKey;
+    else if (existing && Object.prototype.hasOwnProperty.call(existing, 'starterKey')) starterKey = existing.starterKey;
+    if (!starterKeyValid(starterKey)) return { ok: false, code: 'invalid-starter-key' };
+    var fields = { name: name, category: category, quantity: quantity, owner: owner, notes: notes, itineraryDate: itineraryDate, isOptional: isOptional, laundryKey: laundryKey };
+    if (starterKey !== undefined) fields.starterKey = starterKey;
+    return { ok: true, fields: fields };
   }
 
   PR.reduce.packing.add = function (doc, p) {
@@ -23714,6 +23953,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       notes: v.fields.notes, owner: v.fields.owner, itineraryDate: v.fields.itineraryDate, isOptional: v.fields.isOptional, laundryKey: v.fields.laundryKey,
       fromTemplate: false, _t: now, _by: by, _rev: 1
     };
+    if (v.fields.starterKey !== undefined) update['packing.items.' + id].starterKey = v.fields.starterKey;
     update.updatedAt = now;
     update.updatedBy = by;
     return { ok: true, update: update };
@@ -23794,6 +24034,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     });
     return { nights: nights, travelerCount: Math.max(1, Math.min(8, travelerCount)) };
   }
+  PR.packing.scale = function (doc, fallbackNights) { return packingPlanScale(doc, fallbackNights); };
 
   PR.reduce.packing.setLaundry = function (doc, p) {
     var by = p.by, now = p.now, mode = p.mode;
@@ -23823,6 +24064,58 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     update.updatedAt = now;
     update.updatedBy = by;
     return { ok: true, update: update, changed: changed };
+  };
+
+  PR.reduce.packing.applyStarter = function (doc, p) {
+    var by = p.by, now = p.now, profile = p.profile, ctx = p.ctx || {};
+    if (!PR.roleOf(doc, by)) return { ok: false, code: 'not-a-member' };
+    if (!PR.canEdit(doc, by)) return { ok: false, code: 'not-editor' };
+    if (!starterProfile(profile)) return { ok: false, code: 'invalid-starter-profile' };
+    var preview = PR.packing.previewStarter(doc, profile, ctx);
+    if (!preview.ok) return preview;
+    var items = (doc.packing && doc.packing.items) || {}, update = {}, ids = p.ids || [], stagedIds = {}, idx = 0, added = 0, updated = 0, i, row, id, old, full, changed, oldProfile = doc.packing && doc.packing.defaultList;
+    for (i = 0; i < preview.rows.length; i++) {
+      row = preview.rows[i];
+      if (row.action === 'keep') continue;
+      if (row.action === 'add') {
+        id = ids[idx++];
+        if (!id || items[id] || stagedIds[id]) return { ok: false, code: 'duplicate-id' };
+        stagedIds[id] = true;
+        full = { id: id, name: row.name, category: row.category, quantity: row.quantity, isPacked: false, notes: '', owner: '', itineraryDate: '', isOptional: !!row.isOptional, fromTemplate: false, laundryKey: row.laundryKey || '', starterKey: row.starterKey, _t: now, _by: by, _rev: 1 };
+        update['packing.items.' + id] = full; added++;
+        continue;
+      }
+      old = items[row.id];
+      if (!old) return { ok: false, code: 'unknown-item' };
+      changed = old.name !== row.name || old.category !== row.category || old.quantity !== row.quantity || old.starterKey !== row.starterKey || old.isOptional !== row.isOptional || (old.laundryKey || '') !== (row.laundryKey || '');
+      if (!changed) continue;
+      full = {};
+      Object.keys(old).forEach(function (k) { full[k] = old[k]; });
+      full.name = row.name; full.category = row.category; full.quantity = row.quantity; full.starterKey = row.starterKey;
+      full.laundryKey = row.laundryKey || ''; full.isOptional = !!row.isOptional;
+      full._t = now; full._by = by; full._rev = (old._rev || 0) + 1;
+      update['packing.items.' + row.id] = full; updated++;
+    }
+    /* Tag matching generic seed rows as Travel basics when a wedding kit is
+       selected. This classifies the existing checklist without adding or
+       changing its values, and keeps those rows available in their list. */
+    if (profile === 'wedding-planning' || profile === 'wedding-day') {
+      var essentials = PR.packing.starterRows('essentials', ctx), allIds = Object.keys(items);
+      for (i = 0; i < essentials.length; i++) {
+        row = essentials[i];
+        for (var j = 0; j < allIds.length; j++) {
+          id = allIds[j]; old = items[id];
+          if (!old || !old.fromTemplate || old.starterKey || !starterAliases('essentials', row).some(function (a) { return String(old.name || '').toLowerCase() === a.toLowerCase(); })) continue;
+          full = {}; Object.keys(old).forEach(function (k) { full[k] = old[k]; }); full.starterKey = row.starterKey; full._t = now; full._by = by; full._rev = (old._rev || 0) + 1;
+          update['packing.items.' + id] = full;
+        }
+      }
+    }
+    if (Object.keys(items).length + added > PR.CAPS.packing) return { ok: false, code: 'cap-reached' };
+    if (oldProfile !== profile) update['packing.defaultList'] = profile;
+    if (!Object.keys(update).length) return { ok: true, unchanged: true, added: added, updated: updated, kept: preview.kept };
+    update.updatedAt = now; update.updatedBy = by;
+    return { ok: true, update: update, added: added, updated: updated, kept: preview.kept };
   };
 
   PR.reduce.packing.seed = function (doc, p) {
@@ -23860,11 +24153,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         notes: row.notes || '', owner: row.owner || '', itineraryDate: row.itineraryDate || '', isOptional: !!row.isOptional,
         fromTemplate: !!row.fromTemplate, laundryKey: PR.packing.laundryKey(row)
       };
+      if (Object.prototype.hasOwnProperty.call(row, 'starterKey')) full.starterKey = row.starterKey;
       if (prevRow) {
         sameShape = prevRow.name === full.name && prevRow.category === full.category && prevRow.quantity === full.quantity
           && prevRow.isPacked === full.isPacked && prevRow.notes === full.notes && prevRow.owner === full.owner
           && (prevRow.itineraryDate || '') === full.itineraryDate && !!prevRow.isOptional === full.isOptional
-          && prevRow.fromTemplate === full.fromTemplate && PR.packing.laundryKey(prevRow) === full.laundryKey;
+          && prevRow.fromTemplate === full.fromTemplate && PR.packing.laundryKey(prevRow) === full.laundryKey
+          && prevRow.starterKey === full.starterKey;
         if (sameShape) continue;
         full._t = now; full._by = by; full._rev = (prevRow._rev || 0) + 1;
         update['packing.items.' + id] = full;
@@ -25199,6 +25494,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     if (f.itineraryDate !== undefined) args.itineraryDate = f.itineraryDate;
     if (f.isOptional !== undefined) args.isOptional = f.isOptional;
     if (f.laundryKey !== undefined) args.laundryKey = f.laundryKey;
+    if (f.starterKey !== undefined) args.starterKey = f.starterKey;
     return runPlanOp(tripId, PR.reduce.packing.add, args).then(function (res) {
       if (res.ok) res.id = id;
       return res;
@@ -25214,11 +25510,20 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     if (p.itineraryDate !== undefined) args.itineraryDate = p.itineraryDate;
     if (p.isOptional !== undefined) args.isOptional = p.isOptional;
     if (p.laundryKey !== undefined) args.laundryKey = p.laundryKey;
+    if (p.starterKey !== undefined) args.starterKey = p.starterKey;
     return runPlanOp(tripId, PR.reduce.packing.edit, args);
   };
   PR.packing.setLaundry = function (tripId, mode) {
     var ctx = PR.prepare.context(tripId);
     return runPlanOp(tripId, PR.reduce.packing.setLaundry, { mode: mode, nights: ctx && ctx.nights });
+  };
+  PR.packing.applyStarter = function (tripId, profile) {
+    var ctx = PR.prepare.context(tripId), current = PR.get(tripId), plan = current && current.plan || {}, scale = PR.packing.scale(plan, ctx && ctx.nights);
+    ctx = Object.assign({}, ctx || {}, { nights: scale.nights, travelerCount: scale.travelerCount, laundryMode: plan.packing && plan.packing.laundryMode });
+    var preview = PR.packing.previewStarter(plan, profile, ctx), ids = [], i;
+    if (!preview.ok) return Promise.resolve(preview);
+    for (i = 0; i < preview.added; i++) ids.push(U.uid('pk'));
+    return runPlanOp(tripId, PR.reduce.packing.applyStarter, { profile: profile, ctx: ctx, ids: ids });
   };
   PR.packing.remove = function (tripId, id) {
     return runPlanOp(tripId, PR.reduce.packing.remove, { id: id });
@@ -26837,7 +27142,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       if (target) {
         if (target.id !== match[2]) return { ok: false, code: 'imported-batch' };
         var allowed = match[1] === 'checklist' ? 'id title category isDone notes dueOffsetDays completedBy completedAt fromTemplate requirement linkRoute importSource _t _by _rev'
-          : match[1] === 'packing' ? 'id name category quantity isPacked notes owner itineraryDate isOptional laundryKey fromTemplate _t _by _rev'
+          : match[1] === 'packing' ? 'id name category quantity isPacked notes owner itineraryDate isOptional laundryKey starterKey fromTemplate _t _by _rev'
           : 'id title kind date startTime endTime endDate location notes confirmation createdBy _t _by _rev';
         if (Object.keys(target).some(function (k) { return allowed.split(' ').indexOf(k) < 0; })) return { ok: false, code: 'imported-batch' };
         var valid = match[1] === 'checklist' ? validateChecklistCore(target, null) : match[1] === 'packing' ? validatePackingCore(working, target, null) : validateItineraryCore(target, null);
@@ -46734,7 +47039,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   function packingSession(tripId) {
     var s = packingFilterSessions[tripId];
     if (!s) s = packingFilterSessions[tripId] = { search: '', category: '', state: 'all' };
-    ['owner', 'day', 'quickName', 'message'].forEach(function (key) { if (s[key] == null) s[key] = ''; });
+    ['owner', 'day', 'quickName', 'message', 'collection'].forEach(function (key) { if (s[key] == null) s[key] = ''; });
     return s;
   }
   function focusPackingControl(key) {
@@ -46750,6 +47055,64 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   function packingManagedKey(item) {
     return PR.packing.laundryKey ? PR.packing.laundryKey(item) : '';
   }
+  function packingCollection(item) { return String(item.starterKey || '').split(':')[0]; }
+  function packingGuidance(item) { return PR.packing.starterDetails ? PR.packing.starterDetails(item) : ''; }
+  function openPackingStarters(tripId, doc, ctx, session, travelers) {
+    var body = U.el('div', { class: 'packstarter' });
+    body.appendChild(U.el('p', { class: 'packstarter__intro', text: 'Choose what this list is for. Travel supplies, wedding planning and the wedding day are separate starters; you can use more than one.' }));
+    var profiles = PR.packing.STARTER_PROFILES || [], selected = '', preview = null;
+    var cards = U.el('div', { class: 'packstarter__choices', role: 'group', 'aria-label': 'Starter list purpose' });
+    var previewHost = U.el('div', { class: 'packstarter__preview' });
+    var status = U.el('p', { class: 'packstarter__status', role: 'status', 'aria-live': 'polite' });
+    var footer = U.el('div', { class: 'packstarter__footer' });
+    var cancel = U.el('button', { class: 'btn', type: 'button', text: 'Cancel' });
+    var apply = U.el('button', { class: 'btn btn--primary', type: 'button', text: 'Choose a starter', disabled: true });
+    function renderPreview(profile) {
+      selected = profile.key; U.qsa('button', cards).forEach(function (button) { button.setAttribute('aria-pressed', String(button.dataset.profile === selected)); });
+      preview = PR.packing.previewStarter(doc, selected, ctx); U.clear(previewHost);
+      if (!preview || !preview.ok) { U.setText(status, 'This starter is unavailable.'); apply.disabled = true; return; }
+      previewHost.appendChild(U.el('h3', { text: profile.title }));
+      var wardrobe = selected === 'italy-autumn';
+      previewHost.appendChild(U.el('p', { class: 'packstarter__hint', text: wardrobe ? 'A suggested capsule for Bressanone and Venice in October. Navy, charcoal, cream and olive mix easily. Counts include what you wear in transit and are totals for ' + travelers + ' travelers.' : 'Add only the items that fit your plan. Digital documents count too. Existing personal notes, quantities and packed status stay yours.' }));
+      var table = U.el('table', { class: 'packstarter__table' }), thead = U.el('thead'), tr = U.el('tr');
+      ['Item', wardrobe ? 'No laundry' : 'Total qty'].concat(wardrobe ? ['One wash'] : []).forEach(function (name) { tr.appendChild(U.el('th', { scope: 'col', text: name })); }); thead.appendChild(tr); table.appendChild(thead);
+      var tbody = U.el('tbody');
+      (preview.rows || []).forEach(function (row) {
+        var line = U.el('tr'), description = U.el('td');
+        description.appendChild(U.el('strong', { text: row.name }));
+        description.appendChild(U.el('span', { class: 'packstarter__tag', text: (row.action === 'add' ? 'New' : row.action === 'update' ? 'Refine existing' : 'Already here') + (row.isOptional ? ' Â· Optional' : '') }));
+        if (row.owner) description.appendChild(U.el('p', { text: 'Quantity for ' + ((doc.members && doc.members[row.owner] && doc.members[row.owner].label) || 'assigned traveler') + ' only.' }));
+        var detail = packingGuidance(row) || row.notes; if (detail) description.appendChild(U.el('p', { text: detail }));
+        line.appendChild(description);
+        var key = packingManagedKey(row), people = row.owner ? 1 : travelers;
+        ['none'].concat(wardrobe ? ['once'] : []).forEach(function (mode) { var quantity = wardrobe && key ? PR.packing.laundryQuantity(key, mode, Number(ctx.nights) || 0, people) : row.quantity; line.appendChild(U.el('td', { text: String(quantity || 1) })); });
+        tbody.appendChild(line);
+      }); table.appendChild(tbody); previewHost.appendChild(table);
+      if (wardrobe) {
+        var sources = U.el('p', { class: 'packstarter__hint', text: 'Layering context: ' });
+        sources.appendChild(U.el('a', { href: 'https://www.suedtirol.info/en/en/seasons/autumn', target: '_blank', rel: 'noopener', text: 'South Tyrol in autumn' })); previewHost.appendChild(sources);
+      }
+      U.setText(status, preview.added + ' new Â· ' + preview.updated + ' to refine Â· ' + preview.kept + ' already in your list. Nothing is removed.');
+      U.setText(apply, 'Use ' + profile.title); apply.disabled = false;
+    }
+    profiles.forEach(function (profile) {
+      var card = U.el('button', { class: 'packstarter__choice', type: 'button', dataset: { profile: profile.key }, 'aria-pressed': 'false' });
+      card.appendChild(U.el('strong', { text: profile.title })); card.appendChild(U.el('span', { text: profile.description }));
+      card.addEventListener('click', function () { renderPreview(profile); }); cards.appendChild(card);
+    });
+    cancel.addEventListener('click', function () { T.modal.close(); focusPackingControl('pack-starters'); });
+    apply.addEventListener('click', function () {
+      if (!selected) return; apply.disabled = true; cancel.disabled = true; U.qsa('button', cards).forEach(function (button) { button.disabled = true; }); U.setText(status, 'Saving this starterâ€¦');
+      callPacking('applyStarter', [tripId, selected]).then(function (result) {
+        if (!result || !result.ok) { apply.disabled = false; cancel.disabled = false; U.qsa('button', cards).forEach(function (button) { button.disabled = false; }); setPrepareStatus(status, result && result.code); return; }
+        session.collection = selected; session.category = ''; session.search = ''; session.owner = ''; session.day = ''; session.state = 'all';
+        session.message = 'Starter saved. ' + (result.added || 0) + ' items added; ' + (result.updated || 0) + ' refined. Your other lists are still available under List.';
+        T.modal.close(); repaintNow(); focusPackingControl('pack-collection');
+      }).catch(function () { apply.disabled = false; cancel.disabled = false; U.qsa('button', cards).forEach(function (button) { button.disabled = false; }); U.setText(status, 'Could not save. Please try again.'); });
+    });
+    body.appendChild(cards); body.appendChild(previewHost); body.appendChild(status); footer.appendChild(cancel); footer.appendChild(apply); body.appendChild(footer);
+    var box = T.modal.open({ title: 'Starter lists', body: body }); if (box) box.classList.add('packstarter-modal');
+  }
   function buildPackingDrawer(tripId, members, statusLine, days, routeDay, ctx, session, travelerCount, mode) {
     function open(item, defaults) {
       defaults = defaults || {};
@@ -46757,6 +47120,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       var returnKey = editing ? 'pack-edit-' + item.id : 'pack-quick';
       var lead = U.el('p', { class: 'packedit__intro', text: 'Start with a name. Add as much detail as you need.' });
       form.appendChild(lead);
+      var starterAdvice = packingGuidance(original);
+      if (starterAdvice) form.appendChild(U.el('p', { class: 'packedit__suggestion', text: 'Starter suggestion: ' + starterAdvice }));
       function field(label, input, wide) {
         var row = U.el('div', { class: 'packedit__field' + (wide ? ' packedit__field--wide' : '') });
         row.appendChild(U.el('label', { for: input.id, text: label })); row.appendChild(input); return row;
@@ -46785,6 +47150,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       if (selectedDay && !days.some(function (d) { return d.date === selectedDay; })) day.appendChild(U.el('option', { value: selectedDay, text: packingDateLabel(selectedDay) }));
       day.value = selectedDay;
       fields.appendChild(field('Needed for an itinerary day', day));
+      var itemList = U.el('select', { id: 'plan-pack-list', class: 'input' });
+      itemList.appendChild(U.el('option', { value: '', text: 'Other items' }));
+      (PR.packing.STARTER_PROFILES || []).forEach(function (profile) { itemList.appendChild(U.el('option', { value: profile.key, text: profile.title })); });
+      itemList.value = editing ? packingCollection(original) : (session.collection === 'personal' ? '' : session.collection);
+      fields.appendChild(field('List', itemList, true));
       var autoRow = U.el('div', { class: 'packedit__auto packedit__field--wide' });
       var autoLabel = U.el('label', { class: 'packedit__checkline' });
       var auto = U.el('input', { id: 'plan-pack-auto', type: 'checkbox' });
@@ -46795,7 +47165,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       var autoHelp = U.el('p', { class: 'packedit__help', id: 'plan-pack-auto-help' });
       auto.setAttribute('aria-describedby', 'plan-pack-auto-help'); autoRow.appendChild(autoHelp); fields.appendChild(autoRow);
       function currentKey() {
-        if (category.value !== 'clothing') return '';
+        if (category.value !== 'clothing' || itemList.value.indexOf('wedding-') === 0) return '';
         return originalKey || packingManagedKey({ name: name.value.trim(), category: 'clothing', fromTemplate: true });
       }
       function syncQuantity() {
@@ -46804,7 +47174,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         if (qty.disabled && PR.packing.laundryQuantity) qty.value = String(PR.packing.laundryQuantity(key, mode, Number(ctx.nights) || 0, owner.value ? 1 : travelerCount));
         U.setText(autoHelp, qty.disabled ? (mode === 'once' ? 'One wash' : 'No laundry') + ' Â· ' + qty.value + ' total' + (owner.value ? ' for this traveler.' : ' for ' + travelerCount + ' travelers.') : 'Your quantity stays fixed when you switch laundry plans.');
       }
-      [name, category, owner, auto].forEach(function (input) { input.addEventListener('input', syncQuantity); input.addEventListener('change', syncQuantity); });
+      [name, category, owner, itemList, auto].forEach(function (input) { input.addEventListener('input', syncQuantity); input.addEventListener('change', syncQuantity); });
       syncQuantity();
       var notes = U.el('textarea', { id: 'plan-pack-notes', class: 'textarea', rows: '3', maxlength: '300', placeholder: 'Size, which bag it goes in, or a useful reminderâ€¦' });
       notes.value = original.notes || '';
@@ -46838,7 +47208,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         var cleanName = name.value.trim(), quantity = Number(qty.value);
         if (!cleanName || cleanName.length > 80) { U.setText(error, 'Enter an item name, up to 80 characters.'); name.focus(); return; }
         if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) { U.setText(error, 'Enter a whole quantity from 1 to 99.'); qty.focus(); return; }
-        var payload = { name: cleanName, category: category.value, quantity: quantity, owner: owner.value, notes: notes.value, itineraryDate: day.value, isOptional: optional.checked, laundryKey: auto.checked ? currentKey() : '' };
+        var starterKey = itemList.value === packingCollection(original) ? (original.starterKey || '') : itemList.value ? itemList.value + ':custom' : '';
+        var payload = { name: cleanName, category: category.value, quantity: quantity, owner: owner.value, notes: notes.value, itineraryDate: day.value, isOptional: optional.checked, laundryKey: auto.checked ? currentKey() : '', starterKey: starterKey };
         save.disabled = true; U.setText(error, 'Savingâ€¦');
         callPacking(editing ? 'edit' : 'add', editing ? [tripId, item.id, payload] : [tripId, payload]).then(function (r) {
           if (!r || !r.ok) { save.disabled = false; setPrepareStatus(error, r && r.code, { capN: capsOf().packing, noun: 'items' }); return; }
@@ -46855,13 +47226,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   function buildPackingItem(tripId, item, members, statusLine, drawer, session) {
     var li = U.el('li', { class: 'packdash__item', dataset: { id: item.id, packed: String(!!item.isPacked), optional: String(!!item.isOptional) } });
     var checkLabel = U.el('label', { class: 'packdash__checklabel' });
-    var check = U.el('input', { class: 'packdash__check', type: 'checkbox', 'aria-label': (item.isPacked ? 'Unpack ' : 'Pack ') + item.name, 'data-plan-focus': 'pack-check-' + item.id });
+    var weddingList = session.collection.indexOf('wedding-') === 0;
+    var check = U.el('input', { class: 'packdash__check', type: 'checkbox', 'aria-label': (weddingList ? (item.isPacked ? 'Mark not ready: ' : 'Mark ready: ') : (item.isPacked ? 'Unpack ' : 'Pack ')) + item.name, 'data-plan-focus': 'pack-check-' + item.id });
     check.checked = !!item.isPacked; checkLabel.appendChild(check); li.appendChild(checkLabel);
     check.addEventListener('change', function () {
       var packed = check.checked; check.disabled = true;
       callPacking('toggle', [tripId, item.id, packed]).then(function (r) {
         if (!r || !r.ok) { check.checked = !packed; check.disabled = false; setPrepareStatus(statusLine, r && r.code); return; }
-        session.message = item.name + (packed ? ' packed.' : ' moved back to pack.'); repaintNow(); focusPackingControl('pack-check-' + item.id);
+        session.message = item.name + (packed ? (weddingList ? ' ready.' : ' packed.') : ' marked incomplete.'); repaintNow(); focusPackingControl('pack-check-' + item.id);
       }).catch(function () { check.checked = !packed; check.disabled = false; U.setText(statusLine, 'Could not save. Please try again.'); });
     });
     var open = U.el('button', { type: 'button', class: 'packdash__item-open', 'aria-label': 'Edit ' + item.name, 'data-plan-focus': 'pack-edit-' + item.id });
@@ -46871,6 +47243,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     if (item.isOptional) meta.push('Optional');
     if (packingManagedKey(item)) meta.push('Follows laundry plan');
     if (meta.length) open.appendChild(U.el('span', { class: 'packdash__itemmeta', text: meta.join(' Â· ') }));
+    var guidance = packingGuidance(item);
+    if (guidance) open.appendChild(U.el('span', { class: 'packdash__guidance', text: guidance }));
     if (item.notes) open.appendChild(U.el('span', { class: 'packdash__notepreview', text: item.notes }));
     open.addEventListener('click', function () { drawer.openForEdit(item); }); li.appendChild(open);
     var quantity = U.el('span', { class: 'packdash__quantity', 'aria-label': 'Total quantity ' + (item.quantity || 1), text: String(item.quantity || 1) });
@@ -46883,32 +47257,44 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     ctx = ctx || {};
     var doc = prep.plan || {}, members = PR.members && PR.members.list ? PR.members.list(tripId) : [];
     var travelers = packingTravelers(doc, members), session = packingSession(tripId);
-    var items = (view && view.packing) || callPure(packingApi(), 'ordered', [(doc.packing && doc.packing.items) || {}], []);
-    var mode = doc.packing && doc.packing.laundryMode === 'once' ? 'once' : 'none';
+    if (PR.packing.scale) { var scale = PR.packing.scale(doc, ctx.nights); travelers = scale.travelerCount; ctx = Object.assign({}, ctx, { nights: scale.nights, travelerCount: travelers }); }
+    if (!session.collectionInitialized) { session.collection = doc.packing && doc.packing.defaultList || ''; session.collectionInitialized = true; }
+    var allItems = (view && view.packing) || callPure(packingApi(), 'ordered', [(doc.packing && doc.packing.items) || {}], []);
+    var storedMode = doc.packing && doc.packing.laundryMode === 'once' ? 'once' : 'none';
+    if (session.laundryPending && !session.laundrySaving && doc !== session.laundryBaseDoc && storedMode === session.laundryPending && allItems.every(function (item) { var key = packingManagedKey(item); return !key || item.quantity === PR.packing.laundryQuantity(key, storedMode, Number(ctx.nights) || 0, item.owner ? 1 : travelers); })) session.laundryPending = null;
+    var mode = session.laundryPending || storedMode;
+    if (session.laundryPending) allItems = allItems.map(function (item) { var key = packingManagedKey(item); return key ? Object.assign({}, item, { quantity: PR.packing.laundryQuantity(key, mode, Number(ctx.nights) || 0, item.owner ? 1 : travelers) }) : item; });
+    var items = allItems.filter(function (item) { return !session.collection || (session.collection === 'personal' ? !item.starterKey : packingCollection(item) === session.collection); });
+    var managedCount = items.filter(function (item) { return !!packingManagedKey(item); }).length;
+    var weddingList = session.collection.indexOf('wedding-') === 0;
+    var showLaundry = managedCount > 0 && !!ctx.departure && !!ctx.returnDate && !weddingList;
     var mainItems = items.filter(function (item) { return !item.isOptional; });
     var packed = mainItems.filter(function (item) { return item.isPacked; }).length;
     var optionalN = items.length - mainItems.length;
     var itinerary = itineraryViewOf(tripId), days = itinerary && itinerary.days || [];
     var routeDay = route && route.query && route.query.day || '';
     if (itineraryValidDay(routeDay)) session.day = routeDay;
-    var wrap = U.el('div', { class: 'packdash', dataset: { tripId: tripId } });
+    var wrap = U.el('div', { class: 'packdash', dataset: { tripId: tripId, laundrySaving: String(!!session.laundrySaving) } });
     var statusLine = U.el('p', { class: 'packdash__status', role: 'status', 'aria-live': 'polite', text: session.message });
     var drawer = buildPackingDrawer(tripId, members, statusLine, days, routeDay, ctx, session, travelers, mode);
     var head = U.el('header', { class: 'packdash__head' });
     var title = U.el('div');
     title.appendChild(U.el('p', { class: 'packdash__eyebrow', text: (prep.trip && prep.trip.name) || 'YOUR TRIP' }));
-    title.appendChild(U.el('h1', { class: 'packdash__title', text: 'Packing' }));
-    var scope = (ctx.departure && ctx.returnDate ? dayShort(ctx.departure) + 'â€“' + dayShort(ctx.returnDate) + ' Â· ' : '') + travelers + (travelers === 1 ? ' traveler' : ' travelers');
+    var collectionTitle = session.collection === 'wedding-planning' ? 'Wedding planning kit' : session.collection === 'wedding-day' ? 'Wedding-day kit' : 'Packing';
+    title.appendChild(U.el('h1', { class: 'packdash__title', text: collectionTitle }));
+    var scope = (ctx.departure && ctx.returnDate ? dayShort(ctx.departure) + 'â€“' + dayShort(ctx.returnDate) + ' Â· ' : '') + (weddingList ? 'Shared supplies' : travelers + (travelers === 1 ? ' traveler' : ' travelers'));
     title.appendChild(U.el('p', { class: 'packdash__subtitle', text: scope + ' Â· Quantities are totals for the list.' }));
     head.appendChild(title);
     var links = U.el('div', { class: 'packdash__links' });
+    var starters = U.el('button', { class: 'btn', type: 'button', text: 'Starter lists', 'data-plan-focus': 'pack-starters' });
+    starters.addEventListener('click', function () { openPackingStarters(tripId, doc, ctx, session, travelers); }); links.appendChild(starters);
     links.appendChild(U.el('a', { href: T.router.build('plan', ['prepare'], { tab: 'checklist' }), text: 'Trip checklist â†—' }));
     links.appendChild(U.el('a', { href: T.router.build('plan', ['itinerary']), text: 'Itinerary â†—' }));
     head.appendChild(links); wrap.appendChild(head);
-    var planning = U.el('section', { class: 'packdash__planning', 'aria-label': 'Packing progress and laundry plan' });
+    var planning = U.el('section', { class: 'packdash__planning' + (showLaundry ? '' : ' packdash__planning--simple'), 'aria-label': 'List progress' });
     var progress = U.el('div', { class: 'packdash__progress' });
-    progress.appendChild(U.el('p', { class: 'packdash__progress-title', text: packed + ' / ' + mainItems.length + ' packed' }));
-    progress.appendChild(U.el('progress', { class: 'packdash__progressbar', max: String(Math.max(1, mainItems.length)), value: String(packed), 'aria-label': 'Main list packed' }));
+    progress.appendChild(U.el('p', { class: 'packdash__progress-title', text: packed + ' / ' + mainItems.length + (weddingList ? ' ready' : ' packed') }));
+    progress.appendChild(U.el('progress', { class: 'packdash__progressbar', max: String(Math.max(1, mainItems.length)), value: String(packed), 'aria-label': weddingList ? 'Main list ready' : 'Main list packed' }));
     progress.appendChild(U.el('p', { class: 'packdash__helper', text: optionalN + ' optional items counted separately.' })); planning.appendChild(progress);
     var laundry = U.el('div', { class: 'packdash__laundry' });
     var laundryCopy = U.el('div'); laundryCopy.appendChild(U.el('h2', { text: 'Your laundry plan' }));
@@ -46918,20 +47304,28 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       var button = U.el('button', { type: 'button', text: entry[1], 'aria-pressed': String(mode === entry[0]), 'data-plan-focus': 'pack-laundry-' + entry[0], disabled: !!session.laundrySaving });
       button.addEventListener('click', function () {
         if (mode === entry[0] || session.laundrySaving) return;
-        session.laundrySaving = true; U.qsa('button', laundryButtons).forEach(function (b) { b.disabled = true; }); U.setText(statusLine, 'Updating clothing quantitiesâ€¦');
+        session.laundrySaving = true; session.laundryBaseDoc = doc; session.laundryPending = entry[0]; session.message = 'Quantities updated Â· saving laundry planâ€¦'; repaintNow();
         callPacking('setLaundry', [tripId, entry[0]]).then(function (r) {
           session.laundrySaving = false;
-          if (!r || !r.ok) { U.qsa('button', laundryButtons).forEach(function (b) { b.disabled = false; }); setPrepareStatus(statusLine, r && r.code); return; }
-          session.message = entry[1] + ' selected. Clothing quantities updated.'; repaintNow(); focusPackingControl('pack-laundry-' + entry[0]);
-        }).catch(function () { session.laundrySaving = false; U.qsa('button', laundryButtons).forEach(function (b) { b.disabled = false; }); U.setText(statusLine, 'Could not save the laundry plan. Please try again.'); });
+          if (!r || !r.ok) { session.laundryPending = null; session.message = 'Could not save the laundry plan. Previous quantities restored; please try again.'; repaintNow(); return; }
+          if (r.unchanged) session.laundryPending = null;
+          session.message = entry[1] + ' saved. ' + (r.changed || 0) + ' clothing groups updated.'; repaintNow(); focusPackingControl('pack-laundry-' + entry[0]);
+        }).catch(function () { session.laundrySaving = false; session.laundryPending = null; session.message = 'Could not save the laundry plan. Previous quantities restored; please try again.'; repaintNow(); });
       }); laundryButtons.appendChild(button);
-    }); laundry.appendChild(laundryButtons); planning.appendChild(laundry); wrap.appendChild(planning);
+    }); laundry.appendChild(laundryButtons); if (showLaundry) planning.appendChild(laundry); wrap.appendChild(planning);
     var workspace = U.el('div', { class: 'packdash__workspace' });
     var rail = U.el('nav', { class: 'packdash__rail', 'aria-label': 'Packing categories' });
+    var collectionLabel = U.el('label', { class: 'packdash__rail-title', for: 'pack-collection', text: 'List' }); rail.appendChild(collectionLabel);
+    var collection = U.el('select', { class: 'input packdash__collection', id: 'pack-collection', 'data-plan-focus': 'pack-collection' });
+    collection.appendChild(U.el('option', { value: '', text: 'All items' }));
+    (PR.packing.STARTER_PROFILES || []).forEach(function (profile) { if (session.collection === profile.key || allItems.some(function (item) { return packingCollection(item) === profile.key; })) collection.appendChild(U.el('option', { value: profile.key, text: profile.title })); });
+    if (allItems.some(function (item) { return !item.starterKey; })) collection.appendChild(U.el('option', { value: 'personal', text: 'Other items' }));
+    collection.value = session.collection; collection.addEventListener('change', function () { session.collection = collection.value; session.category = ''; session.search = ''; session.owner = ''; session.day = ''; session.state = 'all'; repaintNow(); focusPackingControl('pack-collection'); }); rail.appendChild(collection);
     rail.appendChild(U.el('p', { class: 'packdash__rail-title', text: 'Categories' }));
     var categoryNav = U.el('div', { class: 'packdash__categories' }), categoryButtons = [];
     [['', 'All categories']].concat(packingCategories().map(function (c) { return [c, PACKING_CATEGORY_WORDS[c] || c]; })).forEach(function (entry) {
       var count = entry[0] ? items.filter(function (i) { return (i.category || 'misc') === entry[0]; }).length : items.length;
+      if (entry[0] && !count) return;
       var button = U.el('button', { type: 'button', class: 'packdash__category-filter', dataset: { category: entry[0] }, 'aria-pressed': String(session.category === entry[0]) });
       button.appendChild(U.el('span', { text: entry[1] })); button.appendChild(U.el('span', { class: 'packdash__category-count', text: String(count) }));
       button.addEventListener('click', function () { session.category = entry[0]; renderRows(); }); categoryButtons.push(button); categoryNav.appendChild(button);
@@ -46939,7 +47333,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     var board = U.el('section', { class: 'packdash__board', 'aria-label': 'Packing list' });
     var statusTabs = U.el('div', { class: 'packdash__statuses', role: 'group', 'aria-label': 'Packing status' }), statusButtons = [];
     function matchesState(item, state) { return state === 'to-pack' ? !item.isPacked && !item.isOptional : state === 'packed' ? !!item.isPacked : state === 'optional' ? !!item.isOptional : true; }
-    [['all', 'All'], ['to-pack', 'To pack'], ['packed', 'Packed'], ['optional', 'Optional']].forEach(function (entry) {
+    [['all', 'All'], ['to-pack', weddingList ? 'To prepare' : 'To pack'], ['packed', weddingList ? 'Ready' : 'Packed'], ['optional', 'Optional']].forEach(function (entry) {
       var count = items.filter(function (item) { return matchesState(item, entry[0]); }).length;
       var button = U.el('button', { type: 'button', dataset: { state: entry[0] }, 'aria-pressed': String(session.state === entry[0]), text: entry[1] + ' ' + count });
       button.addEventListener('click', function () { session.state = entry[0]; renderRows(); }); statusButtons.push(button); statusTabs.appendChild(button);
@@ -46965,7 +47359,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       event.preventDefault(); var defaults = quickDefaults();
       if (!defaults.name) { U.setText(statusLine, 'Enter the item you want to add.'); quickInput.focus(); return; }
       add.disabled = true;
-      callPacking('add', [tripId, { name: defaults.name, category: defaults.category, quantity: 1, owner: defaults.owner, itineraryDate: defaults.day, notes: '', isOptional: false, laundryKey: '' }]).then(function (r) {
+      callPacking('add', [tripId, { name: defaults.name, category: defaults.category, quantity: 1, owner: defaults.owner, itineraryDate: defaults.day, notes: '', isOptional: false, laundryKey: '', starterKey: session.collection && session.collection !== 'personal' ? session.collection + ':custom' : '' }]).then(function (r) {
         if (!r || !r.ok) { add.disabled = false; setPrepareStatus(statusLine, r && r.code); return; }
         session.quickName = ''; session.message = 'Added ' + defaults.name + '.'; repaintNow(); focusPackingControl('pack-quick');
       }).catch(function () { add.disabled = false; U.setText(statusLine, 'Could not add the item. Please try again.'); });
@@ -47007,8 +47401,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         empty.appendChild(U.el('h2', { text: items.length ? 'Nothing here yet' : 'Start with what you need' }));
         empty.appendChild(U.el('p', { text: items.length ? 'Try another category or clear the filters.' : 'Add your first item above, or use a starter list and make it your own.' }));
         if (!items.length) {
-          var seed = U.el('button', { class: 'btn', type: 'button', text: 'Use a starter list' });
-          seed.addEventListener('click', function () { seed.disabled = true; callPacking('seed', [tripId]).then(function (r) { if (!r || !r.ok) { seed.disabled = false; setPrepareStatus(statusLine, r && r.code); return; } session.message = 'Starter items added. Review quantities and optional items for your trip.'; repaintNow(); }); }); empty.appendChild(seed);
+          var seed = U.el('button', { class: 'btn', type: 'button', text: 'Choose a starter list' });
+          seed.addEventListener('click', function () { openPackingStarters(tripId, doc, ctx, session, travelers); }); empty.appendChild(seed);
         } listHost.appendChild(empty);
       }
     }
