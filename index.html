@@ -12946,32 +12946,34 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 /* END plan-polish-itinerary */
 
 /* BEGIN plan-polish-packing */
-.packdash { display: grid; gap: var(--s5); min-width: 0; }
+.packdash { display: grid; grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr); gap: var(--s4); min-width: 0; align-items: start; }
 .packdash__hero, .packdash__progress, .packdash__add, .packdash__list {
   min-width: 0; padding: var(--s5); border: var(--hair) solid var(--line);
   border-radius: calc(var(--radius-lg) * 2); background: var(--surface);
 }
-.packdash__hero { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s5); background: var(--surface-alt); }
+.packdash__hero { grid-column: 1 / -1; display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s5); background: var(--surface-alt); }
 .packdash__hero-copy { min-width: 0; }
 .packdash__hero-copy > :last-child { margin-bottom: 0; }
 .packdash__hero-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--s2); }
-.packdash__progress { display: grid; grid-template-columns: minmax(0, 1fr) minmax(150px, 0.7fr); align-items: center; gap: var(--s4); }
+.packdash__progress { display: grid; grid-column: 1; align-content: center; gap: var(--s3); min-height: 100%; }
 .packdash__progresscopy { display: grid; gap: var(--s1); }
 .packdash__progresscopy > p { margin: 0; }
-.packdash__progressbar { width: 100%; height: 0.7rem; accent-color: var(--accent); }
+.packdash__progressbar { width: 100%; height: 0.75rem; accent-color: var(--accent); }
 .packdash__addhead, .packdash__listhead, .packdash__category-head, .packdash__itemtop, .packdash__form-actions {
   display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
 }
-.packdash__addhead, .packdash__listhead { flex-wrap: wrap; margin-bottom: var(--s4); }
+.packdash__add { grid-column: 2; }
+.packdash__addhead, .packdash__listhead { flex-wrap: wrap; margin-bottom: var(--s3); }
 .packdash__addhead > *, .packdash__listhead > * { margin-top: 0; margin-bottom: 0; }
 .packdash__seed { flex: 0 0 auto; }
-.packdash__add-form { display: grid; gap: var(--s3); max-width: 900px; }
+.packdash__add-form { display: grid; gap: var(--s2); }
 .packdash__quick { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--s2) var(--s3); }
 .packdash__quick > .sync__label { grid-column: 1 / -1; }
-.packdash__quick .input { min-width: 0; width: 100%; min-height: var(--tap-min); }
-.packdash__advanced { border-top: var(--hair) solid var(--line); padding-top: var(--s3); }
+.packdash__quick .input { min-width: 0; width: 100%; min-height: 48px; }
+.packdash__quick .btn { min-height: 48px; padding-inline: var(--s4); }
+.packdash__advanced { border-top: var(--hair) solid var(--line); margin-top: var(--s2); padding-top: var(--s2); }
 .packdash__advanced > summary { min-height: var(--tap-min); display: flex; align-items: center; width: fit-content; color: var(--accent); cursor: pointer; font-size: var(--text-sm); font-weight: var(--weight-medium); }
-.packdash__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); padding: var(--s3) 0 var(--s2); }
+.packdash__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); padding: var(--s2) 0; }
 .packdash__fields .sync__field { min-width: 0; margin: 0; }
 .packdash__fields .input, .packdash__fields .textarea { width: 100%; min-width: 0; }
 .packdash__notesfield { grid-column: 1 / -1; }
@@ -12979,35 +12981,44 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .packdash__optional input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
 .packdash__form-actions { justify-content: flex-start; }
 .packdash__status:empty { display: none; }
-.packdash__listhead { align-items: baseline; }
+.packdash__list { grid-column: 1 / -1; }
+.packdash__listhead { align-items: center; }
 .packdash__listhead .packdash__resultcount { margin-left: auto; }
 .packdash__resultcount { color: var(--ink-faint); font-size: var(--text-xs); }
-.packdash__filters { display: grid; grid-template-columns: minmax(180px, 1.5fr) repeat(2, minmax(150px, 0.7fr)); gap: var(--s2); margin-bottom: var(--s4); }
+.packdash__filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, .42fr); gap: var(--s2); margin-bottom: var(--s2); }
 .packdash__filters > * { min-width: 0; width: 100%; min-height: var(--tap-min); }
-.packdash__groups { display: grid; gap: var(--s4); }
-.packdash__category { min-width: 0; padding: var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-lg); background: var(--surface-alt); }
-.packdash__category-head { justify-content: flex-start; margin-bottom: var(--s3); }
+.packdash__category-filters { display: flex; flex-wrap: wrap; gap: var(--s1); margin: 0 0 var(--s4); padding-bottom: var(--s3); border-bottom: var(--hair) solid var(--line); }
+.packdash__category-filter { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); min-height: 40px; padding: 0 var(--s3); border: var(--hair) solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink-muted); cursor: pointer; font: inherit; font-size: var(--text-xs); white-space: nowrap; transition: background-color .16s ease, border-color .16s ease, color .16s ease; }
+.packdash__category-filter:hover { border-color: var(--line-strong); color: var(--ink); }
+.packdash__category-filter[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--surface); }
+.packdash__category-filter-count { font-size: var(--text-2xs); font-variant-numeric: tabular-nums; opacity: .78; }
+.packdash__groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: var(--s3); }
+.packdash__category { min-width: 0; padding: var(--s3) var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-lg); background: var(--surface-alt); }
+.packdash__category-head { justify-content: flex-start; margin-bottom: var(--s2); padding-bottom: var(--s2); border-bottom: var(--hair) solid var(--line); }
 .packdash__category-head > * { margin: 0; }
-.packdash__category-count { display: inline-grid; place-items: center; min-width: 1.75rem; height: 1.75rem; padding: 0 var(--s1); border: var(--hair) solid var(--line); border-radius: 999px; color: var(--ink-muted); font-size: var(--text-xs); }
-.packdash__items, .itin-board__packing-list { display: grid; gap: var(--s2); margin: 0; padding: 0; list-style: none; }
-.packdash__item { display: grid; gap: var(--s2); min-width: 0; padding: var(--s3) var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
-.packdash__item[data-packed="true"] { background: var(--surface-alt); }
-.packdash__itemtop { flex-wrap: wrap; justify-content: flex-start; }
+.packdash__category-count { display: inline-grid; place-items: center; min-width: 1.55rem; height: 1.55rem; padding: 0 var(--s1); border-radius: 999px; background: var(--surface); color: var(--ink-muted); font-size: var(--text-2xs); font-variant-numeric: tabular-nums; }
+.packdash__items, .itin-board__packing-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.packdash__item { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "top actions" "day actions" "details actions"; align-items: center; gap: 0 var(--s2); min-width: 0; padding: var(--s2) 0; border-bottom: var(--hair) solid var(--line); background: transparent; }
+.packdash__item:last-child { border-bottom: 0; }
+.packdash__item[data-packed="true"] { background: transparent; }
+.packdash__itemtop { grid-area: top; flex-wrap: wrap; justify-content: flex-start; }
 .packdash__checklabel { display: flex; align-items: center; gap: var(--s3); min-height: var(--tap-min); min-width: 0; flex: 1 1 240px; cursor: pointer; }
 .packdash__check { width: 1.15rem; height: 1.15rem; flex: 0 0 auto; accent-color: var(--accent); }
 .packdash__itemname { min-width: 0; color: var(--ink); font-weight: var(--weight-medium); overflow-wrap: anywhere; }
 .packdash__item[data-packed="true"] .packdash__itemname { color: var(--ink-faint); text-decoration: line-through; text-decoration-thickness: 1px; }
 .packdash__badges { display: flex; flex-wrap: wrap; gap: var(--s1); }
-.packdash__badge { display: inline-flex; align-items: center; min-height: 1.7rem; padding: 0 var(--s2); border: var(--hair) solid var(--line); border-radius: 999px; color: var(--ink-muted); font-size: var(--text-xs); }
-.packdash__badge--optional { border-color: var(--line-strong); color: var(--accent); }
-.packdash__daylink { width: fit-content; color: var(--accent); font-size: var(--text-sm); text-decoration: none; }
+.packdash__badge { display: inline-flex; align-items: center; min-height: 1.55rem; padding: 0 var(--s2); border-radius: 999px; background: var(--surface); color: var(--ink-muted); font-size: var(--text-2xs); white-space: nowrap; }
+.packdash__badge--optional { border: var(--hair) solid var(--line-strong); color: var(--accent); }
+.packdash__daylink { grid-area: day; width: fit-content; min-height: 30px; display: inline-flex; align-items: center; color: var(--accent); font-size: var(--text-xs); text-decoration: none; }
 .packdash__daylink:hover { text-decoration: underline; text-underline-offset: 0.2em; }
-.packdash__notes { color: var(--ink-muted); font-size: var(--text-sm); }
-.packdash__notes > summary { width: fit-content; min-height: var(--tap-min); display: flex; align-items: center; cursor: pointer; }
-.packdash__notes > p { margin: 0 0 var(--s2); line-height: var(--leading-body); overflow-wrap: anywhere; }
-.packdash__actions { display: flex; flex-wrap: wrap; gap: var(--s1); }
-.packdash__actions .btn { min-height: var(--tap-min); }
-.packdash__empty-filter { margin: 0; padding: var(--s5); border: var(--hair) dashed var(--line-strong); border-radius: var(--radius-lg); color: var(--ink-muted); text-align: center; }
+.packdash__notes { grid-area: details; color: var(--ink-muted); font-size: var(--text-xs); }
+.packdash__notes > summary { width: fit-content; min-height: 30px; display: flex; align-items: center; color: var(--ink-muted); cursor: pointer; }
+.packdash__notes[open] { padding-bottom: var(--s2); }
+.packdash__notes > p { max-width: 62ch; margin: 0 0 var(--s2); line-height: var(--leading-body); overflow-wrap: anywhere; }
+.packdash__actions { grid-area: actions; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0; }
+.packdash__actions .btn { min-height: 40px; padding-inline: var(--s2); font-size: var(--text-xs); }
+.packdash__actions .btn:last-child { color: var(--ink-faint); }
+.packdash__empty-filter { grid-column: 1 / -1; margin: 0; padding: var(--s5); border: var(--hair) dashed var(--line-strong); border-radius: var(--radius-lg); color: var(--ink-muted); text-align: center; }
 .itin-board__packing { display: grid; gap: var(--s3); margin-top: var(--s4); padding: var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-lg); background: var(--surface-alt); }
 .itin-board__packing-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s2); }
 .itin-board__packing-head > * { margin: 0; }
@@ -13019,12 +13030,15 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .itin-board__packing-item[data-packed="true"] .itin-board__packing-name { color: var(--ink-faint); text-decoration: line-through; }
 .itin-board__packing-empty { margin: 0; color: var(--ink-muted); font-size: var(--text-sm); line-height: var(--leading-body); }
 .packdash :focus-visible, .itin-board__packing :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+@media (max-width: 760px) {
+  .packdash { grid-template-columns: 1fr; }
+  .packdash__hero, .packdash__progress, .packdash__add, .packdash__list, .packdash__status { grid-column: 1; }
+  .packdash__groups { grid-template-columns: 1fr; }
+}
 @media (max-width: 700px) {
   .packdash__hero { align-items: flex-start; flex-direction: column; }
   .packdash__hero-actions { justify-content: flex-start; }
-  .packdash__progress { grid-template-columns: 1fr; }
-  .packdash__filters { grid-template-columns: 1fr 1fr; }
-  .packdash__filters input[type="search"] { grid-column: 1 / -1; }
+  .packdash__filters { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 580px) {
   .packdash { gap: var(--s3); }
@@ -13032,13 +13046,13 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   .packdash__quick { grid-template-columns: minmax(0, 1fr); }
   .packdash__quick > .sync__label { grid-column: auto; }
   .packdash__quick .btn { width: 100%; }
-  .packdash__fields, .packdash__filters { grid-template-columns: 1fr; }
-  .packdash__filters input[type="search"] { grid-column: auto; }
+  .packdash__fields { grid-template-columns: 1fr; }
   .packdash__fields input, .packdash__fields select, .packdash__fields textarea, .packdash__filters > * { font-size: 16px; }
   .packdash__category { padding: var(--s3); }
-  .packdash__item { padding: var(--s3); }
   .packdash__listhead { align-items: flex-start; }
   .packdash__listhead .packdash__resultcount { width: 100%; margin-left: 0; }
+  .packdash__item { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "day" "details" "actions"; }
+  .packdash__actions { justify-content: flex-start; margin-left: 2rem; }
 }
 /* END plan-polish-packing */
 /* ==== src/css/90-utilities.css ==== */
@@ -13146,7 +13160,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 (function (T) {
   'use strict';
 
-  T.version = '0.28.12';   // Simplify the home page and header navigation
+  T.version = '0.28.13';   // Make the packing dashboard easier to scan and use
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -45833,15 +45847,15 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   function buildPackingDrawer(tripId, members, statusLine, days, routeDay) {
     var form = U.el('form', { class: 'packdash__add-form', novalidate: true });
     var quick = U.el('div', { class: 'packdash__quick' });
-    var nameInput = U.el('input', { class: 'input sync__input', id: 'plan-pack-name', type: 'text', maxlength: '80', autocomplete: 'off', placeholder: 'e.g. Warm walking layer' });
-    quick.appendChild(U.el('label', { class: 'sync__label', for: 'plan-pack-name', text: 'Add an item' }));
+    var nameInput = U.el('input', { class: 'input sync__input', id: 'plan-pack-name', type: 'text', maxlength: '80', autocomplete: 'off', placeholder: 'e.g. Warm walking layer or travel adapter' });
+    quick.appendChild(U.el('label', { class: 'sync__label', for: 'plan-pack-name', text: 'Item name' }));
     quick.appendChild(nameInput);
     var submitBtn = U.el('button', { type: 'submit', class: 'btn btn--primary', text: 'Add item' });
     quick.appendChild(submitBtn);
     form.appendChild(quick);
 
     var more = U.el('details', { class: 'packdash__advanced' });
-    more.appendChild(U.el('summary', { text: 'Add trip details (optional)' }));
+    more.appendChild(U.el('summary', { text: 'Add details · quantity, traveler, day, notes' }));
     var fields = U.el('div', { class: 'packdash__fields' });
     var categorySelect = U.el('select', { class: 'input sync__input', id: 'plan-pack-category' });
     packingCategories().forEach(function (c) { categorySelect.appendChild(U.el('option', { value: c }, PACKING_CATEGORY_WORDS[c] || c)); });
@@ -45954,7 +45968,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var scopeLine = tripRange + (ctx && ctx.nights ? ' · ' + ctx.nights + ' nights' : '') +
       ' · ' + travelerCount + (travelerCount === 1 ? ' traveler' : ' travelers') +
       (stops.length ? ' · ' + stops.slice(0, 3).join(' → ') : '');
-    introCopy.appendChild(U.el('p', { class: 'decisiondash__copy', text: scopeLine + '. Add a quick item or open the details for quantity, traveler, day, and notes.' }));
+    introCopy.appendChild(U.el('p', { class: 'decisiondash__copy', text: scopeLine + '. Keep essentials together and link day-specific items to the itinerary.' }));
     intro.appendChild(introCopy);
     var introLinks = U.el('div', { class: 'packdash__hero-actions' });
     introLinks.appendChild(U.el('a', { class: 'btn btn--quiet', href: T.router.build('plan', ['itinerary']), text: 'Open itinerary' }));
@@ -45979,7 +45993,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var drawer = buildPackingDrawer(tripId, members, statusLine, days, routeDay);
     var addSection = U.el('section', { class: 'packdash__add' });
     var addHead = U.el('div', { class: 'packdash__addhead' });
-    addHead.appendChild(U.el('h3', { class: 'plan__h', text: items.length ? 'Add something' : 'Start with an item or a suggested list' }));
+    addHead.appendChild(U.el('h3', { class: 'plan__h', text: items.length ? 'Add an item' : 'Start your packing list' }));
     if (!items.length) {
       var firstSeed = U.el('button', { type: 'button', class: 'btn btn--quiet packdash__seed', text: 'Build a suggested list · ' + generated.length + ' items' });
       firstSeed.addEventListener('click', function () { runSeed(firstSeed); });
@@ -46001,22 +46015,45 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       dataset: { seeded: String(hasTemplateRow) }, text: hasTemplateRow ? 'Update suggested items' : 'Add suggested essentials' });
     seedBtn.addEventListener('click', function () { runSeed(seedBtn); });
 
-    var controls = U.el('div', { class: 'packdash__filters', 'aria-label': 'Filter packing items' });
+    var session = packingFilterSessions[tripId] || (packingFilterSessions[tripId] = { search: '', category: '', state: 'all' });
+    var controls = U.el('div', { class: 'packdash__filters', role: 'group', 'aria-label': 'Search and filter packing items' });
     var search = U.el('input', { class: 'input', type: 'search', maxlength: '80', placeholder: 'Find an item', 'aria-label': 'Search packing items' });
-    var categoryFilter = U.el('select', { class: 'input', 'aria-label': 'Filter by category' });
-    categoryFilter.appendChild(U.el('option', { value: '' }, 'All categories'));
-    packingCategories().forEach(function (category) { categoryFilter.appendChild(U.el('option', { value: category }, PACKING_CATEGORY_WORDS[category] || category)); });
     var stateFilter = U.el('select', { class: 'input', 'aria-label': 'Filter by packing status' });
     [['all', 'All items'], ['to-pack', 'Still to pack'], ['packed', 'Packed'], ['optional', 'Optional']].forEach(function (entry) {
       stateFilter.appendChild(U.el('option', { value: entry[0] }, entry[1]));
     });
-    controls.appendChild(search); controls.appendChild(categoryFilter); controls.appendChild(stateFilter);
+    controls.appendChild(search); controls.appendChild(stateFilter);
+    var categoryNav = U.el('div', { class: 'packdash__category-filters', role: 'group', 'aria-label': 'Filter by category' });
+    var categoryButtons = [];
+    function addCategoryFilter(category, label, count) {
+      var button = U.el('button', {
+        type: 'button', class: 'packdash__category-filter', dataset: { category: category },
+        'aria-pressed': String(session.category === category), 'aria-label': label + ', ' + count + ' items'
+      });
+      button.appendChild(U.el('span', { class: 'packdash__category-filter-name', text: label }));
+      button.appendChild(U.el('span', { class: 'packdash__category-filter-count', 'aria-hidden': 'true', text: String(count) }));
+      button.addEventListener('click', function () {
+        session.category = category;
+        syncCategoryFilters();
+        renderRows();
+      });
+      categoryButtons.push(button); categoryNav.appendChild(button);
+    }
+    addCategoryFilter('', 'All', items.length);
+    packingCategories().forEach(function (category) {
+      var count = items.filter(function (item) { return (item.category || 'misc') === category; }).length;
+      addCategoryFilter(category, PACKING_CATEGORY_WORDS[category] || category, count);
+    });
+    function syncCategoryFilters() {
+      categoryButtons.forEach(function (button) {
+        button.setAttribute('aria-pressed', String(button.dataset.category === session.category));
+      });
+    }
     var results = U.el('p', { class: 'packdash__resultcount', 'aria-live': 'polite' });
     var listHost = U.el('div', { class: 'packdash__groups' });
-    var session = packingFilterSessions[tripId] || (packingFilterSessions[tripId] = { search: '', category: '', state: 'all' });
-    search.value = session.search; categoryFilter.value = session.category; stateFilter.value = session.state;
+    search.value = session.search; stateFilter.value = session.state;
     function renderRows() {
-      session.search = String(search.value || '').trim().toLowerCase(); session.category = categoryFilter.value; session.state = stateFilter.value;
+      session.search = String(search.value || '').trim().toLowerCase(); session.state = stateFilter.value;
       while (listHost.firstChild) listHost.removeChild(listHost.firstChild);
       var filtered = items.filter(function (item) {
         if (session.category && item.category !== session.category) return false;
@@ -46043,14 +46080,15 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (!filtered.length) listHost.appendChild(U.el('p', { class: 'packdash__empty-filter',
         text: items.length ? 'No items match these filters.' : 'Your list is empty. Add a first item or build the suggested essentials above.' }));
     }
-    search.addEventListener('input', renderRows); categoryFilter.addEventListener('change', renderRows); stateFilter.addEventListener('change', renderRows);
+    search.addEventListener('input', renderRows); stateFilter.addEventListener('change', renderRows);
+    syncCategoryFilters();
     renderRows();
     var listSection = U.el('section', { class: 'packdash__list', 'aria-label': 'Packing items' });
     var listHead = U.el('div', { class: 'packdash__listhead' });
-    listHead.appendChild(U.el('h3', { class: 'plan__h', text: 'Your list' }));
+    listHead.appendChild(U.el('h3', { class: 'plan__h', text: 'Packing list' }));
     if (items.length) listHead.appendChild(seedBtn);
     listHead.appendChild(results); listSection.appendChild(listHead);
-    listSection.appendChild(controls); listSection.appendChild(listHost); wrap.appendChild(listSection);
+    listSection.appendChild(controls); listSection.appendChild(categoryNav); listSection.appendChild(listHost); wrap.appendChild(listSection);
     wrap.appendChild(statusLine);
     if (itineraryValidDay(routeDay)) drawer.openForAdd(routeDay);
     return wrap;
