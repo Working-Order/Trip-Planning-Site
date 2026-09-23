@@ -13094,6 +13094,72 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .itin-board__packing-item[data-packed="true"] .itin-board__packing-name { color: var(--ink-faint); text-decoration: line-through; }
 .itin-board__packing-empty { margin: 0; color: var(--ink-muted); font-size: var(--text-sm); line-height: var(--leading-body); }
 /* END plan-polish-packing */
+/* BEGIN interactive-date-calendar */
+.datesdash__hero { grid-template-columns: minmax(280px, .8fr) minmax(0, 1.7fr); align-items: start; }
+.datesdash__sidebar { display: grid; gap: 16px; min-width: 0; }
+.datesdash__decision { padding: 24px; gap: 12px; }
+.datesdash__decision .decisiondash__title { font-size: clamp(25px, 2.8vw, 36px); }
+.datesdash__composer.plan__drawer { margin: 0; max-width: none; width: 100%; padding: 22px; border-radius: 18px; box-sizing: border-box; }
+.datesdash__composer > summary { display: none; }
+.datesdash__composer .dates__form { margin: 0; gap: 16px; }
+.datesdash__composer-title { margin: 0; font-size: 17px; color: var(--ink); }
+.datesdash__toggle { display: flex; align-items: flex-start; gap: 11px; cursor: pointer; color: var(--ink); }
+.datesdash__toggle input { width: 19px; height: 19px; flex-shrink: 0; accent-color: var(--accent); margin-top: 3px; }
+.datesdash__toggle span { display: grid; gap: 4px; }
+.datesdash__toggle strong { font-size: 13px; font-weight: 600; }
+.datesdash__toggle small, .datesdash__connection { font-size: 11px; color: var(--ink-muted); line-height: 1.6; }
+.datesdash__connection { margin: 0; }
+.datesdash__selection { display: grid; gap: 7px; }
+.datesdash__selection-empty { font-size: 13px; line-height: 1.6; color: var(--ink-muted); margin: 0; }
+.datesdash__range-chip { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--ok-soft); border: 1px solid var(--line); border-radius: 9px; padding: 4px 6px 4px 12px; font-size: 12px; line-height: 1.5; }
+.datesdash__remove-range { flex-shrink: 0; min-width: 34px; min-height: 34px; border: 0; border-radius: 7px; color: var(--ink); background: transparent; font-size: 20px; cursor: pointer; }
+.datesdash__remove-range:hover { background: var(--surface-alt); }
+.datesdash__composer .dates__nights { margin: -6px 0 0; font-size: 11px; color: var(--ink-muted); }
+.datesdash__composer textarea { min-height: 78px; resize: vertical; font: inherit; font-size: 13px; }
+.datesdash__picker { gap: 14px; padding: 26px; min-width: 0; }
+.datesdash__calendar-title { font-size: 26px; line-height: 1.2; margin: 0; color: var(--ink); font-weight: 600; }
+.datesdash__hint { min-height: 40px; margin: 0; font-size: 12px; line-height: 1.7; color: var(--ink-muted); }
+.datesdash__toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+.datesdash__toolbar .btn { min-height: 42px; min-width: 42px; font-size: 20px; padding: 4px 10px; }
+.datesdash__month-jump { max-width: 210px; min-width: 0; background: transparent; font-size: 13px; text-align: center; min-height: 42px; }
+.datesdash__picker .datesdash__months { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.datesdash__picker .datesdash__calendar { border-spacing: 2px 5px; font-size: 13px; }
+.datesdash__picker .datesdash__calendar caption { margin: 8px 0 14px; font-size: 15px; text-align: center; }
+.datesdash__picker .datesdash__calendar th { font-size: 10px; height: 28px; }
+.datesdash__picker .datesdash__calendar td { height: 44px; }
+.datesdash__day { width: 100%; min-height: 44px; padding: 0; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--ink); font: inherit; font-size: 14px; font-variant-numeric: tabular-nums; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.datesdash__day:hover { background: var(--surface-alt); border-color: var(--line); }
+.datesdash__day[data-preview="true"] { border-color: var(--line-strong, var(--ink-muted)); background: var(--surface-alt); }
+.datesdash__day[aria-pressed="true"] { background: var(--ok-soft); border-color: transparent; color: var(--ok); font-weight: 700; }
+.datesdash__day[data-edge="start"], .datesdash__day[data-edge="end"] { color: var(--surface); background: var(--ok); }
+.datesdash__day[data-anchor="true"] { outline: 2px dashed var(--ok); outline-offset: 2px; }
+.datesdash__day:focus-visible, .datesdash__remove-range:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.datesdash__calendar-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; }
+.datesdash__picker .datesdash__preview-range { font-size: 12px; font-weight: 500; overflow-wrap: anywhere; }
+.datesdash__picker .datesdash__legend { font-size: 10px; }
+.datesdash__clear { flex-shrink: 0; }
+.itin-board__date-ranges { margin: 8px 0 0; font-size: 12px; line-height: 1.7; color: var(--ink-muted); }
+.itin-board__date-ranges a { white-space: nowrap; }
+@media (max-width: 1150px) {
+  .datesdash__hero { grid-template-columns: minmax(250px, .85fr) minmax(0, 1.15fr); }
+  .datesdash__picker .datesdash__months { grid-template-columns: 1fr; }
+  .datesdash__picker .datesdash__calendar:nth-child(2) { display: none; }
+  .datesdash__picker .datesdash__calendar td, .datesdash__day { min-height: 48px; height: 48px; }
+}
+@media (max-width: 700px) {
+  .datesdash__hero { display: flex; flex-direction: column; gap: 14px; }
+  .datesdash__sidebar { display: contents; }
+  .datesdash__decision { order: 0; width: 100%; box-sizing: border-box; }
+  .datesdash__picker { order: 1; width: 100%; box-sizing: border-box; padding: 18px 12px; }
+  .datesdash__composer { order: 2; }
+  .datesdash__picker .decisiondash__eyebrow, .datesdash__calendar-title, .datesdash__hint { margin-left: 6px; margin-right: 6px; }
+  .datesdash__calendar-title { font-size: 24px; }
+  .datesdash__picker .datesdash__months { gap: 0; }
+  .datesdash__picker .datesdash__calendar { border-spacing: 2px 4px; }
+  .datesdash__picker .datesdash__calendar td, .datesdash__day { height: 44px; min-height: 44px; }
+  .datesdash__calendar-footer { align-items: flex-start; }
+}
+/* END interactive-date-calendar */
 /* ==== src/css/90-utilities.css ==== */
 /* 90-utilities.css — last layer. OWNER: WS-D.
  * Single-purpose helpers only. If something here needs three declarations to
@@ -15377,6 +15443,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   /** label(trip) -> 'Oct 15–22, 2026 · 7 nights' | 'No dates yet'. */
   TR.label = function (trip) {
     var t = trip || TR.active();
+    if (t && t.start && t.start === t.end && parseDay(t.start)) return SHORT[parseDay(t.start).m - 1] + ' ' + parseDay(t.start).d + ', ' + parseDay(t.start).y + ' · Day trip';
     if (!t || !t.start || !t.end || !t.nights) return 'No dates yet';
     return rangeLabel(t.start, t.end) + ' · ' + t.nights + ' night' + (t.nights === 1 ? '' : 's');
   };
@@ -15385,6 +15452,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
    *  label(), no year (see rangeLabelShort above). */
   TR.labelShort = function (trip) {
     var t = trip || TR.active();
+    if (t && t.start && t.start === t.end && parseDay(t.start)) return SHORT[parseDay(t.start).m - 1] + ' ' + parseDay(t.start).d + ' · Day trip';
     if (!t || !t.start || !t.end || !t.nights) return 'No dates yet';
     return rangeLabelShort(t.start, t.end) + ' · ' + t.nights + ' night' + (t.nights === 1 ? '' : 's');
   };
@@ -15545,7 +15613,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
     var start = has('start') ? day(v.start) : day(prev.start);
     var end = has('end') ? day(v.end) : day(prev.end);
-    if (start && end && !TR.windowKey(start, end)) {
+    var projectedDayTrip = start && start === end && wellFormedDatesFrom(has('datesFrom') ? v.datesFrom : prev.datesFrom);
+    if (start && end && !TR.windowKey(start, end) && !projectedDayTrip) {
       T.diag.note('trips', 'the end date must be after the start date');
       return false;
     }
@@ -16459,6 +16528,43 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     return s.trim();
   };
 
+  /** normalizeRanges(ranges) -> sorted, non-overlapping `{start,end}` rows,
+   *  merging overlapping or adjacent spans. Equal start/end is a valid
+   *  one-day selection here; legacy start/end inputs retain their old
+   *  positive-duration rule in the proposal reducers below. */
+  PR.dates.normalizeRanges = function (ranges) {
+    if (!Array.isArray(ranges) || !ranges.length) return null;
+    var out = [], i;
+    for (i = 0; i < ranges.length; i++) {
+      var row = ranges[i] || {};
+      var start = PR.dates.validateDay(row.start), end = PR.dates.validateDay(row.end);
+      if (!start || !end || end < start) return null;
+      out.push({ start: start, end: end });
+    }
+    out.sort(function (a, b) { return a.start.localeCompare(b.start) || a.end.localeCompare(b.end); });
+    var merged = [];
+    for (i = 0; i < out.length; i++) {
+      var next = out[i], last = merged[merged.length - 1];
+      var lastEnd = last ? Date.parse(last.end + 'T00:00:00Z') : 0;
+      var nextStart = Date.parse(next.start + 'T00:00:00Z');
+      if (last && nextStart <= lastEnd + 86400000) {
+        if (next.end > last.end) last.end = next.end;
+      } else merged.push({ start: next.start, end: next.end });
+    }
+    return merged;
+  };
+
+  /** rangesOf(proposal) -> canonical saved ranges, or a contiguous range for
+   *  pre-ranges proposals. Invalid legacy data returns an empty list. */
+  PR.dates.rangesOf = function (proposal) {
+    if (!proposal) return [];
+    if (Array.isArray(proposal.ranges) && proposal.ranges.length) {
+      return PR.dates.normalizeRanges(proposal.ranges) || [];
+    }
+    var start = PR.dates.validateDay(proposal.start), end = PR.dates.validateDay(proposal.end);
+    return start && end && end > start ? [{ start: start, end: end }] : [];
+  };
+
   /** hasFullAgreement(proposal, memberUids) -> boolean (DatePlanning.cs:
    *  73-78). Empty membership is never "full"; a missing response is not
    *  agreement; 'maybe' is not agreement. Pure — responses come from the
@@ -17321,6 +17427,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var governing = (f && f.reopened !== true) ? f : null;
     var departure = governing ? governing.start : ((trip && trip.start) || null);
     var returnDate = governing ? governing.end : ((trip && trip.end) || null);
+    var priorFinalizedStillOnTrip = f && f.reopened === true && trip && trip.start === f.start && trip.end === f.end;
+    var ranges = (governing || priorFinalizedStillOnTrip) ? PR.dates.rangesOf(governing || f)
+      : (departure && returnDate && returnDate >= departure ? [{ start: departure, end: returnDate }] : []);
     var nights = 0;
     if (departure && returnDate) {
       var diff = dayDiff(departure, returnDate);
@@ -17339,6 +17448,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     return {
       scope: scope, countries: countries, homeCountry: homeCountry, nights: nights,
       destinationCount: destinationCount, departure: departure, returnDate: returnDate,
+      dateRanges: ranges,
       planningStart: planningStart, isInternational: isInternational,
       isLongTrip: nights >= 8, isMultiCity: destinationCount > 1,
       winnerName: (winnerView && winnerView.f && winnerView.f.destination) || null
@@ -18455,6 +18565,24 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   /** isDerived(row) -> boolean. */
   PR.itinerary.isDerived = function (row) { return !!(row && row.derived === true); };
 
+  /** scheduleRanges(plan, ctx) -> the finalized selected days (including
+   *  gaps), falling back to the current trip envelope while dates are open. */
+  PR.itinerary.scheduleRanges = function (plan, ctx) {
+    var f = plan && plan.dates && plan.dates.finalized;
+    if (f && f.reopened !== true) return PR.dates.rangesOf(f);
+    if (ctx && Array.isArray(ctx.dateRanges)) return PR.dates.normalizeRanges(ctx.dateRanges) || [];
+    return ctx && ctx.departure && ctx.returnDate && ctx.returnDate >= ctx.departure
+      ? [{ start: ctx.departure, end: ctx.returnDate }] : [];
+  };
+
+  /** isScheduleDay(plan, ctx, day) -> whether a date belongs to one of the
+   *  selected travel spans. Calendar rows outside the schedule remain visible. */
+  PR.itinerary.isScheduleDay = function (plan, ctx, day) {
+    var ranges = PR.itinerary.scheduleRanges(plan, ctx), i;
+    for (i = 0; i < ranges.length; i++) if (day >= ranges[i].start && day <= ranges[i].end) return true;
+    return false;
+  };
+
   /** derivedRows(plan) -> array, pure, NEVER written anywhere (HANDOFF:
    *  "flights/lodging derived read-only from bookings as calendar rows —
    *  never stored twice"). One row per flight segment with a departsOn, one
@@ -18564,7 +18692,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       dayItems = [];
       for (j = 0; j < all.length; j++) if (PR.itinerary.coversDate(all[j], dateStr)) dayItems.push(all[j]);
       dayItems.sort(PR.itinerary.compare);
-      days.push({ date: dateStr, dayNumber: off + 1, items: dayItems, isEmpty: dayItems.length === 0 });
+      days.push({ date: dateStr, dayNumber: off + 1, items: dayItems, isEmpty: dayItems.length === 0,
+        inSchedule: PR.itinerary.isScheduleDay(plan, ctx, dateStr) });
     }
     return days;
   };
@@ -21766,9 +21895,18 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var by = p.by, now = p.now, id = p.id;
     if (!PR.roleOf(doc, by)) return { ok: false, code: 'not-a-member' };
     if (!PR.canEdit(doc, by)) return { ok: false, code: 'not-editor' };
-    var start = PR.dates.validateDay(p.start);
-    var end = PR.dates.validateDay(p.end);
-    if (!start || !end || !(end > start)) return { ok: false, code: 'invalid-dates' };
+    var ranges, start, end;
+    if (p.ranges !== undefined) {
+      if (!Array.isArray(p.ranges)) return { ok: false, code: 'invalid-dates' };
+      ranges = PR.dates.normalizeRanges(p.ranges);
+      if (!ranges || ranges.length > 60) return { ok: false, code: 'invalid-dates' };
+      start = ranges[0].start; end = ranges[ranges.length - 1].end;
+    } else {
+      start = PR.dates.validateDay(p.start);
+      end = PR.dates.validateDay(p.end);
+      if (!start || !end || !(end > start)) return { ok: false, code: 'invalid-dates' };
+      ranges = [{ start: start, end: end }];
+    }
     var label = (p.label === undefined || p.label === null) ? '' : p.label;
     if (typeof label !== 'string' || label.length > 60) return { ok: false, code: 'invalid-label' };
     var notes = (p.notes === undefined || p.notes === null) ? '' : p.notes;
@@ -21781,6 +21919,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       id: id, start: start, end: end, label: label, notes: notes,
       proposedByUid: by, createdAt: now, responses: {}, _t: now, _by: by, _rev: 1
     };
+    if (Array.isArray(p.ranges)) update['dates.proposals.' + id].ranges = ranges;
     update.updatedAt = now;
     update.updatedBy = by;
     return { ok: true, update: update };
@@ -21847,20 +21986,36 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
        label as "changed" and write a path that was never actually touched. */
     var curLabel = (proposal.label == null) ? '' : proposal.label;
     var curNotes = (proposal.notes == null) ? '' : proposal.notes;
-    var mStart = (p.start !== undefined) ? p.start : proposal.start;
-    var mEnd = (p.end !== undefined) ? p.end : proposal.end;
+    var curRanges = PR.dates.rangesOf(proposal);
+    var nextRanges = curRanges;
+    if (p.ranges !== undefined) {
+      if (!Array.isArray(p.ranges)) return { ok: false, code: 'invalid-dates' };
+      nextRanges = PR.dates.normalizeRanges(p.ranges);
+      if (!nextRanges || nextRanges.length > 60) return { ok: false, code: 'invalid-dates' };
+    } else if (p.start !== undefined || p.end !== undefined) {
+      var mStart = (p.start !== undefined) ? p.start : proposal.start;
+      var mEnd = (p.end !== undefined) ? p.end : proposal.end;
+      var vStart = PR.dates.validateDay(mStart), vEnd = PR.dates.validateDay(mEnd);
+      if (!vStart || !vEnd || !(vEnd > vStart)) return { ok: false, code: 'invalid-dates' };
+      // Older clients send both unchanged endpoints even for a notes edit.
+      // Preserve gaps unless those endpoints actually changed.
+      if (vStart !== proposal.start || vEnd !== proposal.end) nextRanges = [{ start: vStart, end: vEnd }];
+    }
+    if (!nextRanges.length) return { ok: false, code: 'invalid-dates' };
+    var nextStart = nextRanges[0].start, nextEnd = nextRanges[nextRanges.length - 1].end;
     var mLabel = (p.label !== undefined) ? p.label : curLabel;
     var mNotes = (p.notes !== undefined) ? p.notes : curNotes;
-
-    var vStart = PR.dates.validateDay(mStart);
-    var vEnd = PR.dates.validateDay(mEnd);
-    if (!vStart || !vEnd || !(vEnd > vStart)) return { ok: false, code: 'invalid-dates' };
     if (typeof mLabel !== 'string' || mLabel.length > 60) return { ok: false, code: 'invalid-label' };
     if (typeof mNotes !== 'string' || mNotes.length > 500) return { ok: false, code: 'invalid-notes' };
 
     var changed = {}, anyChanged = false;
-    if (vStart !== proposal.start) { changed.start = vStart; anyChanged = true; }
-    if (vEnd !== proposal.end) { changed.end = vEnd; anyChanged = true; }
+    var rangesChanged = JSON.stringify(nextRanges) !== JSON.stringify(curRanges);
+    if (nextStart !== proposal.start) { changed.start = nextStart; anyChanged = true; }
+    if (nextEnd !== proposal.end) { changed.end = nextEnd; anyChanged = true; }
+    if (rangesChanged) {
+      if (p.ranges !== undefined || Array.isArray(proposal.ranges)) changed.ranges = nextRanges;
+      anyChanged = true;
+    }
     if (mLabel !== curLabel) { changed.label = mLabel; anyChanged = true; }
     if (mNotes !== curNotes) { changed.notes = mNotes; anyChanged = true; }
     if (!anyChanged) return { ok: true, unchanged: true };
@@ -21872,7 +22027,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     update['dates.proposals.' + pid + '._t'] = now;
     update['dates.proposals.' + pid + '._by'] = by;
     update['dates.proposals.' + pid + '._rev'] = (proposal._rev || 0) + 1;
-    if ('start' in changed || 'end' in changed) update['dates.proposals.' + pid + '.responses'] = {};
+    if (rangesChanged || 'start' in changed || 'end' in changed) update['dates.proposals.' + pid + '.responses'] = {};
     update.updatedAt = now;
     update.updatedBy = by;
     return { ok: true, update: update };
@@ -21910,7 +22065,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (!PR.dates.hasFullAgreement(proposal, doc.memberUids)) return { ok: false, code: 'not-agreed' };
     var version = (doc.dates.finalized ? doc.dates.finalized.version : 0) + 1;
     var update = {};
-    update['dates.finalized'] = { proposalId: pid, start: proposal.start, end: proposal.end, version: version, at: now, by: by, reopened: false };
+    update['dates.finalized'] = { proposalId: pid, start: proposal.start, end: proposal.end,
+      version: version, at: now, by: by, reopened: false };
+    if (Array.isArray(proposal.ranges)) update['dates.finalized'].ranges = PR.dates.rangesOf(proposal);
     update.updatedAt = now;
     update.updatedBy = by;
     return { ok: true, update: update, version: version };
@@ -24315,7 +24472,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var o = opts || {};
     var id = U.uid('dp');
     return runPlanOp(tripId, PR.reduce.dates.propose, {
-      id: id, start: o.start, end: o.end, label: o.label, notes: o.notes
+      id: id, start: o.start, end: o.end, ranges: o.ranges, label: o.label, notes: o.notes
     }).then(function (res) {
       if (res.ok) res.id = id;
       return res;
@@ -24328,7 +24485,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
   PR.dates.edit = function (tripId, pid, opts) {
     var o = opts || {};
-    return runPlanOp(tripId, PR.reduce.dates.edit, { pid: pid, start: o.start, end: o.end, label: o.label, notes: o.notes });
+    return runPlanOp(tripId, PR.reduce.dates.edit, { pid: pid, start: o.start, end: o.end, ranges: o.ranges, label: o.label, notes: o.notes });
   };
 
   /** delete(tripId, pid) — defined with bracket syntax because `delete` is a
@@ -42687,7 +42844,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
    *  its three example forms. */
   function datesLineText(f) {
     if (!f) return 'No dates finalized yet.';
-    var label = rangeLabel(f.start, f.end);
+    var label = scheduleLabel(f);
     if (f.reopened) return 'Dates: ' + label + ' — reopened — the trip keeps these dates until you finalize again.';
     return 'Dates: ' + label + ' — finalized.';
   }
@@ -43161,36 +43318,6 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     drawer.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
   function decisionKicker(text) { return U.el('p', { class: 'decisiondash__eyebrow', text: text }); }
-  function dateMonthCalendar(start, end, month) {
-    var base = new Date(month + '-01T00:00:00Z');
-    if (!isFinite(base.getTime())) return null;
-    var table = U.el('table', { class: 'datesdash__calendar' });
-    table.appendChild(U.el('caption', { text: base.toLocaleDateString(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' }) }));
-    var head = U.el('thead'), labels = U.el('tr');
-    ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(function (label) {
-      labels.appendChild(U.el('th', { scope: 'col', 'aria-label': label, text: label.slice(0, 1) }));
-    });
-    head.appendChild(labels); table.appendChild(head);
-    var body = U.el('tbody'), year = base.getUTCFullYear(), m = base.getUTCMonth();
-    var first = (base.getUTCDay() + 6) % 7, days = new Date(Date.UTC(year, m + 1, 0)).getUTCDate();
-    for (var row = 0; row < Math.ceil((first + days) / 7); row++) {
-      var tr = U.el('tr');
-      for (var col = 0; col < 7; col++) {
-        var day = row * 7 + col - first + 1;
-        var td = U.el('td');
-        if (day > 0 && day <= days) {
-          var iso = month + '-' + (day < 10 ? '0' : '') + day;
-          td.dataset.range = iso === start ? 'start' : iso === end ? 'end' : iso > start && iso < end ? 'inside' : 'outside';
-          var date = U.el('time', { datetime: iso, text: String(day),
-            'aria-label': dayShort(iso) + (iso === start ? ', arrival' : iso === end ? ', departure' : '') });
-          td.appendChild(date);
-        }
-        tr.appendChild(td);
-      }
-      body.appendChild(tr);
-    }
-    table.appendChild(body); return table;
-  }
   function buildDatesBanner(prep) {
     var refused = !!(prep && prep.projection && prep.projection.refused);
     return U.el('p', { class: 'dates__banner', hidden: !refused, text:
@@ -43253,7 +43380,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     } });
 
     var optionHead = U.el('div', { class: 'datesdash__option-head' });
-    optionHead.appendChild(U.el('p', { class: 'dates__range', text: rangeLabel(proposal.start, proposal.end) }));
+    optionHead.appendChild(U.el('p', { class: 'dates__range', text: scheduleLabel(proposal) }));
     optionHead.appendChild(U.el('span', { class: 'decisiondash__badge', dataset: { tone: isGoverning || summary.full ? 'ok' : summary.conflicts.length ? 'warn' : 'neutral' },
       text: isGoverning ? 'Selected' : summary.full ? 'Everyone agrees' : summary.conflicts.length ? 'Has a conflict' : 'Awaiting agreement' }));
     li.appendChild(optionHead);
@@ -43355,127 +43482,252 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     return li;
   }
 
-  /** ONE shared propose/edit drawer per Dates page — the row-level Edit
-   *  buttons open and prefill this same drawer (`form.dataset.editing = pid`)
-   *  rather than each carrying their own copy. */
-  function buildProposeDrawer(tripId, statusLine) {
-    var details = U.el('details', { class: 'plan__drawer dates__drawer', dataset: { drawer: 'dates' } });
-    var summary = U.el('summary', { class: 'sync__advsum', text: 'Propose dates' });
-    details.appendChild(summary);
-
-    var form = U.el('form', { class: 'dates__form', novalidate: true });
-    var startInput = U.el('input', { type: 'date', id: 'plan-date-start', class: 'input sync__input' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-date-start', text: 'Arrive' }), startInput
-    ]));
-    var endInput = U.el('input', { type: 'date', id: 'plan-date-end', class: 'input sync__input' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-date-end', text: 'Leave' }), endInput
-    ]));
-
-    var nightsLine = U.el('p', { class: 'dates__nights' });
-    form.appendChild(nightsLine);
-
-    var notesInput = U.el('textarea', { id: 'plan-date-notes', class: 'textarea sync__input', rows: '2' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-date-notes', text: 'Notes (optional)' }), notesInput
-    ]));
-
-    var errLine = U.el('p', { class: 'field__error dates__error' });
-    form.appendChild(errLine);
-
-    var acts = U.el('div', { class: 'sync__actions' });
-    var submitBtn = U.el('button', { type: 'submit', class: 'btn btn--primary dates__submit', text: 'Propose' });
-    var cancelBtn = U.el('button', { type: 'button', class: 'btn btn--quiet dates__cancel', text: 'Cancel' });
-    acts.appendChild(submitBtn); acts.appendChild(cancelBtn);
-    form.appendChild(acts);
-
-    /* PLAN-GAP: WAVE2_CONTRACT §3.3 says this hint reuses "nights / 'end must
-       be after start' — reuse the trip form's words", without saying whether
-       that includes 36-comp-tripform.js's 60-night REFUSAL line too. Read
-       literally, PR.reduce.dates.propose's own precondition list (§2.2) has
-       no nights cap at all — only validateDay + end>start — and WAVE2_CONTRACT
-       §30.17 explicitly proposes a 76-night range and expects it to succeed
-       (that is what makes the projection-refused banner reachable). So this
-       reuses only the two named words/phrases, not the trip form's stricter,
-       unrelated 60-night business rule. */
-    function paintNights() {
-      var a = startInput.value, b = endInput.value;
-      if (!a || !b) { U.setText(nightsLine, 'Both dates.'); return; }
-      var n = T.trips && T.trips.nightsOf ? T.trips.nightsOf(a, b) : null;
-      if (n == null || n <= 0) { U.setText(nightsLine, 'end must be after start'); return; }
-      U.setText(nightsLine, F.plural(n, 'night'));
-    }
-    [startInput, endInput].forEach(function (i) {
-      i.addEventListener('change', paintNights);
-      i.addEventListener('input', paintNights);
+  /** One shared calendar composer for new proposals and schedule edits. */
+  /* Inline date composer. Drafts stay local until the proposal is saved. */
+  function scheduleRanges(record) {
+    if (PR.dates.rangesOf) return PR.dates.rangesOf(record);
+    return record && record.start && record.end ? [{ start: record.start, end: record.end }] : [];
+  }
+  function scheduleLabel(record) {
+    if (record && record.start === record.end && record.start) return dayShort(record.start);
+    return scheduleRanges(record).map(function (r) {
+      return r.start === r.end ? dayShort(r.start) : plainRangeLabel(r.start, r.end);
+    }).join(' · ');
+  }
+  function calendarShift(day, amount) {
+    return new Date(Date.parse(day + 'T12:00:00Z') + amount * 86400000).toISOString().slice(0, 10);
+  }
+  function calendarRanges(days) {
+    var ranges = [];
+    Object.keys(days).sort().forEach(function (day) {
+      var last = ranges[ranges.length - 1];
+      if (last && calendarShift(last.end, 1) === day) last.end = day;
+      else ranges.push({ start: day, end: day });
     });
+    return ranges;
+  }
+  function buildProposeDrawer(tripId, statusLine, initialRecord) {
+    var details = U.el('details', { class: 'plan__drawer dates__drawer datesdash__composer', dataset: { drawer: 'dates' }, open: true });
+    details.appendChild(U.el('summary', { class: 'sr-only', text: 'Propose dates' }));
+    var form = U.el('form', { class: 'dates__form', novalidate: true });
+    var title = U.el('h3', { class: 'datesdash__composer-title', text: 'Your proposed schedule' });
+    form.appendChild(title);
+    var multiple = U.el('input', { type: 'checkbox', id: 'plan-date-multiple' });
+    form.appendChild(U.el('label', { class: 'datesdash__toggle', for: 'plan-date-multiple' }, [multiple,
+      U.el('span', {}, [U.el('strong', { text: 'Multiple date ranges' }), U.el('small', { text: 'Add separate parts of the same trip.' })]) ]));
+    // A hidden *text* input retains a separate defaultValue for formBusy().
+    var draft = U.el('input', { type: 'text', hidden: true, id: 'plan-date-selection', value: '' });
+    form.appendChild(draft);
+    var selection = U.el('div', { class: 'datesdash__selection', 'aria-label': 'Selected date ranges' });
+    var countLine = U.el('p', { class: 'dates__nights', role: 'status', 'aria-live': 'polite' });
+    form.appendChild(selection); form.appendChild(countLine);
+    var notes = U.el('textarea', { id: 'plan-date-notes', class: 'textarea sync__input', rows: '2', maxlength: '500', placeholder: 'Flexibility, travel time, or anything to keep in mind…' });
+    form.appendChild(U.el('div', { class: 'sync__field' }, [U.el('label', { class: 'sync__label', for: 'plan-date-notes', text: 'Notes (optional)' }), notes]));
+    var error = U.el('p', { class: 'field__error dates__error', role: 'alert' });
+    form.appendChild(error);
+    var submit = U.el('button', { type: 'submit', class: 'btn btn--primary dates__submit', text: 'Propose dates' });
+    var cancel = U.el('button', { type: 'button', class: 'btn btn--quiet dates__cancel', text: 'Cancel' });
+    form.appendChild(U.el('div', { class: 'sync__actions' }, [submit, cancel]));
+    form.appendChild(U.el('p', { class: 'datesdash__connection', text: 'Once agreed and finalized, these dates shape your itinerary. Add destinations and daily plans there.' }));
+    details.appendChild(form);
 
-    /* Every place this drawer's three fields are set programmatically (reset
-       to blank, or prefilled for an edit) moves `.defaultValue` right along
-       with `.value` — formBusy() below treats a mismatch between the two as
-       "the traveler typed something," so a prefill that never touches
-       defaultValue would misread as busy forever, exactly the bug B3 found
-       in the start drawer (see buildStartDrawer's success handler). */
-    function setField(input, v) { input.value = v; input.defaultValue = v; }
+    var panel = U.el('section', { class: 'datesdash__preview datesdash__picker', 'aria-label': 'Choose your trip dates' });
+    panel.appendChild(decisionKicker('MAKE TIME FOR YOUR NEXT CHAPTER'));
+    panel.appendChild(U.el('h3', { class: 'datesdash__calendar-title', text: 'Choose your dates' }));
+    var hint = U.el('p', { class: 'datesdash__hint', id: 'plan-calendar-help' }); panel.appendChild(hint);
+    var toolbar = U.el('div', { class: 'datesdash__toolbar' });
+    var prev = U.el('button', { type: 'button', class: 'btn btn--quiet datesdash__prev', 'aria-label': 'Previous month', text: '←' });
+    var jump = U.el('input', { type: 'month', class: 'input datesdash__month-jump', 'aria-label': 'Jump to month', min: '0100-01', max: '9998-12' });
+    var next = U.el('button', { type: 'button', class: 'btn btn--quiet datesdash__next', 'aria-label': 'Next month', text: '→' });
+    toolbar.appendChild(prev); toolbar.appendChild(jump); toolbar.appendChild(next); panel.appendChild(toolbar);
+    var months = U.el('div', { class: 'datesdash__months', 'aria-describedby': 'plan-calendar-help' }); panel.appendChild(months);
+    var footer = U.el('div', { class: 'datesdash__calendar-footer' });
+    var previewLine = U.el('p', { class: 'datesdash__preview-range' });
+    var clear = U.el('button', { type: 'button', class: 'btn btn--quiet datesdash__clear', text: 'Clear dates' });
+    footer.appendChild(previewLine); footer.appendChild(clear); panel.appendChild(footer);
+    var legend = U.el('p', { class: 'datesdash__legend', text: 'Filled dates are your draft · Outlined dates are the option you’re viewing' }); panel.appendChild(legend);
+    var selected = {}, anchor = '', anchorBase = {}, gesture = null, preview = null, busy = false;
+    var trip = T.trips.get(tripId) || {}, initial = initialRecord && initialRecord.start || trip.start || new Date().toISOString().slice(0, 10);
+    var session = decisionViewState(tripId), month = session.dateMonth || initial.slice(0, 7);
 
-    function reset() {
-      form.dataset.editing = '';
-      setField(startInput, ''); setField(endInput, ''); setField(notesInput, '');
-      U.setText(errLine, '');
-      U.setText(submitBtn, 'Propose');
-      U.setText(summary, 'Propose dates');
-      paintNights();
+    function addSpan(base, a, b, remove) {
+      var out = Object.assign({}, base), start = a < b ? a : b, end = a < b ? b : a;
+      if ((Date.parse(end) - Date.parse(start)) / 86400000 > 3700) { U.setText(error, 'Choose dates within a ten-year window.'); return out; }
+      for (var day = start; day <= end; day = calendarShift(day, 1)) {
+        if (remove) delete out[day]; else out[day] = true;
+      }
+      return out;
     }
-    reset();
-
-    function openForEdit(proposal) {
-      form.dataset.editing = proposal.id;
-      setField(startInput, proposal.start || '');
-      setField(endInput, proposal.end || '');
-      setField(notesInput, proposal.notes || '');
-      U.setText(errLine, '');
-      U.setText(submitBtn, 'Save changes');
-      U.setText(summary, 'Edit these dates');
-      paintNights();
-      details.open = true;
-      try { startInput.focus(); } catch (e) {}
+    function dirty() { return draft.value !== draft.defaultValue || notes.value !== notes.defaultValue || multiple.checked !== multiple.defaultChecked; }
+    function sync() {
+      var ranges = calendarRanges(selected), total = Object.keys(selected).length;
+      draft.value = ranges.length || anchor ? JSON.stringify({ ranges: ranges, anchor: anchor }) : '';
+      U.clear(selection);
+      if (!ranges.length) selection.appendChild(U.el('p', { class: 'datesdash__selection-empty', text: 'Select dates on the calendar to get started.' }));
+      ranges.forEach(function (range, index) {
+        var chip = U.el('div', { class: 'datesdash__range-chip' });
+        chip.appendChild(U.el('span', { text: (multiple.checked ? (index + 1) + '. ' : '') + scheduleLabel(range) }));
+        var remove = U.el('button', { type: 'button', class: 'datesdash__remove-range', 'aria-label': 'Remove ' + scheduleLabel(range), text: '×' });
+        remove.disabled = busy;
+        remove.addEventListener('click', function () { selected = addSpan(selected, range.start, range.end, true); anchor = ''; sync(); });
+        chip.appendChild(remove); selection.appendChild(chip);
+      });
+      U.setText(countLine, total ? total + (total === 1 ? ' selected day' : ' selected days') + (ranges.length > 1 ? ' · ' + ranges.length + ' ranges · gaps excluded' : '') : 'One schedule for everyone to consider.');
+      U.setText(hint, anchor ? 'Choose an end date, or propose this single day.' : multiple.checked
+        ? 'Click two dates or drag to add a range. Click a selected day to leave a gap.'
+        : 'Click a start and end date, or drag across the calendar.');
+      U.setText(previewLine, total ? 'Your draft · ' + total + (total === 1 ? ' day' : ' days') : preview ? 'Viewing: ' + scheduleLabel(preview) : 'Your next trip starts with a date.');
+      submit.disabled = busy || !total;
+      [cancel, clear, multiple, notes, prev, next, jump].forEach(function (control) { control.disabled = busy; });
+      paintDays();
     }
-
-    function submit() {
-      var a = String(startInput.value || '').trim();
-      var b = String(endInput.value || '').trim();
-      if (!a || !b) { U.setText(errLine, 'Pick both dates.'); return; }
-      var n = T.trips && T.trips.nightsOf ? T.trips.nightsOf(a, b) : null;
-      if (n == null || n <= 0) { U.setText(errLine, 'The end date has to come after the start date.'); return; }
-      U.setText(errLine, '');
-      var notes = String(notesInput.value || '').trim();
-      var editingPid = form.dataset.editing || '';
-      submitBtn.disabled = true;
-      var p = editingPid
-        ? callDates('edit', [tripId, editingPid, { start: a, end: b, notes: notes }])
-        : callDates('propose', [tripId, { start: a, end: b, notes: notes }]);
-      p.then(function (r) {
-        submitBtn.disabled = false;
-        if (r && r.ok) {
-          reset();
-          details.open = false;
-          try { T.notify.toast({ text: editingPid ? 'Saved.' : 'Proposed.' }); } catch (e) {}
-          /* REPAIR CYCLE 3 — covers both propose and edit (one success path
-             for both); see buildStartDrawer's identical call for the race. */
-          repaintNow();
-          return;
-        }
-        setDatesStatus(statusLine, r && r.code);
+    function paintDays() {
+      var viewed = scheduleRanges(preview);
+      U.qsa('.datesdash__day', months).forEach(function (button) {
+        var day = button.dataset.date, on = !!selected[day];
+        button.setAttribute('aria-pressed', String(on)); button.disabled = busy;
+        button.dataset.edge = on ? (!selected[calendarShift(day, -1)] ? 'start' : !selected[calendarShift(day, 1)] ? 'end' : 'inside') : '';
+        button.dataset.anchor = String(day === anchor);
+        button.dataset.preview = String(!on && viewed.some(function (r) { return day >= r.start && day <= r.end; }));
       });
     }
-    form.addEventListener('submit', function (ev) { ev.preventDefault(); submit(); });
-    cancelBtn.addEventListener('click', function () { reset(); details.open = false; });
-
-    details.appendChild(form);
-    details.openForEdit = openForEdit;
+    function activate(day) {
+      if (busy) return;
+      U.setText(error, '');
+      if (multiple.checked && selected[day]) { delete selected[day]; anchor = ''; }
+      else if (anchor) { selected = addSpan(anchorBase, anchor, day, false); anchor = ''; }
+      else { anchorBase = multiple.checked ? Object.assign({}, selected) : {}; anchor = day; selected = addSpan(anchorBase, day, day, false); }
+      sync();
+    }
+    function monthShift(amount) {
+      var base = new Date(month + '-01T12:00:00Z'); base.setUTCMonth(base.getUTCMonth() + amount);
+      if (base.getUTCFullYear() < 100 || base.getUTCFullYear() > 9998) return;
+      month = base.toISOString().slice(0, 7); renderMonths();
+    }
+    function focusDay(day) {
+      var button = months.querySelector('[data-date="' + day + '"]');
+      if (!button || !button.getClientRects().length) { month = day.slice(0, 7); renderMonths(); button = months.querySelector('[data-date="' + day + '"]'); }
+      if (button) button.focus({ preventScroll: true });
+    }
+    function renderMonths() {
+      session.dateMonth = month;
+      U.clear(months); jump.value = month;
+      for (var offset = 0; offset < 2; offset++) {
+        var base = new Date(month + '-01T12:00:00Z'); base.setUTCMonth(base.getUTCMonth() + offset);
+        var key = base.toISOString().slice(0, 7), first = (base.getUTCDay() + 6) % 7;
+        var days = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth() + 1, 0)).getUTCDate();
+        var table = U.el('table', { class: 'datesdash__calendar' });
+        table.appendChild(U.el('caption', { text: base.toLocaleDateString(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' }) }));
+        var thead = U.el('thead'), labels = U.el('tr');
+        ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(function (label) { labels.appendChild(U.el('th', { scope: 'col', text: label })); });
+        thead.appendChild(labels); table.appendChild(thead);
+        var body = U.el('tbody');
+        for (var row = 0; row < 6; row++) {
+          var tr = U.el('tr');
+          for (var col = 0; col < 7; col++) {
+            var number = row * 7 + col - first + 1, td = U.el('td');
+            if (number > 0 && number <= days) {
+              var iso = key + '-' + String(number).padStart(2, '0');
+              var button = U.el('button', { type: 'button', class: 'datesdash__day', dataset: { date: iso }, text: String(number), 'aria-pressed': 'false',
+                'aria-label': new Date(iso + 'T12:00:00Z').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }) });
+              td.appendChild(button);
+            }
+            tr.appendChild(td);
+          }
+          body.appendChild(tr);
+        }
+        table.appendChild(body); months.appendChild(table);
+      }
+      paintDays();
+    }
+    months.addEventListener('pointerdown', function (event) {
+      var button = event.target.closest('.datesdash__day');
+      if (!button || busy || event.button !== 0 || event.isPrimary === false) return;
+      event.preventDefault(); button.focus({ preventScroll: true });
+      form.dataset.selectingDates = 'true';
+      gesture = { id: event.pointerId, start: button.dataset.date, end: button.dataset.date, moved: false,
+        before: Object.assign({}, selected), remove: multiple.checked && !!selected[button.dataset.date] };
+      months.setPointerCapture(event.pointerId);
+    });
+    months.addEventListener('pointermove', function (event) {
+      if (!gesture || gesture.id !== event.pointerId) return;
+      var hit = document.elementFromPoint(event.clientX, event.clientY), button = hit && hit.closest('.datesdash__day');
+      if (!button || !months.contains(button)) return;
+      var day = button.dataset.date;
+      if (day !== gesture.start) gesture.moved = true;
+      gesture.end = day;
+      if (gesture.moved) { selected = addSpan(multiple.checked ? gesture.before : {}, gesture.start, day, gesture.remove); paintDays(); }
+    });
+    months.addEventListener('pointerup', function (event) {
+      if (!gesture || gesture.id !== event.pointerId) return;
+      var done = gesture; gesture = null; form.dataset.selectingDates = 'false';
+      if (months.hasPointerCapture(event.pointerId)) months.releasePointerCapture(event.pointerId);
+      if (done.moved) { anchor = ''; U.setText(error, ''); sync(); }
+      else activate(done.start);
+    });
+    function cancelGesture() { if (gesture) { selected = gesture.before; gesture = null; form.dataset.selectingDates = 'false'; sync(); } }
+    months.addEventListener('pointercancel', cancelGesture);
+    months.addEventListener('lostpointercapture', cancelGesture);
+    months.addEventListener('click', function (event) {
+      var button = event.target.closest('.datesdash__day');
+      if (button && event.detail === 0) activate(button.dataset.date);
+    });
+    months.addEventListener('keydown', function (event) {
+      var button = event.target.closest('.datesdash__day'); if (!button) return;
+      var amount = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[event.key];
+      if (amount) { event.preventDefault(); focusDay(calendarShift(button.dataset.date, amount)); }
+      if (event.key === 'Escape') { event.preventDefault(); if (gesture) cancelGesture(); else if (anchor) { selected = anchorBase; anchor = ''; sync(); } }
+      if (event.key === 'PageDown' || event.key === 'PageUp') { event.preventDefault(); monthShift(event.key === 'PageDown' ? 1 : -1); focusDay(month + '-01'); }
+    });
+    prev.addEventListener('click', function () { monthShift(-1); });
+    next.addEventListener('click', function () { monthShift(1); });
+    jump.addEventListener('change', function () { if (/^\d{4}-\d{2}$/.test(jump.value) && jump.validity.valid) { month = jump.value; renderMonths(); } });
+    multiple.addEventListener('change', function () {
+      if (!multiple.checked && calendarRanges(selected).length > 1) { multiple.checked = true; U.setText(error, 'Keep one range before turning this off. Remove extra ranges or clear the dates.'); }
+      else U.setText(error, '');
+      anchor = ''; sync();
+    });
+    function reset() {
+      selected = {}; anchor = ''; anchorBase = {}; form.dataset.editing = ''; busy = false;
+      notes.value = notes.defaultValue = ''; draft.value = draft.defaultValue = '';
+      multiple.checked = multiple.defaultChecked = false;
+      U.setText(error, ''); U.setText(title, 'Your proposed schedule'); U.setText(submit, 'Propose dates'); sync();
+    }
+    clear.addEventListener('click', function () { selected = {}; anchor = ''; U.setText(error, ''); sync(); });
+    cancel.addEventListener('click', reset);
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); if (busy) return;
+      var ranges = calendarRanges(selected); if (!ranges.length) return;
+      var editing = form.dataset.editing || '';
+      var fields = { start: ranges[0].start, end: ranges[ranges.length - 1].end, ranges: ranges, notes: notes.value.trim() };
+      busy = true; sync(); U.setText(error, '');
+      callDates(editing ? 'edit' : 'propose', editing ? [tripId, editing, fields] : [tripId, fields]).then(function (result) {
+        busy = false;
+        if (result && result.ok) { reset(); repaintNow(); return; }
+        sync(); setDatesStatus(error, result && result.code);
+      }).catch(function () { busy = false; sync(); U.setText(error, 'Your dates are still here. Please try saving again.'); });
+    });
+    details.openForEdit = function (proposal) {
+      reset(); preview = proposal;
+      scheduleRanges(proposal).forEach(function (range) { selected = addSpan(selected, range.start, range.end, false); });
+      form.dataset.editing = proposal.id; multiple.checked = multiple.defaultChecked = scheduleRanges(proposal).length > 1;
+      notes.value = notes.defaultValue = proposal.notes || '';
+      U.setText(title, 'Edit this schedule'); U.setText(submit, 'Save changes');
+      U.setText(error, 'Changing dates clears the responses so everyone can confirm the new schedule.');
+      month = proposal.start.slice(0, 7); renderMonths(); sync(); draft.defaultValue = draft.value;
+      details.open = true; panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    };
+    details.startNew = function () { details.open = true; focusDay(month + '-01'); };
+    details.showPreview = function (proposal, navigate) {
+      preview = proposal;
+      if (!dirty() && !form.dataset.editing && proposal && proposal.start && navigate) { month = proposal.start.slice(0, 7); renderMonths(); }
+      sync();
+    };
+    details.calendarPanel = panel;
+    reset(); renderMonths();
     return details;
   }
+
 
   function buildDatesSection(tripId, prep) {
     var plan = prep.plan || {}, datesDoc = plan.dates || { proposals: {}, finalized: null };
@@ -43492,13 +43744,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     });
     var sec = U.el('section', { class: 'dates datesdash' });
     var statusLine = U.el('p', { class: 'dates__status', role: 'status', 'aria-live': 'polite' });
-    var drawer = buildProposeDrawer(tripId, statusLine);
+    var drawer = buildProposeDrawer(tripId, statusLine, proposals[ui.datePreview] || (f && proposals[f.proposalId]) || sorted[0] || f);
     var hero = U.el('div', { class: 'datesdash__hero' });
     var decision = U.el('section', { class: 'datesdash__decision', 'aria-label': 'Date decision' });
     decision.appendChild(decisionKicker('MAKE ROOM FOR THE JOURNEY'));
     decision.appendChild(U.el('span', { class: 'decisiondash__badge', dataset: { tone: governing ? 'ok' : f ? 'warn' : 'neutral' },
       text: governing ? 'Dates finalized' : f ? 'Open for discussion' : 'Decision in progress' }));
-    decision.appendChild(U.el('h2', { class: 'decisiondash__title', text: f ? plainRangeLabel(f.start, f.end) : 'Find your shared window.' }));
+    decision.appendChild(U.el('h2', { class: 'decisiondash__title', text: f ? scheduleLabel(f) : 'Find your shared window.' }));
     decision.appendChild(U.el('p', { class: 'dates__state', dataset: { state: datesStateOf(f), at: String((f && f.at) || 0) },
       text: datesLineText(f) }));
     var context = !pids.length ? 'Add an option, then see which dates work for everyone.' :
@@ -43512,9 +43764,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     decision.appendChild(counts);
     var propose = U.el('button', { type: 'button', class: 'btn btn--primary datesdash__propose',
       text: '+ Propose dates', dataset: { planFocus: 'dates-propose' } });
-    propose.addEventListener('click', function () { decisionOpenDrawer(drawer); });
-    decision.appendChild(propose); hero.appendChild(decision);
-    var calendarPanel = U.el('section', { class: 'datesdash__preview', 'aria-label': 'Date range preview' });
+    propose.addEventListener('click', function () { drawer.startNew(); });
+    decision.appendChild(propose);
+    var sidebar = U.el('div', { class: 'datesdash__sidebar' }); sidebar.appendChild(decision); sidebar.appendChild(drawer); hero.appendChild(sidebar);
+    var calendarPanel = drawer.calendarPanel;
     hero.appendChild(calendarPanel); sec.appendChild(hero);
     sec.appendChild(buildDatesBanner(prep));
     var head = U.el('div', { class: 'decisiondash__sectionhead' });
@@ -43525,45 +43778,29 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (!pids.length) {
       sec.appendChild(U.el('div', { class: 'decisiondash__empty dates__empty' }, [
         U.el('h3', { text: 'The first idea starts here.' }),
-        U.el('p', { text: 'Propose an arrival and departure date. You can leave a note about flexibility, work or travel time.' })
+        U.el('p', { text: 'Choose your dates above, then propose a schedule. Turn on multiple date ranges for a trip with separate parts.' })
       ]));
     } else {
       sorted.forEach(function (proposal) {
         var row = buildProposalRow(tripId, proposal, plan, members, memberUids, myUidVal, isOwner, governing, statusLine, drawer);
         var preview = U.el('button', { type: 'button', class: 'btn btn--quiet datesdash__preview-button',
           text: 'Preview calendar', 'aria-pressed': 'false', dataset: { pid: proposal.id, planFocus: 'dates-preview:' + proposal.id } });
-        preview.addEventListener('click', function () { ui.datePreview = proposal.id; renderPreview(); });
+        preview.addEventListener('click', function () { ui.datePreview = proposal.id; renderPreview(true); });
         row.querySelector('.dates__actions').appendChild(preview); ul.appendChild(row);
       });
       sec.appendChild(ul);
     }
-    function renderPreview() {
-      U.clear(calendarPanel);
+    function renderPreview(navigate) {
       var preview = proposals[ui.datePreview] || (f && proposals[f.proposalId]) || sorted[0] || f;
-      var chosen = !!(preview && governing && preview.id === governing.proposalId);
       U.qsa('.datesdash__preview-button', ul).forEach(function (button) {
         var selected = !!preview && button.dataset.pid === preview.id;
         button.setAttribute('aria-pressed', String(selected));
         button.closest('.dates__proposal').dataset.preview = String(selected);
       });
-      calendarPanel.appendChild(decisionKicker(preview ? (chosen ? 'YOUR SELECTED DATES' : 'OPTION PREVIEW') : 'YOUR DATES, AT A GLANCE'));
-      if (!preview || !preview.start || !preview.end) {
-        calendarPanel.appendChild(U.el('div', { class: 'datesdash__calendar-empty' }, [
-          U.el('span', { class: 'datesdash__calendar-symbol', 'aria-hidden': 'true', text: '31' }),
-          U.el('p', { text: 'Your first date option will appear here.' })
-        ])); return;
-      }
-      calendarPanel.appendChild(U.el('h3', { class: 'datesdash__preview-range', text: rangeLabel(preview.start, preview.end) }));
-      var months = U.el('div', { class: 'datesdash__months' }), startMonth = preview.start.slice(0, 7), endMonth = preview.end.slice(0, 7);
-      var firstMonth = dateMonthCalendar(preview.start, preview.end, startMonth);
-      if (firstMonth) months.appendChild(firstMonth);
-      if (endMonth !== startMonth) { var lastMonth = dateMonthCalendar(preview.start, preview.end, endMonth); if (lastMonth) months.appendChild(lastMonth); }
-      calendarPanel.appendChild(months);
-      calendarPanel.appendChild(U.el('p', { class: 'datesdash__legend', text: '● Arrival & departure · shaded dates are within this option' }));
-      if (endMonth !== startMonth) calendarPanel.appendChild(U.el('p', { class: 'datesdash__legend', text: 'Showing the arrival and departure months.' }));
+      drawer.showPreview(preview, navigate);
     }
     renderPreview();
-    sec.appendChild(statusLine); sec.appendChild(drawer);
+    sec.appendChild(statusLine);
     return sec;
   }
 
@@ -46910,6 +47147,15 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   function itineraryDayNumber(date, ctx) {
     if (!itineraryValidDay(date) || !ctx || !itineraryValidDay(ctx.departure)) return null;
     if (date < ctx.departure || itineraryValidDay(ctx.returnDate) && date > ctx.returnDate) return null;
+    if (ctx.dateRanges && ctx.dateRanges.length) {
+      var offset = 0;
+      for (var i = 0; i < ctx.dateRanges.length; i++) {
+        var range = ctx.dateRanges[i];
+        if (date >= range.start && date <= range.end) return offset + Math.round((Date.parse(date) - Date.parse(range.start)) / 86400000) + 1;
+        offset += Math.round((Date.parse(range.end) - Date.parse(range.start)) / 86400000) + 1;
+      }
+      return null;
+    }
     return Math.round((Date.parse(date + 'T12:00:00Z') - Date.parse(ctx.departure + 'T12:00:00Z')) / 86400000) + 1;
   }
   function itineraryDayLabel(date, ctx) {
@@ -46917,10 +47163,12 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (number !== null) return 'Day ' + number;
     if (ctx && itineraryValidDay(ctx.departure) && date < ctx.departure) return 'Before trip';
     if (ctx && itineraryValidDay(ctx.returnDate) && date > ctx.returnDate) return 'After trip';
+    if (ctx && ctx.dateRanges && ctx.dateRanges.length > 1 && date >= ctx.departure && date <= ctx.returnDate) return 'Between trip ranges';
     return 'Your plans';
   }
   function itineraryDayModel(view, plan) {
     var ctx = view && view.ctx || {}, daysByDate = Object.create(null), all = [], seen = Object.create(null);
+    ctx = Object.assign({}, ctx, { dateRanges: callItineraryPure('scheduleRanges', [plan, ctx], ctx.dateRanges || []) });
     var stored = view && view.entries || Object.keys(plan.itinerary && plan.itinerary.items || {}).map(function (id) { return plan.itinerary.items[id]; });
     var derived = view && view.derived || callItineraryPure('derivedRows', [plan], []);
     stored.concat(derived).forEach(function (entry) {
@@ -46944,7 +47192,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         for (var tick = from; tick <= until; tick += 86400000) daysByDate[new Date(tick).toISOString().slice(0, 10)] = true;
       }
     }
-    var dates = Object.keys(daysByDate).sort();
+    var dates = Object.keys(daysByDate).sort().filter(function (date) {
+      // Keep saved events within gaps reachable, but do not invent empty trip
+      // days between explicitly separate travel ranges.
+      if (!ctx.dateRanges || ctx.dateRanges.length < 2 || date < ctx.departure || date > ctx.returnDate || itineraryDayNumber(date, ctx) !== null) return true;
+      return all.some(function (entry) { return itineraryValidDay(entry.date) && entry.date <= date &&
+        (itineraryValidDay(entry.endDate) && entry.endDate >= entry.date ? entry.endDate : entry.date) >= date; }) ||
+        Object.keys(plan.packing && plan.packing.items || {}).some(function (id) { return plan.packing.items[id].itineraryDate === date; });
+    });
     var days = dates.map(function (date) {
       var items = all.filter(function (entry) { return itineraryValidDay(entry.date) && entry.date <= date &&
         (itineraryValidDay(entry.endDate) && entry.endDate >= entry.date ? entry.endDate : entry.date) >= date; });
@@ -46953,7 +47208,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     });
     return { ctx: ctx, days: days, stored: stored, derived: derived,
       unscheduled: all.filter(function (entry) { return !itineraryValidDay(entry.date); }),
-      outside: days.filter(function (day) { return itineraryDayLabel(day.date, ctx) === 'Before trip' || itineraryDayLabel(day.date, ctx) === 'After trip'; }) };
+      outside: days.filter(function (day) { return itineraryDayNumber(day.date, ctx) === null; }) };
   }
   function itineraryEntryTiming(item, day, plan) {
     var dated = itineraryValidDay(day.date), span = dated && itineraryValidDay(item.date) ? itinSpanOf(item, day.date) : null;
@@ -47105,6 +47360,12 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     state.appendChild(U.el('h2', { class: 'itin-board__range', text: range }));
     state.appendChild(U.el('p', { class: 'itin__state', dataset: { state: model.days.length ? 'dated' : 'none' }, text:
       model.stored.length + (model.stored.length === 1 ? ' added entry' : ' added entries') + ' · ' + model.derived.length + ' from bookings' + (model.days.length ? ' · ' + model.days.length + ' calendar days' : '') }));
+    if (model.ctx.dateRanges && model.ctx.dateRanges.length > 1) {
+      state.appendChild(U.el('p', { class: 'itin-board__date-ranges' }, [
+        U.el('span', { text: model.ctx.dateRanges.length + ' travel ranges · ' + scheduleLabel({ ranges: model.ctx.dateRanges }) + ' ' }),
+        U.el('a', { href: T.router.build('plan', ['dates']), text: 'Manage trip dates' })
+      ]));
+    }
     summary.appendChild(state);
     var add = U.el('button', { type: 'button', class: 'btn btn--primary itin-board__add', text: '+ Add a plan', dataset: { planFocus: 'itin-add' } });
     add.addEventListener('click', function () { drawer.openForAdd(ui.date); }); summary.appendChild(add); sec.appendChild(summary);
@@ -47885,7 +48146,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     }
     var forms = U.qsa(FORM_SELECTOR, el);
     for (var f = 0; f < forms.length; f++) {
-      if (forms[f].dataset.legsChanged === 'true') return true;
+      if (forms[f].dataset.legsChanged === 'true' || forms[f].dataset.selectingDates === 'true') return true;
       var fields = U.qsa('input, textarea, select', forms[f]);
       for (var i = 0; i < fields.length; i++) {
         var node = fields[i];
@@ -48207,7 +48468,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var lines = [];
       var governing = governingOf(plan);
       if (governing) {
-        lines.push({ key: 'dates', text: 'Dates: ' + plainRangeLabel(governing.start, governing.end) + '.',
+        lines.push({ key: 'dates', text: 'Dates: ' + scheduleLabel(governing) + '.',
           href: T.router.build('plan', ['dates']) });
       } else {
         var dCount = Object.keys((plan.dates && plan.dates.proposals) || {}).length;
