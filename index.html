@@ -6005,6 +6005,484 @@ header.masthead {
   .navmenu--device .navmenu__button { min-width: var(--tap-min); justify-content: center; padding-inline: var(--s1); }
   .masthead .masthead__util { gap: var(--s1); }
 }
+/* ==== src/css/20a-comp-navigation.css ==== */
+/* Unified single-row masthead, destination menu and mobile dock. */
+.shell--top { position: sticky; top: 0; z-index: 40; }
+header.masthead.masthead--unified {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: block;
+  width: 100%;
+  max-width: var(--page-max);
+  min-height: 76px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  background: var(--bg);
+  border-bottom: var(--hair) solid var(--line);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-sizing: border-box;
+}
+
+.masthead--unified > .masthead__bar {
+  display: flex;
+  align-items: center;
+  gap: clamp(var(--s2), 1.5vw, var(--s5));
+  width: 100%;
+  min-width: 0;
+  min-height: 76px;
+  white-space: nowrap;
+}
+
+/* Author display rules on the one-row controls must never reveal closed
+   disclosure panels or the trip bar while the catalog route hides them. */
+.masthead--unified [hidden],
+.shell--bottom .tabbar[hidden],
+.sheet[hidden],
+.sheet__backdrop[hidden] { display: none !important; }
+
+.masthead--unified .masthead__nameplate.nameplate {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: var(--s2);
+  min-width: 0;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.masthead--unified .masthead__brandmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  color: var(--accent-on-soft);
+  background: var(--accent-soft);
+  border: var(--hair) solid var(--accent-line);
+  border-radius: var(--radius-md);
+}
+.masthead--unified .masthead__brandmark svg { display: block; width: 22px; height: 22px; }
+.masthead--unified .masthead__brandmark svg,
+.masthead--unified .masthead__glass svg,
+.masthead--unified .masthead__searchicon svg,
+.masthead--unified .masthead__settingsglyph svg,
+.tabbar__icon svg,
+.sheet__itemglyph svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  max-width: 100%;
+  max-height: 100%;
+}
+.masthead--unified .masthead__glass,
+.masthead--unified .masthead__searchicon,
+.masthead--unified .masthead__settingsglyph,
+.tabbar__icon,
+.sheet__itemglyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+}
+.masthead--unified .masthead__brandtext {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semi);
+  letter-spacing: var(--tracking-tight, normal);
+}
+
+.masthead--unified > .masthead__bar > .navmenu--trip {
+  flex: 0 1 15rem;
+  min-width: 0;
+  max-width: 19rem;
+}
+.masthead--unified .navmenu--trip .tripswitch {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 var(--s3);
+  color: var(--ink);
+  background: var(--surface);
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius-round);
+  font: var(--weight-medium) var(--text-sm)/1.2 var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+.masthead--unified .navmenu--trip .tripswitch:hover,
+.masthead--unified .navmenu--trip .tripswitch[aria-expanded="true"] {
+  background: var(--surface-alt);
+  border-color: var(--line-strong);
+}
+.masthead--unified .navmenu--trip .tripswitch .navmenu__label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.15;
+  overflow: hidden;
+}
+.masthead--unified .tripswitch__name {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--ink);
+  font-weight: var(--weight-semi);
+}
+.masthead--unified .tripswitch__meta {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--ink-muted);
+  font-size: var(--text-xs);
+}
+.masthead--unified .navmenu--trip .navmenu__caret { flex: 0 0 auto; }
+.masthead--unified .navmenu--trip .navmenu__list { left: 0; right: auto; }
+
+.masthead--unified .tripbar__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+.masthead--unified .masthead__navlist {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--surface-inset);
+  border: var(--hair) solid var(--line-hair);
+  border-radius: var(--radius-round);
+}
+.masthead--unified .masthead__navlist > li { display: flex; list-style: none; }
+.masthead--unified .masthead__link,
+.masthead--unified .navmenu--more .navmenu__button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s1);
+  min-height: 38px;
+  padding: 0 var(--s3);
+  color: var(--ink-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-round);
+  font: var(--weight-medium) var(--text-sm)/1 var(--font-body);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.masthead--unified .masthead__link:hover,
+.masthead--unified .navmenu--more .navmenu__button:hover { color: var(--ink); background: var(--surface-alt); }
+.masthead--unified .masthead__link[aria-current="page"],
+.masthead--unified .navmenu--more .navmenu__button.is-current,
+.masthead--unified .navmenu--more .navmenu__button[aria-expanded="true"] {
+  color: var(--accent-on-soft);
+  background: var(--accent-soft);
+  font-weight: var(--weight-semi);
+}
+.masthead--unified .masthead__link[aria-current="page"]::after,
+.masthead--unified .navmenu--more .navmenu__button.is-current::after { display: none; }
+.masthead--unified .masthead__link:focus-visible,
+.masthead--unified .navmenu--more .navmenu__button:focus-visible,
+.masthead--unified .masthead__nameplate:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.masthead--unified > .masthead__bar > .masthead__util {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+  gap: var(--s1);
+  min-width: 0;
+  min-height: 44px;
+  margin-left: auto;
+  padding: 0;
+}
+.masthead--unified .masthead__search { position: relative; display: flex; align-items: center; flex: 0 0 auto; min-width: 0; }
+.masthead--unified .masthead__search .masthead__magnifier { display: none; }
+.masthead--unified .masthead__glass { top: 50%; transform: translateY(-50%); }
+.masthead--unified .masthead__magnifier > svg { display: block; width: 20px; height: 20px; }
+.masthead--unified .masthead__searchfield {
+  width: 10rem;
+  height: 40px;
+  min-height: 40px;
+  padding: 0 var(--s4) 0 var(--s6);
+  color: var(--ink);
+  background: var(--surface-inset);
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius-round);
+}
+.masthead--unified .masthead__searchfield:focus { border-color: var(--focus); background: var(--surface); }
+.masthead--unified .masthead__glass { left: var(--s3); font-size: var(--text-lg); }
+.masthead--unified .masthead__magnifier,
+.masthead--unified .navmenu--device .navmenu__button,
+.masthead--unified .masthead__settings {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  color: var(--ink-muted);
+  background: transparent;
+  border: var(--hair) solid transparent;
+  border-radius: var(--radius-round);
+}
+.masthead--unified .masthead__magnifier { font-size: var(--text-xl); cursor: pointer; }
+.masthead--unified .masthead__settings { font-size: var(--text-md); text-decoration: none; }
+.masthead--unified .masthead__magnifier:hover,
+.masthead--unified .navmenu--device .navmenu__button:hover,
+.masthead--unified .navmenu--device .navmenu__button[aria-expanded="true"],
+.masthead--unified .masthead__settings:hover { color: var(--ink); background: var(--surface-alt); border-color: var(--line); }
+.masthead--unified .masthead__magnifier:focus-visible,
+.masthead--unified .navmenu--device .navmenu__button:focus-visible,
+.masthead--unified .masthead__settings:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.masthead--unified .navmenu--device .navmenu__label { display: contents; }
+.masthead--unified .navmenu--device .navmenu__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  color: currentColor;
+  background: transparent;
+  border: 0;
+}
+.masthead--unified .navmenu--device .navmenu__who { display: none; }
+.masthead--unified .navmenu--device .navmenu__caret { display: none; }
+.masthead--unified .navmenu--device .navmenu__glyph svg { width: 18px; height: 18px; }
+.masthead--unified .navmenu--device .masthead__userdot { right: -2px; bottom: -1px; }
+
+/* The existing More menu now presents three tidy columns. */
+.masthead--unified .navmenu--more { position: relative; }
+.masthead--unified .navmenu--more .navmenu__list {
+  position: fixed;
+  top: calc(76px + var(--s2));
+  left: 50%;
+  right: auto;
+  width: min(660px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  max-height: min(72vh, 680px);
+  max-height: min(72dvh, 680px);
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s4);
+  padding: var(--s4);
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: var(--hair) solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.masthead--unified .navmenu--more .navmenu__col { min-width: 0; }
+.masthead--unified .navmenu--more .navmenu__grouplabel {
+  margin: 0 0 var(--s2);
+  padding: var(--s1) var(--s2) var(--s2);
+  color: var(--ink-faint);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-caps);
+}
+.masthead--unified .navmenu--more .navmenu__rowlink {
+  min-height: 54px;
+  padding: var(--s2);
+  border-radius: var(--radius-md);
+}
+.masthead--unified .navmenu--more .navmenu__rowlink:hover { background: var(--surface-alt); }
+.masthead--unified .navmenu--more .navmenu__rowlink[aria-current="page"] { background: var(--accent-soft); }
+.masthead--unified .navmenu--more .navmenu__rowtitle { font-size: var(--text-sm); }
+.masthead--unified .navmenu--more .navmenu__rowdesc { line-height: var(--leading-normal, 1.4); }
+
+.masthead--unified .navmenu__rowtext { min-width: 0; white-space: normal; }
+.masthead--unified .navmenu--more .navmenu__rowdesc { white-space: normal; overflow-wrap: anywhere; }
+.masthead--unified .navmenu--more .navmenu__rowlink { align-items: flex-start; }
+.masthead--unified .navmenu--more .navmenu__rowglyph { margin-top: 2px; }
+.masthead--unified .masthead__link[aria-current="page"],
+.masthead--unified .navmenu--more .navmenu__button.is-current { box-shadow: none; }
+.masthead--unified .masthead__search .search__key {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  left: auto; pointer-events: none; margin: 0; font-size: 10px;
+}
+.masthead--unified .masthead__searchfield { padding-right: 54px; }
+.masthead--unified .masthead__search:focus-within .search__key { display: none; }
+.masthead--unified .masthead__searchfield:focus { padding-right: 12px; }
+.sheet .sheet__item { justify-content: flex-start; gap: 12px; }
+.sheet .sheet__itemlabel { flex: 1; }
+.sheet .sheet__item::after { content: '›'; color: var(--ink-faint); }
+.shell--bottom .tabbar .tabbar__tab.is-current,
+.shell--bottom .tabbar .tabbar__tab[aria-current="page"] {
+  color: var(--accent-on-soft); background: var(--accent-soft);
+}
+.shell--bottom .tabbar__tab[aria-current="page"]::before { display: none; }
+
+/* Keep disclosure panels attached to controls and let their contents scroll. */
+.masthead--unified .navmenu { position: relative; }
+.masthead--unified .navmenu__list {
+  z-index: 50;
+  background: var(--surface);
+  border-color: var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.masthead--unified .navmenu__link:focus-visible,
+.masthead--unified .navmenu__plainrow:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+/* Unified search is a compact trigger; the native search panel still anchors
+   to .srch and retains its own positioning context. */
+@media (max-width: 1099px) {
+  .masthead--unified .masthead__search { width: 44px; min-width: 44px; }
+  .masthead--unified .masthead__searchfield { display: none; }
+  .masthead--unified .masthead__glass { display: none; }
+  .masthead--unified .masthead__search .masthead__magnifier { display: inline-flex; }
+  .masthead--unified .masthead__search .search__key { display: none; }
+  .masthead--unified.is-searching .masthead__searchfield {
+    display: block;
+    position: fixed;
+    top: 84px;
+    right: var(--gutter);
+    z-index: 60;
+    width: min(440px, calc(100vw - 64px));
+    max-width: none;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 var(--s3);
+    opacity: 1;
+    pointer-events: auto;
+    border: var(--hair) solid var(--line-strong);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .masthead--unified.is-searching .masthead__magnifier { display: inline-flex; }
+  .masthead--unified .masthead__search .srch__panel {
+    position: fixed; top: 132px; right: var(--gutter); left: auto;
+    width: min(440px, calc(100vw - 64px)); max-width: none;
+    max-height: calc(100dvh - 156px); overflow-y: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  header.masthead.masthead--unified { min-height: 68px; padding-inline: max(var(--s2), var(--gutter)); }
+  .masthead--unified > .masthead__bar { min-height: 68px; gap: var(--s1); }
+  .masthead--unified .masthead__nameplate.nameplate { flex: 0 0 44px; width: 44px; min-height: 44px; gap: 0; }
+  .masthead--unified .masthead__brandmark { flex-basis: 44px; width: 44px; height: 44px; }
+  .masthead--unified .masthead__brandtext { display: none; }
+  .masthead--unified > .masthead__bar > .navmenu--trip { flex: 1 1 auto; min-width: 0; max-width: none; }
+  .masthead--unified .navmenu--trip .tripswitch { min-height: 44px; padding-inline: var(--s3); }
+  .masthead--unified .navmenu--trip .tripswitch .navmenu__label { display: flex; min-width: 0; }
+  .masthead--unified .tripswitch__name { flex: 1 1 auto; }
+  .masthead--unified .tripswitch__meta { display: none; }
+  .masthead--unified .tripbar__nav { display: none; }
+  .masthead--unified > .masthead__bar > .masthead__util { gap: 0; margin-left: 0; }
+  .masthead--unified .masthead__settings { display: none; }
+  .masthead--unified .masthead__search,
+  .masthead--unified .navmenu--device { flex: 0 0 44px; }
+  .masthead--unified .navmenu--trip .navmenu__list {
+    position: fixed;
+    top: calc(68px + var(--s2));
+    left: 16px;
+    right: 16px;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+  .masthead--unified .navmenu--more .navmenu__list {
+    top: calc(68px + var(--s2));
+    left: 50%;
+    right: auto;
+    width: min(660px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
+    transform: translateX(-50%);
+  }
+
+  .masthead--unified ~ .shell__bands { padding-inline: var(--gutter); }
+  .tabbar {
+    display: block;
+    left: var(--s2);
+    right: var(--s2);
+    bottom: max(var(--s2), var(--safe-b));
+    overflow: hidden;
+    padding: 4px;
+    background: var(--surface);
+    border: var(--hair) solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+  .tabbar__list { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; }
+  .tabbar__item { min-width: 0; }
+  .tabbar__tab {
+    min-width: 0;
+    min-height: 52px;
+    border-radius: var(--radius-md);
+    gap: 3px;
+    font-size: var(--text-2xs);
+  }
+  .tabbar__icon { font-size: var(--text-md); }
+  .tabbar__tab.is-current,
+  .tabbar__tab[aria-current="page"] {
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    box-shadow: none;
+  }
+  .has-tabbar #trip-app { padding-bottom: calc(68px + var(--safe-b) + var(--s5)); }
+  .sheet {
+    max-height: min(88vh, 760px);
+    max-height: min(88dvh, 760px);
+    padding-bottom: calc(var(--s5) + var(--safe-b));
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+  .masthead--unified .masthead__brandtext { display: none; }
+  .masthead--unified > .masthead__bar { gap: var(--s2); }
+  .masthead--unified > .masthead__bar > .navmenu--trip { flex-basis: clamp(9rem, 23vw, 15rem); }
+  .masthead--unified .masthead__link,
+  .masthead--unified .navmenu--more .navmenu__button { padding-inline: var(--s2); }
+  .masthead--unified .masthead__navlist { gap: 0; }
+  .masthead--unified .masthead__settings { display: none; }
+}
+
+@media (max-width: 359px) {
+  .masthead--unified > .masthead__bar { gap: 2px; }
+  .masthead--unified .masthead__brandmark { flex-basis: 44px; width: 44px; height: 44px; }
+  .masthead--unified .masthead__nameplate.nameplate { flex-basis: 44px; width: 44px; }
+  .masthead--unified .navmenu--trip .tripswitch { padding-inline: var(--s2); }
+  .masthead--unified .masthead__magnifier,
+  .masthead--unified .navmenu--device .navmenu__button { flex-basis: 44px; width: 44px; }
+  .masthead--unified .masthead__search,
+  .masthead--unified .navmenu--device { flex-basis: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .masthead--unified *,
+  .tabbar,
+  .sheet { scroll-behavior: auto; animation-duration: 0.01ms; transition-duration: 0.01ms; }
+}
+
 /* ==== src/css/30-view-explore.css ==== */
 /* 30-view-explore.css — the Explore screen shell and grid. OWNER: IMPL-2.
  * Grid + density behaviour is UX_SPEC §3.8: card minimum width 300px, and the
@@ -61741,10 +62219,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     opts = opts || {};
     var wrap = U.el('div', { class: 'navmenu' + (opts.class ? ' ' + opts.class : '') });
     var btn = U.el('button', {
-      type: 'button', class: 'navmenu__button', 'aria-expanded': 'false', 'aria-haspopup': opts.haspopup || 'true'
+      type: 'button', class: 'navmenu__button', 'aria-expanded': 'false', 'aria-controls': 'shell-menu-' + openMenus.length
     }, [U.el('span', { class: 'navmenu__label', text: label }),
         U.el('span', { class: 'navmenu__caret', 'aria-hidden': 'true', text: '▾' })]);
-    var list = U.el('ul', { class: 'navmenu__list', hidden: true });
+    var list = U.el('ul', { class: 'navmenu__list', id: 'shell-menu-' + openMenus.length, hidden: true });
 
     /** (re)populate the list. Exposed as `wrap._setItems` so a menu whose
      *  contents can change after it is built (the trip switcher — trips get
@@ -61799,6 +62277,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (returnFocus) btn.focus();
     }
     wrap._close = close;
+    wrap.addEventListener('focusout', function () {
+      window.setTimeout(function () {
+        if (!wrap.contains(document.activeElement)) close(false);
+      }, 0);
+    });
 
     btn.addEventListener('click', function () {
       if (btn.getAttribute('aria-expanded') === 'true') close(false); else open(false);
@@ -61994,61 +62477,36 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     });
   }
 
-  /** The trip bar is the whole of row 2, so it is hidden as one thing: on the
-   *  catalog there is no active trip being looked at, only a list of them.
-   *  `#/trips/<id>` HAS a param and so keeps the bar — the parsed route in the
-   *  store is the only thing that can tell those two URLs apart, since both
-   *  render under the name 'trips'. */
+  /** The catalog shows app controls; a trip adds its selector and destinations.
+   *  The parsed route distinguishes the catalog from a trip's own home. */
   function paintTripBar() {
-    if (!nodes.tripbar) return;
     var r = store.getState().ui.route;
-    if (!r) { try { r = T.router.parse(window.location.hash); } catch (e) { r = { name: '', params: [] }; } }
-    var params = r.params || [];
-    nodes.tripbar.hidden = (r.name === 'trips' && !params[0]);
+    if (!r) r = T.router.parse(window.location.hash);
+    var catalog = r.name === 'trips' && !(r.params || [])[0];
+    if (nodes.tripMenu) nodes.tripMenu.hidden = catalog;
+    if (nodes.tripbar) nodes.tripbar.hidden = catalog;
+    if (nodes.masthead) nodes.masthead.classList.toggle('is-catalog', catalog);
   }
 
-  /* ---- the two rows (NAV_SPEC §2) --------------------------------------
-   * ONE sticky `header.masthead`, two lines inside it, and the split is the
-   * whole point: row 1 is the APP (who we are, search, this device, settings,
-   * the workbook's health) and never changes; row 2 is the TRIP (which trip,
-   * its dates, its sections) and disappears on the catalog, where no single
-   * trip is being looked at. v0.18.0 put the trip in row 1's dateline and
-   * every reviewer read it as decoration.
-   *
-   * The old "exactly five / four children" invariant is GONE with the grid it
-   * was written for: both rows are plain flex lines with a gap, the search
-   * takes the slack, and the responsive queries below shrink controls to
-   * glyphs rather than counting columns. */
+  /* One physical row, in reading order: brand, trip, destinations, account.
+     On phones the destinations become a thumb-reachable bottom dock. */
   function buildMasthead() {
-    var head = U.el('header', { class: 'masthead', role: 'banner' });
-    /* Source and keyboard order follow the two visual rows at every width. */
-    head.appendChild(buildGlobalRow());
-    head.appendChild(buildUtilRow());
-    head.appendChild(buildTripBar());
+    var head = U.el('header', { class: 'masthead masthead--unified', role: 'banner' });
+    var bar = U.el('div', { class: 'masthead__bar' });
+    var plate = U.el('a', {
+      class: 'masthead__nameplate nameplate', href: href('trips'),
+      'aria-label': 'The Trip List — all trips', title: 'All trips'
+    }, [
+      U.el('span', { class: 'masthead__brandmark', 'aria-hidden': 'true', html: navIcon('brand') }),
+      U.el('span', { class: 'masthead__brandtext', text: 'Trip List' })
+    ]);
+    bar.appendChild(plate);
+    bar.appendChild(buildTripSwitch());
+    bar.appendChild(buildTripBar());
+    bar.appendChild(buildUtilRow());
+    head.appendChild(bar);
     nodes.masthead = head;
     return head;
-  }
-
-  function buildGlobalRow() {
-    var inner = U.el('div', { class: 'masthead__inner masthead__global' });
-
-    /* Nameplate — a publication masthead, not a logo. The typographic
-       treatment is WS-D's (05-chrome.css, `.nameplate*`); the `masthead__*`
-       classes stay for the shell's own layout. v0.19.0 — the trip switcher
-       left for row 2, which makes the nameplate a single `<a>` again (nothing
-       interactive is nested inside it any more), and it points at the trips
-       list: the publication's front page is the list of trips. */
-    var plate = U.el('a', {
-      class: 'masthead__nameplate nameplate nameplate__link',
-      href: href('trips'), 'aria-label': 'The Trip List — see all your trips'
-    }, U.el('span', { class: 'masthead__title nameplate__title' }, [
-        U.el('span', { class: 'nameplate__article', text: 'The' }),
-        U.el('span', { class: 'nameplate__name', text: 'Trip List' })
-      ]));
-    inner.appendChild(plate);
-
-    nodes.globalRow = inner;
-    return inner;
   }
 
   /** Top-row utilities: search, identity, settings. */
@@ -62071,7 +62529,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     nodes.settingsLink = U.el('a', {
       class: 'masthead__settings', href: href('data'), dataset: { route: 'data' },
       'aria-label': 'Settings'
-    }, U.el('span', { class: 'masthead__settingsglyph', 'aria-hidden': 'true', text: '⚙' }));
+    }, U.el('span', { class: 'masthead__settingsglyph', 'aria-hidden': 'true', html: navIcon('data') }));
     inner.appendChild(nodes.settingsLink);
 
     /* A-hybrid SPEC §8 — the workbook-health and sync-status chips are no
@@ -62090,6 +62548,24 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
      `DEVICE_GLYPHS`'s house style (inline SVG, `stroke="currentColor"`, no
      external asset — fact 20 holds). Copied verbatim from the pixel-verified
      mockup (`SCRATCH/design/mock/header-a.html`). */
+  function navIcon(name) {
+    var shapes = {
+      brand: '<path d="m3 3 10 4-5 2-2 5Z"/><path d="m8 9 5-2"/>',
+      home: '<path d="m2 7 6-5 6 5v7H9v-4H7v4H2Z"/>',
+      explore: '<circle cx="8" cy="8" r="6"/><path d="m10.5 5.5-1.4 3.6-3.6 1.4 1.4-3.6Z"/>',
+      plan: '<rect x="3" y="3" width="10" height="11" rx="2"/><path d="M6 2v3M10 2v3M5.5 9l1.5 1.5 3.5-3.5"/>',
+      dates: '<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M5 1.5v3M11 1.5v3M2 7h12M5 10h2M9 10h2"/>',
+      bookings: '<path d="M2 3h12v4a1.5 1.5 0 0 0 0 3v3H2v-3a1.5 1.5 0 0 0 0-3Z"/><path d="M9 3v2M9 7v2M9 11v2"/>',
+      prepare: '<rect x="2" y="5" width="12" height="9" rx="2"/><path d="M5 5V2h6v3M5 5v9M11 5v9"/>',
+      itinerary: '<circle cx="4" cy="3" r="1.5"/><circle cx="12" cy="13" r="1.5"/><path d="M4 4.5v3h8v4"/>',
+      search: '<circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/>',
+      menu: '<rect x="2" y="2" width="4" height="4" rx="1"/><rect x="10" y="2" width="4" height="4" rx="1"/><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="10" y="10" width="4" height="4" rx="1"/>',
+      data: '<path d="m6 2-.5 2-2 .5L2 7l1.5 1-1 2 2 2 2-.5L8 14l2-1.5 2 .5 1.5-2-1-2L14 7l-1.5-2-2-.5L10 2Z"/><circle cx="8" cy="8" r="2"/>'
+    };
+    if (shapes[name]) return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + shapes[name] + '</svg>';
+    return ROUTE_GLYPHS[name] || '';
+  }
+
   var ROUTE_GLYPHS = {
     collections: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>',
     map: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m1.5 3 4-1.5 5 1.5 4-1.5V13l-4 1.5-5-1.5-4 1.5zM5.5 1.5V13M10.5 3v11.5"/></svg>',
@@ -62104,55 +62580,64 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
   /** One row of the More▾ mega-lite panel: 16px glyph + bold title + a
    *  one-line description (A-hybrid SPEC §7). */
+  function destinationHref(item) { return href(item.name, item.params || []); }
+  function destinationIsCurrent(item) {
+    var current = T.router.parse(window.location.hash);
+    if (item.name !== T.router.currentName()) return false;
+    return !item.params || (current.params || [])[0] === item.params[0];
+  }
+
+  /* Desktop and phone share the same destinations and order. */
+  function navigationGroups() {
+    function planItem(section, label, desc) {
+      return { name: 'plan', params: [section], label: label, menuDesc: desc, icon: section };
+    }
+    return [
+      { title: 'Discover', items: ['collections', 'map', 'responses', 'compare'].map(route) },
+      { title: 'Your plan', items: [
+        planItem('dates', 'Dates', 'Find the right time'),
+        planItem('budget', 'Budget', 'Keep spending in view'),
+        planItem('bookings', 'Bookings', 'Everything you have reserved'),
+        planItem('prepare', 'Prepare', 'Tasks, packing & documents'),
+        planItem('itinerary', 'Itinerary', 'Bring your days together')
+      ] },
+      { title: 'Tools & settings', items: ['budget', 'decision', 'changed', 'tasks', 'archive', 'data'].map(route) }
+    ];
+  }
+
   function moreRow(r) {
-    var a = U.el('a', { class: 'navmenu__rowlink', href: href(r.name), dataset: { route: r.name } }, [
-      U.el('span', { class: 'navmenu__rowglyph', 'aria-hidden': 'true', html: ROUTE_GLYPHS[r.name] || '' }),
+    var a = U.el('a', {
+      class: 'navmenu__rowlink', href: destinationHref(r),
+      dataset: { route: r.name, section: r.params ? r.params[0] : '' }
+    }, [
+      U.el('span', { class: 'navmenu__rowglyph', 'aria-hidden': 'true', html: navIcon(r.icon || r.name) }),
       U.el('span', { class: 'navmenu__rowtext' }, [
         U.el('span', { class: 'navmenu__rowtitle', text: r.label }),
-        U.el('span', { class: 'navmenu__rowdesc', text: r.menuDesc || '' })
+        U.el('span', { class: 'navmenu__rowdesc', text: r.menuDesc || 'Account, sharing & preferences' })
       ])
     ]);
     return { node: a };
   }
 
-  /** Row 2: which trip, when it is, and where you can go inside it. */
   function buildTripBar() {
-    var bar = U.el('div', { class: 'masthead__inner masthead__trip tripbar', hidden: true });
-
-    bar.appendChild(buildTripSwitch());
-
-    /* The trip's sections. Same links, same `[data-route]` + aria-current
-       convention and the same dropdown helper as the old `.masthead__nav` —
-       it simply moved down a line, to sit under the name of the trip they all
-       belong to. `.masthead__navlist`/`.masthead__link` stay as the class
-       hooks so the link styling is unchanged. */
     var nav = U.el('nav', { class: 'tripbar__nav', 'aria-label': 'This trip' });
     var navList = U.el('ul', { class: 'masthead__navlist tripbar__navlist' });
     SH.ROUTES.filter(function (r) { return r.group === 'primary'; }).forEach(function (r) {
       var a = U.el('a', { class: 'masthead__link', href: href(r.name), dataset: { route: r.name } }, r.label);
       navList.appendChild(U.el('li', {}, a));
     });
-
-    /* Secondary destinations stay one click away in two balanced groups. */
-    var browseItems = SH.ROUTES.filter(function (r) { return r.group === 'more' && r.menuGroup === 'browse'; }).map(moreRow);
-    var toolItems = SH.ROUTES.filter(function (r) {
-      return r.group === 'labs' || (r.group === 'more' && r.menuGroup !== 'browse');
-    }).map(moreRow);
-    var more = dropdown('More', [
-      { col: [{ grouplabel: 'Browse & compare' }].concat(browseItems) },
-      { col: [{ grouplabel: 'Tools & updates' }].concat(toolItems) }
-    ], { class: 'navmenu--more' });
+    var more = dropdown('Menu', navigationGroups().map(function (group) {
+      return { col: [{ grouplabel: group.title }].concat(group.items.map(moreRow)) };
+    }), { class: 'navmenu--more' });
     nodes.moreMenuButton = U.qs('.navmenu__button', more);
+    nodes.moreMenuButton.setAttribute('aria-label', 'Menu — all trip destinations');
     nodes.moreMenuDot = U.el('span', { class: 'navmenu__dot', hidden: true, 'aria-hidden': 'true', text: ' •' });
     nodes.moreMenuButton.insertBefore(nodes.moreMenuDot, U.qs('.navmenu__caret', nodes.moreMenuButton));
     navList.appendChild(U.el('li', {}, more));
-
     nav.appendChild(navList);
-    bar.appendChild(nav);
-
-    nodes.tripbar = bar;
+    nodes.tripbar = nav;
     nodes.navList = navList;
-    return bar;
+    return nav;
   }
 
   function buildSearch() {
@@ -62163,9 +62648,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var label = U.el('label', { class: 'visually-hidden', for: id, text: 'Search anything' });
     var input = U.el('input', {
       class: 'masthead__searchfield', id: id, type: 'search', autocomplete: 'off',
-      placeholder: 'Search anything', enterkeyhint: 'search'
+      placeholder: 'Search', enterkeyhint: 'search'
     });
-    var glass = U.el('span', { class: 'masthead__glass', 'aria-hidden': 'true', text: '⌕' });
+    var glass = U.el('span', { class: 'masthead__glass', 'aria-hidden': 'true', html: navIcon('search') });
     /* A-hybrid SPEC §5 — the field is the trigger for T.search; the ⌘K hint is
        new, purely advisory (the shortcut itself is unchanged — SH.onKeydown
        below still handles ⌘K/Ctrl+K/`/`), and hides on focus (CSS
@@ -62199,11 +62684,22 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       input.blur();
     });
 
+    input.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (T.search && T.search.close) T.search.close();
+      nodes.masthead.classList.remove('is-searching');
+      if (window.matchMedia('(max-width: 1099px)').matches) magnifier.focus();
+      else input.blur();
+    });
+
     // Mobile/tablet: the field collapses to a magnifier that opens search.
     var magnifier = U.el('button', {
       type: 'button', class: 'masthead__magnifier', 'aria-label': 'Search anything'
-    }, '⌕');
+    }, U.el('span', { class: 'masthead__searchicon', 'aria-hidden': 'true', html: navIcon('search') }));
     magnifier.addEventListener('click', function () {
+      if (window.matchMedia('(min-width: 768px)').matches) nodes.masthead.classList.add('is-searching');
       if (!handOff('magnifier')) {
         nodes.masthead.classList.add('is-searching');
         try { input.focus(); } catch (e) {}
@@ -62220,6 +62716,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   }
 
   SH.focusSearch = function () {
+    if (nodes.masthead && window.matchMedia('(min-width: 768px)').matches) nodes.masthead.classList.add('is-searching');
     if (T.search && typeof T.search.open === 'function') {
       try { return T.search.open({ query: '', source: 'shortcut' }); } catch (e) {}
     }
@@ -62576,7 +63073,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var a = U.el('a', {
         class: 'tabbar__tab', href: href(name), dataset: { route: name }
       }, [
-        U.el('span', { class: 'tabbar__icon', 'aria-hidden': 'true', text: r.glyph }),
+        U.el('span', { class: 'tabbar__icon', 'aria-hidden': 'true', html: navIcon(name) }),
         U.el('span', { class: 'tabbar__label', text: r.tab })
       ]);
       if (name === 'compare') {
@@ -62591,8 +63088,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       type: 'button', class: 'tabbar__tab tabbar__tab--more',
       'aria-haspopup': 'dialog', 'aria-expanded': 'false'
     }, [
-      U.el('span', { class: 'tabbar__icon', 'aria-hidden': 'true', text: '⋯' }),
-      U.el('span', { class: 'tabbar__label', text: 'More' })
+      U.el('span', { class: 'tabbar__icon', 'aria-hidden': 'true', html: navIcon('menu') }),
+      U.el('span', { class: 'tabbar__label', text: 'Menu' })
     ]);
     nodes.moreDot = U.el('span', { class: 'tabbar__dot', hidden: true, 'aria-hidden': 'true' });
     moreBtn.appendChild(nodes.moreDot);
@@ -62650,20 +63147,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   /* ---- More sheet ---------------------------------------------------- */
 
   function sheetGroups() {
-    var counts = T.select.get('counts') || {};
-    var open = openTaskCount();
-    /* Collections keeps a direct home in More after Plan becomes a primary
-       mobile tab. Plan stays in this list too for existing menu habits. */
-    var perspectives = [route('collections'), route('responses'), route('plan'), route('changed'), route('map')];
-    return [
-      { title: 'Labs', items: [route('budget'), route('decision')] },
-      { title: 'Perspectives', items: perspectives },
-      { title: 'Keeping track', items: [
-        { name: 'tasks', label: 'Loose ends', badge: open },
-        { name: 'archive', label: 'The No Pile', badge: counts.rejected || 0 }
-      ] },
-      { title: 'Setup', items: [route('data')] }
-    ];
+    return navigationGroups().map(function (group) {
+      return { title: group.title, items: group.items.filter(function (item) {
+        return TABS.indexOf(item.name) < 0 || item.params;
+      }) };
+    });
   }
 
   function openTaskCount() {
@@ -62690,7 +63178,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     });
     panel.appendChild(U.el('div', { class: 'sheet__grab', 'aria-hidden': 'true' }));
     var head = U.el('div', { class: 'sheet__head' });
-    head.appendChild(U.el('h2', { id: 'sheet-title', class: 'sheet__title', text: 'Everywhere else' }));
+    head.appendChild(U.el('h2', { id: 'sheet-title', class: 'sheet__title', text: 'Your trip, in one place' }));
     var close = U.el('button', { type: 'button', class: 'sheet__close', 'aria-label': 'Close this menu' }, '×');
     close.addEventListener('click', function () { SH.closeMore(); });
     head.appendChild(close);
@@ -62726,8 +63214,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       sec.appendChild(U.el('h3', { class: 'sheet__grouptitle', text: g.title }));
       var ul = U.el('ul', { class: 'sheet__list' });
       g.items.forEach(function (item) {
-        var a = U.el('a', { class: 'sheet__item', href: href(item.name), dataset: { route: item.name } });
-        if (item.name === T.router.currentName()) a.setAttribute('aria-current', 'page');
+        var a = U.el('a', { class: 'sheet__item', href: destinationHref(item), dataset: { route: item.name, section: item.params ? item.params[0] : '' } });
+        if (destinationIsCurrent(item)) a.setAttribute('aria-current', 'page');
+        a.appendChild(U.el('span', { class: 'sheet__itemglyph', 'aria-hidden': 'true', html: navIcon(item.icon || item.name) }));
         a.appendChild(U.el('span', { class: 'sheet__itemlabel', text: item.label }));
         if (item.name === 'changed') {
           var dot = U.el('span', { class: 'sheet__dot', hidden: !store.getState().ui.changedUnread });
@@ -62764,12 +63253,16 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   var sheetReturnFocus = null;
   SH.openMore = function () {
     if (!nodes.sheet || !nodes.sheet.hidden) return;
+    closeAllMenus(null);
     paintSheet();
     sheetReturnFocus = document.activeElement;
     nodes.sheetBackdrop.hidden = false;
     nodes.sheet.hidden = false;
     if (nodes.moreButton) nodes.moreButton.setAttribute('aria-expanded', 'true');
     document.documentElement.classList.add('has-sheet');
+    if (nodes.root) nodes.root.inert = true;
+    document.getElementById('app-main').inert = true;
+    if (nodes.tabbar) nodes.tabbar.inert = true;
     var first = U.qs('a, button', nodes.sheet);
     if (first) try { first.focus(); } catch (e) {}
   };
@@ -62779,6 +63272,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     nodes.sheetBackdrop.hidden = true;
     if (nodes.moreButton) nodes.moreButton.setAttribute('aria-expanded', 'false');
     document.documentElement.classList.remove('has-sheet');
+    if (nodes.root) nodes.root.inert = false;
+    document.getElementById('app-main').inert = false;
+    if (nodes.tabbar) nodes.tabbar.inert = false;
     if (sheetReturnFocus && sheetReturnFocus.focus) { try { sheetReturnFocus.focus(); } catch (e) {} }
     sheetReturnFocus = null;
   };
@@ -62818,14 +63314,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   function paintCurrentRoute() {
     var name = T.router.currentName() || 'trips';
     (nodes.roots || []).forEach(function (n) { n.dataset.route = name; });
-    /* Row 2 first: it changes the masthead's height, and everything below
-       reads that height. `#/trips/<id>` reports itself as 'home' here — only
-       the parsed route in the store separates the catalog from a trip. */
+    /* Show trip context only after a trip has been entered. */
     paintTripBar();
 
     (nodes.roots || []).forEach(function (rootNode) {
       U.qsa('[data-route]', rootNode).forEach(function (a) {
         var mine = a.dataset.route === name;
+        if (a.dataset.section) mine = mine && (T.router.parse(window.location.hash).params || [])[0] === a.dataset.section;
         if (mine) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
         U.toggleClass(a, 'is-current', mine);
       });
@@ -62852,7 +63347,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (nodes.moreMenuDot) nodes.moreMenuDot.hidden = !on;
     if (nodes.moreDot) nodes.moreDot.hidden = !on;
     if (nodes.moreButton) {
-      nodes.moreButton.setAttribute('aria-label', on ? 'More sections — a new digest is waiting' : 'More sections');
+      nodes.moreButton.setAttribute('aria-label', on ? 'Menu — a new digest is waiting' : 'Menu — all trip destinations');
     }
   }
 
@@ -62868,6 +63363,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
   function onKeydown(e) {
     if (e.defaultPrevented) return;
+    if (document.querySelector('[aria-modal="true"]:not([hidden])')) return;
     var k = e.key;
     if ((e.metaKey || e.ctrlKey) && (k === 'k' || k === 'K')) { e.preventDefault(); SH.focusSearch(); return; }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -62938,11 +63434,35 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       nodes.searchInput.addEventListener('focus', function () { nodes.searchHandOff('focus'); });
     }
 
+    // Handle search before its component's legacy global listener so the
+    // compact field is revealed before focus, and existing dialogs stay modal.
+    document.addEventListener('keydown', function (e) {
+      var shortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k';
+      shortcut = shortcut || (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !isTyping(e.target));
+      if (!shortcut || e.defaultPrevented) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (document.querySelector('[aria-modal="true"]:not([hidden])')) return;
+      closeAllMenus(null);
+      SH.focusSearch();
+    }, true);
     document.addEventListener('keydown', onKeydown);
     document.addEventListener('click', function (e) {
       if (!e.target.closest || !e.target.closest('.navmenu')) closeAllMenus(null);
+      if (e.target.closest && !e.target.closest('.srch, .srch-overlay')) {
+        nodes.masthead.classList.remove('is-searching');
+      }
     });
-    window.addEventListener('hashchange', function () { SH.closeMore(); });
+    window.addEventListener('hashchange', function () {
+      SH.closeMore();
+      if (T.search && T.search.close) T.search.close();
+      if (nodes.masthead) nodes.masthead.classList.remove('is-searching');
+    });
+    nodes.utilRow.addEventListener('focusout', function () {
+      window.setTimeout(function () {
+        if (!document.activeElement.closest('.srch') && nodes.masthead) nodes.masthead.classList.remove('is-searching');
+      }, 0);
+    });
 
     paintWorkbookChip();
     paintSyncChip();
@@ -63007,6 +63527,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     window.setTimeout(SH.init, 0);
   }
 })(window.TRIP);
+
 /* ==== src/js/80-health.js ==== */
 /* 80-health.js — workbook + storage health. OWNER: IMPL-5 (transferred from WS-B).
  *
