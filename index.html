@@ -12588,6 +12588,362 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   .prepboard__empty { padding: 23px; }
   .prepboard__footer { gap: 5px; }
 }
+
+
+
+/* BEGIN plan-polish-bookings */
+/* Bookings: saved journeys, stays and coverage, with existing native forms. */
+.plan > .bookings { grid-template-columns: minmax(0, 1fr); gap: var(--s5); }
+.plan .bookings__overview { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--s3); margin: 0; }
+.plan .bookings__metric { min-width: 0; display:flex; flex-direction:column-reverse; align-items:flex-start; gap:var(--s1); padding:var(--s4) var(--s5); border:var(--hair) solid var(--line); border-radius:calc(var(--radius-lg)*2); background:var(--surface); }
+.plan .bookings__metric dt { font-size:var(--text-xs); color:var(--ink-muted); }
+.plan .bookings__metric dd { margin:0; font-size:clamp(1.6rem,3vw,2rem); font-weight:var(--weight-semi); line-height:1.15; font-variant-numeric:tabular-nums; color:var(--accent); }
+.plan .bookings__note { grid-column:1/-1; padding:0 var(--s1); }
+.plan .bookings__group { min-width:0; align-content:start; border:0; padding:0; gap:var(--s3); }
+.plan .bookings__grouphead { display:flex; justify-content:space-between; align-items:center; gap:var(--s3); }
+.plan .bookings__grouphead .plan__h { margin:0; }
+.plan .bookings__groupintro { margin:var(--s1) 0 0; font-size:var(--text-sm); color:var(--ink-muted); }
+.plan .bookings__add { flex-shrink:0; border:var(--hair) solid var(--line); background:var(--surface); }
+.plan .bookings__empty { padding:var(--s5); border:var(--hair) dashed var(--line-strong); border-radius:calc(var(--radius-lg)*2); line-height:var(--leading-body); }
+.plan .bookings__item { display:flex; flex-direction:column; gap:var(--s4); padding:var(--s5); border-radius:calc(var(--radius-lg)*2); min-width:0; }
+.plan .bookings__cardhead { display:flex; justify-content:space-between; align-items:flex-start; gap:var(--s4); min-width:0; }
+.plan .bookings__headingcopy { min-width:0; }
+.plan .bookings__meta { margin:0 0 var(--s1); font-size:var(--text-xs); color:var(--ink-muted); }
+.plan .bookings__title { font-size:var(--text-lg); line-height:1.35; margin:0; letter-spacing:-.02em; }
+.plan .bookings__price { flex-shrink:0; text-align:right; }
+.plan .bookings__pricelabel { display:block; color:var(--ink-muted); font-size:var(--text-xs); margin-bottom:var(--s1); }
+.plan .bookings__amount { font-size:var(--text-lg); text-align:inherit; line-height:1.3; white-space:nowrap; }
+.plan .bookings__foreigntag { display:block; font-size:var(--text-xs); margin-top:2px; font-weight:var(--weight-normal); }
+.plan .bookings__ribbon { display:flex; flex-wrap:wrap; gap:var(--s2) var(--s4); align-items:center; }
+.plan .bookings__people { margin:0; font-size:var(--text-sm); color:var(--ink); overflow-wrap:anywhere; }
+.plan .bookings__people > span { color:var(--ink-muted); }
+.plan .bookings__chip { display:inline-flex; align-items:center; max-width:100%; padding:5px 9px; border-radius:var(--radius-sm); background:var(--surface-alt); color:var(--ink-muted); font-size:var(--text-xs); line-height:1.4; overflow-wrap:anywhere; }
+.plan .bookings__confirmation { font-variant-numeric:tabular-nums; color:var(--ink); }
+.plan .bookings__journeys { display:grid; gap:var(--s4); min-width:0; }
+.plan .bookings__journey { min-width:0; border:var(--hair) solid var(--line); border-radius:var(--radius-lg); overflow:hidden; }
+.plan .bookings__journeytitle { margin:0; display:flex; align-items:center; justify-content:space-between; gap:var(--s3); padding:var(--s3) var(--s4); background:var(--surface-alt); font-size:var(--text-sm); font-weight:var(--weight-medium); color:var(--ink); }
+.plan .bookings__journeytitle > span { font-size:var(--text-xs); font-weight:var(--weight-normal); color:var(--ink-muted); }
+.plan .bookings__legs { margin:0; padding:0; list-style:none; }
+.plan .bookings__leg { display:grid; gap:var(--s3); min-width:0; padding:var(--s4); }
+.plan .bookings__leg + .bookings__leg { border-top:var(--hair) dashed var(--line-strong); }
+.plan .bookings__leghead { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--s2); }
+.plan .bookings__flightname { font-size:var(--text-sm); font-weight:var(--weight-medium); overflow-wrap:anywhere; }
+.plan .bookings__cabin { font-size:var(--text-xs); color:var(--ink-muted); }
+.plan .bookings__legroute { display:grid; grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr); gap:var(--s3); align-items:start; }
+.plan .bookings__endpoint { display:flex; flex-direction:column; align-items:flex-start; min-width:0; gap:4px; }
+.plan .bookings__eyebrow { font-size:var(--text-xs); color:var(--ink-muted); }
+.plan .bookings__airport { font-size:clamp(1.5rem,3vw,2rem); line-height:1.2; letter-spacing:-.04em; font-weight:var(--weight-semi); color:var(--ink); overflow-wrap:anywhere; }
+.plan .bookings__time { font-size:var(--text-md); line-height:1.3; font-weight:var(--weight-medium); font-variant-numeric:tabular-nums; color:var(--ink); }
+.plan .bookings__date,.plan .bookings__zone { font-size:var(--text-xs); color:var(--ink-muted); line-height:1.5; overflow-wrap:anywhere; }
+.plan .bookings__zone { color:var(--ink-faint); }
+.plan .bookings__connector { color:var(--ink-faint); align-self:center; text-align:center; font-size:1.5rem; }
+.plan .bookings__daychange { font-size:var(--text-xs); color:var(--accent); border:var(--hair) solid var(--line); border-radius:var(--radius-round); padding:2px 7px; }
+.plan .bookings__seats,.plan .bookings__amenities { display:flex; flex-wrap:wrap; gap:var(--s2); }
+.plan .bookings__legnotes { font-size:var(--text-sm); color:var(--ink-muted); white-space:pre-wrap; overflow-wrap:anywhere; line-height:var(--leading-body); margin:0; }
+.plan .bookings__legnotes > span { font-size:var(--text-xs); font-weight:var(--weight-medium); }
+.plan .bookings__daterange { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s4); padding:var(--s4); background:var(--surface-alt); border-radius:var(--radius-lg); }
+.plan .bookings__daterange .bookings__date { color:var(--ink); font-size:var(--text-sm); }
+.plan .bookings__deposit { margin:0; font-size:var(--text-sm); color:var(--ink-muted); line-height:var(--leading-body); }
+.plan .bookings__details { margin:0; }
+.plan .bookings__details > summary { border-top:var(--hair) solid var(--line-hair); min-height:44px; }
+.plan .bookings__facts { grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s4); padding-top:var(--s2); }
+.plan .bookings__fact:last-child { grid-column:1/-1; }
+.plan .bookings__actions { margin-top:auto; padding-top:var(--s2); border-top:var(--hair) solid var(--line-hair); }
+.plan .bookings__remove { margin-left:auto; color:var(--ink-muted); }
+.plan .bookings__drawer:not([open]) { display:none; }
+.plan .plan__drawer.bookings__drawer { max-width:none; background:var(--surface-alt); }
+.plan .bookings__form { max-width:none; padding-bottom:var(--s2); grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s4); }
+.plan .bookings__form > .bookings__travelers,.plan .bookings__form > .bookings__segments,.plan .bookings__form > .bookings__coverage,.plan .bookings__form > .bookings__addseg,.plan .bookings__form > .bookings__error,.plan .bookings__form > .sync__actions,.plan .bookings__form > .plan__hint,.plan .bookings__form > .bookings__nights { grid-column:1/-1; }
+.plan .bookings__form .sync__field { min-width:0; }
+.plan .bookings__form .sync__field:has(textarea) { grid-column:1/-1; }
+.plan .bookings__segment { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s3); border:var(--hair) solid var(--line); border-radius:var(--radius-lg); padding:var(--s4); background:var(--surface); }
+.plan .bookings__segmenttitle { grid-column:1/-1; font-size:var(--text-sm); margin:0; }
+.plan .bookings__segment .bookings__dropseg { justify-self:end; }
+.plan .bookings__segment .pbudget__checklabel { min-height:44px; }
+.plan .bookings__travelers .pbudget__checklabel,.plan .bookings__coverage .pbudget__checklabel { min-height:44px; }
+@media(min-width:1100px) {
+ .plan > .bookings { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+ .plan .bookings__group[data-kind="flights"] { grid-column:1/-1; }
+ .plan .bookings__group[data-kind="flights"] .bookings__list { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+ .plan .bookings__group[data-kind="flights"] .bookings__list > .bookings__item:only-child { grid-column:1/-1; }
+ .plan .bookings__group[data-kind="flights"] .bookings__list > .bookings__item:only-child .bookings__journeys { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+ .plan .bookings__group[data-kind="flights"] .bookings__list > .bookings__item:only-child .bookings__journey:only-child { grid-column:1/-1; }
+}
+@media(max-width:599px) {
+ .plan .bookings__overview { gap:var(--s2); }
+ .plan .bookings__metric { padding:var(--s3); }
+ .plan .bookings__metric dt { font-size:11px; }
+ .plan .bookings__grouphead { align-items:flex-start; }
+ .plan .bookings__groupintro { font-size:var(--text-xs); }
+ .plan .bookings__add { font-size:var(--text-xs); padding-inline:var(--s3); }
+ .plan .bookings__item { padding:var(--s4); gap:var(--s3); }
+ .plan .bookings__cardhead { flex-wrap:wrap; gap:var(--s3); }
+ .plan .bookings__title { font-size:var(--text-md); }
+ .plan .bookings__price { text-align:left; }
+ .plan .bookings__amount { font-size:var(--text-md); }
+ .plan .bookings__leg { padding:var(--s3); }
+ .plan .bookings__journeytitle { padding:var(--s3); }
+ .plan .bookings__legroute { grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr); gap:var(--s2); }
+ .plan .bookings__time { font-size:var(--text-sm); }
+ .plan .bookings__daterange { padding:var(--s3); gap:var(--s3); }
+ .plan .bookings__form { grid-template-columns:minmax(0,1fr); }
+ .plan .bookings__facts { grid-template-columns:minmax(0,1fr); }
+ .plan .bookings__segment { padding:var(--s3); gap:var(--s2); }
+ .plan .bookings__segment .sync__label { font-size:var(--text-xs); }
+}
+/* END plan-polish-bookings */
+
+/* BEGIN plan-polish-dates-budget */
+/* Plan decisions — Dates and Budget follow Prepare's calm, compact hierarchy. */
+.dates.datesdash, .pbudget.budgetdash { width: 100%; max-width: none; gap: 24px; min-width: 0; }
+.datesdash *, .budgetdash * { box-sizing: border-box; min-width: 0; }
+.datesdash [hidden], .budgetdash [hidden] { display: none !important; }
+.datesdash h2, .datesdash h3, .budgetdash h2, .budgetdash h3 { font-family: var(--font-body); }
+.datesdash button, .datesdash summary, .budgetdash button, .budgetdash summary { min-height: 44px; touch-action: manipulation; }
+.decisiondash__eyebrow { margin: 0; font: 650 10px/1.5 var(--font-body); letter-spacing: .14em; color: var(--ink-muted); }
+.decisiondash__badge { display: inline-flex; align-items: center; justify-self: start; padding: 5px 9px; border-radius: 7px; font-size: 11px; font-weight: 600; background: var(--surface-inset); color: var(--ink-muted); }
+.decisiondash__badge[data-tone="ok"] { background: var(--ok-soft); color: var(--ok); }
+.decisiondash__badge[data-tone="warn"] { background: var(--warn-soft); color: var(--warn); }
+.decisiondash__title { margin: 0; font-size: clamp(23px, 2.5vw, 31px); line-height: 1.25; letter-spacing: -.035em; font-weight: 600; overflow-wrap: anywhere; }
+.decisiondash__copy { margin: 0; color: var(--ink-muted); font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.decisiondash__sectionhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 18px; }
+.decisiondash__sectionhead .plan__h { font-size: 20px; letter-spacing: -.025em; }
+.decisiondash__empty { display: grid; gap: 8px; padding: 25px; background: var(--surface); border: 1px dashed var(--line-strong); border-radius: 14px; color: var(--ink-muted); font-size: 13px; line-height: 1.6; }
+.decisiondash__empty h3 { color: var(--ink); margin: 0; font-size: 17px; }
+.datesdash .btn, .budgetdash .btn { min-height: 44px; padding: 9px 13px; font-size: 12px; border-radius: 9px; }
+.datesdash__hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 18px; align-items: stretch; }
+.datesdash__decision, .datesdash__preview { border: 1px solid var(--line); border-radius: 18px; padding: 25px; }
+.datesdash__decision { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; background: var(--ok-soft); }
+.datesdash__decision .dates__state { font-size: 12px; line-height: 1.65; color: var(--ink-muted); }
+.datesdash__facts { display: flex; flex-wrap: wrap; gap: 8px; color: var(--ink-muted); font-size: 11px; }
+.datesdash__facts > span { background: color-mix(in srgb, var(--surface) 60%, transparent); border: 1px solid var(--line); border-radius: 7px; padding: 5px 9px; }
+.datesdash__propose { margin-top: auto; }
+.datesdash__preview { display: grid; gap: 13px; background: var(--surface); align-content: start; }
+.datesdash__preview-range { font-size: 15px; font-weight: 600; line-height: 1.5; margin: 0; color: var(--ink); }
+.datesdash__months { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 20px; }
+.datesdash__calendar { width: 100%; border-collapse: separate; border-spacing: 0 4px; table-layout: fixed; font-size: 11px; text-align: center; }
+.datesdash__calendar caption { text-align: left; color: var(--ink); font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+.datesdash__calendar th { color: var(--ink-muted); font-weight: 500; height: 26px; }
+.datesdash__calendar td { height: 29px; padding: 0; border: none; color: var(--ink-muted); }
+.datesdash__calendar time { display: grid; place-items: center; min-height: 29px; font-variant-numeric: tabular-nums; }
+.datesdash__calendar td[data-range="inside"] { color: var(--ok); background: var(--ok-soft); }
+.datesdash__calendar td[data-range="start"], .datesdash__calendar td[data-range="end"] { color: var(--surface); background: var(--ok); border-radius: 7px; font-weight: 700; }
+.datesdash__legend { margin: 0; color: var(--ink-muted); font-size: 10px; line-height: 1.6; }
+.datesdash__calendar-empty { display: grid; justify-items: center; align-content: center; gap: 14px; min-height: 180px; color: var(--ink-muted); text-align: center; font-size: 12px; }
+.datesdash__calendar-symbol { display: grid; place-items: center; width: 62px; height: 62px; font-size: 25px; background: var(--surface-alt); border: 1px solid var(--line); border-top: 8px solid var(--ok-soft); border-radius: 11px; font-variant-numeric: tabular-nums; }
+.datesdash .dates__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; align-items: start; }
+.datesdash .dates__proposal { gap: 14px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; }
+.datesdash .dates__proposal[data-finalized="true"] { border-color: var(--ok); background: color-mix(in srgb, var(--ok-soft) 22%, var(--surface)); }
+.datesdash .dates__proposal[data-preview="true"] { box-shadow: 0 0 0 1px var(--line-strong); }
+.datesdash__option-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.datesdash .dates__range { font-size: 16px; line-height: 1.45; margin: 0; font-family: var(--font-body); letter-spacing: -.02em; }
+.datesdash .dates__meta { font-size: 11px; }
+.datesdash .dates__responses { gap: 0; padding-top: 3px; }
+.datesdash .dates__response { display: grid; gap: 7px; padding: 11px 0; border-top: 1px solid var(--line); }
+.datesdash .dates__who { font-size: 12px; font-weight: 600; }
+.datesdash .dates__answer { font-size: 12px; }
+.datesdash .dates__seg { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
+.datesdash .dates__opt { padding: 8px; font-size: 11px; white-space: normal; text-align: center; }
+.datesdash .dates__summary { font-size: 11px; }
+.datesdash .dates__actions { gap: 6px; padding-top: 3px; }
+.datesdash .datesdash__preview-button[aria-pressed="true"] { color: var(--ok); background: var(--ok-soft); }
+.datesdash__notes { border-top: 1px solid var(--line); }
+.datesdash__notes summary { display: flex; align-items: center; font-size: 11px; color: var(--ink-muted); cursor: pointer; }
+.datesdash .dates__notes { font-size: 12px; padding-bottom: 5px; white-space: pre-wrap; }
+.datesdash > .dates__drawer:not([open]) { display: none; }
+.datesdash .dates__drawer, .budgetdash > .plan__drawer { width: 100%; max-width: none; scroll-margin-top: 100px; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.datesdash .dates__form, .budgetdash .pbudget__form, .budgetdash .pbudget__exform { width: 100%; max-width: 52rem; }
+.datesdash input, .datesdash textarea, .budgetdash input, .budgetdash select, .budgetdash textarea { max-width: 100%; }
+.budgetdash__hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 25px; background: var(--ok-soft); border: 1px solid var(--line); border-radius: 18px; }
+.budgetdash__hero-copy { display: grid; gap: 10px; max-width: 65ch; }
+.budgetdash__hero .pbudget__state { font-size: 12px; line-height: 1.6; color: var(--ink-muted); }
+.budgetdash__hero-actions { display: grid; gap: 8px; flex-shrink: 0; }
+.budgetdash .pbudget__summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 12px; margin: 0; }
+.budgetdash .pbudget__figure { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 8px; min-width: 0; padding: 17px; background: var(--surface); border: 1px solid var(--line); border-radius: 13px; }
+.budgetdash .pbudget__figure dt { font-size: 11px; line-height: 1.5; }
+.budgetdash .pbudget__figure dd { font-size: clamp(20px, 2vw, 26px); letter-spacing: -.03em; line-height: 1.2; overflow-wrap: anywhere; }
+.budgetdash__metric-note { font-size: 10px; color: var(--ink-muted); line-height: 1.5; margin: auto 0 0; }
+.budgetdash .budgetdash__foreign { margin: -8px 0 0; padding: 14px 16px; border: 1px solid color-mix(in srgb, var(--warn) 30%, var(--line)); border-radius: 10px; background: var(--warn-soft); color: var(--ink); font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.budgetdash__overview { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.budgetdash__categories, .budgetdash__sharing { display: grid; gap: 18px; border: 1px solid var(--line); border-radius: 14px; padding: 22px; background: var(--surface); }
+.budgetdash__categories .decisiondash__sectionhead { display: grid; gap: 5px; }
+.budgetdash__category-list { display: grid; gap: 16px; list-style: none; margin: 0; padding: 0; }
+.budgetdash__category { display: grid; gap: 7px; }
+.budgetdash__category-labels { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--ink); }
+.budgetdash__category-value { font-variant-numeric: tabular-nums; font-weight: 600; }
+.budgetdash__category-track { position: relative; height: 8px; border-radius: 5px; background: var(--surface-inset); }
+.budgetdash__category-track > span { position: absolute; inset: 0 auto 0 0; border-radius: 5px; }
+.budgetdash__category-allowance { background: color-mix(in srgb, var(--ok) 27%, var(--surface)); }
+.budgetdash__category-track .budgetdash__category-estimate { top: 2px; bottom: 2px; background: var(--ok); }
+.budgetdash__category[data-over="true"] .budgetdash__category-estimate { background: var(--warn); }
+.budgetdash__category-caption, .budgetdash__chart-key, .budgetdash__chart-caveat { font-size: 10px; line-height: 1.5; color: var(--ink-muted); margin: 0; }
+.budgetdash__category-credit { font-size: 10px; line-height: 1.5; color: var(--ink-muted); margin: 0; }
+.budgetdash__category-credit[hidden] { display: none !important; }
+.budgetdash__chart-caveat { color: var(--warn); }
+.budgetdash__sharing .plan__h { font-size: 18px; }
+.budgetdash .pbudget__travelers { gap: 0; }
+.budgetdash .pbudget__travelers li { display: flex; gap: 12px; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+.budgetdash .pbudget__travelers strong { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.budgetdash .pbudget__maxdrawer { max-width: none; }
+.budgetdash .pbudget__aside { font-size: 11px; line-height: 1.6; }
+.budgetdash__resultcount { margin: 0; font-size: 11px; color: var(--ink-muted); }
+.budgetdash__filters { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+.budgetdash__filters .input { min-height: 44px; border-radius: 9px; background: var(--surface); font-size: 12px; padding: 9px 12px; }
+.budgetdash__filters input { flex: 1 1 250px; }
+.budgetdash__filters select { width: auto; max-width: 210px; }
+.budgetdash .pbudget__expenses { gap: 9px; }
+.budgetdash .pbudget__expense { display: block; padding: 0; border-radius: 12px; overflow: clip; }
+.budgetdash__expense-summary, .budgetdash__proposal-summary { display: flex; align-items: center; gap: 14px; min-height: 75px; padding: 17px 19px; list-style: none; cursor: pointer; }
+.budgetdash__expense-summary::-webkit-details-marker, .budgetdash__proposal-summary::-webkit-details-marker { display: none; }
+.budgetdash__expense-summary::after, .budgetdash__proposal-summary::after { content: '›'; color: var(--ink-muted); font-size: 20px; line-height: 1; margin-left: 2px; }
+.budgetdash__expense-detail[open] > summary::after, .budgetdash__proposal-detail[open] > summary::after { transform: rotate(90deg); }
+.budgetdash__expense-copy { flex: 1; display: grid; gap: 5px; }
+.budgetdash .pbudget__desc { font-size: 12px; font-weight: 600; line-height: 1.5; }
+.budgetdash .pbudget__cat { font-size: 10px; letter-spacing: 0; text-transform: none; }
+.budgetdash .pbudget__amount { display: grid; gap: 4px; text-align: right; font-size: 14px; font-weight: 600; }
+.budgetdash .pbudget__foreigntag { font-size: 10px; font-weight: 400; line-height: 1.5; max-width: 160px; }
+.budgetdash__cost-state { padding: 4px 8px; border-radius: 6px; font-size: 10px; color: var(--ink-muted); background: var(--surface-inset); white-space: nowrap; }
+.budgetdash__cost-state[data-state="paid"] { color: var(--ok); background: var(--ok-soft); }
+.budgetdash__cost-state[data-state="booked"] { color: var(--info); background: var(--info-soft); }
+.budgetdash__expense-body { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; border-top: 1px solid var(--line); padding: 17px 19px; }
+.budgetdash__expense-body > p { width: 100%; font-size: 12px; color: var(--ink-muted); line-height: 1.65; overflow-wrap: anywhere; }
+.budgetdash__expense-body > .pbudget__unbalanced { color: var(--danger); }
+.budgetdash__expense-body .pbudget__stateseg { flex-basis: 100%; justify-content: flex-start; }
+.budgetdash .pbudget__stateopt { min-height: 44px; font-size: 11px; padding: 9px 13px; }
+.budgetdash .pbudget__from { display: inline-flex; align-items: center; min-height: 44px; }
+.budgetdash .pbudget__proposals { gap: 12px; }
+.budgetdash .pbudget__proposal { display: block; padding: 0; border-radius: 13px; border-width: 1px; }
+.budgetdash .pbudget__proposal[data-locked="true"] { border-color: var(--ok); }
+.budgetdash__proposal-summary .pbudget__label { flex: 1; font-size: 15px; font-family: var(--font-body); line-height: 1.5; margin: 0; letter-spacing: -.02em; }
+.budgetdash__proposal-body { display: grid; gap: 15px; padding: 18px 21px; border-top: 1px solid var(--line); }
+.budgetdash .pbudget__meta, .budgetdash .pbudget__count { font-size: 11px; }
+.budgetdash .pbudget__targets { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 20px; padding: 12px; border-radius: 9px; background: var(--surface-alt); }
+.budgetdash .pbudget__targets li { font-size: 11px; line-height: 1.6; }
+.budgetdash .pbudget__notes { white-space: pre-wrap; font-size: 12px; }
+.budgetdash .pbudget__agreements { gap: 0; }
+.budgetdash .pbudget__agreement { padding: 10px 0; border-top: 1px solid var(--line); }
+.budgetdash .pbudget__who, .budgetdash .pbudget__answer { font-size: 12px; }
+.budgetdash .pbudget__opt { font-size: 12px; padding: 8px 15px; min-height: 44px; }
+.budgetdash > .pbudget__drawer:not([open]), .budgetdash > .pbudget__exdrawer:not([open]) { display: none; }
+@media (max-width: 899px) {
+  .datesdash__hero, .budgetdash__overview { grid-template-columns: 1fr; }
+  .datesdash__decision { gap: 12px; }
+  .datesdash__calendar-empty { min-height: 120px; }
+  .datesdash__months { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .budgetdash__hero { align-items: flex-start; }
+  .budgetdash .pbudget__summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 599px) {
+  .dates.datesdash, .pbudget.budgetdash { gap: 20px; }
+  .datesdash__decision, .datesdash__preview, .budgetdash__hero, .budgetdash__categories, .budgetdash__sharing { padding: 20px; border-radius: 14px; }
+  .datesdash .dates__list { grid-template-columns: 1fr; }
+  .datesdash .dates__proposal { padding: 17px; }
+  .datesdash__option-head { flex-wrap: wrap; }
+  .datesdash__months { grid-template-columns: 1fr; }
+  .budgetdash__hero { flex-direction: column; gap: 18px; }
+  .budgetdash__hero-actions { display: flex; flex-wrap: wrap; }
+  .budgetdash .pbudget__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .budgetdash .pbudget__figure { padding: 14px; gap: 7px; }
+  .budgetdash .pbudget__figure dd { font-size: 22px; }
+  .budgetdash__filters input { flex-basis: 100%; width: 100%; }
+  .budgetdash__filters select { flex: 1; width: calc(50% - 5px); max-width: none; }
+  .budgetdash__filters .input { font-size: 16px; }
+  .budgetdash__expense-summary { gap: 9px; padding: 14px; flex-wrap: wrap; }
+  .budgetdash__expense-copy { flex-basis: calc(100% - 25px); order: 0; }
+  .budgetdash__expense-summary::after { order: 1; margin-left: auto; }
+  .budgetdash__cost-state { order: 2; }
+  .budgetdash .pbudget__amount { order: 3; margin-left: auto; }
+  .budgetdash__expense-body { padding: 14px; }
+  .budgetdash__proposal-summary { flex-wrap: wrap; padding: 15px; gap: 8px; }
+  .budgetdash__proposal-summary .pbudget__label { flex-basis: 100%; }
+  .budgetdash__proposal-summary::after { margin-left: auto; }
+  .budgetdash__proposal-body { padding: 15px; }
+  .budgetdash .pbudget__targets { grid-template-columns: 1fr; }
+  .datesdash input, .datesdash textarea, .budgetdash input, .budgetdash select, .budgetdash textarea { min-width: 0; }
+}
+/* END plan-polish-dates-budget */
+
+/* BEGIN plan-polish-itinerary */
+/* Day-focused itinerary, using the Plan surface and theme tokens. */
+.plan .itin.itin-board { max-width: none; min-width: 0; gap: var(--s4); }
+.itin-board__summary { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding: var(--s5); background: var(--surface); border: var(--hair) solid var(--line); border-radius: var(--radius-lg); }
+.itin-board__eyebrow { margin: 0 0 var(--s2); font-size: var(--text-2xs); letter-spacing: var(--tracking-caps); font-weight: var(--weight-semi); color: var(--ink-faint); }
+.itin-board__range { margin: 0 0 var(--s2); font-size: clamp(1.35rem, 3vw, 1.9rem); line-height: 1.2; letter-spacing: -.035em; color: var(--ink); }
+.itin-board .itin__state { font-size: var(--text-sm); color: var(--ink-muted); }
+.itin-board__add { flex-shrink: 0; }
+.itin-board__controls { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s3); min-width: 0; }
+.itin-board__views { display: inline-flex; align-items: center; gap: 3px; padding: 4px; border-radius: var(--radius-md); background: var(--surface-alt); border: var(--hair) solid var(--line); }
+.itin-board__view { min-height: 42px; padding: var(--s2) var(--s4); background: transparent; color: var(--ink-muted); border: 0; border-radius: var(--radius-sm); font-size: var(--text-sm); cursor: pointer; }
+.itin-board__view[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 4px #0000000a; font-weight: var(--weight-semi); }
+.itin-board__navigation { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: var(--s2); min-width: 0; width: min(100%, 440px); }
+.itin-board__navigation .btn { min-height: 44px; padding-inline: 0; font-size: 1.15rem; }
+.itin-board__date-select { width: 100%; min-width: 0; font-size: var(--text-sm); min-height: 44px; text-overflow: ellipsis; }
+.itin-board__days { display: flex; align-items: stretch; gap: var(--s2); overflow-x: auto; overscroll-behavior-inline: contain; max-width: 100%; min-width: 0; padding: 2px 1px var(--s2); scrollbar-width: thin; }
+.itin-board__day-chip { flex: 0 0 112px; display: grid; gap: var(--s1); text-align: left; padding: var(--s3); min-height: 88px; border: var(--hair) solid var(--line); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); cursor: pointer; }
+.itin-board__day-chip strong { font-size: var(--text-md); font-weight: var(--weight-semi); }
+.itin-board__day-chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-1, var(--surface)); }
+.itin-board__chip-label, .itin-board__chip-count { color: var(--ink-faint); font-size: var(--text-2xs); }
+.itin-board__day-chip[aria-pressed="true"] .itin-board__chip-label { color: var(--accent); }
+.itin-board__notices { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.itin-board__notices:empty { display: none; }
+.itin-board__notices .btn { color: var(--ink-muted); font-size: var(--text-xs); min-height: 40px; border: var(--hair) solid var(--line); }
+.itin-board__content { min-width: 0; display: grid; gap: var(--s5); }
+.plan .itin-board .itin__day { min-width: 0; padding: var(--s5); border: var(--hair) solid var(--line); border-radius: var(--radius-lg); background: var(--surface); gap: var(--s4); }
+.itin-board__day-head { min-width: 0; }
+.plan .itin-board .itin__dayh { font-size: clamp(1.25rem, 2.5vw, 1.6rem); letter-spacing: -.025em; line-height: 1.3; }
+.itin-board__day-count { margin: var(--s2) 0 0; font-size: var(--text-sm); color: var(--ink-muted); }
+.itin-board__day-layout { display: grid; gap: var(--s4); min-width: 0; }
+.itin-board__day-layout[data-stays="true"] { grid-template-columns: minmax(0, 1.6fr) minmax(230px, 1fr); }
+.itin-board__schedule, .itin-board__stays { min-width: 0; }
+.itin-board__stay-heading { margin: 0 0 var(--s3); font-size: var(--text-xs); font-weight: var(--weight-semi); color: var(--ink-muted); }
+.itin-board .itin__entries { gap: var(--s3); min-width: 0; }
+.plan .itin-board .itin__entry { display: grid; grid-template-columns: 108px minmax(0, 1fr); align-items: start; min-width: 0; padding: var(--s4); gap: var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-md); background: var(--surface); opacity: 1; }
+.itin-board__timeblock { display: grid; gap: var(--s2); min-width: 0; }
+.itin-board .itin__time { color: var(--ink); line-height: 1.5; font-size: var(--text-sm); font-weight: var(--weight-semi); overflow-wrap: anywhere; }
+.itin-board .itin__span { font-size: var(--text-2xs); color: var(--ink-faint); }
+.itin-board__entry-content { min-width: 0; }
+.itin-board .itin__kind { display: block; margin-bottom: var(--s1); font-size: var(--text-2xs); letter-spacing: .06em; color: var(--ink-faint); }
+.plan .itin-board .itin__title { margin: 0; font-size: var(--text-md); color: var(--ink); line-height: 1.45; font-weight: var(--weight-semi); }
+.itin-board .itin__where { margin: var(--s2) 0 0; color: var(--ink-muted); font-size: var(--text-sm); line-height: 1.5; }
+.itin-board .itin__source { display: inline-flex; align-items: center; min-height: 38px; margin-top: var(--s1); font-size: var(--text-xs); }
+.itin-board__entry-details { margin-top: var(--s2); color: var(--ink-muted); font-size: var(--text-xs); }
+.itin-board__entry-details > summary { display: list-item; width: fit-content; min-height: 38px; padding-block: 9px; cursor: pointer; color: var(--ink-muted); }
+.itin-board__entry-details[open] > summary { color: var(--accent); }
+.itin-board .itin__notes, .itin-board .itin__conf, .itin-board__entry-range { margin: var(--s2) 0 var(--s3); color: var(--ink-muted); font-size: var(--text-sm); line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.itin-board .itin__actions { gap: var(--s2); margin-top: var(--s2); }
+.itin-board .itin__actions .btn { min-height: 42px; font-size: var(--text-xs); }
+.plan .itin-board__stays .itin__entry { grid-template-columns: minmax(0, 1fr); gap: var(--s3); background: var(--surface-alt); }
+.itin-board__stays .itin-board__timeblock { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+.itin-board__stays .itin__span { border-left: var(--hair) solid var(--line); padding-left: var(--s2); }
+.itin-board__empty-day { display: grid; align-content: center; justify-items: start; gap: var(--s2); padding: var(--s5); min-height: 205px; border: var(--hair) dashed var(--line-strong); border-radius: var(--radius-md); background: var(--surface-alt); }
+.itin-board__empty-day h3 { margin: 0; font-size: var(--text-lg); font-weight: var(--weight-medium); color: var(--ink); }
+.itin-board__empty-day p { margin: 0; font-size: var(--text-sm); line-height: 1.6; color: var(--ink-muted); }
+.itin-board__day-add { margin-top: var(--s2); }
+.itin-board .itin__hint { line-height: 1.6; }
+.itin-board .itin__drawer { width: 100%; max-width: none; }
+.itin-board .itin__drawer:not([open]) { display: none; }
+.itin-board .itin__status:empty { min-height: 0; }
+.itin-board__view:focus-visible, .itin-board__day-chip:focus-visible, .itin-board__entry-details > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+@media (max-width: 900px) {
+  .itin-board__day-layout[data-stays="true"] { grid-template-columns: minmax(0, 1fr); }
+  .itin-board__stays { border-top: var(--hair) solid var(--line); padding-top: var(--s4); }
+  .plan .itin-board__stays .itin__entry { grid-template-columns: 108px minmax(0, 1fr); }
+  .itin-board__stays .itin-board__timeblock { display: grid; }
+  .itin-board__stays .itin__span { border: 0; padding: 0; }
+}
+@media (max-width: 580px) {
+  .itin-board__summary { align-items: flex-start; flex-direction: column; padding: var(--s4); gap: var(--s3); }
+  .itin-board__range { font-size: 1.4rem; }
+  .itin-board__controls { align-items: stretch; }
+  .itin-board__navigation { width: 100%; }
+  .itin-board__day-chip { flex-basis: 104px; padding: var(--s3); }
+  .plan .itin-board .itin__day { padding: var(--s4); }
+  .plan .itin-board .itin__entry, .plan .itin-board__stays .itin__entry { grid-template-columns: minmax(0, 1fr); padding: var(--s3); gap: var(--s3); }
+  .itin-board .itin-board__timeblock { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s2); padding-bottom: var(--s2); border-bottom: var(--hair) solid var(--line); }
+  .itin-board .itin__time { font-size: var(--text-sm); }
+  .itin-board__empty-day { padding: var(--s4); }
+}
+/* END plan-polish-itinerary */
 /* ==== src/css/90-utilities.css ==== */
 /* 90-utilities.css — last layer. OWNER: WS-D.
  * Single-purpose helpers only. If something here needs three declarations to
@@ -12693,7 +13049,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 (function (T) {
   'use strict';
 
-  T.version = '0.28.10';   // Simplify the home page and header navigation
+  T.version = '0.28.11';   // Simplify the home page and header navigation
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -42479,6 +42835,49 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   /* 6. Dates page (`section.dates`)                                      */
   /* ==================================================================== */
 
+  /* Local presentation state: no plan writes for previews or cost filters. */
+  var decisionViewSessions = Object.create(null);
+  function decisionViewState(tripId) {
+    if (!decisionViewSessions[tripId]) decisionViewSessions[tripId] = { datePreview: '', search: '', category: 'all', state: 'all' };
+    return decisionViewSessions[tripId];
+  }
+  function decisionOpenDrawer(drawer) {
+    drawer.open = true;
+    var field = drawer.querySelector('input:not([disabled]), textarea, select:not([disabled])');
+    if (field) field.focus();
+    drawer.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  function decisionKicker(text) { return U.el('p', { class: 'decisiondash__eyebrow', text: text }); }
+  function dateMonthCalendar(start, end, month) {
+    var base = new Date(month + '-01T00:00:00Z');
+    if (!isFinite(base.getTime())) return null;
+    var table = U.el('table', { class: 'datesdash__calendar' });
+    table.appendChild(U.el('caption', { text: base.toLocaleDateString(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' }) }));
+    var head = U.el('thead'), labels = U.el('tr');
+    ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(function (label) {
+      labels.appendChild(U.el('th', { scope: 'col', 'aria-label': label, text: label.slice(0, 1) }));
+    });
+    head.appendChild(labels); table.appendChild(head);
+    var body = U.el('tbody'), year = base.getUTCFullYear(), m = base.getUTCMonth();
+    var first = (base.getUTCDay() + 6) % 7, days = new Date(Date.UTC(year, m + 1, 0)).getUTCDate();
+    for (var row = 0; row < Math.ceil((first + days) / 7); row++) {
+      var tr = U.el('tr');
+      for (var col = 0; col < 7; col++) {
+        var day = row * 7 + col - first + 1;
+        var td = U.el('td');
+        if (day > 0 && day <= days) {
+          var iso = month + '-' + (day < 10 ? '0' : '') + day;
+          td.dataset.range = iso === start ? 'start' : iso === end ? 'end' : iso > start && iso < end ? 'inside' : 'outside';
+          var date = U.el('time', { datetime: iso, text: String(day),
+            'aria-label': dayShort(iso) + (iso === start ? ', arrival' : iso === end ? ', departure' : '') });
+          td.appendChild(date);
+        }
+        tr.appendChild(td);
+      }
+      body.appendChild(tr);
+    }
+    table.appendChild(body); return table;
+  }
   function buildDatesBanner(prep) {
     var refused = !!(prep && prep.projection && prep.projection.refused);
     return U.el('p', { class: 'dates__banner', hidden: !refused, text:
@@ -42490,7 +42889,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var seg = U.el('div', { class: 'segmented dates__seg', role: 'radiogroup', 'aria-label': 'Your answer' });
     SEG_OPTIONS.forEach(function (av) {
       var btn = U.el('button', { type: 'button', class: 'segmented__opt dates__opt', role: 'radio',
-        dataset: { availability: av }, 'aria-checked': String(av === currentAv), text: ANSWER_WORDS[av] });
+        dataset: { availability: av, planFocus: 'dates-response:' + proposal.id + ':' + av }, 'aria-checked': String(av === currentAv), text: ANSWER_WORDS[av] });
       btn.addEventListener('click', function () {
         if (btn.getAttribute('aria-checked') === 'true') return;
         callDates('respond', [tripId, proposal.id, av]).then(function (r) {
@@ -42540,14 +42939,23 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       pid: proposal.id, agreement: agreement, finalized: isGoverning ? 'true' : 'false'
     } });
 
-    li.appendChild(U.el('p', { class: 'dates__range', text: rangeLabel(proposal.start, proposal.end) }));
+    var optionHead = U.el('div', { class: 'datesdash__option-head' });
+    optionHead.appendChild(U.el('p', { class: 'dates__range', text: rangeLabel(proposal.start, proposal.end) }));
+    optionHead.appendChild(U.el('span', { class: 'decisiondash__badge', dataset: { tone: isGoverning || summary.full ? 'ok' : summary.conflicts.length ? 'warn' : 'neutral' },
+      text: isGoverning ? 'Selected' : summary.full ? 'Everyone agrees' : summary.conflicts.length ? 'Has a conflict' : 'Awaiting agreement' }));
+    li.appendChild(optionHead);
 
     var proposerLabel = nameFor(proposal.proposedByUid, members);
     var agoText = F.ago(proposal.createdAt);
     li.appendChild(U.el('p', { class: 'dates__meta', dataset: { at: String(proposal.createdAt || 0) }, text:
       'proposed by ' + proposerLabel + (agoText && agoText !== F.MISSING ? ' · ' + agoText : '') }));
 
-    li.appendChild(U.el('p', { class: 'dates__notes', hidden: U.isBlank(proposal.notes), text: proposal.notes || '' }));
+    var notes = U.el('p', { class: 'dates__notes', hidden: U.isBlank(proposal.notes), text: proposal.notes || '' });
+    if (!U.isBlank(proposal.notes)) {
+      var notesDetail = U.el('details', { class: 'datesdash__notes', dataset: { planDisclosure: 'dates-notes:' + proposal.id } });
+      notesDetail.appendChild(U.el('summary', { text: 'Read the note', dataset: { planFocus: 'dates-notes:' + proposal.id } }));
+      notesDetail.appendChild(notes); li.appendChild(notesDetail);
+    } else li.appendChild(notes);
 
     var respUl = U.el('ul', { class: 'dates__responses' });
     members.forEach(function (m) {
@@ -42628,6 +43036,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         actions.appendChild(deleteBtn);
       }
     }
+    U.qsa('button', actions).forEach(function (button) { button.dataset.planFocus = 'dates-action:' + proposal.id + ':' + button.className; });
     li.appendChild(actions);
 
     return li;
@@ -42756,52 +43165,92 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   }
 
   function buildDatesSection(tripId, prep) {
-    var plan = prep.plan || {};
-    var datesDoc = plan.dates || { proposals: {}, finalized: null };
-    var proposals = datesDoc.proposals || {};
-    var pids = Object.keys(proposals);
-
+    var plan = prep.plan || {}, datesDoc = plan.dates || { proposals: {}, finalized: null };
+    var proposals = datesDoc.proposals || {}, pids = Object.keys(proposals), ui = decisionViewState(tripId);
     var members = (PR && PR.members && typeof PR.members.list === 'function') ? PR.members.list(tripId) : [];
-    var memberUids = members.map(function (m) { return m.uid; });
-    var me = null;
+    var memberUids = members.map(function (m) { return m.uid; }), me = null;
     members.forEach(function (m) { if (m.isMe) me = m; });
-    var myUidVal = me ? me.uid : null;
-    var isOwner = !!(myUidVal && plan.ownerUid === myUidVal);
-    var governing = governingOf(plan);
-
-    /* `governing` (used below for the per-row actions) excludes a REOPENED
-       finalization by definition; the state LINE has to show that reopened
-       case too, so it reads straight off the raw `finalized` record instead. */
-    var f = datesDoc.finalized || null;
-
-    var sec = U.el('section', { class: 'dates' });
-    sec.appendChild(U.el('p', { class: 'dates__state', dataset: { state: datesStateOf(f), at: String((f && f.at) || 0) },
-      text: datesLineText(f) }));
-    sec.appendChild(buildDatesBanner(prep));
-
+    var myUidVal = me ? me.uid : null, isOwner = !!(myUidVal && plan.ownerUid === myUidVal);
+    var governing = governingOf(plan), f = datesDoc.finalized || null;
+    var sorted = pids.map(function (pid) { return proposals[pid]; }).sort(function (a, b) {
+      var ag = governing && governing.proposalId === a.id, bg = governing && governing.proposalId === b.id;
+      if (ag !== bg) return ag ? -1 : 1;
+      return String(a.start || '').localeCompare(String(b.start || ''));
+    });
+    var sec = U.el('section', { class: 'dates datesdash' });
     var statusLine = U.el('p', { class: 'dates__status', role: 'status', 'aria-live': 'polite' });
     var drawer = buildProposeDrawer(tripId, statusLine);
-
+    var hero = U.el('div', { class: 'datesdash__hero' });
+    var decision = U.el('section', { class: 'datesdash__decision', 'aria-label': 'Date decision' });
+    decision.appendChild(decisionKicker('MAKE ROOM FOR THE JOURNEY'));
+    decision.appendChild(U.el('span', { class: 'decisiondash__badge', dataset: { tone: governing ? 'ok' : f ? 'warn' : 'neutral' },
+      text: governing ? 'Dates finalized' : f ? 'Open for discussion' : 'Decision in progress' }));
+    decision.appendChild(U.el('h2', { class: 'decisiondash__title', text: f ? plainRangeLabel(f.start, f.end) : 'Find your shared window.' }));
+    decision.appendChild(U.el('p', { class: 'dates__state', dataset: { state: datesStateOf(f), at: String((f && f.at) || 0) },
+      text: datesLineText(f) }));
+    var context = !pids.length ? 'Add an option, then see which dates work for everyone.' :
+      governing ? 'Your agreed travel window is in place. Other options stay below for reference.' :
+      f ? 'The trip keeps its previous dates while you compare options again.' :
+      pids.length + (pids.length === 1 ? ' option' : ' options') + ' to compare. Everyone’s response helps you choose.';
+    decision.appendChild(U.el('p', { class: 'decisiondash__copy', text: context }));
+    var counts = U.el('div', { class: 'datesdash__facts' });
+    counts.appendChild(U.el('span', { text: pids.length + (pids.length === 1 ? ' option' : ' options') }));
+    counts.appendChild(U.el('span', { text: members.length + (members.length === 1 ? ' traveler' : ' travelers') }));
+    decision.appendChild(counts);
+    var propose = U.el('button', { type: 'button', class: 'btn btn--primary datesdash__propose',
+      text: '+ Propose dates', dataset: { planFocus: 'dates-propose' } });
+    propose.addEventListener('click', function () { decisionOpenDrawer(drawer); });
+    decision.appendChild(propose); hero.appendChild(decision);
+    var calendarPanel = U.el('section', { class: 'datesdash__preview', 'aria-label': 'Date range preview' });
+    hero.appendChild(calendarPanel); sec.appendChild(hero);
+    sec.appendChild(buildDatesBanner(prep));
+    var head = U.el('div', { class: 'decisiondash__sectionhead' });
+    head.appendChild(U.el('h2', { class: 'plan__h', text: 'Compare your options' }));
+    head.appendChild(U.el('p', { class: 'decisiondash__copy', text: 'Choose your response on each option.' }));
+    sec.appendChild(head);
+    var ul = U.el('ul', { class: 'dates__list' });
     if (!pids.length) {
-      sec.appendChild(U.el('p', { class: 'dates__empty', text: 'Nobody has proposed dates yet.' }));
+      sec.appendChild(U.el('div', { class: 'decisiondash__empty dates__empty' }, [
+        U.el('h3', { text: 'The first idea starts here.' }),
+        U.el('p', { text: 'Propose an arrival and departure date. You can leave a note about flexibility, work or travel time.' })
+      ]));
     } else {
-      var sorted = pids.map(function (pid) { return proposals[pid]; }).sort(function (a, b) {
-        var ag = governing && governing.proposalId === a.id;
-        var bg = governing && governing.proposalId === b.id;
-        if (ag !== bg) return ag ? -1 : 1;
-        if (a.start < b.start) return -1;
-        if (a.start > b.start) return 1;
-        return 0;
-      });
-      var ul = U.el('ul', { class: 'dates__list' });
-      sorted.forEach(function (p) {
-        ul.appendChild(buildProposalRow(tripId, p, plan, members, memberUids, myUidVal, isOwner, governing, statusLine, drawer));
+      sorted.forEach(function (proposal) {
+        var row = buildProposalRow(tripId, proposal, plan, members, memberUids, myUidVal, isOwner, governing, statusLine, drawer);
+        var preview = U.el('button', { type: 'button', class: 'btn btn--quiet datesdash__preview-button',
+          text: 'Preview calendar', 'aria-pressed': 'false', dataset: { pid: proposal.id, planFocus: 'dates-preview:' + proposal.id } });
+        preview.addEventListener('click', function () { ui.datePreview = proposal.id; renderPreview(); });
+        row.querySelector('.dates__actions').appendChild(preview); ul.appendChild(row);
       });
       sec.appendChild(ul);
     }
-
-    sec.appendChild(statusLine);
-    sec.appendChild(drawer);
+    function renderPreview() {
+      U.clear(calendarPanel);
+      var preview = proposals[ui.datePreview] || (f && proposals[f.proposalId]) || sorted[0] || f;
+      var chosen = !!(preview && governing && preview.id === governing.proposalId);
+      U.qsa('.datesdash__preview-button', ul).forEach(function (button) {
+        var selected = !!preview && button.dataset.pid === preview.id;
+        button.setAttribute('aria-pressed', String(selected));
+        button.closest('.dates__proposal').dataset.preview = String(selected);
+      });
+      calendarPanel.appendChild(decisionKicker(preview ? (chosen ? 'YOUR SELECTED DATES' : 'OPTION PREVIEW') : 'YOUR DATES, AT A GLANCE'));
+      if (!preview || !preview.start || !preview.end) {
+        calendarPanel.appendChild(U.el('div', { class: 'datesdash__calendar-empty' }, [
+          U.el('span', { class: 'datesdash__calendar-symbol', 'aria-hidden': 'true', text: '31' }),
+          U.el('p', { text: 'Your first date option will appear here.' })
+        ])); return;
+      }
+      calendarPanel.appendChild(U.el('h3', { class: 'datesdash__preview-range', text: rangeLabel(preview.start, preview.end) }));
+      var months = U.el('div', { class: 'datesdash__months' }), startMonth = preview.start.slice(0, 7), endMonth = preview.end.slice(0, 7);
+      var firstMonth = dateMonthCalendar(preview.start, preview.end, startMonth);
+      if (firstMonth) months.appendChild(firstMonth);
+      if (endMonth !== startMonth) { var lastMonth = dateMonthCalendar(preview.start, preview.end, endMonth); if (lastMonth) months.appendChild(lastMonth); }
+      calendarPanel.appendChild(months);
+      calendarPanel.appendChild(U.el('p', { class: 'datesdash__legend', text: '● Arrival & departure · shaded dates are within this option' }));
+      if (endMonth !== startMonth) calendarPanel.appendChild(U.el('p', { class: 'datesdash__legend', text: 'Showing the arrival and departure months.' }));
+    }
+    renderPreview();
+    sec.appendChild(statusLine); sec.appendChild(drawer);
     return sec;
   }
 
@@ -42834,7 +43283,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var seg = U.el('div', { class: 'segmented pbudget__seg', role: 'radiogroup', 'aria-label': 'Your agreement' });
       ['yes', 'no'].forEach(function (v) {
         var btn = U.el('button', { type: 'button', class: 'segmented__opt pbudget__opt', role: 'radio',
-          dataset: { agreed: v }, 'aria-checked': String(state === v), text: v === 'yes' ? 'Agree' : 'Not yet' });
+          dataset: { agreed: v, planFocus: 'budget-agreement:' + proposal.id + ':' + v }, 'aria-checked': String(state === v), text: v === 'yes' ? 'Agree' : 'Not yet' });
         btn.addEventListener('click', function () {
           if (btn.getAttribute('aria-checked') === 'true') return;
           var name = v === 'yes' ? 'agree' : 'disagree';
@@ -42954,6 +43403,19 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       text: full ? 'Everyone agrees' : (agreedN + ' of ' + memberUids.length + ' agreed') }));
 
     li.appendChild(buildProposalActions(tripId, proposal, plan, isOwner, myUidVal, full, drawer, statusLine));
+    var details = U.el('details', { class: 'budgetdash__proposal-detail',
+      dataset: { planDisclosure: 'budget-proposal:' + proposal.id } });
+    details.open = isActive || isLockedProposal;
+    var heading = U.el('summary', { class: 'budgetdash__proposal-summary', dataset: { planFocus: 'budget-proposal:' + proposal.id } });
+    heading.appendChild(li.querySelector('.pbudget__label'));
+    heading.appendChild(U.el('span', { class: 'decisiondash__badge', dataset: { tone: isLockedProposal ? 'ok' : 'neutral' },
+      text: isLockedProposal ? 'Locked' : isActive ? 'Under discussion' : 'Alternative' }));
+    var body = U.el('div', { class: 'budgetdash__proposal-body' });
+    while (li.firstChild) body.appendChild(li.firstChild);
+    U.qsa('.pbudget__actions button', body).forEach(function (button) {
+      button.dataset.planFocus = 'budget-action:' + proposal.id + ':' + button.className;
+    });
+    details.appendChild(heading); details.appendChild(body); li.appendChild(details);
     return li;
   }
 
@@ -43376,7 +43838,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     T.modal.open({ title: 'Remove this cost?', body: body, footer: foot });
   }
 
-  function buildExpenseRow(tripId, eid, e, currency, summary, statusLine, drawer) {
+  function buildExpenseRow(tripId, eid, e, currency, summary, statusLine, drawer, members) {
     var isForeign = (e.currency || currency) !== currency;
     var li = U.el('li', { class: 'pbudget__expense', dataset: {
       eid: eid, state: e.state, source: e.sourceKind || 'manual', foreign: isForeign ? 'true' : 'false'
@@ -43397,7 +43859,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var seg = U.el('div', { class: 'segmented pbudget__stateseg', role: 'radiogroup', 'aria-label': 'Cost state' });
     EXPENSE_STATES.forEach(function (s) {
       var btn = U.el('button', { type: 'button', class: 'segmented__opt pbudget__stateopt', role: 'radio',
-        dataset: { state: s }, 'aria-checked': String(s === e.state), text: STATE_WORDS[s] });
+        dataset: { state: s, planFocus: 'budget-expense-state:' + eid + ':' + s }, 'aria-checked': String(s === e.state), text: STATE_WORDS[s] });
       btn.addEventListener('click', function () {
         if (btn.getAttribute('aria-checked') === 'true') return;
         callExpenses('setState', [tripId, eid, s]).then(function (r) {
@@ -43417,100 +43879,212 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       removeBtn.addEventListener('click', function () { confirmRemoveExpense(tripId, eid, statusLine); });
       li.appendChild(removeBtn);
     }
+    var details = U.el('details', { class: 'budgetdash__expense-detail',
+      dataset: { planDisclosure: 'budget-expense:' + eid } });
+    details.open = !!unbalanced;
+    var heading = U.el('summary', { class: 'budgetdash__expense-summary', dataset: { planFocus: 'budget-expense:' + eid } });
+    var copy = U.el('span', { class: 'budgetdash__expense-copy' });
+    copy.appendChild(li.querySelector('.pbudget__desc')); copy.appendChild(li.querySelector('.pbudget__cat'));
+    heading.appendChild(copy);
+    heading.appendChild(U.el('span', { class: 'budgetdash__cost-state', dataset: { state: e.state }, text: STATE_WORDS[e.state] || e.state }));
+    heading.appendChild(amountSpan);
+    var body = U.el('div', { class: 'budgetdash__expense-body' });
+    var context = [];
+    if (e.incurredOn) context.push(dayShort(e.incurredOn));
+    if (e.paidByUid) context.push('Paid by ' + nameFor(e.paidByUid, members || []));
+    if (e.split) context.push('Split: ' + (SPLIT_WORDS[e.split] || e.split));
+    if (context.length) body.appendChild(U.el('p', { class: 'budgetdash__expense-context', text: context.join(' · ') }));
+    if (e.notes) body.appendChild(U.el('p', { class: 'budgetdash__expense-notes', text: e.notes }));
+    while (li.firstChild) body.appendChild(li.firstChild);
+    U.qsa('.pbudget__exedit, .pbudget__exremove', body).forEach(function (button) {
+      button.dataset.planFocus = 'budget-expense-action:' + eid + ':' + button.className;
+    });
+    details.appendChild(heading); details.appendChild(body); li.appendChild(details);
     return li;
   }
 
-  function buildSummaryPanel(summary) {
-    var showPanel = summary && (summary.expenseCount > 0 || summary.isLocked);
-    var dl = U.el('dl', { class: 'pbudget__summary', hidden: !showPanel });
+  function buildSummaryPanel(summary, activeProposal) {
+    var showPanel = summary && (summary.expenseCount > 0 || summary.isLocked || activeProposal);
+    var dl = U.el('dl', { class: 'pbudget__summary budgetdash__metrics', hidden: !showPanel });
     if (!showPanel) return dl;
-    var cur = summary.currency;
-    function figure(name, word, value) {
-      dl.appendChild(U.el('div', { class: 'pbudget__figure', dataset: { figure: name } }, [
-        U.el('dt', {}, word), U.el('dd', {}, moneyFormat(value, cur))
-      ]));
+    var cur = summary.currency, foreign = !!(summary.foreign && summary.foreign.length);
+    function figure(name, word, value, detail) {
+      var cell = U.el('div', { class: 'pbudget__figure', dataset: { figure: name } });
+      cell.appendChild(U.el('dt', { text: word }));
+      cell.appendChild(U.el('dd', { text: moneyFormat(value, cur) }));
+      if (detail) cell.appendChild(U.el('p', { class: 'budgetdash__metric-note', text: detail }));
+      dl.appendChild(cell); return cell;
     }
-    figure('estimated', 'Estimated', summary.estimated);
-    figure('committed', 'Committed', summary.committed);
-    figure('paid', 'Paid', summary.paid);
+    if (summary.isLocked) figure('budget', 'Agreed budget', summary.budget, 'Locked together · ' + cur);
+    else if (activeProposal) figure('proposed', 'Working proposal', summary.proposed, 'Under discussion · not locked');
+    figure('estimated', 'Tracked estimate', summary.estimated, 'Planned + booked + paid · ' + cur);
+    figure('committed', 'Booked or paid', summary.committed, 'Confirmed costs, including paid amounts');
+    figure('paid', 'Marked paid', summary.paid, 'Part of the booked or paid total');
     if (summary.isLocked) {
-      figure('budget', 'Budget', summary.budget);
       var over = summary.remaining != null && summary.remaining < 0;
-      var remainDd = over ? ('over by ' + moneyFormat(Math.abs(summary.remaining), cur)) : moneyFormat(summary.remaining, cur);
-      var remainDiv = U.el('div', { class: 'pbudget__figure', dataset: { figure: 'remaining' } }, [
-        U.el('dt', {}, 'Remaining'), U.el('dd', {}, remainDd)
-      ]);
-      if (over) remainDiv.setAttribute('data-over', 'true');
-      dl.appendChild(remainDiv);
+      var cell = U.el('div', { class: 'pbudget__figure', dataset: { figure: 'remaining', over: String(over) } });
+      cell.appendChild(U.el('dt', { text: over ? 'Over the agreed budget' : 'Remaining · ' + cur + ' costs only' }));
+      cell.appendChild(U.el('dd', { text: moneyFormat(Math.abs(summary.remaining), cur) }));
+      cell.appendChild(U.el('p', { class: 'budgetdash__metric-note', text: foreign
+        ? 'Excludes costs in other currencies. Not the full trip balance.' : 'Agreed budget less the tracked estimate' }));
+      dl.appendChild(cell);
     }
     return dl;
   }
 
+  function buildBudgetCategories(summary) {
+    var panel = U.el('section', { class: 'budgetdash__categories', 'aria-label': 'Category comparison' });
+    var head = U.el('div', { class: 'decisiondash__sectionhead' });
+    head.appendChild(U.el('h2', { class: 'plan__h', text: 'Where the money goes' }));
+    head.appendChild(U.el('p', { class: 'decisiondash__copy', text: 'Tracked estimate by category · ' + summary.currency + ' only' }));
+    panel.appendChild(head);
+    var categories = summary.categories || [];
+    if (!categories.length) {
+      panel.appendChild(U.el('p', { class: 'decisiondash__copy', text: 'Add a cost or a budget proposal to see the category breakdown.' })); return panel;
+    }
+    var comparisonKey = summary.isLocked ? 'budget' : 'proposed', largest = 0;
+    categories.forEach(function (category) { largest = Math.max(largest, category.estimated || 0, category[comparisonKey] || 0); });
+    var list = U.el('ul', { class: 'budgetdash__category-list' });
+    categories.forEach(function (category) {
+      var limit = category[comparisonKey] || 0, estimate = category.estimated || 0;
+      var netCredit = estimate < 0;
+      var row = U.el('li', { class: 'budgetdash__category', dataset: { category: category.category, over: String(summary.isLocked && category.isOverBudget), credit: String(netCredit) } });
+      var labels = U.el('div', { class: 'budgetdash__category-labels' });
+      labels.appendChild(U.el('span', { text: CATEGORY_WORDS[category.category] || category.category }));
+      labels.appendChild(U.el('span', { class: 'budgetdash__category-value', text: moneyFormat(estimate, summary.currency) }));
+      row.appendChild(labels);
+      var track = U.el('div', { class: 'budgetdash__category-track', 'aria-hidden': 'true' });
+      var allowance = U.el('span', { class: 'budgetdash__category-allowance' });
+      allowance.style.width = (largest ? Math.max(0, limit / largest * 100) : 0) + '%';
+      var actual = U.el('span', { class: 'budgetdash__category-estimate' });
+      actual.style.width = (largest ? Math.max(0, estimate / largest * 100) : 0) + '%';
+      track.appendChild(allowance); track.appendChild(actual); row.appendChild(track);
+      row.appendChild(U.el('p', { class: 'budgetdash__category-caption', text: limit
+        ? (summary.isLocked ? 'Agreed ' : 'Proposed ') + moneyFormat(limit, summary.currency)
+        : 'No category allowance set' }));
+      row.appendChild(U.el('p', { class: 'budgetdash__category-credit', hidden: !netCredit, text: 'Net credit · tracked adjustment' }));
+      list.appendChild(row);
+    });
+    panel.appendChild(list);
+    panel.appendChild(U.el('p', { class: 'budgetdash__chart-key', text: 'Solid bar: tracked estimate · light bar: ' + (summary.isLocked ? 'agreed allowance' : 'proposed allowance') }));
+    if (summary.foreign && summary.foreign.length) panel.appendChild(U.el('p', { class: 'budgetdash__chart-caveat',
+      text: 'Costs in other currencies are listed separately and excluded from these bars.' }));
+    return panel;
+  }
+
   function buildBudgetSection(tripId, prep) {
-    var plan = prep.plan || {};
-    var b = plan.budget || { currency: null, proposals: {}, activeProposalId: null, lock: null, expenses: {} };
+    var plan = prep.plan || {}, b = plan.budget || { currency: null, proposals: {}, activeProposalId: null, lock: null, expenses: {} };
     var members = (PR && PR.members && typeof PR.members.list === 'function') ? PR.members.list(tripId) : [];
-    var memberUids = members.map(function (m) { return m.uid; });
-    var me = null;
+    var memberUids = members.map(function (m) { return m.uid; }), me = null;
     members.forEach(function (m) { if (m.isMe) me = m; });
-    var myUidVal = me ? me.uid : null;
-    var isOwner = !!(myUidVal && plan.ownerUid === myUidVal);
-    var currency = b.currency || 'USD';
-    var locked = isLockedOf(plan);
-    /* summarizeOf() is a thin guard over PR.budget.summarize — when that
-       function is unavailable it returns null (never a locally computed
-       number), so every figure below defaults to the "nothing to report"
-       shape: empty panels hide (buildSummaryPanel already treats a falsy
-       summary as showPanel=false) and every other read here is defensive
-       against the same null, never fabricating a total. */
-    var summary = summarizeOf(plan, memberUids) || {
-      currency: currency, isLocked: locked, hasRevision: false, proposed: null, budget: null,
-      estimated: 0, committed: 0, paid: 0, remaining: null, unassigned: null, overage: 0,
-      isOverBudget: false, maximum: null, overMaximum: false, categories: [], perTraveler: {},
-      unbalanced: [], foreign: [], expenseCount: 0, foreignCount: 0
-    };
-
-    var sec = U.el('section', { class: 'pbudget' });
-
+    var myUidVal = me ? me.uid : null, isOwner = !!(myUidVal && plan.ownerUid === myUidVal);
+    var currency = b.currency || 'USD', locked = isLockedOf(plan), ui = decisionViewState(tripId);
+    var computed = summarizeOf(plan, memberUids), activeProposal = callBudgetPure('activeOf', [plan], null);
+    var summary = computed || { currency: currency, isLocked: false, proposed: null, budget: null, estimated: 0, committed: 0, paid: 0,
+      remaining: null, maximum: null, overMaximum: false, categories: [], perTraveler: {}, unbalanced: [], foreign: [], expenseCount: 0 };
+    var sec = U.el('section', { class: 'pbudget budgetdash' });
+    var statusLine = U.el('p', { class: 'pbudget__status', role: 'status', 'aria-live': 'polite' });
+    var drawer = buildBudgetDrawer(tripId, plan, statusLine), maxDrawer = buildMaxDrawer(tripId, plan, statusLine);
+    var exDrawer = buildExpenseDrawer(tripId, plan, members, statusLine);
+    var hero = U.el('header', { class: 'budgetdash__hero' }), heroCopy = U.el('div', { class: 'budgetdash__hero-copy' });
+    heroCopy.appendChild(decisionKicker('PLAN WITH A LITTLE MORE CERTAINTY'));
+    heroCopy.appendChild(U.el('span', { class: 'decisiondash__badge', dataset: { tone: locked ? 'ok' : 'neutral' },
+      text: locked ? 'Budget agreed' : activeProposal ? 'Under discussion' : 'Ready to plan' }));
+    heroCopy.appendChild(U.el('h2', { class: 'decisiondash__title', text: locked ? 'A shared plan for your spending.' : 'Start with a comfortable number.' }));
     var stateText = locked
       ? ('Budget: ' + moneyFormat(budgetTotalOf(plan), currency) + ' — locked by ' + nameFor(b.lock.by, members) + ' · ' + (F.ago(b.lock.at) || '') + '.')
       : 'No budget locked yet.';
-    sec.appendChild(U.el('p', { class: 'pbudget__state', dataset: { state: locked ? 'locked' : 'none', at: String((b.lock && b.lock.at) || 0) }, text: stateText }));
-    sec.appendChild(U.el('p', { class: 'pbudget__revision', hidden: !hasRevisionOf(plan),
-      text: 'The proposal under discussion has changed since it was locked.' }));
-
-    var aside = U.el('p', { class: 'pbudget__aside' });
-    aside.appendChild(document.createTextNode('The money you agree on together. What-ifs on the research live in the '));
-    aside.appendChild(U.el('a', { href: T.router.build('budget') }, 'Budget Lab'));
-    aside.appendChild(document.createTextNode('.'));
-    sec.appendChild(aside);
-
-    sec.appendChild(buildSummaryPanel(summary));
-    sec.appendChild(U.el('p', { class: 'pbudget__max', hidden: summary.maximum == null,
-      text: 'Ceiling: ' + (summary.maximum != null ? moneyFormat(summary.maximum, currency) : '') + (summary.overMaximum ? ' — the estimate is over it' : '') }));
+    heroCopy.appendChild(U.el('p', { class: 'pbudget__state', dataset: { state: locked ? 'locked' : 'none', at: String((b.lock && b.lock.at) || 0) }, text: stateText }));
+    heroCopy.appendChild(U.el('p', { class: 'decisiondash__copy', text: 'Compare the budget you agree on with the costs you record. Planned estimates, bookings and payments stay distinct.' }));
+    hero.appendChild(heroCopy);
+    var heroActions = U.el('div', { class: 'budgetdash__hero-actions' });
+    var addCost = U.el('button', { type: 'button', class: 'btn btn--primary budgetdash__addcost', text: '+ Add a cost', dataset: { planFocus: 'budget-add-cost' } });
+    addCost.addEventListener('click', function () { decisionOpenDrawer(exDrawer); });
+    var propose = U.el('button', { type: 'button', class: 'btn btn--quiet budgetdash__propose', text: 'Propose a budget', dataset: { planFocus: 'budget-propose' } });
+    propose.addEventListener('click', function () { decisionOpenDrawer(drawer); });
+    heroActions.appendChild(addCost); heroActions.appendChild(propose); hero.appendChild(heroActions); sec.appendChild(hero);
+    sec.appendChild(U.el('p', { class: 'pbudget__revision', hidden: !hasRevisionOf(plan), text: 'The proposal under discussion has changed since it was locked.' }));
+    if (computed) sec.appendChild(buildSummaryPanel(summary, activeProposal));
+    else sec.appendChild(U.el('p', { class: 'decisiondash__copy', text: 'The cost summary is not available yet. Your saved proposals and costs are below.' }));
     var foreignText = (summary.foreign || []).map(function (f) { return moneyFormat(f.minorUnits, f.currency); }).join(' · ');
-    sec.appendChild(U.el('p', { class: 'pbudget__foreign', hidden: !(summary.foreign && summary.foreign.length),
-      text: 'Not counted, other currencies: ' + foreignText }));
+    sec.appendChild(U.el('p', { class: 'pbudget__foreign budgetdash__foreign', hidden: !(summary.foreign && summary.foreign.length),
+      text: 'Other currencies · ' + foreignText + '. These costs are not converted and are excluded from the ' + currency + ' estimate, remaining amount and category chart.' }));
+    sec.appendChild(U.el('p', { class: 'pbudget__max', hidden: summary.maximum == null, dataset: { over: String(!!summary.overMaximum) },
+      text: 'Ceiling: ' + (summary.maximum != null ? moneyFormat(summary.maximum, currency) : '') + (summary.overMaximum ? ' — the estimate is over it' : '') }));
 
-    if (summary.estimated > 0) {
+    var middle = U.el('div', { class: 'budgetdash__overview' });
+    if (computed) middle.appendChild(buildBudgetCategories(summary));
+    var sharing = U.el('section', { class: 'budgetdash__sharing' });
+    sharing.appendChild(decisionKicker('THE SHARED PICTURE'));
+    sharing.appendChild(U.el('h2', { class: 'plan__h', text: 'By traveler' }));
+    sharing.appendChild(U.el('p', { class: 'decisiondash__copy', text: 'Each person’s share of the tracked estimate in ' + currency + '. These are cost allocations, not amounts owed.' }));
+    if (computed && summary.estimated > 0) {
       var travelersUl = U.el('ul', { class: 'pbudget__travelers' });
       memberUids.forEach(function (uid) {
-        travelersUl.appendChild(U.el('li', { dataset: { uid: uid },
-          text: nameFor(uid, members) + ' · ' + moneyFormat(summary.perTraveler[uid] || 0, currency) }));
+        travelersUl.appendChild(U.el('li', { dataset: { uid: uid } }, [
+          U.el('span', { text: nameFor(uid, members) }), U.el('strong', { text: moneyFormat(summary.perTraveler[uid] || 0, currency) })
+        ]));
       });
-      sec.appendChild(travelersUl);
+      sharing.appendChild(travelersUl);
+    } else sharing.appendChild(U.el('p', { class: 'decisiondash__copy', text: 'Traveler allocations appear as you add costs.' }));
+    sharing.appendChild(maxDrawer);
+    var aside = U.el('p', { class: 'pbudget__aside' });
+    aside.appendChild(document.createTextNode('Exploring a different scenario? Open the '));
+    aside.appendChild(U.el('a', { href: T.router.build('budget') }, 'Budget Lab')); aside.appendChild(document.createTextNode('.'));
+    sharing.appendChild(aside); middle.appendChild(sharing); sec.appendChild(middle);
+
+    var costHead = U.el('div', { class: 'decisiondash__sectionhead' });
+    costHead.appendChild(U.el('h2', { class: 'plan__h', text: 'Your costs' }));
+    var count = U.el('p', { class: 'budgetdash__resultcount', role: 'status', 'aria-live': 'polite' }); costHead.appendChild(count); sec.appendChild(costHead);
+    var filters = U.el('div', { class: 'budgetdash__filters' });
+    var search = U.el('input', { type: 'search', class: 'input', id: 'plan-cost-search', placeholder: 'Find a cost…',
+      'aria-label': 'Search costs', dataset: { planFocus: 'budget-search' } }); search.value = ui.search;
+    var category = U.el('select', { class: 'input', id: 'plan-cost-category', 'aria-label': 'Cost category', dataset: { planFocus: 'budget-category' } });
+    category.appendChild(U.el('option', { value: 'all' }, 'All categories'));
+    CATEGORIES.forEach(function (key) { category.appendChild(U.el('option', { value: key }, CATEGORY_WORDS[key] || key)); }); category.value = ui.category;
+    var state = U.el('select', { class: 'input', id: 'plan-cost-state', 'aria-label': 'Cost state', dataset: { planFocus: 'budget-state' } });
+    state.appendChild(U.el('option', { value: 'all' }, 'All states'));
+    EXPENSE_STATES.forEach(function (key) { state.appendChild(U.el('option', { value: key }, STATE_WORDS[key] || key)); }); state.value = ui.state;
+    var reset = U.el('button', { type: 'button', class: 'btn btn--quiet budgetdash__reset', text: 'Reset filters', dataset: { planFocus: 'budget-reset' } });
+    filters.appendChild(search); filters.appendChild(category); filters.appendChild(state); filters.appendChild(reset); sec.appendChild(filters);
+    var expenses = b.expenses || {}, eids = Object.keys(expenses);
+    var exUl = U.el('ul', { class: 'pbudget__expenses' });
+    eids.sort(function (x, y) {
+      var ex = expenses[x], ey = expenses[y], xg = !!(ex.sourceKind && ex.sourceKind !== 'manual'), yg = !!(ey.sourceKind && ey.sourceKind !== 'manual');
+      if (xg !== yg) return xg ? -1 : 1;
+      return xg && yg ? String(ex.description || '').localeCompare(String(ey.description || '')) : (ey.createdAt || 0) - (ex.createdAt || 0);
+    }).forEach(function (eid) { exUl.appendChild(buildExpenseRow(tripId, eid, expenses[eid], currency, summary, statusLine, exDrawer, members)); });
+    sec.appendChild(exUl);
+    var empty = U.el('div', { class: 'decisiondash__empty pbudget__noexpenses' });
+    empty.appendChild(U.el('h3', { text: eids.length ? 'No costs match these filters.' : 'Start with what you know.' }));
+    empty.appendChild(U.el('p', { text: eids.length ? 'Try another category or state, or reset your search.' : 'Add an estimate now. Mark it booked or paid as your plans become real.' }));
+    sec.appendChild(empty);
+    function filterCosts() {
+      var query = ui.search.trim().toLowerCase(), visible = 0;
+      U.qsa('.pbudget__expense', exUl).forEach(function (row) {
+        var cost = expenses[row.dataset.eid];
+        var matches = (!query || [cost.description, cost.notes, CATEGORY_WORDS[cost.category], cost.currency].join(' ').toLowerCase().indexOf(query) >= 0)
+          && (ui.category === 'all' || cost.category === ui.category) && (ui.state === 'all' || cost.state === ui.state);
+        row.hidden = !matches; if (matches) visible++;
+      });
+      empty.hidden = visible > 0; exUl.hidden = visible === 0;
+      filters.hidden = !eids.length;
+      reset.hidden = !(ui.search || ui.category !== 'all' || ui.state !== 'all');
+      U.setText(count, visible + ' of ' + eids.length + ' costs');
     }
+    search.addEventListener('input', function () { ui.search = search.value; filterCosts(); });
+    category.addEventListener('change', function () { ui.category = category.value; filterCosts(); });
+    state.addEventListener('change', function () { ui.state = state.value; filterCosts(); });
+    reset.addEventListener('click', function () { ui.search = ''; ui.category = 'all'; ui.state = 'all'; search.value = ''; category.value = 'all'; state.value = 'all'; filterCosts(); search.focus(); });
+    filterCosts();
+    sec.appendChild(exDrawer);
 
-    sec.appendChild(U.el('h2', { class: 'plan__h', text: 'Proposals' }));
-    var statusLine = U.el('p', { class: 'pbudget__status', role: 'status', 'aria-live': 'polite' });
-    var drawer = buildBudgetDrawer(tripId, plan, statusLine);
-    var maxDrawer = buildMaxDrawer(tripId, plan, statusLine);
-
-    var proposals = b.proposals || {};
-    var pids = Object.keys(proposals);
-    if (!pids.length) {
-      sec.appendChild(U.el('p', { class: 'pbudget__empty', text: 'Nobody has proposed a budget yet.' }));
-    } else {
+    var proposalHead = U.el('div', { class: 'decisiondash__sectionhead' });
+    proposalHead.appendChild(U.el('h2', { class: 'plan__h', text: 'Budget options' }));
+    proposalHead.appendChild(U.el('p', { class: 'decisiondash__copy', text: 'Open an option to review its allowances, agreement and notes.' })); sec.appendChild(proposalHead);
+    var proposals = b.proposals || {}, pids = Object.keys(proposals);
+    if (!pids.length) sec.appendChild(U.el('p', { class: 'pbudget__empty decisiondash__empty', text: 'No budget proposed yet. Start with the costs you know or a number that feels comfortable.' }));
+    else {
       var sorted = pids.map(function (pid) { return proposals[pid]; }).sort(function (a, c) {
         var al = locked && b.lock.proposalId === a.id, cl = locked && b.lock.proposalId === c.id;
         if (al !== cl) return al ? -1 : 1;
@@ -43519,42 +44093,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         return (a.createdAt || 0) - (c.createdAt || 0);
       });
       var ul = U.el('ul', { class: 'pbudget__proposals' });
-      sorted.forEach(function (p) {
-        ul.appendChild(buildProposalRowBudget(tripId, p, plan, members, memberUids, myUidVal, isOwner, statusLine, drawer));
-      });
+      sorted.forEach(function (proposal) { ul.appendChild(buildProposalRowBudget(tripId, proposal, plan, members, memberUids, myUidVal, isOwner, statusLine, drawer)); });
       sec.appendChild(ul);
     }
-
-    sec.appendChild(drawer);
-    sec.appendChild(maxDrawer);
-
-    sec.appendChild(U.el('h2', { class: 'plan__h', text: 'Costs' }));
-    var expenses = b.expenses || {};
-    var eids = Object.keys(expenses);
-    /* The Add-a-cost drawer exists on the page whether or not there are any
-       costs yet (it is how the first one gets added), so it is built once,
-       outside the empty/non-empty branch. */
-    var exDrawer = buildExpenseDrawer(tripId, plan, members, statusLine);
-    if (!eids.length) {
-      sec.appendChild(U.el('p', { class: 'pbudget__noexpenses', text: 'No costs yet.' }));
-    } else {
-      var sortedEids = eids.sort(function (x, y) {
-        var ex = expenses[x], ey = expenses[y];
-        var xg = !!(ex.sourceKind && ex.sourceKind !== 'manual'), yg = !!(ey.sourceKind && ey.sourceKind !== 'manual');
-        if (xg !== yg) return xg ? -1 : 1;
-        if (xg && yg) return String(ex.description || '').localeCompare(String(ey.description || ''));
-        return (ey.createdAt || 0) - (ex.createdAt || 0);
-      });
-      var exUl = U.el('ul', { class: 'pbudget__expenses' });
-      sortedEids.forEach(function (eid) {
-        exUl.appendChild(buildExpenseRow(tripId, eid, expenses[eid], currency, summary, statusLine, exDrawer));
-      });
-      sec.appendChild(exUl);
-    }
-    sec.appendChild(exDrawer);
-
-    sec.appendChild(statusLine);
-    return sec;
+    sec.appendChild(drawer); sec.appendChild(statusLine); return sec;
   }
 
   /* ==================================================================== */
@@ -43592,154 +44134,216 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     catch (e) { return s; }
   }
 
-  function bookingItemMeta(kind, entry, members) {
-    if (kind === 'flights') {
-      var segs = orderedSegmentsOf(entry);
-      var legs = segs.map(function (s) {
-        var bits = [];
-        if (s.airline || s.flightNumber) bits.push(((s.airline || '') + ' ' + (s.flightNumber || '')).trim());
-        if (s.originAirport || s.destinationAirport) bits.push((s.originAirport || '?') + ' → ' + (s.destinationAirport || '?'));
-        if (s.departsOn) bits.push(dayShort(s.departsOn));
-        return bits.join(' · ');
-      }).join(' · ');
-      var parts = [TRIP_KIND_WORDS[entry.kind] || entry.kind];
-      if (legs) parts.push(legs);
-      if (entry.confirmation) parts.push(entry.confirmation);
-      var travellers = joinNames(entry.travelerUids, members);
-      if (travellers) parts.push(travellers);
-      return parts.join(' · ');
-    }
-    if (kind === 'lodging') {
-      var nights = lodgingNightsOf(entry);
-      var parts2 = [];
-      /* rangeLabel() already appends " · N nights" itself (T.trips.label) —
-         printing F.plural(nights, 'night') again beside it would be the
-         exact "no number printed twice" violation PLAN_SPEC §0.7 forbids,
-         so the range alone carries the nights count here. */
-      if (entry.checkIn && entry.checkOut) parts2.push(rangeLabel(entry.checkIn, entry.checkOut));
-      else if (nights) parts2.push(F.plural(nights, 'night'));
-      if (entry.rooms) parts2.push(F.plural(entry.rooms, 'room'));
-      if (entry.cityLabel) parts2.push(entry.cityLabel);
-      if (entry.confirmation) parts2.push(entry.confirmation);
-      return parts2.join(' · ');
-    }
-    var parts3 = [];
-    if (entry.coverageStart && entry.coverageEnd) parts3.push(plainRangeLabel(entry.coverageStart, entry.coverageEnd));
-    var covered = joinNames(entry.coveredUids, members);
-    if (covered) parts3.push(covered);
-    var included = COVERAGE_KINDS.filter(function (k) { return entry.coverages && entry.coverages[k] && entry.coverages[k].included; })
-      .map(function (k) { return COVERAGE_WORDS[k]; });
-    if (included.length) parts3.push(included.join(', '));
-    return parts3.join(' · ');
+  function bookingClone(value) { return JSON.parse(JSON.stringify(value)); }
+  function bookingCurrent(tripId, kind, id) {
+    var g = PR && PR.get ? PR.get(tripId) : null;
+    return g && g.plan && g.plan.bookings && g.plan.bookings[kind] && g.plan.bookings[kind][id] || null;
   }
-
+  function bookingChanged(input) {
+    if (input.type === 'checkbox') return input.checked !== input.defaultChecked;
+    var baseline = input.tagName === 'SELECT' ? input.dataset['default'] : input.defaultValue;
+    return input.value !== baseline;
+  }
+  function bookingPut(patch, key, value, input, editing) {
+    if (!editing || bookingChanged(input)) patch[key] = value;
+  }
+  function bookingFocusDrawer(drawer) {
+    drawer.open = true;
+    var first = drawer.querySelector('input, select, textarea');
+    if (first) first.focus();
+  }
+  function bookingDayLabel(day) {
+    if (!day) return 'Date not saved';
+    var valid = PR && PR.dates && PR.dates.validateDay ? PR.dates.validateDay(day) : null;
+    if (!valid) return String(day);
+    var d = new Date(day + 'T12:00:00Z');
+    try { return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); }
+    catch (e) { return day; }
+  }
+  function bookingDayChange(segment) {
+    var validate = PR && PR.dates && PR.dates.validateDay;
+    if (!validate || !validate(segment.departsOn) || !validate(segment.arrivesOn)) return '';
+    var delta = Math.round((Date.parse(segment.arrivesOn + 'T12:00:00Z') - Date.parse(segment.departsOn + 'T12:00:00Z')) / 86400000);
+    if (!delta) return '';
+    return delta > 0 ? ('+' + delta + (delta === 1 ? ' day' : ' days')) : ('−' + Math.abs(delta) + (delta === -1 ? ' day' : ' days'));
+  }
+  function bookingRouteTitle(entry) {
+    var segments = orderedSegmentsOf(entry);
+    if (!segments.length) return 'Flight booking';
+    var connected = segments.every(function (segment, index) {
+      return segment.originAirport && segment.destinationAirport && (!index || segments[index - 1].destinationAirport === segment.originAirport);
+    });
+    return connected ? routeSummaryOf(entry) : F.plural(segments.length, 'saved flight leg');
+  }
+  function bookingChip(text, extraClass) { return U.el('span', { class: 'bookings__chip' + (extraClass ? ' ' + extraClass : ''), text: text }); }
+  function bookingPersonLine(label, uids, members) {
+    var text = joinNames(uids, members);
+    return text ? U.el('p', { class: 'bookings__people' }, [U.el('span', { text: label + ' ' }), document.createTextNode(text)]) : null;
+  }
+  function bookingEndpoint(label, airport, date, time, zone) {
+    var point = U.el('div', { class: 'bookings__endpoint' });
+    point.appendChild(U.el('span', { class: 'bookings__eyebrow', text: label }));
+    if (airport !== null) point.appendChild(U.el('strong', { class: 'bookings__airport', text: airport || 'Airport not saved' }));
+    if (time !== undefined) point.appendChild(U.el('span', { class: 'bookings__time', text: timeDisplay(time) || 'Time not saved' }));
+    point.appendChild(U.el('span', { class: 'bookings__date', text: bookingDayLabel(date) }));
+    if (zone) point.appendChild(U.el('span', { class: 'bookings__zone', text: zone }));
+    return point;
+  }
+  function buildFlightJourney(entry, members) {
+    var wrap = U.el('div', { class: 'bookings__journeys' }), segments = orderedSegmentsOf(entry), groups = [];
+    /* Only saved return flags create direction groups. Never join records or
+       infer a connection, layover duration, timezone or missing travel date. */
+    segments.forEach(function (segment) {
+      var last = groups[groups.length - 1], returning = !!segment.isReturn;
+      if (!last || last.returning !== returning) { last = { returning: returning, segments: [] }; groups.push(last); }
+      last.segments.push(segment);
+    });
+    groups.forEach(function (group) {
+      var section = U.el('section', { class: 'bookings__journey', dataset: { direction: group.returning ? 'return' : 'outbound' } });
+      var label = group.returning ? 'Return' : entry.kind === 'roundTrip' ? 'Outbound' : 'Journey';
+      section.appendChild(U.el('h3', { class: 'bookings__journeytitle' }, [document.createTextNode(label), U.el('span', { text: F.plural(group.segments.length, 'leg') })]));
+      var list = U.el('ol', { class: 'bookings__legs' });
+      group.segments.forEach(function (segment) {
+        var leg = U.el('li', { class: 'bookings__leg', dataset: { segmentId: segment.id || '' } });
+        var top = U.el('div', { class: 'bookings__leghead' });
+        var name = [segment.airline, segment.flightNumber].filter(Boolean).join(' ') || 'Flight details';
+        top.appendChild(U.el('strong', { class: 'bookings__flightname', text: name }));
+        var cabinNames = { economy: 'Economy', premiumEconomy: 'Premium economy', business: 'Business', first: 'First' };
+        if (segment.cabin) top.appendChild(U.el('span', { class: 'bookings__cabin', text: cabinNames[segment.cabin] || segment.cabin }));
+        leg.appendChild(top);
+        var route = U.el('div', { class: 'bookings__legroute' });
+        route.appendChild(bookingEndpoint('Departure', segment.originAirport, segment.departsOn, segment.departsAt, segment.originTimeZone));
+        var connector = U.el('div', { class: 'bookings__connector', 'aria-hidden': 'true' }, '→');
+        route.appendChild(connector);
+        var arrival = bookingEndpoint('Arrival', segment.destinationAirport, segment.arrivesOn, segment.arrivesAt, segment.destinationTimeZone);
+        var dayChange = bookingDayChange(segment);
+        if (dayChange) arrival.appendChild(U.el('span', { class: 'bookings__daychange', text: dayChange, title: 'Difference between the saved departure and arrival calendar dates.' }));
+        route.appendChild(arrival); leg.appendChild(route);
+        var seats = segment.seats || {}, seatUids = Object.keys(seats).filter(function (uid) { return !!seats[uid]; });
+        if (seatUids.length) {
+          var seatLine = U.el('div', { class: 'bookings__seats', 'aria-label': 'Saved seats' });
+          seatUids.forEach(function (uid) { seatLine.appendChild(bookingChip(nameFor(uid, members) + ' · Seat ' + seats[uid])); });
+          leg.appendChild(seatLine);
+        }
+        if (segment.notes) leg.appendChild(U.el('p', { class: 'bookings__legnotes' }, [U.el('span', { text: 'Leg notes · ' }), document.createTextNode(segment.notes)]));
+        list.appendChild(leg);
+      });
+      section.appendChild(list); wrap.appendChild(section);
+    });
+    if (!segments.length) wrap.appendChild(U.el('p', { class: 'bookings__empty', text: 'Add the flight legs to see the route and times here.' }));
+    return wrap;
+  }
+  function bookingItemMeta(kind, entry, members) {
+    if (kind === 'flights') return [TRIP_KIND_WORDS[entry.kind] || entry.kind, entry.bookingSource].filter(Boolean).join(' · ');
+    if (kind === 'lodging') return [LODGING_KIND_WORDS[entry.kind] || entry.kind, entry.cityLabel].filter(Boolean).join(' · ');
+    return entry.provider || 'Travel insurance';
+  }
   function buildBookingDetails(kind, id, entry, members) {
-    var details = U.el('details', { class: 'plan__drawer bookings__details',
-      dataset: { drawer: 'booking-details-' + kind + '-' + id } });
-    details.appendChild(U.el('summary', { text: 'Booking details' }));
+    var details = U.el('details', { class: 'plan__drawer bookings__details', dataset: { drawer: 'booking-details-' + kind + '-' + id } });
+    details.appendChild(U.el('summary', { text: kind === 'flights' ? 'Ticket, seats & booking notes' : kind === 'lodging' ? 'Stay details & cancellation' : 'Coverage, contacts & notes' }));
     var facts = U.el('dl', { class: 'bookings__facts' });
     function fact(label, value) {
       if (typeof value !== 'string' || !value.trim()) return;
-      facts.appendChild(U.el('div', { class: 'bookings__fact' }, [
-        U.el('dt', { text: label }), U.el('dd', { text: value })
-      ]));
+      facts.appendChild(U.el('div', { class: 'bookings__fact' }, [U.el('dt', { text: label }), U.el('dd', { text: value })]));
     }
+    var cur = entry.currency || 'USD';
     if (kind === 'flights') {
-      fact('Booked through', entry.bookingSource);
-      fact('Ticket', entry.ticketType);
+      fact('Booked through', entry.bookingSource); fact('Booked on', entry.bookedOn); fact('Ticket', entry.ticketType);
+      fact('Fare', moneyFormat(entry.fareMinorUnits || 0, cur)); fact('Taxes & fees', moneyFormat(entry.taxesMinorUnits || 0, cur));
       orderedSegmentsOf(entry).forEach(function (segment, index) {
-        var name = ((segment.airline || '') + ' ' + (segment.flightNumber || '')).trim() || ('Flight ' + (index + 1));
-        function moment(day, time, zone) {
-          return [day || '', timeDisplay(time), zone || ''].filter(Boolean).join(' · ');
-        }
+        var name = [segment.airline, segment.flightNumber].filter(Boolean).join(' ') || ('Flight ' + (index + 1));
+        function moment(day, time, zone) { return [day || '', timeDisplay(time), zone || ''].filter(Boolean).join(' · '); }
         fact(name + ' departure', moment(segment.departsOn, segment.departsAt, segment.originTimeZone));
         fact(name + ' arrival', moment(segment.arrivesOn, segment.arrivesAt, segment.destinationTimeZone));
         var seats = segment.seats || {};
-        fact(name + ' seats', Object.keys(seats).map(function (uid) {
-          return nameFor(uid, members) + ': ' + seats[uid];
-        }).join(' · '));
+        fact(name + ' seats', Object.keys(seats).map(function (uid) { return nameFor(uid, members) + ': ' + seats[uid]; }).join(' · '));
         fact(name + ' notes', segment.notes);
       });
     } else if (kind === 'lodging') {
-      fact('Room', entry.roomType);
-      fact('Address', entry.address);
-      fact('Booked through', entry.bookingProvider);
-      fact('Check-in time', timeDisplay(entry.checkInTime));
-      fact('Check-out time', timeDisplay(entry.checkOutTime));
-      fact('Cancellation deadline', entry.cancellationDeadline);
-      fact('Cancellation terms', entry.cancellationNotes);
+      fact('Room', entry.roomType); fact('Address', entry.address); fact('Booked through', entry.bookingProvider); fact('Booked on', entry.bookedOn);
+      fact('Check-in time', timeDisplay(entry.checkInTime)); fact('Check-out time', timeDisplay(entry.checkOutTime));
+      fact('Room cost for the whole stay', moneyFormat(entry.roomRateMinorUnits || 0, cur));
+      if (entry.taxesMinorUnits) fact('Taxes', moneyFormat(entry.taxesMinorUnits, cur));
+      if (entry.resortFeesMinorUnits) fact('Resort fees', moneyFormat(entry.resortFeesMinorUnits, cur));
+      fact('Cancellation deadline', entry.cancellationDeadline); fact('Cancellation terms', entry.cancellationNotes);
       if (entry.mealsIncluded) fact('Meals', 'Included');
     } else {
-      fact('Contact', entry.contactPhone);
-      fact('Claims website', entry.contactUrl);
-      fact('Claim reference', entry.claimReference);
+      fact('Purchased on', entry.purchasedOn); fact('Contact', entry.contactPhone); fact('Claims website', entry.contactUrl); fact('Claim reference', entry.claimReference);
+      COVERAGE_KINDS.forEach(function (key) {
+        var coverage = entry.coverages && entry.coverages[key];
+        if (!coverage) return;
+        if (coverage.limitMinorUnits !== null && coverage.limitMinorUnits !== undefined) fact(COVERAGE_WORDS[key] + ' limit', moneyFormat(coverage.limitMinorUnits, cur));
+        fact(COVERAGE_WORDS[key] + ' notes', coverage.notes);
+      });
     }
-    fact('Notes', entry.notes);
+    fact('Booking notes', entry.notes);
     if (!facts.children.length) return null;
-    details.appendChild(facts);
-    return details;
+    details.appendChild(facts); return details;
   }
-
   function buildBookingItem(tripId, kind, id, entry, currency, members, statusLine, drawer) {
     var isForeign = (entry.currency || currency) !== currency;
     var li = U.el('li', { class: 'bookings__item', dataset: { id: id, kind: kind, foreign: isForeign ? 'true' : 'false' } });
-    var title = kind === 'flights' ? (routeSummaryOf(entry) || 'Flights')
-      : kind === 'lodging' ? (entry.propertyName || 'Lodging')
-      : ((entry.provider ? entry.provider + ' · ' : '') + (entry.planName || 'Travel insurance'));
-    li.appendChild(U.el('p', { class: 'bookings__title', text: title }));
-    li.appendChild(U.el('p', { class: 'bookings__meta', text: bookingItemMeta(kind, entry, members) }));
-
+    var heading = U.el('div', { class: 'bookings__cardhead' });
+    var title = kind === 'flights' ? bookingRouteTitle(entry) : kind === 'lodging' ? entry.propertyName || 'Lodging' : entry.planName || 'Travel insurance';
+    var titleWrap = U.el('div', { class: 'bookings__headingcopy' });
+    titleWrap.appendChild(U.el('p', { class: 'bookings__meta', text: bookingItemMeta(kind, entry, members) }));
+    titleWrap.appendChild(U.el('h3', { class: 'bookings__title', text: title }));
+    heading.appendChild(titleWrap);
     var total = kind === 'flights' ? flightTotalOf(entry) : kind === 'lodging' ? lodgingTotalOf(entry) : policyCostOf(entry);
-    var amountP = U.el('p', { class: 'bookings__amount', text: moneyFormat(total, entry.currency || currency) });
-    if (isForeign) amountP.appendChild(U.el('span', { class: 'bookings__foreigntag', text: ' in ' + (entry.currency || currency) }));
-    li.appendChild(amountP);
-    if (kind === 'lodging' && entry.depositMinorUnits > 0) {
-      li.appendChild(U.el('p', { class: 'bookings__deposit',
-        text: 'deposit ' + moneyFormat(entry.depositMinorUnits, entry.currency || currency) + ' paid · ' +
-          moneyFormat(lodgingRemainingOf(entry), entry.currency || currency) + ' remaining' }));
+    var price = U.el('div', { class: 'bookings__price' });
+    price.appendChild(U.el('span', { class: 'bookings__pricelabel', text: kind === 'lodging' ? 'Total stay' : kind === 'insurance' ? 'Policy cost' : 'Booking total' }));
+    var amount = U.el('p', { class: 'bookings__amount', text: moneyFormat(total, entry.currency || currency) });
+    if (isForeign) amount.appendChild(U.el('span', { class: 'bookings__foreigntag', text: ' ' + (entry.currency || currency) }));
+    price.appendChild(amount); heading.appendChild(price); li.appendChild(heading);
+    var ribbon = U.el('div', { class: 'bookings__ribbon' });
+    if (entry.confirmation) ribbon.appendChild(bookingChip('Confirmation · ' + entry.confirmation, 'bookings__confirmation'));
+    var people = bookingPersonLine(kind === 'insurance' ? 'Covered travelers ·' : 'Travelers ·', kind === 'insurance' ? entry.coveredUids : entry.travelerUids, members);
+    if (people) ribbon.appendChild(people);
+    if (ribbon.children.length) li.appendChild(ribbon);
+    if (kind === 'flights') li.appendChild(buildFlightJourney(entry, members));
+    else {
+      var dates = U.el('div', { class: 'bookings__daterange' });
+      dates.appendChild(bookingEndpoint(kind === 'lodging' ? 'Check-in' : 'Coverage starts', null, kind === 'lodging' ? entry.checkIn : entry.coverageStart, kind === 'lodging' && entry.checkInTime ? entry.checkInTime : undefined));
+      dates.appendChild(bookingEndpoint(kind === 'lodging' ? 'Check-out' : 'Coverage ends', null, kind === 'lodging' ? entry.checkOut : entry.coverageEnd, kind === 'lodging' && entry.checkOutTime ? entry.checkOutTime : undefined));
+      li.appendChild(dates);
+      var tags = U.el('div', { class: 'bookings__amenities' });
+      if (kind === 'lodging') {
+        var nights = lodgingNightsOf(entry);
+        if (nights !== null) tags.appendChild(bookingChip(F.plural(nights, 'night')));
+        if (entry.rooms) tags.appendChild(bookingChip(F.plural(entry.rooms, 'room')));
+        if (entry.roomType) tags.appendChild(bookingChip(entry.roomType));
+        if (entry.mealsIncluded) tags.appendChild(bookingChip('Meals included'));
+      } else {
+        COVERAGE_KINDS.forEach(function (key) { if (entry.coverages && entry.coverages[key] && entry.coverages[key].included) tags.appendChild(bookingChip(COVERAGE_WORDS[key])); });
+      }
+      if (tags.children.length) { tags.setAttribute('aria-label', kind === 'lodging' ? 'Stay details' : 'Recorded coverage'); li.appendChild(tags); }
     }
-
-    var details = buildBookingDetails(kind, id, entry, members);
-    if (details) li.appendChild(details);
-
+    if (kind === 'lodging' && entry.depositMinorUnits > 0) li.appendChild(U.el('p', { class: 'bookings__deposit', text: 'Deposit paid · ' + moneyFormat(entry.depositMinorUnits, entry.currency || currency) + '   /   Remaining · ' + moneyFormat(lodgingRemainingOf(entry), entry.currency || currency) }));
+    var details = buildBookingDetails(kind, id, entry, members); if (details) li.appendChild(details);
     var actions = U.el('div', { class: 'bookings__actions' });
-    var editBtn = U.el('button', { type: 'button', class: 'btn btn--quiet bookings__edit', text: 'Edit' });
-    editBtn.addEventListener('click', function () { if (drawer.openForEdit) drawer.openForEdit(entry); });
-    actions.appendChild(editBtn);
-    var removeBtn = U.el('button', { type: 'button', class: 'btn btn--quiet bookings__remove', text: 'Remove' });
-    removeBtn.addEventListener('click', function () { confirmRemoveBooking(tripId, kind, id, statusLine); });
-    actions.appendChild(removeBtn);
-    li.appendChild(actions);
-    return li;
+    var edit = U.el('button', { type: 'button', class: 'btn btn--quiet bookings__edit', text: 'Edit booking', 'aria-label': 'Edit ' + title });
+    edit.addEventListener('click', function () { if (drawer.openForEdit) { drawer.openForEdit(entry); bookingFocusDrawer(drawer); } });
+    var remove = U.el('button', { type: 'button', class: 'btn btn--quiet bookings__remove', text: 'Remove', 'aria-label': 'Remove ' + title });
+    remove.addEventListener('click', function () { confirmRemoveBooking(tripId, kind, id, statusLine); });
+    actions.appendChild(edit); actions.appendChild(remove); li.appendChild(actions); return li;
   }
-
   function sortKeyFor(kind, entry) {
     if (kind === 'flights') { var segs = orderedSegmentsOf(entry); return (segs[0] && segs[0].departsOn) || null; }
-    if (kind === 'lodging') return entry.checkIn || null;
-    return entry.purchasedOn || null;
+    return kind === 'lodging' ? entry.checkIn || null : entry.purchasedOn || null;
   }
-
   function buildBookingGroup(tripId, kind, plan, members, currency, statusLine, drawer) {
-    var wordsEmpty = { flights: 'No flights yet.', lodging: 'No stays yet.', insurance: 'No policies yet.' };
-    var wordsHeading = { flights: 'Flights', lodging: 'Lodging', insurance: 'Insurance' };
-    var sec = U.el('section', { class: 'bookings__group', dataset: { kind: kind } });
-    sec.appendChild(U.el('h2', { class: 'plan__h', text: wordsHeading[kind] }));
-    var map = (plan.bookings && plan.bookings[kind]) || {};
-    var ids = Object.keys(map);
-    if (!ids.length) {
-      sec.appendChild(U.el('p', { class: 'bookings__empty', text: wordsEmpty[kind] }));
-    } else {
-      var sorted = ids.sort(function (a, b2) {
-        var ka = sortKeyFor(kind, map[a]), kb = sortKeyFor(kind, map[b2]);
-        if (ka !== kb) { if (ka == null) return 1; if (kb == null) return -1; return ka < kb ? -1 : 1; }
-        return (map[a].createdAt || 0) - (map[b2].createdAt || 0);
-      });
-      var ul = U.el('ul', { class: 'bookings__list' });
-      sorted.forEach(function (id) { ul.appendChild(buildBookingItem(tripId, kind, id, map[id], currency, members, statusLine, drawer)); });
-      sec.appendChild(ul);
+    var words = { flights: ['Flights', 'Your saved tickets, leg by leg.', 'Add a flight', 'No flights saved yet. Add a ticket to keep the route, dates and travelers together.'], lodging: ['Stays', 'Where you will settle in.', 'Add a stay', 'No stays saved yet. Add a property and keep its check-in details close.'], insurance: ['Travel insurance', 'Coverage and contacts for the trip.', 'Add a policy', 'No policies saved yet. Add the coverage you have purchased.'] }[kind];
+    var sec = U.el('section', { class: 'bookings__group', dataset: { kind: kind } }), map = plan.bookings && plan.bookings[kind] || {}, ids = Object.keys(map);
+    var header = U.el('div', { class: 'bookings__grouphead' }), copy = U.el('div');
+    copy.appendChild(U.el('h2', { class: 'plan__h', text: words[0] })); copy.appendChild(U.el('p', { class: 'bookings__groupintro', text: words[1] })); header.appendChild(copy);
+    var add = U.el('button', { type: 'button', class: 'btn btn--quiet bookings__add', text: '+ ' + words[2] });
+    add.addEventListener('click', function () { bookingFocusDrawer(drawer); }); header.appendChild(add); sec.appendChild(header);
+    if (!ids.length) sec.appendChild(U.el('p', { class: 'bookings__empty', text: words[3] }));
+    else {
+      ids.sort(function (a, b) { var ka = sortKeyFor(kind, map[a]), kb = sortKeyFor(kind, map[b]); if (ka !== kb) { if (ka == null) return 1; if (kb == null) return -1; return ka < kb ? -1 : 1; } return (map[a].createdAt || 0) - (map[b].createdAt || 0); });
+      var list = U.el('ul', { class: 'bookings__list' }); ids.forEach(function (id) { list.appendChild(buildBookingItem(tripId, kind, id, map[id], currency, members, statusLine, drawer)); }); sec.appendChild(list);
     }
-    sec.appendChild(drawer);
-    return sec;
+    sec.appendChild(drawer); return sec;
   }
 
   /* -- flights drawer -------------------------------------------------- */
@@ -43778,7 +44382,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     });
     form.appendChild(travelerWrap);
 
-    var segRows = [];
+    var segRows = [], nextSegmentNumber = 0, removedSegmentIds = [];
     var segFieldset = U.el('fieldset', { class: 'bookings__segments' }, [U.el('legend', { class: 'sync__label', text: 'Legs' })]);
     form.appendChild(segFieldset);
     var addSegBtn = U.el('button', { type: 'button', class: 'btn btn--quiet bookings__addseg', text: 'Add a leg' });
@@ -43793,40 +44397,46 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var date = U.el('input', { class: 'input sync__input', id: 'plan-fl-seg-' + n + '-date', type: 'date' });
       var time = U.el('input', { class: 'input sync__input', id: 'plan-fl-seg-' + n + '-time', type: 'time' });
       var ret = U.el('input', { type: 'checkbox', id: 'plan-fl-seg-' + n + '-return' });
-      wrap.appendChild(airline); wrap.appendChild(number); wrap.appendChild(from); wrap.appendChild(to);
-      wrap.appendChild(date); wrap.appendChild(time);
+      var arrivalDate = U.el('input', { class: 'input sync__input', id: 'plan-fl-seg-' + n + '-arrival-date', type: 'date' });
+      var arrivalTime = U.el('input', { class: 'input sync__input', id: 'plan-fl-seg-' + n + '-arrival-time', type: 'time' });
+      wrap.appendChild(U.el('h4', { class: 'bookings__segmenttitle', text: 'Flight leg ' + n }));
+      [[airline, 'Airline'], [number, 'Flight number'], [from, 'Departure airport'], [to, 'Arrival airport'], [date, 'Departure date'], [time, 'Departure time'], [arrivalDate, 'Arrival date'], [arrivalTime, 'Arrival time']].forEach(function (pair) {
+        wrap.appendChild(U.el('div', { class: 'sync__field' }, [U.el('label', { class: 'sync__label', for: pair[0].id, text: pair[1] }), pair[0]]));
+      });
       wrap.appendChild(U.el('label', { class: 'pbudget__checklabel' }, [ret, document.createTextNode(' Return leg')]));
       var dropBtn = U.el('button', { type: 'button', class: 'btn btn--quiet bookings__dropseg', text: 'Remove leg' });
       dropBtn.addEventListener('click', function () {
         var idx = segRows.indexOf(row);
         if (idx >= 0) segRows.splice(idx, 1);
+        if (row.segmentId) removedSegmentIds.push(row.segmentId);
+        form.dataset.legsChanged = 'true';
         wrap.parentNode.removeChild(wrap);
       });
       wrap.appendChild(dropBtn);
-      var row = { n: n, el: wrap, airline: airline, number: number, from: from, to: to, date: date, time: time, ret: ret };
+      var row = { n: n, el: wrap, airline: airline, number: number, from: from, to: to, date: date, time: time, arrivalDate: arrivalDate, arrivalTime: arrivalTime, ret: ret, segmentId: null };
       return row;
     }
     function addSeg() {
       /* CORRECTION 1: was a bare 12 (Wave 3's original cap); reads
          PR.CAPS.segments live so it never drifts from D1's re-cut again. */
       if (segRows.length >= (capsOf().segments || 12)) return;
-      var row = segRow(segRows.length + 1);
+      var row = segRow(++nextSegmentNumber);
       segRows.push(row);
       segFieldset.appendChild(row.el);
       return row;
     }
-    addSegBtn.addEventListener('click', function () { addSeg(); });
+    addSegBtn.addEventListener('click', function () { addSeg(); form.dataset.legsChanged = 'true'; });
 
     function clearSegs() {
       segRows.forEach(function (r) { if (r.el.parentNode) r.el.parentNode.removeChild(r.el); });
-      segRows = [];
+      segRows = []; nextSegmentNumber = 0; removedSegmentIds = []; form.dataset.legsChanged = '';
     }
     function resetSegsForKind(k) {
       clearSegs();
       if (k === 'oneWay') { addSeg(); }
       else { var r1 = addSeg(); var r2 = addSeg(); if (r2) { r2.ret.checked = true; r2.ret.defaultChecked = true; } }
     }
-    kindSelect.addEventListener('change', function () { resetSegsForKind(kindSelect.value); });
+    kindSelect.addEventListener('change', function () { if (!form.dataset.editing) resetSegsForKind(kindSelect.value); });
 
     var notesInput = U.el('textarea', { id: 'plan-fl-notes', class: 'textarea sync__input', rows: '2', maxlength: '500' });
     form.appendChild(U.el('div', { class: 'sync__field' }, [U.el('label', { class: 'sync__label', for: 'plan-fl-notes', text: 'Notes (optional)' }), notesInput]));
@@ -43875,7 +44485,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         var row = addSeg();
         setFieldVal(row.airline, s.airline || ''); setFieldVal(row.number, s.flightNumber || '');
         setFieldVal(row.from, s.originAirport || ''); setFieldVal(row.to, s.destinationAirport || '');
+        row.segmentId = s.id || Object.keys(f.segments || {}).filter(function (key) { return f.segments[key] === s; })[0];
         setFieldVal(row.date, s.departsOn || ''); setFieldVal(row.time, (s.departsAt || '').slice(0, 5));
+        setFieldVal(row.arrivalDate, s.arrivesOn || ''); setFieldVal(row.arrivalTime, (s.arrivesAt || '').slice(0, 5));
         setChecked(row.ret, !!s.isReturn);
       });
       if (!segs.length) resetSegsForKind(f.kind || 'roundTrip');
@@ -43887,32 +44499,42 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     }
 
     function submit() {
-      var fare = moneyFromDecimal(fareInput.value || '0', currencySelect.value);
-      var taxes = moneyFromDecimal(taxesInput.value || '0', currencySelect.value);
+      var fare = moneyFromDecimal(fareInput.value || '0', currencySelect.value), taxes = moneyFromDecimal(taxesInput.value || '0', currencySelect.value);
       if (fare == null || taxes == null) { U.setText(errLine, 'Amounts are numbers, like 1,250.00.'); return; }
-      var travelers = [];
-      members.forEach(function (m) { if (travelerChecks[m.uid].checked) travelers.push(m.uid); });
-      var segments = {};
-      var bad = false;
-      segRows.forEach(function (r, i) {
-        if (!r.from.value && !r.to.value) { bad = true; return; }
-        segments[U.uid('sg')] = {
-          seq: i, airline: r.airline.value || '', flightNumber: r.number.value || '',
-          originAirport: r.from.value || '', destinationAirport: r.to.value || '',
-          departsOn: r.date.value || null, departsAt: r.time.value ? (r.time.value + ':00') : null,
-          arrivesOn: null, arrivesAt: null, originTimeZone: '', destinationTimeZone: '',
-          cabin: 'economy', seats: {}, isReturn: !!r.ret.checked, notes: ''
+      var editingId = form.dataset.editing || '', current = editingId ? bookingCurrent(tripId, 'flights', editingId) : null;
+      if (editingId && !current) { U.setText(errLine, 'This booking is no longer available. Close this form and try again.'); return; }
+      var travelers = []; members.forEach(function (m) { if (travelerChecks[m.uid].checked) travelers.push(m.uid); });
+      var booking = {}, segments = bookingClone(current && current.segments || {}), bad = false, changedLegs = !editingId || removedSegmentIds.length > 0;
+      removedSegmentIds.forEach(function (id) { delete segments[id]; });
+      var highestSeq = Object.keys(segments).reduce(function (max, id) { return Math.max(max, segments[id].seq || 0); }, -1);
+      segRows.forEach(function (r) {
+        if (!r.from.value || !r.to.value) { bad = true; return; }
+        var existing = r.segmentId && segments[r.segmentId];
+        if (r.segmentId && !existing) { bad = true; return; }
+        var id = r.segmentId || U.uid('sg'), segment = existing ? bookingClone(existing) : {
+          id: id, seq: ++highestSeq, airline: '', flightNumber: '', originAirport: '', destinationAirport: '', departsOn: null, departsAt: null,
+          arrivesOn: null, arrivesAt: null, originTimeZone: '', destinationTimeZone: '', cabin: 'economy', seats: {}, isReturn: false, notes: ''
         };
+        var fields = {};
+        bookingPut(fields, 'airline', r.airline.value || '', r.airline, !!existing); bookingPut(fields, 'flightNumber', r.number.value || '', r.number, !!existing);
+        bookingPut(fields, 'originAirport', r.from.value || '', r.from, !!existing); bookingPut(fields, 'destinationAirport', r.to.value || '', r.to, !!existing);
+        bookingPut(fields, 'departsOn', r.date.value || null, r.date, !!existing); bookingPut(fields, 'departsAt', r.time.value ? r.time.value + ':00' : null, r.time, !!existing);
+        bookingPut(fields, 'arrivesOn', r.arrivalDate.value || null, r.arrivalDate, !!existing); bookingPut(fields, 'arrivesAt', r.arrivalTime.value ? r.arrivalTime.value + ':00' : null, r.arrivalTime, !!existing);
+        bookingPut(fields, 'isReturn', !!r.ret.checked, r.ret, !!existing);
+        Object.keys(fields).forEach(function (key) { segment[key] = fields[key]; });
+        if (Object.keys(fields).length || !existing) { segments[id] = segment; changedLegs = true; }
       });
-      if (bad) { U.setText(errLine, 'Check ' + fieldLabel('segments') + '.'); return; }
+      if (bad) { U.setText(errLine, 'Check both airports for each leg. If a saved leg changed elsewhere, close and reopen this form.'); return; }
+      bookingPut(booking, 'kind', kindSelect.value, kindSelect, !!editingId);
+      bookingPut(booking, 'confirmation', confirmationInput.value || '', confirmationInput, !!editingId);
+      bookingPut(booking, 'bookingSource', sourceInput.value || '', sourceInput, !!editingId);
+      bookingPut(booking, 'bookedOn', bookedInput.value || null, bookedInput, !!editingId);
+      bookingPut(booking, 'fareMinorUnits', fare, fareInput, !!editingId); bookingPut(booking, 'taxesMinorUnits', taxes, taxesInput, !!editingId);
+      bookingPut(booking, 'currency', currencySelect.value, currencySelect, !!editingId);
+      bookingPut(booking, 'notes', notesInput.value || '', notesInput, !!editingId);
+      if (!editingId || members.some(function (m) { return bookingChanged(travelerChecks[m.uid]); })) booking.travelerUids = travelers;
+      if (changedLegs) booking.segments = segments;
       U.setText(errLine, '');
-      var editingId = form.dataset.editing || '';
-      var booking = {
-        kind: kindSelect.value, travelerUids: travelers, confirmation: confirmationInput.value || '',
-        bookingSource: sourceInput.value || '', bookedOn: bookedInput.value || null, ticketType: '',
-        fareMinorUnits: fare, taxesMinorUnits: taxes, currency: currencySelect.value,
-        paymentMethodId: '', segments: segments, notes: notesInput.value || ''
-      };
       submitBtn.disabled = true;
       var p = editingId ? callBookings('edit', [tripId, 'flights', editingId, booking])
         : callBookings('add', [tripId, 'flights', booking]);
@@ -44061,15 +44683,16 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var travelers = [];
       members.forEach(function (m) { if (travelerChecks[m.uid].checked) travelers.push(m.uid); });
       var editingId = form.dataset.editing || '';
-      var booking = {
-        propertyName: nameInput.value || '', kind: kindSelect.value, address: '', cityLabel: cityInput.value || '',
-        bookingProvider: providerInput.value || '', confirmation: confirmationInput.value || '',
-        checkIn: checkinInput.value || null, checkInTime: null, checkOut: checkoutInput.value || null, checkOutTime: null,
-        roomType: '', rooms: rooms, travelerUids: travelers, currency: currencySelect.value,
-        roomRateMinorUnits: rate, taxesMinorUnits: taxes, resortFeesMinorUnits: fees, depositMinorUnits: deposit,
-        cancellationDeadline: cancelByInput.value || null, cancellationNotes: '', bookedOn: bookedInput.value || null,
-        paymentMethodId: '', mealsIncluded: !!mealsCb.checked, notes: notesInput.value || ''
-      };
+      if (editingId && !bookingCurrent(tripId, 'lodging', editingId)) { U.setText(errLine, 'This booking is no longer available. Close this form and try again.'); return; }
+      var booking = {};
+      [[nameInput, 'propertyName', nameInput.value || ''], [kindSelect, 'kind', kindSelect.value], [cityInput, 'cityLabel', cityInput.value || ''],
+        [providerInput, 'bookingProvider', providerInput.value || ''], [confirmationInput, 'confirmation', confirmationInput.value || ''],
+        [checkinInput, 'checkIn', checkinInput.value || null], [checkoutInput, 'checkOut', checkoutInput.value || null], [roomsInput, 'rooms', rooms],
+        [currencySelect, 'currency', currencySelect.value], [rateInput, 'roomRateMinorUnits', rate], [taxesInput, 'taxesMinorUnits', taxes],
+        [feesInput, 'resortFeesMinorUnits', fees], [depositInput, 'depositMinorUnits', deposit], [cancelByInput, 'cancellationDeadline', cancelByInput.value || null],
+        [bookedInput, 'bookedOn', bookedInput.value || null], [mealsCb, 'mealsIncluded', !!mealsCb.checked], [notesInput, 'notes', notesInput.value || '']]
+        .forEach(function (field) { bookingPut(booking, field[1], field[2], field[0], !!editingId); });
+      if (!editingId || members.some(function (m) { return bookingChanged(travelerChecks[m.uid]); })) booking.travelerUids = travelers;
       submitBtn.disabled = true;
       var p = editingId ? callBookings('edit', [tripId, 'lodging', editingId, booking])
         : callBookings('add', [tripId, 'lodging', booking]);
@@ -44187,15 +44810,19 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       U.setText(errLine, '');
       var covered = [];
       members.forEach(function (m) { if (coveredChecks[m.uid].checked) covered.push(m.uid); });
-      var coverages = {};
-      COVERAGE_KINDS.forEach(function (k) { coverages[k] = { included: !!covChecks[k].checked, limitMinorUnits: null, notes: '' }; });
-      var editingId = form.dataset.editing || '';
-      var booking = {
-        provider: providerInput.value || '', planName: planInput.value || '', purchasedOn: purchasedInput.value || null,
-        coveredUids: covered, coverageStart: startInput.value || null, coverageEnd: endInput.value || null,
-        costMinorUnits: cost, currency: currencySelect.value, paymentMethodId: '', coverages: coverages,
-        contactPhone: phoneInput.value || '', contactUrl: urlInput.value || '', claimReference: '', notes: notesInput.value || ''
-      };
+      var editingId = form.dataset.editing || '', current = editingId ? bookingCurrent(tripId, 'insurance', editingId) : null;
+      if (editingId && !current) { U.setText(errLine, 'This policy is no longer available. Close this form and try again.'); return; }
+      var coverages = bookingClone(current && current.coverages || {}), coverageChanged = !editingId;
+      COVERAGE_KINDS.forEach(function (key) {
+        if (!editingId || bookingChanged(covChecks[key])) { coverages[key] = coverages[key] || { limitMinorUnits: null, notes: '' }; coverages[key].included = !!covChecks[key].checked; coverageChanged = true; }
+      });
+      var booking = {};
+      [[providerInput, 'provider', providerInput.value || ''], [planInput, 'planName', planInput.value || ''], [purchasedInput, 'purchasedOn', purchasedInput.value || null],
+        [startInput, 'coverageStart', startInput.value || null], [endInput, 'coverageEnd', endInput.value || null], [costInput, 'costMinorUnits', cost],
+        [currencySelect, 'currency', currencySelect.value], [phoneInput, 'contactPhone', phoneInput.value || ''], [urlInput, 'contactUrl', urlInput.value || ''], [notesInput, 'notes', notesInput.value || '']]
+        .forEach(function (field) { bookingPut(booking, field[1], field[2], field[0], !!editingId); });
+      if (!editingId || members.some(function (m) { return bookingChanged(coveredChecks[m.uid]); })) booking.coveredUids = covered;
+      if (coverageChanged) booking.coverages = coverages;
       submitBtn.disabled = true;
       var p = editingId ? callBookings('edit', [tripId, 'insurance', editingId, booking])
         : callBookings('add', [tripId, 'insurance', booking]);
@@ -44220,6 +44847,12 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var currency = (plan.budget && plan.budget.currency) || 'USD';
 
     var sec = U.el('section', { class: 'bookings' });
+    var overview = U.el('dl', { class: 'bookings__overview', 'aria-label': 'Saved bookings' });
+    [['flights', 'Flight bookings'], ['lodging', 'Stays'], ['insurance', 'Policies']].forEach(function (pair) {
+      var metric = U.el('div', { class: 'bookings__metric', dataset: { kind: pair[0] } });
+      metric.appendChild(U.el('dt', { text: pair[1] })); metric.appendChild(U.el('dd', { text: String(Object.keys(plan.bookings && plan.bookings[pair[0]] || {}).length) })); overview.appendChild(metric);
+    });
+    sec.appendChild(overview);
     var note = U.el('p', { class: 'bookings__note' });
     note.appendChild(document.createTextNode('Every booking here becomes a cost on '));
     note.appendChild(U.el('a', { href: T.router.build('plan', ['budget']) }, 'Plan budget'));
@@ -45791,7 +46424,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var p = editingId ? callItinerary('edit', [tripId, editingId, fields]) : callItinerary('add', [tripId, fields]);
       p.then(function (r) {
         submitBtn.disabled = false;
-        if (r && r.ok) { reset(); details.open = false; repaintNow(); return; }
+        if (r && r.ok) {
+          var session = itineraryDaySession(tripId);
+          session.date = fields.date; session.mode = 'day';
+          reset(); details.open = false; repaintNow(); return;
+        }
         setItinStatus(errLine, r && r.code);
       });
     }
@@ -45800,108 +46437,263 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
     details.appendChild(form);
     details.openForEdit = openForEdit;
+    details.openForAdd = function (day) {
+      reset();
+      if (itineraryValidDay(day)) setFieldVal(dateInput, day);
+      details.open = true;
+      try { titleInput.focus(); } catch (e) {}
+    };
     return details;
   }
 
-  /* -- one calendar row ------------------------------------------------- */
-  function buildItinEntry(tripId, item, day, statusLine, drawer) {
-    var derived = itinIsDerived(item);
-    var allDay = itinIsAllDay(item);
-    var span = itinSpanOf(item, day.date);
-    var dataset = { id: item.id, kind: item.kind, allday: allDay ? 'true' : 'false', derived: derived ? 'true' : 'false' };
-    if (span && span.count > 1) dataset.span = span.index + '/' + span.count;
-    var li = U.el('li', { class: 'itin__entry', dataset: dataset });
-
-    var timeText = allDay ? 'All day' : (item.endTime ? (timeDisplay(item.startTime) + '–' + timeDisplay(item.endTime)) : timeDisplay(item.startTime));
-    var staySpan = derived && item.kind === 'lodging' && span && span.count > 1;
-    if (staySpan) {
-      timeText = span.index === 1 && item.startTime ? timeDisplay(item.startTime)
-        : span.index === span.count && item.endTime ? timeDisplay(item.endTime) : 'All day';
+  /* A day-focused itinerary. View state is local to this trip and never saved
+     into its plan; dated, outside-trip and undated records all stay reachable. */
+  var itineraryDaySessions = Object.create(null);
+  function itineraryRevealDay(strip) {
+    if (!strip || !strip.isConnected) return;
+    var chip = strip.querySelector('.itin-board__day-chip[aria-pressed="true"]');
+    if (!chip) return;
+    var railRect = strip.getBoundingClientRect(), chipRect = chip.getBoundingClientRect();
+    if (chipRect.left < railRect.left || chipRect.right > railRect.right) {
+      strip.scrollLeft += chipRect.left - railRect.left - Math.max(0, (railRect.width - chipRect.width) / 2);
     }
-    li.appendChild(U.el('span', { class: 'itin__time', text: timeText }));
-    li.appendChild(U.el('span', { class: 'itin__title', text: item.title || '' }));
-    var kindWords = itinKindWords();
-    li.appendChild(U.el('span', { class: 'itin__kind', text: kindWords[item.kind] || item.kind }));
-    if (span && span.count > 1) {
-      var spanText = staySpan ? (span.index === 1 ? 'Check-in' : span.index === span.count ? 'Check-out' : 'During your stay')
-        : 'day ' + span.index + ' of ' + span.count;
-      li.appendChild(U.el('span', { class: 'itin__span', text: spanText }));
+  }
+  var itineraryResizeFrame = null;
+  window.addEventListener('resize', function () {
+    if (itineraryResizeFrame !== null) window.cancelAnimationFrame(itineraryResizeFrame);
+    itineraryResizeFrame = window.requestAnimationFrame(function () {
+      itineraryResizeFrame = null;
+      U.qsa('.itin-board__days', document).forEach(itineraryRevealDay);
+    });
+  });
+  function itineraryDaySession(tripId) {
+    if (!itineraryDaySessions[tripId]) itineraryDaySessions[tripId] = { date: '', mode: 'day' };
+    return itineraryDaySessions[tripId];
+  }
+  function itineraryValidDay(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    if (PR && PR.dates && PR.dates.validateDay) return !!PR.dates.validateDay(value);
+    var d = new Date(value + 'T12:00:00Z');
+    return !isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value;
+  }
+  function itineraryDayNumber(date, ctx) {
+    if (!itineraryValidDay(date) || !ctx || !itineraryValidDay(ctx.departure)) return null;
+    if (date < ctx.departure || itineraryValidDay(ctx.returnDate) && date > ctx.returnDate) return null;
+    return Math.round((Date.parse(date + 'T12:00:00Z') - Date.parse(ctx.departure + 'T12:00:00Z')) / 86400000) + 1;
+  }
+  function itineraryDayLabel(date, ctx) {
+    var number = itineraryDayNumber(date, ctx);
+    if (number !== null) return 'Day ' + number;
+    if (ctx && itineraryValidDay(ctx.departure) && date < ctx.departure) return 'Before trip';
+    if (ctx && itineraryValidDay(ctx.returnDate) && date > ctx.returnDate) return 'After trip';
+    return 'Your plans';
+  }
+  function itineraryDayModel(view, plan) {
+    var ctx = view && view.ctx || {}, daysByDate = Object.create(null), all = [], seen = Object.create(null);
+    var stored = view && view.entries || Object.keys(plan.itinerary && plan.itinerary.items || {}).map(function (id) { return plan.itinerary.items[id]; });
+    var derived = view && view.derived || callItineraryPure('derivedRows', [plan], []);
+    stored.concat(derived).forEach(function (entry) {
+      var key = (itinIsDerived(entry) ? 'derived:' : 'stored:') + entry.id;
+      if (!seen[key]) { seen[key] = true; all.push(entry); }
+    });
+    (view && view.days || []).forEach(function (day) { if (itineraryValidDay(day.date)) daysByDate[day.date] = true; });
+    var boundary = [];
+    [ctx.departure, ctx.returnDate].forEach(function (date) { if (itineraryValidDay(date)) boundary.push(date); });
+    all.forEach(function (entry) {
+      if (!itineraryValidDay(entry.date)) return;
+      boundary.push(entry.date); daysByDate[entry.date] = true;
+      if (itineraryValidDay(entry.endDate) && entry.endDate >= entry.date) { boundary.push(entry.endDate); daysByDate[entry.endDate] = true; }
+    });
+    boundary.sort();
+    if (boundary.length) {
+      var from = Date.parse(boundary[0] + 'T12:00:00Z'), until = Date.parse(boundary[boundary.length - 1] + 'T12:00:00Z');
+      // The normal trip calendar includes every empty day. A corrupt legacy
+      // date many years away must not allocate millions of placeholder cards.
+      if ((until - from) / 86400000 <= 3700) {
+        for (var tick = from; tick <= until; tick += 86400000) daysByDate[new Date(tick).toISOString().slice(0, 10)] = true;
+      }
     }
-    li.appendChild(U.el('span', { class: 'itin__where', hidden: U.isBlank(item.location), text: item.location || '' }));
-    li.appendChild(U.el('span', { class: 'itin__conf', hidden: U.isBlank(item.confirmation),
-      text: item.confirmation ? ('Ref ' + item.confirmation) : '' }));
-    li.appendChild(U.el('p', { class: 'itin__notes', hidden: U.isBlank(item.notes), text: item.notes || '' }));
-
-    if (derived) {
-      li.appendChild(U.el('a', { class: 'itin__source', href: T.router.build('plan', ['bookings']) }, 'Open Bookings'));
-    } else {
+    var dates = Object.keys(daysByDate).sort();
+    var days = dates.map(function (date) {
+      var items = all.filter(function (entry) { return itineraryValidDay(entry.date) && entry.date <= date &&
+        (itineraryValidDay(entry.endDate) && entry.endDate >= entry.date ? entry.endDate : entry.date) >= date; });
+      items.sort(function (a, b) { return callItineraryPure('compare', [a, b], 0); });
+      return { date: date, dayNumber: itineraryDayNumber(date, ctx), items: items, isEmpty: !items.length };
+    });
+    return { ctx: ctx, days: days, stored: stored, derived: derived,
+      unscheduled: all.filter(function (entry) { return !itineraryValidDay(entry.date); }),
+      outside: days.filter(function (day) { return itineraryDayLabel(day.date, ctx) === 'Before trip' || itineraryDayLabel(day.date, ctx) === 'After trip'; }) };
+  }
+  function itineraryEntryTiming(item, day, plan) {
+    var dated = itineraryValidDay(day.date), span = dated && itineraryValidDay(item.date) ? itinSpanOf(item, day.date) : null;
+    var allDay = itinIsAllDay(item), label = '';
+    var time = allDay ? 'All day' : timeDisplay(item.startTime) + (item.endTime ? ' – ' + timeDisplay(item.endTime) : '');
+    var location = item.location || '', source = item.source || {}, bookings = plan.bookings || {};
+    if (itinIsDerived(item) && item.kind === 'lodging') {
+      var stay = bookings.lodging && bookings.lodging[source.id] || {};
+      var first = day.date === item.date, last = item.endDate && day.date === item.endDate;
+      label = first ? 'Check-in' : last ? 'Check-out' : 'During your stay';
+      time = first && stay.checkInTime ? timeDisplay(stay.checkInTime) : last && stay.checkOutTime ? timeDisplay(stay.checkOutTime) : first || last ? 'Time to confirm' : 'Staying here';
+    } else if (itinIsDerived(item) && item.kind === 'flight') {
+      var flight = bookings.flights && bookings.flights[source.id] || {};
+      var segment = flight.segments && flight.segments[source.segmentId] || {};
+      label = 'Flight';
+      if (span && span.count > 1) {
+        var arrival = day.date === item.endDate;
+        label = day.date === item.date ? 'Departure' : arrival ? 'Arrival' : 'In transit';
+        time = day.date === item.date ? timeDisplay(segment.departsAt || item.startTime) || 'Time to confirm'
+          : arrival ? timeDisplay(segment.arrivesAt) || 'Time to confirm' : 'In transit';
+        if (arrival && segment.destinationAirport) location = segment.destinationAirport;
+      }
+    } else if (span && span.count > 1) {
+      label = 'Day ' + span.index + ' of ' + span.count;
+      if (!allDay && span.index > 1) time = span.index === span.count && item.endTime ? 'Until ' + timeDisplay(item.endTime) : 'Continues';
+    }
+    if (!dated) { label = 'Date to choose'; time = allDay ? 'Unscheduled' : time || 'Unscheduled'; }
+    return { time: time || 'Time to confirm', label: label, location: location, span: span, allDay: allDay };
+  }
+  function buildItinEntry(tripId, item, day, statusLine, drawer, plan) {
+    var derived = itinIsDerived(item), timing = itineraryEntryTiming(item, day, plan || {});
+    var dataset = { id: item.id, kind: item.kind, allday: timing.allDay ? 'true' : 'false', derived: derived ? 'true' : 'false' };
+    if (timing.span && timing.span.count > 1) dataset.span = timing.span.index + '/' + timing.span.count;
+    var li = U.el('li', { class: 'itin__entry itin-board__entry', dataset: dataset });
+    var time = U.el('div', { class: 'itin-board__timeblock' });
+    time.appendChild(U.el('span', { class: 'itin__time', text: timing.time }));
+    if (timing.label && !(timing.allDay && timing.label === 'Scheduled')) time.appendChild(U.el('span', { class: 'itin__span', text: timing.label })); li.appendChild(time);
+    var content = U.el('div', { class: 'itin-board__entry-content' });
+    content.appendChild(U.el('span', { class: 'itin__kind', text: itinKindWords()[item.kind] || item.kind || 'Plan' }));
+    content.appendChild(U.el('h3', { class: 'itin__title', text: item.title || 'Untitled entry' }));
+    if (timing.location) content.appendChild(U.el('p', { class: 'itin__where', text: timing.location }));
+    if (derived) content.appendChild(U.el('a', { class: 'itin__source', href: T.router.build('plan', ['bookings']) }, 'View booking →'));
+    var disclosure = U.el('details', { class: 'itin-board__entry-details', dataset: { planDisclosure: 'itin:' + (day.date || 'unscheduled') + ':' + item.id } });
+    var summary = U.el('summary', { dataset: { planFocus: 'itin-details:' + (day.date || 'unscheduled') + ':' + item.id }, text: derived ? 'Booking details' : 'Details & options' });
+    disclosure.appendChild(summary);
+    if (item.confirmation) disclosure.appendChild(U.el('p', { class: 'itin__conf', text: 'Reference · ' + item.confirmation }));
+    if (item.notes) disclosure.appendChild(U.el('p', { class: 'itin__notes', text: item.notes }));
+    if (item.endDate && item.endDate !== item.date && itineraryValidDay(item.date)) disclosure.appendChild(U.el('p', { class: 'itin-board__entry-range', text: dayShort(item.date) + ' – ' + dayShort(item.endDate) }));
+    if (!item.notes && !item.confirmation && !item.endDate) disclosure.appendChild(U.el('p', { class: 'itin-board__entry-range', text: derived ? 'This entry follows the saved booking.' : 'Keep a note, a place or a reference with this plan.' }));
+    if (!derived) {
       var actions = U.el('div', { class: 'itin__actions' });
-      var editBtn = U.el('button', { type: 'button', class: 'btn btn--quiet itin__edit', text: 'Edit' });
-      editBtn.addEventListener('click', function () { if (drawer.openForEdit) drawer.openForEdit(item); });
-      actions.appendChild(editBtn);
-      var removeBtn = U.el('button', { type: 'button', class: 'btn btn--quiet itin__remove', text: 'Remove' });
-      removeBtn.addEventListener('click', function () { confirmRemoveItin(tripId, item.id, statusLine); });
-      actions.appendChild(removeBtn);
-      li.appendChild(actions);
+      var edit = U.el('button', { type: 'button', class: 'btn btn--quiet itin__edit', text: 'Edit entry', dataset: { planFocus: 'itin-edit:' + item.id } });
+      edit.addEventListener('click', function () { drawer.openForEdit(item); });
+      var remove = U.el('button', { type: 'button', class: 'btn btn--quiet itin__remove', text: 'Remove', dataset: { planFocus: 'itin-remove:' + item.id } });
+      remove.addEventListener('click', function () { confirmRemoveItin(tripId, item.id, statusLine); });
+      actions.appendChild(edit); actions.appendChild(remove); disclosure.appendChild(actions);
     }
-    return li;
+    content.appendChild(disclosure); li.appendChild(content); return li;
   }
-
-  /* -- one day ------------------------------------------------------------ */
-  function buildItinDay(tripId, day, statusLine, drawer, today) {
-    var isEmpty = !!day.isEmpty;
-    var sec = U.el('section', { class: 'itin__day', dataset: {
-      date: day.date, daynum: String(day.dayNumber), empty: isEmpty ? 'true' : 'false',
-      today: (day.date === today) ? 'true' : 'false'
-    } });
-    sec.appendChild(U.el('h2', { class: 'itin__dayh',
-      text: 'Day ' + day.dayNumber + ' · ' + weekdayShort(day.date) + ', ' + dayShort(day.date) }));
-    if (isEmpty) {
-      sec.appendChild(U.el('p', { class: 'itin__dayempty', text: 'Nothing planned.' }));
+  function buildItinDay(tripId, day, statusLine, drawer, today, plan, ctx) {
+    var unscheduled = !day.date;
+    var section = U.el('section', { class: 'itin__day', dataset: { date: day.date || 'unscheduled', daynum: day.dayNumber === null ? '' : String(day.dayNumber), empty: String(!day.items.length), today: String(day.date === today) } });
+    var header = U.el('header', { class: 'itin-board__day-head' });
+    header.appendChild(U.el('p', { class: 'itin-board__eyebrow', text: unscheduled ? 'FIND A PLACE FOR THESE' : itineraryDayLabel(day.date, ctx) + (day.date === today ? ' · Today' : '') }));
+    header.appendChild(U.el('h2', { class: 'itin__dayh', text: unscheduled ? 'Unscheduled plans' : weekdayShort(day.date) + ', ' + dayShort(day.date) }));
+    var lodging = day.items.filter(function (item) { return itinIsDerived(item) && item.kind === 'lodging'; });
+    var schedule = day.items.filter(function (item) { return !(itinIsDerived(item) && item.kind === 'lodging'); });
+    header.appendChild(U.el('p', { class: 'itin-board__day-count', text: unscheduled ? 'Choose a date when you are ready. Nothing here is assigned to a day yet.' :
+      schedule.length + (schedule.length === 1 ? ' plan' : ' plans') + (lodging.length ? ' · ' + lodging.length + (lodging.length === 1 ? ' stay' : ' stays') : '') }));
+    section.appendChild(header);
+    var layout = U.el('div', { class: 'itin-board__day-layout', dataset: { stays: String(!!lodging.length) } });
+    var main = U.el('div', { class: 'itin-board__schedule' });
+    if (schedule.length) {
+      var list = U.el('ul', { class: 'itin__entries' });
+      schedule.forEach(function (item) { list.appendChild(buildItinEntry(tripId, item, day, statusLine, drawer, plan)); }); main.appendChild(list);
     } else {
-      var ul = U.el('ul', { class: 'itin__entries' });
-      (day.items || []).forEach(function (item) { ul.appendChild(buildItinEntry(tripId, item, day, statusLine, drawer)); });
-      sec.appendChild(ul);
+      var empty = U.el('div', { class: 'itin-board__empty-day' });
+      empty.appendChild(U.el('h3', { text: 'A little room to explore.' }));
+      empty.appendChild(U.el('p', { class: 'itin__dayempty', text: lodging.length ? 'Your stay is here. The rest of the day is yours to shape.' : 'Nothing is scheduled for this day yet.' }));
+      var add = U.el('button', { type: 'button', class: 'btn btn--quiet itin-board__day-add', text: 'Add a plan for this day' });
+      add.addEventListener('click', function () { drawer.openForAdd(day.date); }); empty.appendChild(add); main.appendChild(empty);
     }
-    return sec;
+    layout.appendChild(main);
+    if (lodging.length) {
+      var aside = U.el('aside', { class: 'itin-board__stays', 'aria-label': 'Your stay' });
+      aside.appendChild(U.el('h3', { class: 'itin-board__stay-heading', text: 'Your stay' }));
+      var stayList = U.el('ul', { class: 'itin__entries' });
+      lodging.forEach(function (item) { stayList.appendChild(buildItinEntry(tripId, item, day, statusLine, drawer, plan)); });
+      aside.appendChild(stayList); layout.appendChild(aside);
+    }
+    section.appendChild(layout); return section;
   }
-
-  /* -- the page ------------------------------------------------------------
-     Text templates below always print "N entries"/"D days" (never
-     singularised) — WAVE5_CONTRACT §3.2's literal sentences, matched exactly
-     by the E3 test's regex, so F.plural is deliberately NOT used here. */
   function buildItinerarySection(tripId, prep) {
-    var view = itineraryViewOf(tripId);
-    var today = todayStr();
-    var sec = U.el('section', { class: 'itin' });
-
-    var hasRange = !!(view && view.range);
-    var stateP = U.el('p', { class: 'itin__state', dataset: { state: hasRange ? 'dated' : 'none' } });
-    if (hasRange) {
-      var r = view.range;
-      var storedCount = (view.entries && view.entries.length) || 0;
-      var derivedCount = (view.derived && view.derived.length) || 0;
-      var entriesPhrase = storedCount > 0 ? (storedCount + ' entries')
-        : derivedCount ? 'no added activities yet' : 'no entries yet';
-      if (derivedCount) entriesPhrase += ' · ' + derivedCount + ' from bookings';
-      U.setText(stateP, dayShort(r.start) + ' – ' + dayShort(r.end) + ' · ' + r.days + ' days · ' + entriesPhrase + '.');
-    } else {
-      U.setText(stateP, 'No dates and no entries yet — add the first entry and the calendar grows around it.');
+    var view = itineraryViewOf(tripId), plan = prep.plan || {}, model = itineraryDayModel(view, plan), today = todayStr(), ui = itineraryDaySession(tripId);
+    var sec = U.el('section', { class: 'itin itin-board' });
+    var selected = model.days.filter(function (day) { return day.date === ui.date; })[0];
+    if (!selected && !(ui.date === 'unscheduled' && model.unscheduled.length)) {
+      selected = model.days.filter(function (day) { return day.date === today; })[0] ||
+        model.days.filter(function (day) { return day.date >= today && day.items.length; })[0] ||
+        model.days.filter(function (day) { return day.date === model.ctx.departure; })[0] || model.days[0];
+      ui.date = selected ? selected.date : model.unscheduled.length ? 'unscheduled' : '';
     }
-    sec.appendChild(stateP);
-
-    sec.appendChild(U.el('p', { class: 'itin__hint', hidden: !(view && view.derived && view.derived.length),
-      text: 'Flights and stays come from Bookings and are edited there.' }));
-
     var statusLine = U.el('p', { class: 'itin__status', role: 'status', 'aria-live': 'polite' });
     var drawer = buildItinDrawer(tripId, statusLine);
-    sec.appendChild(drawer);
-
-    var days = (view && view.days) || [];
-    days.forEach(function (day) { sec.appendChild(buildItinDay(tripId, day, statusLine, drawer, today)); });
-
-    sec.appendChild(statusLine);
-    return sec;
+    var summary = U.el('header', { class: 'itin-board__summary' });
+    var state = U.el('div');
+    state.appendChild(U.el('p', { class: 'itin-board__eyebrow', text: 'THE JOURNEY, DAY BY DAY' }));
+    var range = model.days.length ? dayShort(model.days[0].date) + ' – ' + dayShort(model.days[model.days.length - 1].date) : 'Your itinerary starts here';
+    state.appendChild(U.el('h2', { class: 'itin-board__range', text: range }));
+    state.appendChild(U.el('p', { class: 'itin__state', dataset: { state: model.days.length ? 'dated' : 'none' }, text:
+      model.stored.length + (model.stored.length === 1 ? ' added entry' : ' added entries') + ' · ' + model.derived.length + ' from bookings' + (model.days.length ? ' · ' + model.days.length + ' calendar days' : '') }));
+    summary.appendChild(state);
+    var add = U.el('button', { type: 'button', class: 'btn btn--primary itin-board__add', text: '+ Add a plan', dataset: { planFocus: 'itin-add' } });
+    add.addEventListener('click', function () { drawer.openForAdd(ui.date); }); summary.appendChild(add); sec.appendChild(summary);
+    var controls = U.el('div', { class: 'itin-board__controls' });
+    var modes = U.el('div', { class: 'itin-board__views', 'aria-label': 'Itinerary view' });
+    [['day', 'One day'], ['all', 'All days']].forEach(function (pair) {
+      var button = U.el('button', { type: 'button', class: 'itin-board__view', dataset: { mode: pair[0], planFocus: 'itin-mode:' + pair[0] }, 'aria-pressed': String(ui.mode === pair[0]), text: pair[1] });
+      button.addEventListener('click', function () { ui.mode = pair[0]; render(); }); modes.appendChild(button);
+    }); controls.appendChild(modes);
+    var navigation = U.el('div', { class: 'itin-board__navigation' });
+    var previous = U.el('button', { type: 'button', class: 'btn btn--quiet itin-board__previous', 'aria-label': 'Previous day', text: '←' });
+    var choose = U.el('select', { class: 'input itin-board__date-select', 'aria-label': 'Choose itinerary day', dataset: { planFocus: 'itin-date' } });
+    model.days.forEach(function (day) { choose.appendChild(U.el('option', { value: day.date }, itineraryDayLabel(day.date, model.ctx) + ' · ' + dayShort(day.date) + (day.items.length ? ' · ' + day.items.length + ' entries' : ' · Open day'))); });
+    if (model.unscheduled.length) choose.appendChild(U.el('option', { value: 'unscheduled' }, 'Unscheduled · ' + model.unscheduled.length));
+    var next = U.el('button', { type: 'button', class: 'btn btn--quiet itin-board__next', 'aria-label': 'Next day', text: '→' });
+    function selectDate(date) { ui.date = date; ui.mode = 'day'; render(); }
+    choose.addEventListener('change', function () { selectDate(choose.value); });
+    function moveBy(n) { var index = model.days.findIndex(function (day) { return day.date === ui.date; }); var target = model.days[index + n]; if (target) selectDate(target.date); }
+    previous.addEventListener('click', function () { moveBy(-1); }); next.addEventListener('click', function () { moveBy(1); });
+    navigation.appendChild(previous); navigation.appendChild(choose); navigation.appendChild(next); controls.appendChild(navigation);
+    sec.appendChild(controls);
+    var strip = U.el('nav', { class: 'itin-board__days', 'aria-label': 'Days in your itinerary' });
+    model.days.forEach(function (day) {
+      var button = U.el('button', { type: 'button', class: 'itin-board__day-chip', dataset: { date: day.date, outside: String(itineraryDayNumber(day.date, model.ctx) === null), planFocus: 'itin-day:' + day.date }, 'aria-pressed': String(ui.date === day.date) });
+      button.appendChild(U.el('span', { class: 'itin-board__chip-label', text: itineraryDayLabel(day.date, model.ctx) }));
+      button.appendChild(U.el('strong', { text: dayShort(day.date) }));
+      button.appendChild(U.el('span', { class: 'itin-board__chip-count', text: day.items.length ? day.items.length + (day.items.length === 1 ? ' entry' : ' entries') : 'Open day' }));
+      button.addEventListener('click', function () { selectDate(day.date); }); strip.appendChild(button);
+    }); sec.appendChild(strip);
+    var notices = U.el('div', { class: 'itin-board__notices' });
+    if (model.outside.length) {
+      var outside = U.el('button', { type: 'button', class: 'btn btn--quiet itin-board__outside', text: model.outside.length + (model.outside.length === 1 ? ' date outside your trip' : ' dates outside your trip') });
+      outside.addEventListener('click', function () { selectDate(model.outside[0].date); }); notices.appendChild(outside);
+    }
+    if (model.unscheduled.length) {
+      var unscheduled = U.el('button', { type: 'button', class: 'btn btn--quiet itin-board__unscheduled', text: 'Unscheduled · ' + model.unscheduled.length });
+      unscheduled.addEventListener('click', function () { selectDate('unscheduled'); }); notices.appendChild(unscheduled);
+    }
+    sec.appendChild(notices);
+    var content = U.el('div', { class: 'itin-board__content', 'aria-live': 'polite' }); sec.appendChild(content);
+    function render() {
+      U.clear(content); content.dataset.mode = ui.mode; content.dataset.selectedDate = ui.date;
+      choose.value = ui.date; choose.disabled = !model.days.length && !model.unscheduled.length;
+      var index = model.days.findIndex(function (day) { return day.date === ui.date; });
+      previous.disabled = index <= 0; next.disabled = index < 0 || index >= model.days.length - 1;
+      U.qsa('.itin-board__view', modes).forEach(function (button) { button.setAttribute('aria-pressed', String(button.dataset.mode === ui.mode)); });
+      U.qsa('.itin-board__day-chip', strip).forEach(function (button) { button.setAttribute('aria-pressed', String(button.dataset.date === ui.date)); });
+      var show = ui.mode === 'all' ? model.days.slice() : model.days.filter(function (day) { return day.date === ui.date; });
+      if (model.unscheduled.length && (ui.mode === 'all' || ui.date === 'unscheduled')) show.push({ date: null, dayNumber: null, items: model.unscheduled });
+      if (!show.length) {
+        var empty = U.el('div', { class: 'itin-board__empty-day' });
+        empty.appendChild(U.el('h3', { text: 'Start with something to look forward to.' }));
+        empty.appendChild(U.el('p', { text: 'Add a plan or save a flight or stay in Bookings. Your days will come together here.' })); content.appendChild(empty);
+      }
+      show.forEach(function (day) { content.appendChild(buildItinDay(tripId, day, statusLine, drawer, today, plan, model.ctx)); });
+      window.requestAnimationFrame(function () { itineraryRevealDay(strip); });
+    }
+    render();
+    var hint = U.el('p', { class: 'itin__hint', hidden: !model.derived.length, text: 'Flights and stays follow your saved bookings. Change their details in Bookings.' });
+    sec.appendChild(hint); sec.appendChild(drawer); sec.appendChild(statusLine); return sec;
   }
 
   /* ==================================================================== */
@@ -46622,6 +47414,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     }
     var forms = U.qsa(FORM_SELECTOR, el);
     for (var f = 0; f < forms.length; f++) {
+      if (forms[f].dataset.legsChanged === 'true') return true;
       var fields = U.qsa('input, textarea, select', forms[f]);
       for (var i = 0; i < fields.length; i++) {
         var node = fields[i];
@@ -46710,6 +47503,42 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     });
   }
 
+  /* View-only controls keep their place across live planning updates. Match
+     exact attribute values instead of treating saved IDs as CSS selectors. */
+  function collectPlanViewState(el) {
+    var state = { details: [], focus: null };
+    U.qsa('details[data-plan-disclosure]', el).forEach(function (node) {
+      state.details.push({ key: node.getAttribute('data-plan-disclosure'), open: node.open });
+    });
+    var active = document.activeElement;
+    if (active && el.contains(active) && active.hasAttribute('data-plan-focus')) {
+      state.focus = { key: active.getAttribute('data-plan-focus') };
+      try {
+        if (typeof active.selectionStart === 'number') {
+          state.focus.start = active.selectionStart; state.focus.end = active.selectionEnd;
+        }
+      } catch (e) {}
+    }
+    return state;
+  }
+  function restorePlanViewState(wrap, state) {
+    var details = U.qsa('details[data-plan-disclosure]', wrap);
+    state.details.forEach(function (saved) {
+      details.forEach(function (node) {
+        if (node.getAttribute('data-plan-disclosure') === saved.key) node.open = saved.open;
+      });
+    });
+    if (!state.focus) return;
+    U.qsa('[data-plan-focus]', wrap).some(function (node) {
+      if (node.getAttribute('data-plan-focus') !== state.focus.key || node.disabled) return false;
+      node.focus({ preventScroll: true });
+      if (typeof state.focus.start === 'number' && node.setSelectionRange) {
+        try { node.setSelectionRange(state.focus.start, state.focus.end); } catch (e) {}
+      }
+      return true;
+    });
+  }
+
   /* Wave 3 dates follow-up #2 (WAVE3_CONTRACT §3.4.2): the "· N min ago"
    * tick. Every element that prints F.ago(x) carries data-at="<ms>"; a
    * per-mount interval rewrites ONLY the text after the last " · " on those
@@ -46775,6 +47604,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     try { document.title = titleWord + ' — ' + tripName; } catch (e) {}
 
     var prevOpen = collectOpenDrawers(el);
+    var previousPlanView = collectPlanViewState(el);
     var prepFocus = boardFocus(el);
     var previousBoard = el.querySelector('.prepboard');
     if (previousBoard) rememberBoardDetails(previousBoard, prepareBoardState(previousBoard.dataset.tripId));
@@ -46782,17 +47612,16 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var wrap = U.el('div', { class: 'plan', dataset: { section: section } });
     var header = U.el('header', { class: 'plan__header' });
     header.appendChild(U.el('p', { class: 'plan__eyebrow', text: tripName || 'Your trip' }));
-    header.appendChild(U.el('h1', { class: 'plan__title', text: section === 'overview' ? 'Your trip at a glance' : titleWord }));
+    header.appendChild(U.el('h1', { class: 'plan__title', text: section === 'overview' ? 'Your trip at a glance' : section === 'budget' ? 'Budget' : titleWord }));
     var descriptions = {
       overview: 'The decisions, details and next steps, together.',
-      dates: 'Find a time that works for everyone.',
-      budget: 'Agree on a budget and keep track of every cost.',
-      bookings: 'Your flights, places to stay and travel insurance.',
+      dates: 'Your travel window, with everyone’s availability in view.',
+      budget: 'See the plan, the costs and what’s already paid.',
+      bookings: 'Every journey, stay and policy, easy to find.',
       prepare: 'Know what is done and what still needs your attention.',
-      itinerary: 'See how each day comes together.'
+      itinerary: 'A little structure for each day, with room to explore.'
     };
     header.appendChild(U.el('p', { class: 'plan__intro', text: descriptions[section] }));
-    wrap.appendChild(header);
 
     var nav = U.el('nav', { class: 'plan__nav', 'aria-label': 'Plan sections' });
     [['overview', 'Overview'], ['dates', 'Dates'], ['budget', 'Budget'], ['bookings', 'Bookings'], ['prepare', 'Prepare'], ['itinerary', 'Itinerary']].forEach(function (pair) {
@@ -46802,6 +47631,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       nav.appendChild(link);
     });
     wrap.appendChild(nav);
+    wrap.appendChild(header);
 
     var state = gateState(prep);
     /* The assistant listens to at most one thread doc, and only while its
@@ -46835,6 +47665,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 
     el.appendChild(wrap);
     if (prevOpen.length) reopenDrawers(wrap, prevOpen, prep);
+    restorePlanViewState(wrap, previousPlanView);
     restoreBoardFocus(wrap, prepFocus);
   }
 
