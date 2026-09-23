@@ -12944,6 +12944,103 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   .itin-board__empty-day { padding: var(--s4); }
 }
 /* END plan-polish-itinerary */
+
+/* BEGIN plan-polish-packing */
+.packdash { display: grid; gap: var(--s5); min-width: 0; }
+.packdash__hero, .packdash__progress, .packdash__add, .packdash__list {
+  min-width: 0; padding: var(--s5); border: var(--hair) solid var(--line);
+  border-radius: calc(var(--radius-lg) * 2); background: var(--surface);
+}
+.packdash__hero { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s5); background: var(--surface-alt); }
+.packdash__hero-copy { min-width: 0; }
+.packdash__hero-copy > :last-child { margin-bottom: 0; }
+.packdash__hero-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--s2); }
+.packdash__progress { display: grid; grid-template-columns: minmax(0, 1fr) minmax(150px, 0.7fr); align-items: center; gap: var(--s4); }
+.packdash__progresscopy { display: grid; gap: var(--s1); }
+.packdash__progresscopy > p { margin: 0; }
+.packdash__progressbar { width: 100%; height: 0.7rem; accent-color: var(--accent); }
+.packdash__addhead, .packdash__listhead, .packdash__category-head, .packdash__itemtop, .packdash__form-actions {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
+}
+.packdash__addhead, .packdash__listhead { flex-wrap: wrap; margin-bottom: var(--s4); }
+.packdash__addhead > *, .packdash__listhead > * { margin-top: 0; margin-bottom: 0; }
+.packdash__seed { flex: 0 0 auto; }
+.packdash__add-form { display: grid; gap: var(--s3); max-width: 900px; }
+.packdash__quick { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--s2) var(--s3); }
+.packdash__quick > .sync__label { grid-column: 1 / -1; }
+.packdash__quick .input { min-width: 0; width: 100%; min-height: var(--tap-min); }
+.packdash__advanced { border-top: var(--hair) solid var(--line); padding-top: var(--s3); }
+.packdash__advanced > summary { min-height: var(--tap-min); display: flex; align-items: center; width: fit-content; color: var(--accent); cursor: pointer; font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.packdash__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); padding: var(--s3) 0 var(--s2); }
+.packdash__fields .sync__field { min-width: 0; margin: 0; }
+.packdash__fields .input, .packdash__fields .textarea { width: 100%; min-width: 0; }
+.packdash__notesfield { grid-column: 1 / -1; }
+.packdash__optional { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--s2); min-height: var(--tap-min); color: var(--ink-muted); font-size: var(--text-sm); }
+.packdash__optional input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+.packdash__form-actions { justify-content: flex-start; }
+.packdash__status:empty { display: none; }
+.packdash__listhead { align-items: baseline; }
+.packdash__listhead .packdash__resultcount { margin-left: auto; }
+.packdash__resultcount { color: var(--ink-faint); font-size: var(--text-xs); }
+.packdash__filters { display: grid; grid-template-columns: minmax(180px, 1.5fr) repeat(2, minmax(150px, 0.7fr)); gap: var(--s2); margin-bottom: var(--s4); }
+.packdash__filters > * { min-width: 0; width: 100%; min-height: var(--tap-min); }
+.packdash__groups { display: grid; gap: var(--s4); }
+.packdash__category { min-width: 0; padding: var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-lg); background: var(--surface-alt); }
+.packdash__category-head { justify-content: flex-start; margin-bottom: var(--s3); }
+.packdash__category-head > * { margin: 0; }
+.packdash__category-count { display: inline-grid; place-items: center; min-width: 1.75rem; height: 1.75rem; padding: 0 var(--s1); border: var(--hair) solid var(--line); border-radius: 999px; color: var(--ink-muted); font-size: var(--text-xs); }
+.packdash__items, .itin-board__packing-list { display: grid; gap: var(--s2); margin: 0; padding: 0; list-style: none; }
+.packdash__item { display: grid; gap: var(--s2); min-width: 0; padding: var(--s3) var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
+.packdash__item[data-packed="true"] { background: var(--surface-alt); }
+.packdash__itemtop { flex-wrap: wrap; justify-content: flex-start; }
+.packdash__checklabel { display: flex; align-items: center; gap: var(--s3); min-height: var(--tap-min); min-width: 0; flex: 1 1 240px; cursor: pointer; }
+.packdash__check { width: 1.15rem; height: 1.15rem; flex: 0 0 auto; accent-color: var(--accent); }
+.packdash__itemname { min-width: 0; color: var(--ink); font-weight: var(--weight-medium); overflow-wrap: anywhere; }
+.packdash__item[data-packed="true"] .packdash__itemname { color: var(--ink-faint); text-decoration: line-through; text-decoration-thickness: 1px; }
+.packdash__badges { display: flex; flex-wrap: wrap; gap: var(--s1); }
+.packdash__badge { display: inline-flex; align-items: center; min-height: 1.7rem; padding: 0 var(--s2); border: var(--hair) solid var(--line); border-radius: 999px; color: var(--ink-muted); font-size: var(--text-xs); }
+.packdash__badge--optional { border-color: var(--line-strong); color: var(--accent); }
+.packdash__daylink { width: fit-content; color: var(--accent); font-size: var(--text-sm); text-decoration: none; }
+.packdash__daylink:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.packdash__notes { color: var(--ink-muted); font-size: var(--text-sm); }
+.packdash__notes > summary { width: fit-content; min-height: var(--tap-min); display: flex; align-items: center; cursor: pointer; }
+.packdash__notes > p { margin: 0 0 var(--s2); line-height: var(--leading-body); overflow-wrap: anywhere; }
+.packdash__actions { display: flex; flex-wrap: wrap; gap: var(--s1); }
+.packdash__actions .btn { min-height: var(--tap-min); }
+.packdash__empty-filter { margin: 0; padding: var(--s5); border: var(--hair) dashed var(--line-strong); border-radius: var(--radius-lg); color: var(--ink-muted); text-align: center; }
+.itin-board__packing { display: grid; gap: var(--s3); margin-top: var(--s4); padding: var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-lg); background: var(--surface-alt); }
+.itin-board__packing-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s2); }
+.itin-board__packing-head > * { margin: 0; }
+.itin-board__packing-link { display: inline-flex; align-items: center; min-height: var(--tap-min); color: var(--accent); font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.itin-board__packing-item { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); min-width: 0; }
+.itin-board__packing-label { display: flex; align-items: center; gap: var(--s2); min-height: var(--tap-min); min-width: 0; color: var(--ink); font-size: var(--text-sm); }
+.itin-board__packing-label input { width: 1.05rem; height: 1.05rem; flex: 0 0 auto; accent-color: var(--accent); }
+.itin-board__packing-name { overflow-wrap: anywhere; }
+.itin-board__packing-item[data-packed="true"] .itin-board__packing-name { color: var(--ink-faint); text-decoration: line-through; }
+.itin-board__packing-empty { margin: 0; color: var(--ink-muted); font-size: var(--text-sm); line-height: var(--leading-body); }
+.packdash :focus-visible, .itin-board__packing :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+@media (max-width: 700px) {
+  .packdash__hero { align-items: flex-start; flex-direction: column; }
+  .packdash__hero-actions { justify-content: flex-start; }
+  .packdash__progress { grid-template-columns: 1fr; }
+  .packdash__filters { grid-template-columns: 1fr 1fr; }
+  .packdash__filters input[type="search"] { grid-column: 1 / -1; }
+}
+@media (max-width: 580px) {
+  .packdash { gap: var(--s3); }
+  .packdash__hero, .packdash__progress, .packdash__add, .packdash__list { padding: var(--s4); }
+  .packdash__quick { grid-template-columns: minmax(0, 1fr); }
+  .packdash__quick > .sync__label { grid-column: auto; }
+  .packdash__quick .btn { width: 100%; }
+  .packdash__fields, .packdash__filters { grid-template-columns: 1fr; }
+  .packdash__filters input[type="search"] { grid-column: auto; }
+  .packdash__fields input, .packdash__fields select, .packdash__fields textarea, .packdash__filters > * { font-size: 16px; }
+  .packdash__category { padding: var(--s3); }
+  .packdash__item { padding: var(--s3); }
+  .packdash__listhead { align-items: flex-start; }
+  .packdash__listhead .packdash__resultcount { width: 100%; margin-left: 0; }
+}
+/* END plan-polish-packing */
 /* ==== src/css/90-utilities.css ==== */
 /* 90-utilities.css â€” last layer. OWNER: WS-D.
  * Single-purpose helpers only. If something here needs three declarations to
@@ -13049,7 +13146,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
 (function (T) {
   'use strict';
 
-  T.version = '0.28.11';   // Simplify the home page and header navigation
+  T.version = '0.28.12';   // Simplify the home page and header navigation
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -17508,12 +17605,22 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   });
 
   PR.packing.build = function (ctx) {
-    var rows = [], i, t, qty;
+    var rows = [], i, t, qty, travelers = Math.max(1, Math.min(8, Math.floor(Number(ctx && ctx.travelerCount) || 1)));
+    var perTraveler = {
+      'Underwear': 1, 'Socks': 1, 'Shirts / tops': 1, 'Trousers / shorts': 1, 'Sleepwear': 1,
+      'Comfortable walking shoes': 1, 'Warm layer or jacket': 1, 'Rain shell or umbrella': 1,
+      'Swimwear': 1, 'One smart outfit': 1, 'Toothbrush and toothpaste': 1, 'Deodorant': 1,
+      'Shampoo and body wash': 1, 'Sunscreen': 1, 'Razor and shaving kit': 1, 'Lip balm': 1, 'Phone charger': 1, 'Power bank': 1,
+      'Headphones': 1, 'Charging cables': 1, 'Passport': 1, 'Photo ID': 1,
+      'Boarding passes': 1, 'Copies of passport and cards': 1, 'Prescription medication': 1,
+      'Daypack': 1, 'Reusable water bottle': 1, 'Eye mask and earplugs': 1, 'Travel pillow': 1
+    };
     for (i = 0; i < PACKING_TEMPLATES_RAW.length; i++) {
       t = PACKING_TEMPLATES_RAW[i];
       if (!packingWhen(ctx, t[3])) continue;
       qty = t[2] ? t[2](ctx) : 1;
-      rows.push({ name: t[0], category: t[1], quantity: Math.max(1, qty), notes: t[4], fromTemplate: true });
+      if (perTraveler[t[0]]) qty *= travelers;
+      rows.push({ name: t[0], category: t[1], quantity: Math.max(1, qty), notes: t[4], owner: '', itineraryDate: '', isOptional: false, fromTemplate: true });
     }
     return rows;
   };
@@ -17535,6 +17642,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         r.id = previous.id;
         r.isPacked = previous.isPacked;
         r.owner = previous.owner;
+        r.itineraryDate = previous.itineraryDate || '';
+        r.isOptional = !!previous.isOptional;
         if (previous.notes && String(previous.notes).trim()) r.notes = previous.notes;
       }
     }
@@ -20446,12 +20555,16 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         if (qty > 99) { qty = 99; qtyC.n++; } else if (qty < 1) { qty = 1; qtyC.n++; }
       }
       var owner = migMemberOr(memberUidsAll, pk.owner, '');
-      var pkRes = validatePackingCore(scratchDoc, { name: pk.name, category: pk.category, quantity: qty, owner: owner, notes: pk.notes }, null);
+      var pkRes = validatePackingCore(scratchDoc, {
+        name: pk.name, category: pk.category, quantity: qty, owner: owner, notes: pk.notes,
+        itineraryDate: pk.itineraryDate, isOptional: pk.isOptional === true
+      }, null);
       clipped.packing += qtyC.n;
       if (!pkRes.ok) { dropped.packing++; continue; }
       var pkRow = {
         id: pk.id, name: pkRes.fields.name, category: pkRes.fields.category, quantity: pkRes.fields.quantity,
         isPacked: !!pk.isPacked, notes: pkRes.fields.notes, owner: pkRes.fields.owner, fromTemplate: !!pk.fromTemplate,
+        itineraryDate: pkRes.fields.itineraryDate, isOptional: pkRes.fields.isOptional,
         _t: now, _by: by, _rev: 1
       };
       mergedPacking[pk.id] = pkRow;
@@ -22780,7 +22893,15 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     notes = (notes === undefined || notes === null) ? '' : notes;
     if (typeof notes !== 'string' || notes.length > 300) return { ok: false, code: 'invalid-notes' };
 
-    return { ok: true, fields: { name: name, category: category, quantity: quantity, owner: owner, notes: notes } };
+    var itineraryDate = (p.itineraryDate !== undefined) ? p.itineraryDate : (existing ? existing.itineraryDate : '');
+    itineraryDate = (itineraryDate === undefined || itineraryDate === null) ? '' : itineraryDate;
+    if (typeof itineraryDate !== 'string' || itineraryDate.length > 10 || itineraryDate && !PR.dates.validateDay(itineraryDate)) return { ok: false, code: 'invalid-date' };
+
+    var isOptional = (p.isOptional !== undefined) ? p.isOptional : (existing ? existing.isOptional : false);
+    if (isOptional === undefined || isOptional === null) isOptional = false;
+    if (typeof isOptional !== 'boolean') return { ok: false, code: 'invalid-state' };
+
+    return { ok: true, fields: { name: name, category: category, quantity: quantity, owner: owner, notes: notes, itineraryDate: itineraryDate, isOptional: isOptional } };
   }
 
   PR.reduce.packing.add = function (doc, p) {
@@ -22795,7 +22916,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     var update = {};
     update['packing.items.' + id] = {
       id: id, name: v.fields.name, category: v.fields.category, quantity: v.fields.quantity, isPacked: false,
-      notes: v.fields.notes, owner: v.fields.owner, fromTemplate: false, _t: now, _by: by, _rev: 1
+      notes: v.fields.notes, owner: v.fields.owner, itineraryDate: v.fields.itineraryDate, isOptional: v.fields.isOptional,
+      fromTemplate: false, _t: now, _by: by, _rev: 1
     };
     update.updatedAt = now;
     update.updatedBy = by;
@@ -22884,11 +23006,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       prevRow = itemsMap[id];
       full = {
         id: id, name: row.name, category: row.category, quantity: row.quantity, isPacked: !!row.isPacked,
-        notes: row.notes || '', owner: row.owner || '', fromTemplate: !!row.fromTemplate
+        notes: row.notes || '', owner: row.owner || '', itineraryDate: row.itineraryDate || '', isOptional: !!row.isOptional,
+        fromTemplate: !!row.fromTemplate
       };
       if (prevRow) {
         sameShape = prevRow.name === full.name && prevRow.category === full.category && prevRow.quantity === full.quantity
           && prevRow.isPacked === full.isPacked && prevRow.notes === full.notes && prevRow.owner === full.owner
+          && (prevRow.itineraryDate || '') === full.itineraryDate && !!prevRow.isOptional === full.isOptional
           && prevRow.fromTemplate === full.fromTemplate;
         if (sameShape) continue;
         full._t = now; full._by = by; full._rev = (prevRow._rev || 0) + 1;
@@ -24199,9 +24323,19 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   };
 
   PR.packing.seed = function (tripId) {
-    var ctx = PR.prepare.context(tripId);
+    var ctx = PR.prepare.context(tripId), current = PR.get(tripId), members = PR.members.list(tripId) || [], memberCount = members.length;
+    var plan = current && current.plan || {}, bookings = plan.bookings || {}, group, key, record, count;
+    ['flights', 'lodging'].forEach(function (kind) {
+      group = bookings[kind] || {};
+      Object.keys(group).forEach(function (id) {
+        record = group[id] || {};
+        count = Array.isArray(record.travelerUids) ? record.travelerUids.length : 0;
+        memberCount = Math.max(memberCount, count);
+      });
+    });
+    ctx.travelerCount = Math.max(1, memberCount);
     var ids = [], i;
-    for (i = 0; i < PACKING_TEMPLATES_RAW.length; i++) ids.push(U.uid('pk'));
+    for (i = 0; i < PR.packing.build(ctx).length; i++) ids.push(U.uid('pk'));
     return runPlanOp(tripId, PR.reduce.packing.seed, { ctx: ctx, ids: ids });
   };
   PR.packing.add = function (tripId, fields) {
@@ -24211,6 +24345,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     if (f.quantity !== undefined) args.quantity = f.quantity;
     if (f.owner !== undefined) args.owner = f.owner;
     if (f.notes !== undefined) args.notes = f.notes;
+    if (f.itineraryDate !== undefined) args.itineraryDate = f.itineraryDate;
+    if (f.isOptional !== undefined) args.isOptional = f.isOptional;
     return runPlanOp(tripId, PR.reduce.packing.add, args).then(function (res) {
       if (res.ok) res.id = id;
       return res;
@@ -24223,6 +24359,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     if (p.quantity !== undefined) args.quantity = p.quantity;
     if (p.owner !== undefined) args.owner = p.owner;
     if (p.notes !== undefined) args.notes = p.notes;
+    if (p.itineraryDate !== undefined) args.itineraryDate = p.itineraryDate;
+    if (p.isOptional !== undefined) args.isOptional = p.isOptional;
     return runPlanOp(tripId, PR.reduce.packing.edit, args);
   };
   PR.packing.remove = function (tripId, id) {
@@ -25842,7 +25980,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       if (target) {
         if (target.id !== match[2]) return { ok: false, code: 'imported-batch' };
         var allowed = match[1] === 'checklist' ? 'id title category isDone notes dueOffsetDays completedBy completedAt fromTemplate requirement linkRoute importSource _t _by _rev'
-          : match[1] === 'packing' ? 'id name category quantity isPacked notes owner fromTemplate _t _by _rev'
+          : match[1] === 'packing' ? 'id name category quantity isPacked notes owner itineraryDate isOptional fromTemplate _t _by _rev'
           : 'id title kind date startTime endTime endDate location notes confirmation createdBy _t _by _rev';
         if (Object.keys(target).some(function (k) { return allowed.split(' ').indexOf(k) < 0; })) return { ok: false, code: 'imported-batch' };
         var valid = match[1] === 'checklist' ? validateChecklistCore(target, null) : match[1] === 'packing' ? validatePackingCore(working, target, null) : validateItineraryCore(target, null);
@@ -42404,7 +42542,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
   var PACKING_CATEGORIES = ['clothing', 'toiletries', 'electronics', 'documents', 'health', 'gear', 'misc'];
   var PACKING_CATEGORY_WORDS = {
     clothing: 'Clothing', toiletries: 'Toiletries', electronics: 'Electronics', documents: 'Documents',
-    health: 'Health', gear: 'Gear', misc: 'Misc'
+    health: 'Health', gear: 'Gear', misc: 'Extras'
   };
   function packingCategories() { var api = packingApi(); return (api && api.CATEGORIES) || PACKING_CATEGORIES; }
 
@@ -42761,6 +42899,15 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     return line;
   }
 
+  function buildPackingLine(tripId) {
+    var summary = prepareSummaryOf(tripId), packing = summary && summary.packing || { packed: 0, total: 0 };
+    var line = U.el('p', { class: 'plan__packingline' });
+    var text = packing.total ? 'Packing: ' + packing.packed + ' of ' + packing.total + ' packed.' : 'Your packing list is ready to build.';
+    line.appendChild(document.createTextNode(text + ' '));
+    line.appendChild(U.el('a', { class: 'plan__packinglink', href: T.router.build('plan', ['prepare'], { tab: 'packing' }) }, 'Open Packing'));
+    return line;
+  }
+
   /** Overview `p.plan__itinline` â€” WAVE5_CONTRACT Â§3.1. Mirrors buildPrepLine
    *  exactly; note-for-note the same "one number, not the queue" rule. The
    *  count always reads "N entries" (never singularised â€” WAVE5_CONTRACT Â§3.1
@@ -42808,6 +42955,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     card('flights', 'Flights', bookingsLine('flights'));
     card('lodging', 'Stays', bookingsLine('lodging'));
     card('prepare', 'Preparation', buildPrepLine(tripId));
+    card('packing', 'Packing', buildPackingLine(tripId));
     card('itinerary', 'Itinerary', buildItinLine(tripId));
     return section;
   }
@@ -45601,15 +45749,30 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
 
 
   /* -- packing tab --------------------------------------------------------- */
+  var packingFilterSessions = Object.create(null);
   function ownerSuffix(uid, members) {
     if (!uid) return '';
     return nameFor(uid, members) + 'â€™s';
   }
-
+  function packingDateLabel(date) {
+    return itineraryValidDay(date) ? weekdayShort(date) + ', ' + dayShort(date) : 'Any trip day';
+  }
+  function packingTravelers(plan, members) {
+    var count = (members || []).length, bookings = plan && plan.bookings || {};
+    ['flights', 'lodging'].forEach(function (kind) {
+      var group = bookings[kind] || {};
+      Object.keys(group).forEach(function (id) {
+        var row = group[id] || {};
+        if (Array.isArray(row.travelerUids)) count = Math.max(count, row.travelerUids.length);
+      });
+    });
+    return Math.max(1, count);
+  }
   function confirmRemovePacking(tripId, id, statusLine) {
     function doRemove() {
       callPacking('remove', [tripId, id]).then(function (r) {
-        if (!r || !r.ok) setPrepareStatus(statusLine, r && r.code); else U.setText(statusLine, '');
+        if (!r || !r.ok) setPrepareStatus(statusLine, r && r.code);
+        else { U.setText(statusLine, ''); repaintNow(); }
       });
     }
     if (!T.modal || typeof T.modal.open !== 'function') { doRemove(); return; }
@@ -45622,186 +45785,276 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     foot.appendChild(cancel); foot.appendChild(ok);
     T.modal.open({ title: 'Remove this item?', body: body, footer: foot });
   }
-
   function buildPackingItem(tripId, item, members, statusLine, drawer) {
-    var li = U.el('li', { class: 'prepare__item', dataset: {
-      id: item.id, packed: item.isPacked ? 'true' : 'false', template: item.fromTemplate ? 'true' : 'false'
+    var li = U.el('li', { class: 'packdash__item', dataset: {
+      id: item.id, packed: item.isPacked ? 'true' : 'false', optional: item.isOptional ? 'true' : 'false', template: item.fromTemplate ? 'true' : 'false'
     } });
-    var top = U.el('div', { class: 'prepare__itemtop' });
-    var label = U.el('label', { class: 'prepare__packlabel' });
-    var checkbox = U.el('input', { class: 'prepare__packcheck', type: 'checkbox' });
+    var top = U.el('div', { class: 'packdash__itemtop' });
+    var label = U.el('label', { class: 'packdash__checklabel' });
+    var checkbox = U.el('input', { class: 'packdash__check', type: 'checkbox', 'aria-label': (item.isPacked ? 'Mark not packed: ' : 'Mark packed: ') + item.name });
     checkbox.checked = !!item.isPacked;
     checkbox.addEventListener('change', function () {
       var next = checkbox.checked;
       checkbox.disabled = true;
       callPacking('toggle', [tripId, item.id, next]).then(function (r) {
-        checkbox.disabled = false;
-        if (!r || !r.ok) { checkbox.checked = !next; setPrepareStatus(statusLine, r && r.code); }
-        else U.setText(statusLine, '');
+        if (!r || !r.ok) { checkbox.checked = !next; checkbox.disabled = false; setPrepareStatus(statusLine, r && r.code); }
+        else { U.setText(statusLine, ''); repaintNow(); }
       });
     });
     label.appendChild(checkbox);
-    var nameText = item.name + (item.quantity > 1 ? ' Ã— ' + item.quantity : '');
-    label.appendChild(U.el('span', { class: 'prepare__itemname', text: nameText }));
+    label.appendChild(U.el('span', { class: 'packdash__itemname', text: item.name }));
     top.appendChild(label);
-    top.appendChild(U.el('span', { class: 'prepare__owner', hidden: !item.owner, text: ownerSuffix(item.owner, members) }));
+    var badges = U.el('div', { class: 'packdash__badges' });
+    if (item.quantity > 1) badges.appendChild(U.el('span', { class: 'packdash__badge', text: 'Qty ' + item.quantity }));
+    if (item.owner) badges.appendChild(U.el('span', { class: 'packdash__badge', text: ownerSuffix(item.owner, members) }));
+    if (item.isOptional) badges.appendChild(U.el('span', { class: 'packdash__badge packdash__badge--optional', text: 'Optional' }));
+    if (badges.childNodes.length) top.appendChild(badges);
     li.appendChild(top);
-    li.appendChild(U.el('p', { class: 'prepare__itemnotes', hidden: U.isBlank(item.notes), text: item.notes || '' }));
-
-    var actions = U.el('div', { class: 'prepare__itemactions' });
-    var editBtn = U.el('button', { type: 'button', class: 'btn btn--quiet prepare__edit', text: 'Edit' });
+    if (item.itineraryDate) li.appendChild(U.el('a', {
+      class: 'packdash__daylink', href: T.router.build('plan', ['itinerary'], { day: item.itineraryDate }),
+      text: 'Itinerary Â· ' + packingDateLabel(item.itineraryDate)
+    }));
+    if (!U.isBlank(item.notes)) {
+      var notes = U.el('details', { class: 'packdash__notes' });
+      notes.appendChild(U.el('summary', { text: 'Item details' }));
+      notes.appendChild(U.el('p', { text: item.notes }));
+      li.appendChild(notes);
+    }
+    var actions = U.el('div', { class: 'packdash__actions' });
+    var editBtn = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Edit' });
     editBtn.addEventListener('click', function () { if (drawer.openForEdit) drawer.openForEdit(item); });
     actions.appendChild(editBtn);
-    var removeBtn = U.el('button', { type: 'button', class: 'btn btn--quiet prepare__remove', text: 'Remove' });
+    var removeBtn = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Remove' });
     removeBtn.addEventListener('click', function () { confirmRemovePacking(tripId, item.id, statusLine); });
     actions.appendChild(removeBtn);
     li.appendChild(actions);
     return li;
   }
+  function buildPackingDrawer(tripId, members, statusLine, days, routeDay) {
+    var form = U.el('form', { class: 'packdash__add-form', novalidate: true });
+    var quick = U.el('div', { class: 'packdash__quick' });
+    var nameInput = U.el('input', { class: 'input sync__input', id: 'plan-pack-name', type: 'text', maxlength: '80', autocomplete: 'off', placeholder: 'e.g. Warm walking layer' });
+    quick.appendChild(U.el('label', { class: 'sync__label', for: 'plan-pack-name', text: 'Add an item' }));
+    quick.appendChild(nameInput);
+    var submitBtn = U.el('button', { type: 'submit', class: 'btn btn--primary', text: 'Add item' });
+    quick.appendChild(submitBtn);
+    form.appendChild(quick);
 
-  function buildPackingDrawer(tripId, members, statusLine) {
-    var details = U.el('details', { class: 'plan__drawer prepare__drawer', dataset: { drawer: 'packing' } });
-    var summaryEl = U.el('summary', { class: 'sync__advsum', text: 'Add an item' });
-    details.appendChild(summaryEl);
-    var form = U.el('form', { class: 'prepare__form', novalidate: true });
-
-    var nameInput = U.el('input', { class: 'input sync__input', id: 'plan-pack-name', type: 'text', maxlength: '80' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-pack-name', text: 'Item' }), nameInput
-    ]));
+    var more = U.el('details', { class: 'packdash__advanced' });
+    more.appendChild(U.el('summary', { text: 'Add trip details (optional)' }));
+    var fields = U.el('div', { class: 'packdash__fields' });
     var categorySelect = U.el('select', { class: 'input sync__input', id: 'plan-pack-category' });
-    packingCategories().forEach(function (c) {
-      categorySelect.appendChild(U.el('option', { value: c }, PACKING_CATEGORY_WORDS[c] || c));
-    });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-pack-category', text: 'Category' }), categorySelect
-    ]));
-    var quantityInput = U.el('input', { class: 'input sync__input', id: 'plan-pack-quantity', type: 'text', inputmode: 'numeric' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-pack-quantity', text: 'Quantity' }), quantityInput
-    ]));
+    packingCategories().forEach(function (c) { categorySelect.appendChild(U.el('option', { value: c }, PACKING_CATEGORY_WORDS[c] || c)); });
+    fields.appendChild(U.el('div', { class: 'sync__field' }, [U.el('label', { class: 'sync__label', for: 'plan-pack-category', text: 'Category' }), categorySelect]));
+    var quantityInput = U.el('input', { class: 'input sync__input', id: 'plan-pack-quantity', type: 'number', min: '1', max: '99', step: '1', inputmode: 'numeric' });
+    fields.appendChild(U.el('div', { class: 'sync__field' }, [U.el('label', { class: 'sync__label', for: 'plan-pack-quantity', text: 'Quantity' }), quantityInput]));
     var ownerSelect = U.el('select', { class: 'input sync__input', id: 'plan-pack-owner' });
     memberOptions(members, true).forEach(function (o) { ownerSelect.appendChild(o); });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-pack-owner', text: 'Owner' }), ownerSelect
+    fields.appendChild(U.el('div', { class: 'sync__field' }, [U.el('label', { class: 'sync__label', for: 'plan-pack-owner', text: 'For traveler' }), ownerSelect]));
+    var dateSelect = U.el('select', { class: 'input sync__input', id: 'plan-pack-day' });
+    dateSelect.appendChild(U.el('option', { value: '' }, 'Any day Â· whole trip'));
+    (days || []).forEach(function (day) {
+      dateSelect.appendChild(U.el('option', { value: day.date }, packingDateLabel(day.date)));
+    });
+    if (itineraryValidDay(routeDay) && !(days || []).some(function (day) { return day.date === routeDay; })) {
+      dateSelect.appendChild(U.el('option', { value: routeDay }, packingDateLabel(routeDay)));
+    }
+    fields.appendChild(U.el('div', { class: 'sync__field packdash__datefield' }, [
+      U.el('label', { class: 'sync__label', for: 'plan-pack-day', text: 'Link to itinerary day' }), dateSelect
     ]));
-    var notesInput = U.el('textarea', { id: 'plan-pack-notes', class: 'textarea sync__input', rows: '2', maxlength: '300' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-pack-notes', text: 'Notes (optional)' }), notesInput
+    var optionalLabel = U.el('label', { class: 'packdash__optional' });
+    var optionalInput = U.el('input', { id: 'plan-pack-optional', type: 'checkbox' });
+    optionalLabel.appendChild(optionalInput);
+    optionalLabel.appendChild(document.createTextNode(' Optional Â· pack only if useful'));
+    fields.appendChild(optionalLabel);
+    var notesInput = U.el('textarea', {
+      id: 'plan-pack-notes', class: 'textarea sync__input', rows: '3', maxlength: '300',
+      placeholder: 'Color, size, what it is for, or where to keep it.'
+    });
+    fields.appendChild(U.el('div', { class: 'sync__field packdash__notesfield' }, [
+      U.el('label', { class: 'sync__label', for: 'plan-pack-notes', text: 'Details or reminder' }), notesInput
     ]));
-
-    var errLine = U.el('p', { class: 'field__error' });
+    more.appendChild(fields);
+    form.appendChild(more);
+    var errLine = U.el('p', { class: 'field__error', role: 'status', 'aria-live': 'polite' });
     form.appendChild(errLine);
-    var acts = U.el('div', { class: 'sync__actions' });
-    var submitBtn = U.el('button', { type: 'submit', class: 'btn btn--primary', text: 'Add' });
-    var cancelBtn = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Cancel' });
-    acts.appendChild(submitBtn); acts.appendChild(cancelBtn);
+    var cancelBtn = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Cancel', hidden: true });
+    var acts = U.el('div', { class: 'packdash__form-actions' });
+    acts.appendChild(cancelBtn);
     form.appendChild(acts);
 
-    function setFieldVal(input, v) { input.value = v; input.defaultValue = v; }
-    function setSelectVal(sel, v) { sel.value = v; sel.defaultValue = v; sel.dataset['default'] = v; }
-
+    function setFieldVal(input, value) { input.value = value; input.defaultValue = value; }
+    function setSelectVal(select, value) { select.value = value; select.defaultValue = value; select.dataset['default'] = value; }
     function reset() {
       form.dataset.editing = '';
-      setFieldVal(nameInput, '');
-      setSelectVal(categorySelect, packingCategories()[0]);
-      setFieldVal(quantityInput, '1');
-      setSelectVal(ownerSelect, '');
-      setFieldVal(notesInput, '');
-      U.setText(errLine, '');
-      U.setText(submitBtn, 'Add');
-      U.setText(summaryEl, 'Add an item');
+      setFieldVal(nameInput, ''); setSelectVal(categorySelect, 'misc'); setFieldVal(quantityInput, '1');
+      setSelectVal(ownerSelect, ''); setSelectVal(dateSelect, itineraryValidDay(routeDay) ? routeDay : '');
+      setFieldVal(notesInput, ''); optionalInput.checked = false; more.open = false;
+      U.setText(errLine, ''); U.setText(submitBtn, 'Add item'); cancelBtn.hidden = true;
     }
     reset();
-
     function openForEdit(item) {
       form.dataset.editing = item.id;
-      setFieldVal(nameInput, item.name || '');
-      setSelectVal(categorySelect, item.category || packingCategories()[0]);
-      setFieldVal(quantityInput, String(item.quantity || 1));
-      setSelectVal(ownerSelect, item.owner || '');
-      setFieldVal(notesInput, item.notes || '');
-      U.setText(errLine, '');
-      U.setText(submitBtn, 'Save changes');
-      U.setText(summaryEl, 'Edit this item');
-      details.open = true;
+      setFieldVal(nameInput, item.name || ''); setSelectVal(categorySelect, item.category || 'misc');
+      setFieldVal(quantityInput, String(item.quantity || 1)); setSelectVal(ownerSelect, item.owner || '');
+      setSelectVal(dateSelect, item.itineraryDate || ''); setFieldVal(notesInput, item.notes || '');
+      optionalInput.checked = !!item.isOptional; U.setText(errLine, '');
+      U.setText(submitBtn, 'Save item'); cancelBtn.hidden = false; more.open = true; nameInput.focus();
     }
-
+    function openForAdd(date) {
+      reset();
+      if (itineraryValidDay(date)) { setSelectVal(dateSelect, date); more.open = true; }
+      nameInput.focus();
+    }
     function submit() {
       var name = String(nameInput.value || '').trim();
-      if (!name || name.length > 80) { setPrepareStatus(errLine, 'invalid-name'); return; }
+      if (!name || name.length > 80) { setPrepareStatus(errLine, 'invalid-name'); nameInput.focus(); return; }
       var qty = parseInt(quantityInput.value, 10);
       if (!qty || qty < 1) qty = 1;
       if (qty > 99) qty = 99;
       U.setText(errLine, '');
       var editingId = form.dataset.editing || '';
-      var fields = { name: name, category: categorySelect.value, quantity: qty, owner: ownerSelect.value || '', notes: notesInput.value || '' };
+      var payload = {
+        name: name, category: categorySelect.value, quantity: qty, owner: ownerSelect.value || '',
+        notes: notesInput.value || '', itineraryDate: dateSelect.value || '', isOptional: !!optionalInput.checked
+      };
       submitBtn.disabled = true;
-      var p = editingId ? callPacking('edit', [tripId, editingId, fields]) : callPacking('add', [tripId, fields]);
-      p.then(function (r) {
+      var promise = editingId ? callPacking('edit', [tripId, editingId, payload]) : callPacking('add', [tripId, payload]);
+      promise.then(function (r) {
         submitBtn.disabled = false;
-        if (r && r.ok) { reset(); details.open = false; repaintNow(); return; }
+        if (r && r.ok) { reset(); repaintNow(); return; }
         setPrepareStatus(errLine, r && r.code, { capN: capsOf().packing, noun: 'items' });
       });
     }
-    form.addEventListener('submit', function (ev) { ev.preventDefault(); submit(); });
-    cancelBtn.addEventListener('click', function () { reset(); details.open = false; });
-
-    details.appendChild(form);
-    details.openForEdit = openForEdit;
-    return details;
+    form.addEventListener('submit', function (event) { event.preventDefault(); submit(); });
+    cancelBtn.addEventListener('click', reset);
+    form.openForEdit = openForEdit; form.openForAdd = openForAdd;
+    return form;
   }
+  function buildPackingTab(tripId, prep, view, ctx, route) {
+    var doc = prep.plan || {}, members = (PR && PR.members && typeof PR.members.list === 'function') ? PR.members.list(tripId) : [];
+    var travelerCount = packingTravelers(doc, members);
+    var wrap = U.el('div', { class: 'packdash' });
+    var statusLine = U.el('p', { class: 'prepare__status packdash__status', role: 'status', 'aria-live': 'polite' });
+    var items = (view && view.packing) || callPure(packingApi(), 'ordered', [(doc.packing && doc.packing.items) || {}], []);
+    var packedN = items.filter(function (item) { return item.isPacked && !item.isOptional; }).length;
+    var requiredN = items.filter(function (item) { return !item.isOptional; }).length;
+    var optionalN = items.filter(function (item) { return item.isOptional; }).length;
 
-  function buildPackingTab(tripId, prep, view, ctx) {
-    var doc = prep.plan || {};
-    var members = (PR && PR.members && typeof PR.members.list === 'function') ? PR.members.list(tripId) : [];
-    var wrap = U.el('div', {});
-    var statusLine = U.el('p', { class: 'prepare__status', role: 'status', 'aria-live': 'polite' });
+    var intro = U.el('header', { class: 'packdash__hero' });
+    var introCopy = U.el('div', { class: 'packdash__hero-copy' });
+    introCopy.appendChild(U.el('p', { class: 'decisiondash__eyebrow', text: 'THE DETAILS THAT GO WITH YOU' }));
+    introCopy.appendChild(U.el('h2', { class: 'decisiondash__title', text: 'Packing for ' + ((ctx && ctx.winnerName) || 'your trip') }));
+    var tripRange = ctx && ctx.departure && ctx.returnDate ? dayShort(ctx.departure) + 'â€“' + dayShort(ctx.returnDate) : 'Trip dates not set';
+    var stops = [], seenStops = Object.create(null), lodging = doc.bookings && doc.bookings.lodging || {};
+    Object.keys(lodging).forEach(function (id) {
+      var row = lodging[id] || {}, place = String(row.cityLabel || row.propertyName || '').trim();
+      if (place && !seenStops[place.toLowerCase()]) { seenStops[place.toLowerCase()] = true; stops.push(place); }
+    });
+    var scopeLine = tripRange + (ctx && ctx.nights ? ' Â· ' + ctx.nights + ' nights' : '') +
+      ' Â· ' + travelerCount + (travelerCount === 1 ? ' traveler' : ' travelers') +
+      (stops.length ? ' Â· ' + stops.slice(0, 3).join(' â†’ ') : '');
+    introCopy.appendChild(U.el('p', { class: 'decisiondash__copy', text: scopeLine + '. Add a quick item or open the details for quantity, traveler, day, and notes.' }));
+    intro.appendChild(introCopy);
+    var introLinks = U.el('div', { class: 'packdash__hero-actions' });
+    introLinks.appendChild(U.el('a', { class: 'btn btn--quiet', href: T.router.build('plan', ['itinerary']), text: 'Open itinerary' }));
+    introLinks.appendChild(U.el('a', { class: 'btn btn--quiet', href: T.router.build('plan', ['prepare'], { tab: 'checklist' }), text: 'Open checklist' }));
+    intro.appendChild(introLinks); wrap.appendChild(intro);
 
-    var items = (view && view.packing) ||
-      callPure(packingApi(), 'ordered', [(doc.packing && doc.packing.items) || {}], []);
-    var packedN = items.filter(function (i) { return i.isPacked; }).length;
-    wrap.appendChild(U.el('p', { class: 'prepare__packprogress', hidden: !items.length,
-      text: packedN + ' of ' + items.length + ' packed' }));
+    var progress = U.el('section', { class: 'packdash__progress', 'aria-label': 'Packing progress' });
+    var progressText = U.el('div', { class: 'packdash__progresscopy' });
+    progressText.appendChild(U.el('p', { class: 'plan__h', text: requiredN ? packedN + ' of ' + requiredN + ' essentials packed' : 'Your list is ready to start' }));
+    progressText.appendChild(U.el('p', { class: 'decisiondash__copy', text: optionalN ? optionalN + ' optional item' + (optionalN === 1 ? '' : 's') + ' kept separate' : 'Optional extras stay separate from the essentials.' }));
+    progress.appendChild(progressText);
+    progress.appendChild(U.el('progress', { class: 'packdash__progressbar', max: String(Math.max(1, requiredN)), value: String(packedN), 'aria-label': 'Essentials packed' }));
+    wrap.appendChild(progress);
 
-    var itemsMap = (doc.packing && doc.packing.items) || {};
-    var hasTemplateRow = Object.keys(itemsMap).some(function (id) { return itemsMap[id].fromTemplate; });
-    var drawer = buildPackingDrawer(tripId, members, statusLine);
-    var seedBtn = U.el('button', { type: 'button', class: 'prepare__packseed', dataset: { seeded: String(hasTemplateRow) },
-      text: hasTemplateRow ? 'Refresh from the template' : 'Start the packing list' });
-    seedBtn.addEventListener('click', function () {
-      seedBtn.disabled = true;
-      callPacking('seed', [tripId]).then(function (r) {
-        seedBtn.disabled = false;
-        if (!r || !r.ok) { setPrepareStatus(statusLine, r && r.code, { capN: capsOf().packing, noun: 'items' }); return; }
-        if (r.unchanged) U.setText(statusLine, 'Nothing to change.');
-        else U.setText(statusLine, 'Added ' + (r.added || 0) + ' Â· removed ' + (r.removed || 0));
+    var itemsMap = doc.packing && doc.packing.items || {};
+    var hasTemplateRow = Object.keys(itemsMap).some(function (id) { return itemsMap[id] && itemsMap[id].fromTemplate; });
+    var seedCtx = {};
+    Object.keys(ctx || {}).forEach(function (key) { seedCtx[key] = ctx[key]; });
+    seedCtx.travelerCount = travelerCount;
+    var generated = callPure(packingApi(), 'build', [seedCtx], []);
+    var itinerary = itineraryViewOf(tripId), days = itinerary && itinerary.days || [], routeDay = route && route.query && route.query.day || '';
+    var drawer = buildPackingDrawer(tripId, members, statusLine, days, routeDay);
+    var addSection = U.el('section', { class: 'packdash__add' });
+    var addHead = U.el('div', { class: 'packdash__addhead' });
+    addHead.appendChild(U.el('h3', { class: 'plan__h', text: items.length ? 'Add something' : 'Start with an item or a suggested list' }));
+    if (!items.length) {
+      var firstSeed = U.el('button', { type: 'button', class: 'btn btn--quiet packdash__seed', text: 'Build a suggested list Â· ' + generated.length + ' items' });
+      firstSeed.addEventListener('click', function () { runSeed(firstSeed); });
+      addHead.appendChild(firstSeed);
+    }
+    addSection.appendChild(addHead); addSection.appendChild(drawer); wrap.appendChild(addSection);
+
+    function runSeed(button) {
+      button.disabled = true;
+      callPacking('seed', [tripId]).then(function (result) {
+        button.disabled = false;
+        if (!result || !result.ok) { setPrepareStatus(statusLine, result && result.code, { capN: capsOf().packing, noun: 'items' }); return; }
+        U.setText(statusLine, result.unchanged ? 'Your suggested items are up to date.' :
+          'Added ' + (result.added || 0) + ' suggested items. Adjust the list to fit what you actually plan to bring.');
+        repaintNow();
       });
-    });
-    wrap.appendChild(seedBtn);
+    }
+    var seedBtn = U.el('button', { type: 'button', class: 'btn btn--quiet packdash__seed',
+      dataset: { seeded: String(hasTemplateRow) }, text: hasTemplateRow ? 'Update suggested items' : 'Add suggested essentials' });
+    seedBtn.addEventListener('click', function () { runSeed(seedBtn); });
 
-    var byCat = {};
-    items.forEach(function (item) {
-      var cat = item.category || 'misc';
-      if (!byCat[cat]) byCat[cat] = [];
-      byCat[cat].push(item);
+    var controls = U.el('div', { class: 'packdash__filters', 'aria-label': 'Filter packing items' });
+    var search = U.el('input', { class: 'input', type: 'search', maxlength: '80', placeholder: 'Find an item', 'aria-label': 'Search packing items' });
+    var categoryFilter = U.el('select', { class: 'input', 'aria-label': 'Filter by category' });
+    categoryFilter.appendChild(U.el('option', { value: '' }, 'All categories'));
+    packingCategories().forEach(function (category) { categoryFilter.appendChild(U.el('option', { value: category }, PACKING_CATEGORY_WORDS[category] || category)); });
+    var stateFilter = U.el('select', { class: 'input', 'aria-label': 'Filter by packing status' });
+    [['all', 'All items'], ['to-pack', 'Still to pack'], ['packed', 'Packed'], ['optional', 'Optional']].forEach(function (entry) {
+      stateFilter.appendChild(U.el('option', { value: entry[0] }, entry[1]));
     });
-    packingCategories().forEach(function (cat) {
-      var rows = byCat[cat];
-      if (!rows || !rows.length) return;
-      var sec = U.el('section', { class: 'prepare__cat', dataset: { category: cat } });
-      sec.appendChild(U.el('h2', { class: 'plan__h', text: PACKING_CATEGORY_WORDS[cat] || cat }));
-      var ul = U.el('ul', { class: 'prepare__items' });
-      rows.forEach(function (item) { ul.appendChild(buildPackingItem(tripId, item, members, statusLine, drawer)); });
-      sec.appendChild(ul);
-      wrap.appendChild(sec);
-    });
-
-    wrap.appendChild(drawer);
+    controls.appendChild(search); controls.appendChild(categoryFilter); controls.appendChild(stateFilter);
+    var results = U.el('p', { class: 'packdash__resultcount', 'aria-live': 'polite' });
+    var listHost = U.el('div', { class: 'packdash__groups' });
+    var session = packingFilterSessions[tripId] || (packingFilterSessions[tripId] = { search: '', category: '', state: 'all' });
+    search.value = session.search; categoryFilter.value = session.category; stateFilter.value = session.state;
+    function renderRows() {
+      session.search = String(search.value || '').trim().toLowerCase(); session.category = categoryFilter.value; session.state = stateFilter.value;
+      while (listHost.firstChild) listHost.removeChild(listHost.firstChild);
+      var filtered = items.filter(function (item) {
+        if (session.category && item.category !== session.category) return false;
+        if (session.search && String(item.name || '').toLowerCase().indexOf(session.search) < 0 &&
+            String(item.notes || '').toLowerCase().indexOf(session.search) < 0) return false;
+        if (session.state === 'to-pack' && (item.isPacked || item.isOptional)) return false;
+        if (session.state === 'packed' && !item.isPacked) return false;
+        if (session.state === 'optional' && !item.isOptional) return false;
+        return true;
+      });
+      U.setText(results, filtered.length + ' of ' + items.length + ' items');
+      packingCategories().forEach(function (category) {
+        var rows = filtered.filter(function (item) { return (item.category || 'misc') === category; });
+        if (!rows.length) return;
+        var group = U.el('section', { class: 'packdash__category', dataset: { category: category } });
+        var heading = U.el('div', { class: 'packdash__category-head' });
+        heading.appendChild(U.el('h3', { class: 'plan__h', text: PACKING_CATEGORY_WORDS[category] || category }));
+        heading.appendChild(U.el('span', { class: 'packdash__category-count', text: String(rows.length) }));
+        group.appendChild(heading);
+        var list = U.el('ul', { class: 'packdash__items' });
+        rows.forEach(function (item) { list.appendChild(buildPackingItem(tripId, item, members, statusLine, drawer)); });
+        group.appendChild(list); listHost.appendChild(group);
+      });
+      if (!filtered.length) listHost.appendChild(U.el('p', { class: 'packdash__empty-filter',
+        text: items.length ? 'No items match these filters.' : 'Your list is empty. Add a first item or build the suggested essentials above.' }));
+    }
+    search.addEventListener('input', renderRows); categoryFilter.addEventListener('change', renderRows); stateFilter.addEventListener('change', renderRows);
+    renderRows();
+    var listSection = U.el('section', { class: 'packdash__list', 'aria-label': 'Packing items' });
+    var listHead = U.el('div', { class: 'packdash__listhead' });
+    listHead.appendChild(U.el('h3', { class: 'plan__h', text: 'Your list' }));
+    if (items.length) listHead.appendChild(seedBtn);
+    listHead.appendChild(results); listSection.appendChild(listHead);
+    listSection.appendChild(controls); listSection.appendChild(listHost); wrap.appendChild(listSection);
     wrap.appendChild(statusLine);
+    if (itineraryValidDay(routeDay)) drawer.openForAdd(routeDay);
     return wrap;
   }
-
   /* -- documents tab -------------------------------------------------------- */
   function monthsForTraveler(summary) {
     return function (countryCode) {
@@ -46260,7 +46513,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     var ctx = (view && view.ctx) || prepareContextOf(tripId) || null;
 
     var sec = U.el('section', { class: 'prepare', dataset: { tab: tab } });
-    if (tab === 'packing') sec.appendChild(buildPackingTab(tripId, prep, view, ctx));
+    if (tab === 'packing') sec.appendChild(buildPackingTab(tripId, prep, view, ctx, route));
     else if (tab === 'documents') sec.appendChild(buildDocumentsTab(tripId, prep, view, ctx));
     else sec.appendChild(buildChecklistTab(tripId, prep, view, ctx));
     wrap.appendChild(sec);
@@ -46582,7 +46835,43 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     }
     content.appendChild(disclosure); li.appendChild(content); return li;
   }
-  function buildItinDay(tripId, day, statusLine, drawer, today, plan, ctx) {
+  function buildItineraryPacking(tripId, day, plan, showEmpty) {
+    if (!day || !itineraryValidDay(day.date)) return null;
+    var map = plan && plan.packing && plan.packing.items || {};
+    var items = callPure(packingApi(), 'ordered', [map], []).filter(function (item) { return item.itineraryDate === day.date; });
+    if (!items.length && !showEmpty) return null;
+    var section = U.el('section', { class: 'itin-board__packing', 'aria-label': 'Packing for ' + packingDateLabel(day.date) });
+    var head = U.el('div', { class: 'itin-board__packing-head' });
+    head.appendChild(U.el('h3', { class: 'itin-board__stay-heading', text: 'Packing for this day' }));
+    head.appendChild(U.el('a', { class: 'itin-board__packing-link', href: T.router.build('plan', ['prepare'], { tab: 'packing', day: day.date }), text: items.length ? 'Edit list' : 'Add an item' }));
+    section.appendChild(head);
+    if (!items.length) {
+      section.appendChild(U.el('p', { class: 'itin-board__packing-empty', text: 'Keep day-specific things here. The full packing list stays in Prepare.' }));
+      return section;
+    }
+    var status = U.el('p', { class: 'sr-only', role: 'status', 'aria-live': 'polite' });
+    var list = U.el('ul', { class: 'itin-board__packing-list' });
+    items.forEach(function (item) {
+      var li = U.el('li', { class: 'itin-board__packing-item', dataset: { packed: String(!!item.isPacked), optional: String(!!item.isOptional) } });
+      var label = U.el('label', { class: 'itin-board__packing-label' });
+      var check = U.el('input', { type: 'checkbox', 'aria-label': (item.isPacked ? 'Mark not packed: ' : 'Mark packed: ') + item.name });
+      check.checked = !!item.isPacked;
+      check.addEventListener('change', function () {
+        var next = check.checked; check.disabled = true;
+        callPacking('toggle', [tripId, item.id, next]).then(function (result) {
+          if (!result || !result.ok) { check.disabled = false; check.checked = !next; setPrepareStatus(status, result && result.code); }
+          else repaintNow();
+        });
+      });
+      label.appendChild(check);
+      label.appendChild(U.el('span', { class: 'itin-board__packing-name', text: item.name + (item.quantity > 1 ? ' Â· ' + item.quantity : '') }));
+      li.appendChild(label);
+      if (item.isOptional) li.appendChild(U.el('span', { class: 'packdash__badge packdash__badge--optional', text: 'Optional' }));
+      list.appendChild(li);
+    });
+    section.appendChild(list); section.appendChild(status); return section;
+  }
+  function buildItinDay(tripId, day, statusLine, drawer, today, plan, ctx, showPackingPrompt) {
     var unscheduled = !day.date;
     var section = U.el('section', { class: 'itin__day', dataset: { date: day.date || 'unscheduled', daynum: day.dayNumber === null ? '' : String(day.dayNumber), empty: String(!day.items.length), today: String(day.date === today) } });
     var header = U.el('header', { class: 'itin-board__day-head' });
@@ -46605,6 +46894,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       var add = U.el('button', { type: 'button', class: 'btn btn--quiet itin-board__day-add', text: 'Add a plan for this day' });
       add.addEventListener('click', function () { drawer.openForAdd(day.date); }); empty.appendChild(add); main.appendChild(empty);
     }
+    var packingPanel = buildItineraryPacking(tripId, day, plan, !!showPackingPrompt);
+    if (packingPanel) main.appendChild(packingPanel);
     layout.appendChild(main);
     if (lodging.length) {
       var aside = U.el('aside', { class: 'itin-board__stays', 'aria-label': 'Your stay' });
@@ -46615,8 +46906,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
     }
     section.appendChild(layout); return section;
   }
-  function buildItinerarySection(tripId, prep) {
+  function buildItinerarySection(tripId, prep, route) {
     var view = itineraryViewOf(tripId), plan = prep.plan || {}, model = itineraryDayModel(view, plan), today = todayStr(), ui = itineraryDaySession(tripId);
+    var routeDay = route && route.query && route.query.day;
+    if (itineraryValidDay(routeDay) && model.days.some(function (day) { return day.date === routeDay; })) { ui.date = routeDay; ui.mode = 'day'; }
     var sec = U.el('section', { class: 'itin itin-board' });
     var selected = model.days.filter(function (day) { return day.date === ui.date; })[0];
     if (!selected && !(ui.date === 'unscheduled' && model.unscheduled.length)) {
@@ -46688,7 +46981,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
         empty.appendChild(U.el('h3', { text: 'Start with something to look forward to.' }));
         empty.appendChild(U.el('p', { text: 'Add a plan or save a flight or stay in Bookings. Your days will come together here.' })); content.appendChild(empty);
       }
-      show.forEach(function (day) { content.appendChild(buildItinDay(tripId, day, statusLine, drawer, today, plan, model.ctx)); });
+      show.forEach(function (day) { content.appendChild(buildItinDay(tripId, day, statusLine, drawer, today, plan, model.ctx, ui.mode === 'day')); });
       window.requestAnimationFrame(function () { itineraryRevealDay(strip); });
     }
     render();
@@ -47654,7 +47947,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review â€¢ 10 September 2026 â€
       if (currentPrepareTab(route) === 'checklist') header.hidden = true;
       wrap.appendChild(buildPrepareSection(tripId, prep, route));
     } else if (section === 'itinerary') {
-      wrap.appendChild(buildItinerarySection(tripId, prep));
+      wrap.appendChild(buildItinerarySection(tripId, prep, route));
     } else {
       wrap.appendChild(buildOverview(tripId, prep.plan || {}));
       var together = U.el('div', { class: 'plan__together' });
