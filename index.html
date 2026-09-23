@@ -6098,9 +6098,9 @@ header.masthead.masthead--unified {
 }
 
 .masthead--unified > .masthead__bar > .navmenu--trip {
-  flex: 0 1 15rem;
+  flex: 0 1 11.5rem;
   min-width: 0;
-  max-width: 19rem;
+  max-width: 14rem;
 }
 .masthead--unified .navmenu--trip .tripswitch {
   display: flex;
@@ -6132,6 +6132,7 @@ header.masthead.masthead--unified {
   min-width: 0;
   line-height: 1.15;
   overflow: hidden;
+  flex: 1;
 }
 .masthead--unified .tripswitch__name {
   flex: 0 1 auto;
@@ -6140,10 +6141,7 @@ header.masthead.masthead--unified {
   font-weight: var(--weight-semi);
 }
 .masthead--unified .tripswitch__meta {
-  flex: 0 1 auto;
-  min-width: 0;
-  color: var(--ink-muted);
-  font-size: var(--text-xs);
+  display: none;
 }
 .masthead--unified .navmenu--trip .navmenu__caret { flex: 0 0 auto; }
 .masthead--unified .navmenu--trip .navmenu__list { left: 0; right: auto; }
@@ -6157,11 +6155,12 @@ header.masthead.masthead--unified {
   margin: 0;
 }
 .masthead--unified .masthead__navlist {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 2px;
   min-width: 0;
+  width: 100%;
   margin: 0;
   padding: 4px;
   list-style: none;
@@ -6169,7 +6168,8 @@ header.masthead.masthead--unified {
   border: var(--hair) solid var(--line-hair);
   border-radius: var(--radius-round);
 }
-.masthead--unified .masthead__navlist > li { display: flex; list-style: none; }
+.masthead--unified .masthead__navlist > li { display: flex; flex: 1; min-width: 0; list-style: none; }
+.masthead--unified .masthead__navlist > li > .navmenu--more { width: 100%; }
 .masthead--unified .masthead__link,
 .masthead--unified .navmenu--more .navmenu__button {
   position: relative;
@@ -6178,6 +6178,7 @@ header.masthead.masthead--unified {
   justify-content: center;
   gap: var(--s1);
   min-height: 38px;
+  width: 100%;
   padding: 0 var(--s3);
   color: var(--ink-muted);
   background: transparent;
@@ -6459,7 +6460,7 @@ header.masthead.masthead--unified {
 @media (min-width: 768px) and (max-width: 1100px) {
   .masthead--unified .masthead__brandtext { display: none; }
   .masthead--unified > .masthead__bar { gap: var(--s2); }
-  .masthead--unified > .masthead__bar > .navmenu--trip { flex-basis: clamp(9rem, 23vw, 15rem); }
+  .masthead--unified > .masthead__bar > .navmenu--trip { flex-basis: clamp(8rem, 19vw, 11.5rem); }
   .masthead--unified .masthead__link,
   .masthead--unified .navmenu--more .navmenu__button { padding-inline: var(--s2); }
   .masthead--unified .masthead__navlist { gap: 0; }
