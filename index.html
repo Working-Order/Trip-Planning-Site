@@ -13682,6 +13682,54 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
   body { background: #fff; }
   .card, .panel { box-shadow: none; border-color: #ccc; break-inside: avoid; }
 }
+/* BEGIN budget-proposal-pass */
+.plan .budgetdash > .budgetproposal { width: 100%; max-width: none; padding: 22px 26px; scroll-margin-top: 100px; border-color: var(--line-strong); }
+.budgetdash .budgetproposal__form { max-width: none; display: grid; gap: 20px; }
+.budgetproposal > summary { font-size: var(--text-lg) !important; }
+.budgetproposal__intro, .budgetproposal__source, .budgetproposal__help, .budgetproposal__next { margin: 0; font-size: var(--text-sm); line-height: 1.55; color: var(--ink-muted); }
+.budgetproposal__source:empty, .budgetproposal .pbudget__error:empty, .budgetproposal [hidden] { display: none; }
+.budgetproposal__source { padding: 12px 14px; border-left: 3px solid var(--accent); background: var(--accent-soft); color: var(--ink); }
+.budgetproposal__starts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.budgetproposal__starts > span { font-size: var(--text-xs); color: var(--ink-muted); margin-right: 5px; }
+.budgetproposal__starts .btn { border: 1px solid var(--line); min-height: 42px; }
+.budgetproposal__overview { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(240px, 1fr); gap: 24px; }
+.budgetproposal__entry { display: grid; gap: 18px; }
+.budgetproposal__main { display: grid; grid-template-columns: minmax(0, 2fr) minmax(120px, 1fr); gap: 24px; }
+.budgetproposal__field { display: grid; align-content: start; gap: 8px; min-width: 0; }
+.budgetproposal__field > label, .budgetproposal__label { font-size: var(--text-sm); font-weight: 500; color: var(--ink); }
+.budgetproposal__field > .input, .budgetproposal__field > .textarea { width: 100%; min-width: 0; font-family: var(--font-body); }
+.budgetproposal__field > .input { min-height: 46px; }
+.budgetproposal .budgetproposal__amount { font-size: var(--text-xl); font-variant-numeric: tabular-nums; padding: 12px 14px; }
+.budgetproposal__currency { display: flex; align-items: center; min-height: 52px; font: 500 var(--text-lg) var(--font-body); }
+.budgetproposal__help { font-size: var(--text-xs); }
+.budgetproposal__allocation { display: grid; gap: 9px; align-content: center; padding: 18px 20px; border-radius: 10px; background: var(--surface-alt); border: 1px solid var(--line); }
+.budgetproposal__allocation .pbudget__total { margin: 0; color: var(--ink); font: 600 var(--text-xl) var(--font-body); font-variant-numeric: tabular-nums; }
+.budgetproposal__allocation[data-invalid="true"] { border-color: var(--danger); }
+.budgetproposal__breakdown { border: 1px solid var(--line); border-radius: 10px; padding: 0 18px; }
+.budgetproposal__breakdown > summary { min-height: 50px; padding-block: 15px; cursor: pointer; font-size: var(--text-sm); font-weight: 500; color: var(--accent); }
+.budgetproposal__breakdown[open] { padding-bottom: 18px; }
+.budgetproposal__breakdown .pbudget__targetgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 18px 0; }
+.budgetproposal__next { font-size: var(--text-xs); }
+.budgetproposal__actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 4px; }
+.budgetproposal__actions .btn { min-height: 46px; }
+.budgetproposal [aria-invalid="true"] { border-color: var(--danger); }
+.budgetproposal :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+@media (max-width: 799px) {
+  .plan .budgetdash > .budgetproposal { padding: 16px; }
+  .budgetdash .budgetproposal__form { gap: 17px; }
+  .budgetproposal__overview { grid-template-columns: 1fr; gap: 17px; }
+  .budgetproposal__main { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .budgetproposal__main > .budgetproposal__field:last-child { order: -1; display: flex; align-items: center; gap: 12px; }
+  .budgetproposal__main > .budgetproposal__field:last-child .budgetproposal__help { display: none; }
+  .budgetproposal__main > .budgetproposal__field:last-child .input { width: auto; flex: 1; }
+  .budgetproposal__currency { min-height: 0; font-size: var(--text-sm); }
+  .budgetproposal__starts > span { flex-basis: 100%; }
+  .budgetproposal__starts .btn { padding: 8px 10px; font-size: var(--text-xs); }
+  .budgetproposal__breakdown { padding-inline: 12px; }
+  .budgetproposal__breakdown .pbudget__targetgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; }
+  .budgetproposal__allocation { padding: 14px; }
+}
+/* END budget-proposal-pass */
 </style>
 
 <div id="trip-app">
@@ -13743,7 +13791,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 (function (T) {
   'use strict';
 
-  T.version = '0.28.14';   // Make the packing dashboard easier to scan and use
+  T.version = '0.28.15';   // Make the packing dashboard easier to scan and use
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -17319,7 +17367,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (!Object.prototype.hasOwnProperty.call(targets, k)) continue;
       if (PR.budget.CATEGORIES.indexOf(k) < 0) return null;
       v = targets[k];
-      if (typeof v !== 'number' || !isFinite(v) || Math.floor(v) !== v || v < 0) return null;
+      if (typeof v !== 'number' || !isFinite(v) || Math.floor(v) !== v || v < 0 || v > 9007199254740991) return null;
       if (v !== 0) out[k] = v;
     }
     return out;
@@ -22583,10 +22631,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var targets = PR.budget.validateTargets(p.targets);
     if (!targets) return { ok: false, code: 'invalid-targets' };
     var unassigned = orDefault(p.unassignedMinorUnits, 0);
-    if (typeof unassigned !== 'number' || Math.floor(unassigned) !== unassigned || unassigned < 0) return { ok: false, code: 'invalid-amount' };
+    if (typeof unassigned !== 'number' || !isFinite(unassigned) || Math.floor(unassigned) !== unassigned || unassigned < 0 || unassigned > 9007199254740991) return { ok: false, code: 'invalid-amount' };
     var total = 0, k;
-    for (k in targets) if (Object.prototype.hasOwnProperty.call(targets, k)) total += targets[k];
+    for (k in targets) if (Object.prototype.hasOwnProperty.call(targets, k)) {
+      total += targets[k];
+      if (total > 9007199254740991) return { ok: false, code: 'invalid-amount' };
+    }
     total += unassigned;
+    if (total > 9007199254740991) return { ok: false, code: 'invalid-amount' };
     if (total === 0) return { ok: false, code: 'empty-proposal' };
 
     var update = {};
@@ -22636,10 +22688,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (typeof mNotes !== 'string' || mNotes.length > 500) return { ok: false, code: 'invalid-notes' };
     var vTargets = PR.budget.validateTargets(mTargets);
     if (!vTargets) return { ok: false, code: 'invalid-targets' };
-    if (typeof mUnassigned !== 'number' || Math.floor(mUnassigned) !== mUnassigned || mUnassigned < 0) return { ok: false, code: 'invalid-amount' };
+    if (typeof mUnassigned !== 'number' || !isFinite(mUnassigned) || Math.floor(mUnassigned) !== mUnassigned || mUnassigned < 0 || mUnassigned > 9007199254740991) return { ok: false, code: 'invalid-amount' };
     var total = 0, k;
-    for (k in vTargets) if (Object.prototype.hasOwnProperty.call(vTargets, k)) total += vTargets[k];
+    for (k in vTargets) if (Object.prototype.hasOwnProperty.call(vTargets, k)) {
+      total += vTargets[k];
+      if (total > 9007199254740991) return { ok: false, code: 'invalid-amount' };
+    }
     total += mUnassigned;
+    if (total > 9007199254740991) return { ok: false, code: 'invalid-amount' };
     if (total === 0) return { ok: false, code: 'empty-proposal' };
 
     var changed = {}, any = false;
@@ -44448,166 +44504,174 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   }
 
   /** Propose/edit budget drawer — `details[data-drawer=pbudget]`. */
+  /** A total-first proposal, with optional category allowances. */
   function buildBudgetDrawer(tripId, plan, statusLine) {
-    var details = U.el('details', { class: 'plan__drawer pbudget__drawer', dataset: { drawer: 'pbudget' } });
-    var summaryEl = U.el('summary', { class: 'sync__advsum', text: 'Propose a budget' });
-    details.appendChild(summaryEl);
-
-    var form = U.el('form', { class: 'pbudget__form', novalidate: true });
-
-    var labelInput = U.el('input', { class: 'input sync__input', id: 'plan-budget-label', type: 'text', maxlength: '60' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-budget-label', text: 'Label' }), labelInput
-    ]));
-
-    var fixedCurrency = (plan.budget && plan.budget.currency) || null;
-    var currencyWrap = U.el('div', { class: 'sync__field pbudget__currencyfield' });
-    var currencySpan = U.el('span', { class: 'pbudget__currency', hidden: !fixedCurrency,
-      text: 'in ' + (fixedCurrency || 'USD') });
-    var currencySelect = U.el('select', { class: 'input sync__input', id: 'plan-budget-currency', hidden: !!fixedCurrency });
-    CURRENCIES.forEach(function (c) { currencySelect.appendChild(U.el('option', { value: c }, c)); });
-    currencySelect.value = 'USD'; currencySelect.dataset['default'] = 'USD';
-    currencyWrap.appendChild(currencySpan); currencyWrap.appendChild(currencySelect);
-    form.appendChild(currencyWrap);
-
-    function currentCurrency() { return fixedCurrency || currencySelect.value || 'USD'; }
-
-    var targetInputs = {};
-    var grid = U.el('div', { class: 'pbudget__targetgrid' });
+    var b = plan.budget || {}, fixedCurrency = b.currency || null;
+    var baseline = b.lock || callBudgetPure('activeOf', [plan], null);
+    var details = U.el('details', { class: 'plan__drawer pbudget__drawer budgetproposal', dataset: { drawer: 'pbudget' } });
+    var summaryEl = U.el('summary', { class: 'sync__advsum', text: 'Propose a new budget' }); details.appendChild(summaryEl);
+    var form = U.el('form', { class: 'pbudget__form budgetproposal__form', novalidate: true });
+    var intro = U.el('p', { class: 'budgetproposal__intro', text: 'Choose a total for the whole trip and everyone traveling. Add a category breakdown if it helps.' }); form.appendChild(intro);
+    var starts = U.el('div', { class: 'budgetproposal__starts', role: 'group', 'aria-label': 'Starting amounts' });
+    starts.appendChild(U.el('span', { text: 'Start with' }));
+    var blankBtn = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Blank amounts' });
+    var copyBtn = U.el('button', { type: 'button', class: 'btn btn--quiet', text: b.lock ? 'Copy agreed budget' : 'Copy current proposal', hidden: !baseline });
+    var seedBtn = U.el('button', { type: 'button', class: 'btn btn--quiet pbudget__seed', text: 'Use tracked costs' });
+    starts.appendChild(blankBtn); starts.appendChild(copyBtn); starts.appendChild(seedBtn); form.appendChild(starts);
+    var sourceNote = U.el('p', { class: 'budgetproposal__source', role: 'status' }); form.appendChild(sourceNote);
+    var overview = U.el('div', { class: 'budgetproposal__overview' }), entry = U.el('div', { class: 'budgetproposal__entry' });
+    var main = U.el('div', { class: 'budgetproposal__main' });
+    function field(label, input) {
+      return U.el('div', { class: 'budgetproposal__field' }, [U.el('label', { for: input.id, text: label }), input]);
+    }
+    var totalInput = U.el('input', { class: 'input budgetproposal__amount', id: 'plan-budget-total', type: 'text', inputmode: 'decimal', placeholder: '0.00', autocomplete: 'off', required: true, 'aria-describedby': 'plan-budget-total-help plan-budget-error' });
+    var totalField = field('Whole-trip total', totalInput);
+    totalField.appendChild(U.el('p', { id: 'plan-budget-total-help', class: 'budgetproposal__help', text: 'For all travelers combined, including costs already booked or paid.' })); main.appendChild(totalField);
+    var currencySelect = U.el('select', { class: 'input', id: 'plan-budget-currency', hidden: !!fixedCurrency });
+    CURRENCIES.forEach(function (c) { currencySelect.appendChild(U.el('option', { value: c, text: c })); });
+    var currencyField = field('Currency', currencySelect);
+    if (fixedCurrency) {
+      currencyField.querySelector('label').remove();
+      currencyField.appendChild(U.el('span', { class: 'budgetproposal__label', text: 'Currency' }));
+      currencyField.appendChild(U.el('strong', { class: 'budgetproposal__currency', text: fixedCurrency }));
+      currencyField.appendChild(U.el('p', { class: 'budgetproposal__help', text: 'The shared plan uses this currency.' }));
+    }
+    main.appendChild(currencyField); entry.appendChild(main);
+    var labelInput = U.el('input', { class: 'input', id: 'plan-budget-label', type: 'text', maxlength: '60', placeholder: 'e.g. Comfortable option', autocomplete: 'off' });
+    entry.appendChild(field('Proposal name · optional', labelInput)); overview.appendChild(entry);
+    var allocation = U.el('section', { class: 'budgetproposal__allocation', 'aria-label': 'Proposal totals' });
+    var totalLine = U.el('strong', { class: 'pbudget__total' });
+    var allocationLine = U.el('p', { class: 'budgetproposal__help', 'aria-live': 'polite' });
+    var comparison = U.el('p', { class: 'budgetproposal__help' });
+    allocation.appendChild(totalLine); allocation.appendChild(allocationLine); allocation.appendChild(comparison); overview.appendChild(allocation); form.appendChild(overview);
+    var breakdown = U.el('details', { class: 'budgetproposal__breakdown' });
+    var breakdownTitle = U.el('summary', { text: 'Category breakdown · optional' }); breakdown.appendChild(breakdownTitle);
+    breakdown.appendChild(U.el('p', { class: 'budgetproposal__help', text: 'These allowances are included in your total. Any amount left over stays unassigned, ready to allocate later.' }));
+    var grid = U.el('div', { class: 'pbudget__targetgrid' }), targetInputs = {};
     CATEGORIES.forEach(function (cat) {
-      var id = 'plan-budget-t-' + cat;
-      var input = U.el('input', { class: 'input sync__input', id: id, type: 'text', inputmode: 'decimal', placeholder: '0.00' });
-      targetInputs[cat] = input;
-      grid.appendChild(U.el('div', { class: 'sync__field pbudget__targetfield' }, [
-        U.el('label', { class: 'sync__label', for: id, text: CATEGORY_WORDS[cat] }), input
-      ]));
+      var input = U.el('input', { class: 'input', id: 'plan-budget-t-' + cat, type: 'text', inputmode: 'decimal', placeholder: '0.00', autocomplete: 'off', 'aria-describedby': 'plan-budget-error' });
+      targetInputs[cat] = input; grid.appendChild(field(CATEGORY_WORDS[cat], input));
     });
-    form.appendChild(grid);
-
-    var unassignedInput = U.el('input', { class: 'input sync__input', id: 'plan-budget-unassigned', type: 'text', inputmode: 'decimal', placeholder: '0.00' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-budget-unassigned', text: 'Unassigned' }), unassignedInput
-    ]));
-
-    var notesInput = U.el('textarea', { id: 'plan-budget-notes', class: 'textarea sync__input', rows: '2', maxlength: '500' });
-    form.appendChild(U.el('div', { class: 'sync__field' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-budget-notes', text: 'Notes (optional)' }), notesInput
-    ]));
-
-    var totalLine = U.el('p', { class: 'pbudget__total' });
-    form.appendChild(totalLine);
-
-    function recomputeTotal() {
-      var sum = 0, cur = currentCurrency();
-      CATEGORIES.forEach(function (cat) {
-        var v = moneyFromDecimal(targetInputs[cat].value, cur);
-        if (v != null) sum += v;
-      });
-      var u = moneyFromDecimal(unassignedInput.value || '0', cur);
-      if (u != null) sum += u;
-      U.setText(totalLine, 'Total ' + moneyFormat(sum, cur));
-    }
-    form.addEventListener('input', recomputeTotal);
-    currencySelect.addEventListener('change', recomputeTotal);
-
-    var seedBtn = U.el('button', { type: 'button', class: 'btn btn--quiet pbudget__seed', text: 'Start from the costs on the board' });
-    seedBtn.addEventListener('click', function () {
-      var cur = currentCurrency();
-      var est = proposalFromEstimatesOf(plan);
-      CATEGORIES.forEach(function (cat) {
-        var v = est[cat];
-        setFieldVal(targetInputs[cat], v ? moneyToDecimal(v, cur) : '');
-      });
-      recomputeTotal();
-    });
-    form.appendChild(seedBtn);
-
-    var errLine = U.el('p', { class: 'field__error pbudget__error' });
-    form.appendChild(errLine);
-
-    var acts = U.el('div', { class: 'sync__actions' });
-    var submitBtn = U.el('button', { type: 'submit', class: 'btn btn--primary pbudget__submit', text: 'Propose' });
+    breakdown.appendChild(grid);
+    var matchBtn = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Use category sum as total' }); breakdown.appendChild(matchBtn);
+    form.appendChild(breakdown);
+    var notesInput = U.el('textarea', { class: 'textarea', id: 'plan-budget-notes', rows: '3', maxlength: '500', placeholder: 'What is included, assumptions, or why this option works…' });
+    form.appendChild(field('Notes · optional', notesInput));
+    var nextStep = U.el('p', { class: 'budgetproposal__next' }); form.appendChild(nextStep);
+    var errLine = U.el('p', { id: 'plan-budget-error', class: 'field__error pbudget__error', role: 'alert' }); form.appendChild(errLine);
+    var acts = U.el('div', { class: 'budgetproposal__actions' });
     var cancelBtn = U.el('button', { type: 'button', class: 'btn btn--quiet pbudget__cancel', text: 'Cancel' });
-    acts.appendChild(submitBtn); acts.appendChild(cancelBtn);
-    form.appendChild(acts);
-
-    function setFieldVal(input, v) { input.value = v; input.defaultValue = v; }
-
+    var submitBtn = U.el('button', { type: 'submit', class: 'btn btn--primary pbudget__submit', text: 'Create proposal' });
+    acts.appendChild(cancelBtn); acts.appendChild(submitBtn); form.appendChild(acts);
+    // Programmatic starting amounts are a draft too: protect them during live updates.
+    var dirty = U.el('input', { type: 'hidden', id: 'plan-budget-dirty', value: '' }); form.appendChild(dirty);
+    function markDraft() { dirty.value = '1'; }
+    function currentCurrency() { return fixedCurrency || currencySelect.value || 'USD'; }
+    function setField(input, value) { input.value = value; input.defaultValue = value; input.removeAttribute('aria-invalid'); }
+    function parse(input, emptyZero) {
+      if (!input.value.trim()) return emptyZero ? 0 : null;
+      var value = moneyFromDecimal(input.value, currentCurrency());
+      return Number.isSafeInteger(value) && value >= 0 ? value : null;
+    }
+    function amounts() {
+      var targets = {}, sum = 0, bad = null;
+      CATEGORIES.forEach(function (cat) {
+        var value = parse(targetInputs[cat], true);
+        if (value == null || !Number.isSafeInteger(sum + value)) { if (!bad) bad = targetInputs[cat]; return; }
+        sum += value; if (value) targets[cat] = value;
+      });
+      return { total: parse(totalInput, false), targets: targets, sum: sum, bad: bad };
+    }
+    function estimates() {
+      // Use the selected currency even before this plan has fixed its currency.
+      return proposalFromEstimatesOf(Object.assign({}, plan, { budget: Object.assign({}, b, { currency: currentCurrency() }) }));
+    }
+    function foreignMessage() {
+      var currencies = {};
+      Object.keys(b.expenses || {}).forEach(function (id) {
+        var expense = b.expenses[id];
+        if (expense.state !== 'void' && expense.currency !== currentCurrency()) currencies[expense.currency] = true;
+      });
+      var other = Object.keys(currencies);
+      return other.length ? ' ' + other.join(', ') + ' costs are excluded; no conversion is applied.' : '';
+    }
+    function recompute() {
+      var values = amounts(), cur = currentCurrency();
+      U.setText(totalLine, values.total == null ? 'Your total will appear here' : moneyFormat(values.total, cur) + ' total');
+      allocation.dataset.invalid = String(!!values.bad || (values.total != null && values.sum > values.total));
+      U.setText(allocationLine, values.bad ? 'Check the category amounts to see your remaining allowance.' :
+        values.total == null ? 'Enter a total, or add category amounts and use their sum.' :
+        values.sum > values.total ? 'Categories exceed your total by ' + moneyFormat(values.sum - values.total, cur) + '. Increase the total or reduce an allowance.' :
+        moneyFormat(values.sum, cur) + ' allocated · ' + moneyFormat(values.total - values.sum, cur) + ' unassigned');
+      comparison.hidden = !baseline || values.total == null;
+      if (!comparison.hidden) {
+        var reference = totalOf(baseline), difference = values.total - reference;
+        U.setText(comparison, difference === 0 ? 'Same total as the ' + (b.lock ? 'agreed budget.' : 'current proposal.') :
+          moneyFormat(Math.abs(difference), cur) + (difference > 0 ? ' above' : ' below') + ' the ' + (b.lock ? 'agreed budget.' : 'current proposal.'));
+      }
+      seedBtn.disabled = !Object.keys(estimates()).length;
+    }
+    function setAmounts(targets, total) {
+      CATEGORIES.forEach(function (cat) { setField(targetInputs[cat], targets[cat] ? moneyToDecimal(targets[cat], currentCurrency()) : ''); });
+      setField(totalInput, total == null ? '' : moneyToDecimal(total, currentCurrency()));
+      U.setText(errLine, ''); recompute();
+    }
     function reset() {
-      form.dataset.editing = '';
-      setFieldVal(labelInput, '');
-      CATEGORIES.forEach(function (cat) { setFieldVal(targetInputs[cat], ''); });
-      setFieldVal(unassignedInput, '');
-      setFieldVal(notesInput, '');
-      currencySelect.value = 'USD'; currencySelect.defaultValue = 'USD'; currencySelect.dataset['default'] = 'USD';
-      U.setText(errLine, '');
-      U.setText(submitBtn, 'Propose');
-      U.setText(summaryEl, 'Propose a budget');
-      var hasEstimates = Object.keys(proposalFromEstimatesOf(plan)).length > 0;
-      seedBtn.hidden = !hasEstimates;
-      recomputeTotal();
+      form.dataset.editing = ''; currencySelect.value = fixedCurrency || 'USD'; currencySelect.dataset.default = currencySelect.value;
+      setField(labelInput, ''); setField(notesInput, ''); setAmounts({}, null); setField(dirty, '');
+      breakdown.open = false; starts.hidden = false; U.setText(sourceNote, '');
+      U.setText(summaryEl, 'Propose a new budget'); U.setText(submitBtn, 'Create proposal');
+      U.setText(nextStep, b.lock ? 'Your agreed budget stays in place. Everyone can review this new option before it is locked in.' : 'This creates an option for everyone to review. It becomes the agreed budget when everyone agrees and the owner locks it in.');
     }
-    reset();
-
     function openForEdit(proposal) {
-      form.dataset.editing = proposal.id;
-      setFieldVal(labelInput, proposal.label || '');
-      var cur = fixedCurrency || 'USD';
-      CATEGORIES.forEach(function (cat) {
-        var v = proposal.targets && proposal.targets[cat];
-        setFieldVal(targetInputs[cat], v ? moneyToDecimal(v, cur) : '');
-      });
-      setFieldVal(unassignedInput, proposal.unassignedMinorUnits ? moneyToDecimal(proposal.unassignedMinorUnits, cur) : '');
-      setFieldVal(notesInput, proposal.notes || '');
-      U.setText(errLine, '');
-      U.setText(submitBtn, 'Save changes');
-      U.setText(summaryEl, 'Edit this proposal');
-      details.open = true;
-      recomputeTotal();
+      reset(); form.dataset.editing = proposal.id;
+      setField(labelInput, proposal.label || ''); setField(notesInput, proposal.notes || ''); setAmounts(proposal.targets || {}, totalOf(proposal));
+      breakdown.open = Object.keys(proposal.targets || {}).some(function (cat) { return proposal.targets[cat] > 0; }); starts.hidden = true;
+      U.setText(summaryEl, 'Edit budget proposal'); U.setText(submitBtn, 'Save changes');
+      U.setText(nextStep, 'Changing amounts requires fresh agreement. Any locked budget stays in place until a revised option is agreed and locked in.');
+      decisionOpenDrawer(details);
     }
-
-    function submit() {
-      var cur = currentCurrency();
-      var targets = {}, bad = null;
-      CATEGORIES.forEach(function (cat) {
-        if (bad) return;
-        var raw = targetInputs[cat].value;
-        if (raw == null || String(raw).trim() === '') return;
-        var v = moneyFromDecimal(raw, cur);
-        if (v == null) { bad = cat; return; }
-        if (v !== 0) targets[cat] = v;
+    blankBtn.addEventListener('click', function () { setAmounts({}, null); markDraft(); U.setText(sourceNote, 'Amounts cleared. Your name and notes are kept.'); totalInput.focus(); });
+    copyBtn.addEventListener('click', function () { setAmounts(baseline.targets || {}, totalOf(baseline)); markDraft(); U.setText(sourceNote, 'Copied the ' + (b.lock ? 'agreed' : 'current') + ' allowances. Adjust them for this new proposal.'); });
+    seedBtn.addEventListener('click', function () {
+      var targets = estimates(), sum = 0; Object.keys(targets).forEach(function (cat) { sum += targets[cat]; });
+      setAmounts(targets, sum); markDraft(); breakdown.open = true;
+      U.setText(sourceNote, 'Using recorded planned, booked and paid costs in ' + currentCurrency() + '.' + foreignMessage());
+    });
+    matchBtn.addEventListener('click', function () {
+      var values = amounts();
+      if (values.bad) { showError(values.bad, 'Enter a valid, non-negative category amount.'); return; }
+      setField(totalInput, moneyToDecimal(values.sum, currentCurrency())); markDraft(); recompute();
+    });
+    breakdownTitle.addEventListener('click', markDraft);
+    form.addEventListener('input', function (event) { markDraft(); event.target.removeAttribute('aria-invalid'); U.setText(errLine, ''); recompute(); });
+    currencySelect.addEventListener('change', function () { markDraft(); U.setText(sourceNote, 'Amounts are now entered in ' + currentCurrency() + '; they have not been converted.' + foreignMessage()); recompute(); });
+    function showError(input, message) { U.setText(errLine, message); input.setAttribute('aria-invalid', 'true'); if (input !== totalInput) breakdown.open = true; input.focus(); }
+    var saving = false;
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); if (saving) return;
+      var values = amounts();
+      if (values.total == null || values.total <= 0) { showError(totalInput, 'Enter a whole-trip total greater than zero, such as 5,000.00.'); return; }
+      if (values.bad) { showError(values.bad, 'Enter a valid, non-negative category amount, such as 1,250.00.'); return; }
+      if (values.sum > values.total) { showError(totalInput, 'The category allowances exceed your total. Increase the total or reduce the allowances.'); return; }
+      var editing = form.dataset.editing || '', payload = { label: labelInput.value.trim() || 'Trip budget', notes: notesInput.value.trim(), targets: values.targets, unassignedMinorUnits: values.total - values.sum };
+      if (!editing && !fixedCurrency) payload.currency = currentCurrency();
+      saving = true; markDraft(); U.setText(errLine, '');
+      U.qsa('input, select, textarea, button', form).forEach(function (node) { node.disabled = true; }); U.setText(submitBtn, 'Saving…');
+      callBudget(editing ? 'editTargets' : 'propose', editing ? [tripId, editing, payload] : [tripId, payload]).then(function (result) {
+        if (!result || !result.ok) { setPbudgetStatus(errLine, result && result.code, { currency: currentCurrency(), capWord: capSentenceOf(capsOf().budgetProposals, 'proposals') }); return; }
+        reset(); details.open = false;
+        try { T.notify.toast({ text: editing ? 'Budget proposal updated.' : 'Proposal created. Review it in Budget options.' }); } catch (e) {}
+        repaintNow();
+        var trigger = document.querySelector('[data-plan-focus="budget-propose"]'); if (trigger) trigger.focus({ preventScroll: true });
+      }).catch(function () { U.setText(errLine, 'Could not save. Your draft is still here; try again.'); }).finally(function () {
+        saving = false; U.qsa('input, select, textarea, button', form).forEach(function (node) { node.disabled = false; });
+        U.setText(submitBtn, form.dataset.editing ? 'Save changes' : 'Create proposal'); recompute();
       });
-      if (bad) { U.setText(errLine, 'Amounts are numbers, like 1,250.00 (' + CATEGORY_WORDS[bad] + ').'); return; }
-      var unassignedRaw = unassignedInput.value;
-      var unassigned = (unassignedRaw == null || String(unassignedRaw).trim() === '') ? 0 : moneyFromDecimal(unassignedRaw, cur);
-      if (unassigned == null) { U.setText(errLine, 'Amounts are numbers, like 1,250.00 (Unassigned).'); return; }
-      U.setText(errLine, '');
-      var label = String(labelInput.value || '').trim();
-      var notes = String(notesInput.value || '').trim();
-      var editingPid = form.dataset.editing || '';
-      submitBtn.disabled = true;
-      var args = editingPid
-        ? [tripId, editingPid, { targets: targets, unassignedMinorUnits: unassigned, label: label, notes: notes }]
-        : [tripId, { targets: targets, unassignedMinorUnits: unassigned, label: label, notes: notes, currency: fixedCurrency ? undefined : cur }];
-      var p = editingPid ? callBudget('editTargets', args) : callBudget('propose', args);
-      p.then(function (r) {
-        submitBtn.disabled = false;
-        if (r && r.ok) {
-          reset();
-          details.open = false;
-          try { T.notify.toast({ text: editingPid ? 'Saved.' : 'Proposed.' }); } catch (e) {}
-          repaintNow();
-          return;
-        }
-        setPbudgetStatus(errLine, r && r.code, { currency: cur,
-          capWord: capSentenceOf(capsOf().budgetProposals, 'proposals') });
-      });
-    }
-    form.addEventListener('submit', function (ev) { ev.preventDefault(); submit(); });
-    cancelBtn.addEventListener('click', function () { reset(); details.open = false; });
-
-    details.appendChild(form);
-    details.openForEdit = openForEdit;
+    });
+    cancelBtn.addEventListener('click', function () { reset(); details.open = false; var trigger = document.querySelector('[data-plan-focus="budget-propose"]'); if (trigger) trigger.focus({ preventScroll: true }); });
+    reset(); details.appendChild(form); details.openForEdit = openForEdit;
+    details.openForNew = function () { if (form.dataset.editing) reset(); decisionOpenDrawer(details); };
     return details;
   }
 
@@ -45029,8 +45093,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var addCost = U.el('button', { type: 'button', class: 'btn btn--primary budgetdash__addcost', text: '+ Add a cost', dataset: { planFocus: 'budget-add-cost' } });
     addCost.addEventListener('click', function () { decisionOpenDrawer(exDrawer); });
     var propose = U.el('button', { type: 'button', class: 'btn btn--quiet budgetdash__propose', text: 'Propose a budget', dataset: { planFocus: 'budget-propose' } });
-    propose.addEventListener('click', function () { decisionOpenDrawer(drawer); });
+    propose.addEventListener('click', function () { drawer.openForNew(); });
     heroActions.appendChild(addCost); heroActions.appendChild(propose); hero.appendChild(heroActions); sec.appendChild(hero);
+    sec.appendChild(drawer);
     sec.appendChild(U.el('p', { class: 'pbudget__revision', hidden: !hasRevisionOf(plan), text: 'The proposal under discussion has changed since it was locked.' }));
     if (computed) sec.appendChild(buildSummaryPanel(summary, activeProposal));
     else sec.appendChild(U.el('p', { class: 'decisiondash__copy', text: 'The cost summary is not available yet. Your saved proposals and costs are below.' }));
@@ -45124,7 +45189,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       sorted.forEach(function (proposal) { ul.appendChild(buildProposalRowBudget(tripId, proposal, plan, members, memberUids, myUidVal, isOwner, statusLine, drawer)); });
       sec.appendChild(ul);
     }
-    sec.appendChild(drawer); sec.appendChild(statusLine); return sec;
+    sec.appendChild(statusLine); return sec;
   }
 
   /* ==================================================================== */
