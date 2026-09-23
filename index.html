@@ -12946,79 +12946,143 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 /* END plan-polish-itinerary */
 
 /* BEGIN plan-polish-packing */
-.packdash { display: grid; grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr); gap: var(--s4); min-width: 0; align-items: start; }
-.packdash__hero, .packdash__progress, .packdash__add, .packdash__list {
-  min-width: 0; padding: var(--s5); border: var(--hair) solid var(--line);
-  border-radius: calc(var(--radius-lg) * 2); background: var(--surface);
-}
-.packdash__hero { grid-column: 1 / -1; display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s5); background: var(--surface-alt); }
-.packdash__hero-copy { min-width: 0; }
-.packdash__hero-copy > :last-child { margin-bottom: 0; }
-.packdash__hero-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--s2); }
-.packdash__progress { display: grid; grid-column: 1; align-content: center; gap: var(--s3); min-height: 100%; }
-.packdash__progresscopy { display: grid; gap: var(--s1); }
-.packdash__progresscopy > p { margin: 0; }
-.packdash__progressbar { width: 100%; height: 0.75rem; accent-color: var(--accent); }
-.packdash__addhead, .packdash__listhead, .packdash__category-head, .packdash__itemtop, .packdash__form-actions {
-  display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
-}
-.packdash__add { grid-column: 2; }
-.packdash__addhead, .packdash__listhead { flex-wrap: wrap; margin-bottom: var(--s3); }
-.packdash__addhead > *, .packdash__listhead > * { margin-top: 0; margin-bottom: 0; }
-.packdash__seed { flex: 0 0 auto; }
-.packdash__add-form { display: grid; gap: var(--s2); }
-.packdash__quick { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--s2) var(--s3); }
-.packdash__quick > .sync__label { grid-column: 1 / -1; }
-.packdash__quick .input { min-width: 0; width: 100%; min-height: 48px; }
-.packdash__quick .btn { min-height: 48px; padding-inline: var(--s4); }
-.packdash__advanced { border-top: var(--hair) solid var(--line); margin-top: var(--s2); padding-top: var(--s2); }
-.packdash__advanced > summary { min-height: var(--tap-min); display: flex; align-items: center; width: fit-content; color: var(--accent); cursor: pointer; font-size: var(--text-sm); font-weight: var(--weight-medium); }
-.packdash__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); padding: var(--s2) 0; }
-.packdash__fields .sync__field { min-width: 0; margin: 0; }
-.packdash__fields .input, .packdash__fields .textarea { width: 100%; min-width: 0; }
-.packdash__notesfield { grid-column: 1 / -1; }
-.packdash__optional { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--s2); min-height: var(--tap-min); color: var(--ink-muted); font-size: var(--text-sm); }
-.packdash__optional input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
-.packdash__form-actions { justify-content: flex-start; }
-.packdash__status:empty { display: none; }
-.packdash__list { grid-column: 1 / -1; }
-.packdash__listhead { align-items: center; }
-.packdash__listhead .packdash__resultcount { margin-left: auto; }
-.packdash__resultcount { color: var(--ink-faint); font-size: var(--text-xs); }
-.packdash__filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, .42fr); gap: var(--s2); margin-bottom: var(--s2); }
-.packdash__filters > * { min-width: 0; width: 100%; min-height: var(--tap-min); }
-.packdash__category-filters { display: flex; flex-wrap: wrap; gap: var(--s1); margin: 0 0 var(--s4); padding-bottom: var(--s3); border-bottom: var(--hair) solid var(--line); }
-.packdash__category-filter { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); min-height: 40px; padding: 0 var(--s3); border: var(--hair) solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink-muted); cursor: pointer; font: inherit; font-size: var(--text-xs); white-space: nowrap; transition: background-color .16s ease, border-color .16s ease, color .16s ease; }
-.packdash__category-filter:hover { border-color: var(--line-strong); color: var(--ink); }
-.packdash__category-filter[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--surface); }
-.packdash__category-filter-count { font-size: var(--text-2xs); font-variant-numeric: tabular-nums; opacity: .78; }
-.packdash__groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: var(--s3); }
-.packdash__category { min-width: 0; padding: var(--s3) var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-lg); background: var(--surface-alt); }
-.packdash__category-head { justify-content: flex-start; margin-bottom: var(--s2); padding-bottom: var(--s2); border-bottom: var(--hair) solid var(--line); }
-.packdash__category-head > * { margin: 0; }
-.packdash__category-count { display: inline-grid; place-items: center; min-width: 1.55rem; height: 1.55rem; padding: 0 var(--s1); border-radius: 999px; background: var(--surface); color: var(--ink-muted); font-size: var(--text-2xs); font-variant-numeric: tabular-nums; }
-.packdash__items, .itin-board__packing-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
-.packdash__item { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "top actions" "day actions" "details actions"; align-items: center; gap: 0 var(--s2); min-width: 0; padding: var(--s2) 0; border-bottom: var(--hair) solid var(--line); background: transparent; }
+.plan .prepare[data-tab="packing"] { width: 100%; max-width: none; min-width: 0; }
+.packdash { display: grid; gap: 24px; width: 100%; min-width: 0; }
+.packdash__head { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.packdash__eyebrow { margin: 0 0 6px; color: var(--ink-muted); font-size: var(--text-xs); }
+.packdash__title { margin: 0; font-family: var(--font-body); font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 600; letter-spacing: -.04em; }
+.packdash__subtitle { margin: 8px 0 0; color: var(--ink-muted); font-size: var(--text-sm); }
+.packdash__links { display: flex; gap: 20px; flex-wrap: wrap; }
+.packdash__links a { display: inline-flex; min-height: 44px; align-items: center; color: var(--accent); font-size: var(--text-sm); text-decoration: none; }
+.packdash__links a:hover { text-decoration: underline; }
+.packdash__planning { display: grid; grid-template-columns: minmax(220px, .65fr) minmax(0, 1.35fr); gap: 28px; padding: 22px 26px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-alt); }
+.packdash__progress { display: grid; align-content: center; gap: 8px; }
+.packdash__progress-title { margin: 0; color: var(--ink); font-size: var(--text-lg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.packdash__progressbar { appearance: none; width: 100%; height: 6px; border: none; border-radius: 9px; overflow: hidden; background: var(--line); accent-color: var(--accent); }
+.packdash__progressbar::-webkit-progress-bar { background: var(--line); border-radius: 9px; }
+.packdash__progressbar::-webkit-progress-value { background: var(--accent); border-radius: 9px; }
+.packdash__progressbar::-moz-progress-bar { background: var(--accent); }
+.packdash__helper { margin: 0; color: var(--ink-muted); font-size: var(--text-xs); line-height: 1.5; }
+.packdash__laundry { display: flex; gap: 20px; justify-content: space-between; align-items: center; border-left: 1px solid var(--line); padding-left: 28px; min-width: 0; }
+.packdash__laundry h2 { margin: 0 0 5px; color: var(--ink); font: 600 var(--text-sm) var(--font-body); }
+.packdash__switch { flex: 0 0 auto; display: flex; padding: 4px; gap: 4px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; }
+.packdash__switch button { border: 1px solid transparent; background: transparent; color: var(--ink-muted); min-height: 42px; padding: 8px 14px; border-radius: 7px; font: inherit; font-size: var(--text-sm); cursor: pointer; }
+.packdash__switch button[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); font-weight: 600; }
+.packdash__switch button:disabled { opacity: .6; cursor: wait; }
+.packdash__workspace { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 28px; align-items: start; }
+.packdash__rail { min-width: 0; position: sticky; top: 20px; }
+.packdash__rail-title { margin: 2px 12px 12px; color: var(--ink-muted); font-size: var(--text-xs); }
+.packdash__categories { display: grid; gap: 4px; }
+.packdash__category-filter { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--ink-muted); cursor: pointer; font: inherit; font-size: var(--text-sm); text-align: left; }
+.packdash__category-filter:hover { background: var(--surface-alt); color: var(--ink); }
+.packdash__category-filter[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); border-color: var(--line-strong); font-weight: 600; }
+.packdash__category-count { font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+.packdash__board { min-width: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+.packdash__statuses { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--line); padding: 8px 14px 0; }
+.packdash__statuses button { min-height: 48px; padding: 10px 15px; border: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--ink-muted); font: inherit; font-size: var(--text-sm); cursor: pointer; }
+.packdash__statuses button[aria-pressed="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.packdash__filters { display: grid; grid-template-columns: minmax(150px, 1.5fr) minmax(115px, .8fr) minmax(135px, .8fr); gap: 10px; padding: 18px 20px 12px; }
+.packdash__filters .input { width: 100%; min-width: 0; min-height: 44px; font-family: var(--font-body); }
+.packdash__quick { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; margin: 0 20px 12px; padding: 7px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface-alt); }
+.packdash__quick .input { min-width: 0; width: 100%; min-height: 44px; border: 0; background: transparent; font-family: var(--font-body); box-shadow: none; }
+.packdash__quick .btn { padding-inline: 14px; border-radius: 7px; }
+.packdash__listhead { display: flex; justify-content: space-between; align-items: center; min-height: 44px; padding: 0 20px 8px; gap: 12px; }
+.packdash__resultcount { margin: 0; color: var(--ink-muted); font-size: var(--text-xs); }
+.packdash__listhead .btn { padding: 4px 8px; min-height: 36px; font-size: var(--text-xs); }
+.packdash__groups { display: grid; }
+.packdash__category { min-width: 0; }
+.packdash__category-head { display: grid; grid-template-columns: minmax(0, 1fr) 66px 114px; align-items: center; gap: 12px; padding: 10px 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface-alt); }
+.packdash__category-head h2 { margin: 0; font: 600 var(--text-sm) var(--font-body); color: var(--ink); }
+.packdash__qtyheading, .packdash__dayheading { color: var(--ink-muted); font-size: var(--text-2xs); text-align: center; }
+.packdash__items { margin: 0; padding: 0; list-style: none; }
+.packdash__item { display: grid; grid-template-columns: 36px minmax(0, 1fr) 66px 114px; align-items: center; gap: 12px; padding: 8px 20px; min-width: 0; border-bottom: 1px solid var(--line); }
 .packdash__item:last-child { border-bottom: 0; }
-.packdash__item[data-packed="true"] { background: transparent; }
-.packdash__itemtop { grid-area: top; flex-wrap: wrap; justify-content: flex-start; }
-.packdash__checklabel { display: flex; align-items: center; gap: var(--s3); min-height: var(--tap-min); min-width: 0; flex: 1 1 240px; cursor: pointer; }
-.packdash__check { width: 1.15rem; height: 1.15rem; flex: 0 0 auto; accent-color: var(--accent); }
-.packdash__itemname { min-width: 0; color: var(--ink); font-weight: var(--weight-medium); overflow-wrap: anywhere; }
-.packdash__item[data-packed="true"] .packdash__itemname { color: var(--ink-faint); text-decoration: line-through; text-decoration-thickness: 1px; }
-.packdash__badges { display: flex; flex-wrap: wrap; gap: var(--s1); }
-.packdash__badge { display: inline-flex; align-items: center; min-height: 1.55rem; padding: 0 var(--s2); border-radius: 999px; background: var(--surface); color: var(--ink-muted); font-size: var(--text-2xs); white-space: nowrap; }
-.packdash__badge--optional { border: var(--hair) solid var(--line-strong); color: var(--accent); }
-.packdash__daylink { grid-area: day; width: fit-content; min-height: 30px; display: inline-flex; align-items: center; color: var(--accent); font-size: var(--text-xs); text-decoration: none; }
-.packdash__daylink:hover { text-decoration: underline; text-underline-offset: 0.2em; }
-.packdash__notes { grid-area: details; color: var(--ink-muted); font-size: var(--text-xs); }
-.packdash__notes > summary { width: fit-content; min-height: 30px; display: flex; align-items: center; color: var(--ink-muted); cursor: pointer; }
-.packdash__notes[open] { padding-bottom: var(--s2); }
-.packdash__notes > p { max-width: 62ch; margin: 0 0 var(--s2); line-height: var(--leading-body); overflow-wrap: anywhere; }
-.packdash__actions { grid-area: actions; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0; }
-.packdash__actions .btn { min-height: 40px; padding-inline: var(--s2); font-size: var(--text-xs); }
-.packdash__actions .btn:last-child { color: var(--ink-faint); }
-.packdash__empty-filter { grid-column: 1 / -1; margin: 0; padding: var(--s5); border: var(--hair) dashed var(--line-strong); border-radius: var(--radius-lg); color: var(--ink-muted); text-align: center; }
+.packdash__item:hover { background: var(--surface-alt); }
+.packdash__checklabel { display: flex; align-items: center; justify-content: center; min-height: 44px; cursor: pointer; }
+.packdash__check { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.packdash__item-open { display: grid; gap: 3px; width: 100%; min-width: 0; min-height: 44px; padding: 6px 0; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: inherit; }
+.packdash__itemname { font-size: var(--text-sm); font-weight: 500; line-height: 1.45; overflow-wrap: anywhere; }
+.packdash__item-open:hover .packdash__itemname { color: var(--accent); }
+.packdash__itemmeta { font-size: var(--text-2xs); color: var(--accent); }
+.packdash__notepreview { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ink-muted); font-size: var(--text-xs); }
+.packdash__quantity { text-align: center; font-size: var(--text-sm); font-variant-numeric: tabular-nums; color: var(--ink); }
+.packdash__daylink, .packdash__dayempty { font-size: var(--text-xs); text-align: center; color: var(--ink-muted); }
+.packdash__daylink { display: flex; align-items: center; justify-content: center; min-height: 44px; color: var(--accent); text-decoration: none; }
+.packdash__daylink:hover { text-decoration: underline; }
+.packdash__item[data-packed="true"] .packdash__itemname { text-decoration: line-through; color: var(--ink-faint); }
+.packdash__item[data-packed="true"] .packdash__notepreview { color: var(--ink-faint); }
+.packdash__empty { padding: 44px 24px; text-align: center; }
+.packdash__empty h2 { margin: 0 0 8px; font: 600 var(--text-lg) var(--font-body); }
+.packdash__empty p { margin: 0 auto 20px; color: var(--ink-muted); font-size: var(--text-sm); }
+.packdash__status { margin: 0; color: var(--ink-muted); font-size: var(--text-sm); }
+.packdash__status:empty, .packdash [hidden], .packedit [hidden] { display: none; }
+.packdash :focus-visible, .packedit :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.itin-board__packing-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.itin-board__packing :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.modal.packedit { width: min(620px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; }
+.packedit__form { padding: 0 24px 24px; min-width: 0; }
+.packedit__intro { margin: 0 0 20px; font-size: var(--text-sm); color: var(--ink-muted); }
+.packedit__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; }
+.packedit__field { display: grid; gap: 7px; min-width: 0; }
+.packedit__field--wide { grid-column: 1 / -1; }
+.packedit__field > label { color: var(--ink-muted); font-size: var(--text-xs); font-weight: 500; }
+.packedit .input, .packedit .textarea { width: 100%; min-width: 0; font-family: var(--font-body); min-height: 46px; }
+.packedit .textarea { resize: vertical; }
+.packedit__checkline { display: flex; align-items: center; gap: 10px; min-height: 44px; color: var(--ink); font-size: var(--text-sm); cursor: pointer; }
+.packedit__checkline input { flex: 0 0 auto; width: 18px; height: 18px; accent-color: var(--accent); }
+.packedit__auto { border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px 12px; background: var(--surface-alt); }
+.packedit__help { margin: 0; color: var(--ink-muted); font-size: var(--text-xs); }
+.packedit__error { margin: 12px 0; color: var(--danger); font-size: var(--text-sm); }
+.packedit__error:empty { display: none; }
+.packedit__actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); }
+.packedit__remove { margin-top: 18px; font-size: var(--text-xs); color: var(--ink-muted); }
+.packedit__remove summary { width: fit-content; min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+.packedit__remove p { margin: 4px 0 12px; }
+@media (max-width: 1000px) {
+  .packdash__planning { grid-template-columns: 1fr 1.2fr; }
+  .packdash__laundry { display: grid; gap: 10px; }
+  .packdash__switch { justify-self: start; }
+  .packdash__workspace { grid-template-columns: 156px minmax(0, 1fr); gap: 18px; }
+  .packdash__filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .packdash__filters input { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .packdash { gap: 18px; }
+  .packdash__head { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .packdash__links { gap: 20px; }
+  .packdash__planning { padding: 18px; gap: 18px; }
+  .packdash__laundry { padding-left: 18px; }
+  .packdash__workspace { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .packdash__rail { position: static; }
+  .packdash__rail-title { display: none; }
+  .packdash__categories { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 8px; }
+  .packdash__category-filter { flex: 0 0 auto; width: auto; white-space: nowrap; padding: 8px 14px; border-color: var(--line); border-radius: 999px; }
+  .packdash__filters { grid-template-columns: minmax(0, 1.5fr) minmax(110px, 1fr) minmax(125px, 1fr); }
+  .packdash__filters input { grid-column: auto; }
+}
+@media (max-width: 540px) {
+  .packdash__planning { grid-template-columns: 1fr; }
+  .packdash__laundry { padding: 16px 0 0; border-left: 0; border-top: 1px solid var(--line); }
+  .packdash__switch { justify-self: stretch; }
+  .packdash__switch button { flex: 1; }
+  .packdash__statuses { padding: 4px 6px 0; gap: 0; flex-wrap: nowrap; }
+  .packdash__statuses button { flex: 1; padding: 10px 6px; font-size: var(--text-xs); white-space: nowrap; }
+  .packdash__filters { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 14px 12px 10px; gap: 8px; }
+  .packdash__filters input { grid-column: 1 / -1; }
+  .packdash__filters .input, .packdash__quick .input, .packedit .input, .packedit .textarea { font-size: 16px; }
+  .packdash__quick { margin: 0 12px 8px; padding: 5px; gap: 2px; }
+  .packdash__quick .btn { padding-inline: 10px; font-size: var(--text-xs); }
+  .packdash__listhead { padding: 0 12px 6px; }
+  .packdash__category-head { grid-template-columns: minmax(0, 1fr) 46px; padding: 10px 12px; }
+  .packdash__dayheading { display: none; }
+  .packdash__item { grid-template-columns: 32px minmax(0, 1fr) 46px; padding: 8px 12px; gap: 2px 8px; }
+  .packdash__quantity { grid-column: 3; grid-row: 1; }
+  .packdash__daylink { grid-column: 2; grid-row: 2; justify-content: flex-start; min-height: 36px; }
+  .packdash__dayempty { display: none; }
+  .packedit__form { padding: 0 18px 20px; }
+  .packedit__fields { gap: 14px 12px; }
+  .packedit__field:first-child, .packedit__field:nth-child(4), .packedit__field:nth-child(5) { grid-column: 1 / -1; }
+}
 .itin-board__packing { display: grid; gap: var(--s3); margin-top: var(--s4); padding: var(--s4); border: var(--hair) solid var(--line); border-radius: var(--radius-lg); background: var(--surface-alt); }
 .itin-board__packing-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s2); }
 .itin-board__packing-head > * { margin: 0; }
@@ -13029,31 +13093,6 @@ details[open] > .sync__advsum::after { content: " \25B4"; }
 .itin-board__packing-name { overflow-wrap: anywhere; }
 .itin-board__packing-item[data-packed="true"] .itin-board__packing-name { color: var(--ink-faint); text-decoration: line-through; }
 .itin-board__packing-empty { margin: 0; color: var(--ink-muted); font-size: var(--text-sm); line-height: var(--leading-body); }
-.packdash :focus-visible, .itin-board__packing :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
-@media (max-width: 760px) {
-  .packdash { grid-template-columns: 1fr; }
-  .packdash__hero, .packdash__progress, .packdash__add, .packdash__list, .packdash__status { grid-column: 1; }
-  .packdash__groups { grid-template-columns: 1fr; }
-}
-@media (max-width: 700px) {
-  .packdash__hero { align-items: flex-start; flex-direction: column; }
-  .packdash__hero-actions { justify-content: flex-start; }
-  .packdash__filters { grid-template-columns: minmax(0, 1fr); }
-}
-@media (max-width: 580px) {
-  .packdash { gap: var(--s3); }
-  .packdash__hero, .packdash__progress, .packdash__add, .packdash__list { padding: var(--s4); }
-  .packdash__quick { grid-template-columns: minmax(0, 1fr); }
-  .packdash__quick > .sync__label { grid-column: auto; }
-  .packdash__quick .btn { width: 100%; }
-  .packdash__fields { grid-template-columns: 1fr; }
-  .packdash__fields input, .packdash__fields select, .packdash__fields textarea, .packdash__filters > * { font-size: 16px; }
-  .packdash__category { padding: var(--s3); }
-  .packdash__listhead { align-items: flex-start; }
-  .packdash__listhead .packdash__resultcount { width: 100%; margin-left: 0; }
-  .packdash__item { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "day" "details" "actions"; }
-  .packdash__actions { justify-content: flex-start; margin-left: 2rem; }
-}
 /* END plan-polish-packing */
 /* ==== src/css/90-utilities.css ==== */
 /* 90-utilities.css — last layer. OWNER: WS-D.
@@ -13160,7 +13199,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 (function (T) {
   'use strict';
 
-  T.version = '0.28.13';   // Make the packing dashboard easier to scan and use
+  T.version = '0.28.14';   // Make the packing dashboard easier to scan and use
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -16322,7 +16361,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       budget: { currency: null, proposals: {}, activeProposalId: null, lock: null, expenses: {} },
       bookings: { flights: {}, lodging: {}, insurance: {} },
       checklist: { items: {} },
-      packing: { items: {} },
+      packing: { items: {}, laundryMode: 'none' },
       itinerary: { items: {} },
       travelerSummaries: {},
       overrides: { preparation: [] },
@@ -17533,6 +17572,45 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   PR.packing = {};
   PR.packing.CATEGORIES = ['clothing', 'toiletries', 'electronics', 'documents', 'health', 'gear', 'misc'];
   PR.packing.LAUNDRY_CEILING = 8;
+  PR.packing.LAUNDRY_MODES = ['none', 'once'];
+  PR.packing.LAUNDRY_KEYS = ['', 'underwear', 'socks', 'tops', 'bottoms', 'sleepwear'];
+
+  /** laundryKey(item) -> an explicit managed key, or a legacy exact-name
+   *  template match when the property has never been stored. An explicit
+   *  empty string means the user chose manual quantity control. */
+  PR.packing.laundryKey = function (item) {
+    if (!item || typeof item !== 'object') return '';
+    if (Object.prototype.hasOwnProperty.call(item, 'laundryKey')) {
+      return PR.packing.LAUNDRY_KEYS.indexOf(item.laundryKey) >= 0 ? item.laundryKey : '';
+    }
+    if (item.fromTemplate !== true) return '';
+    var legacy = {
+      'Underwear': 'underwear',
+      'Socks': 'socks',
+      'Shirts / tops': 'tops',
+      'Trousers / shorts': 'bottoms',
+      'Sleepwear': 'sleepwear'
+    };
+    return legacy[item.name] || '';
+  };
+
+  /** laundryQuantity(key, mode, nights, travelers) -> group total. Items
+   *  assigned to one owner pass one traveler; unassigned shared items pass
+   *  the plan's traveler count. */
+  PR.packing.laundryQuantity = function (key, mode, nights, travelers) {
+    if (PR.packing.LAUNDRY_KEYS.indexOf(key) <= 0 || PR.packing.LAUNDRY_MODES.indexOf(mode) < 0) return null;
+    var n = Number(nights), t = Number(travelers);
+    if (!isFinite(n)) n = 0;
+    if (!isFinite(t)) t = 1;
+    n = Math.max(0, Math.min(365, Math.floor(n)));
+    t = Math.max(1, Math.min(8, Math.floor(t)));
+    var days = n + 1, perPerson;
+    if (key === 'underwear' || key === 'socks') perPerson = mode === 'once' ? Math.ceil(days / 2) + 1 : days;
+    else if (key === 'tops') perPerson = mode === 'once' ? Math.ceil(days / 2) : Math.ceil(days * 0.7);
+    else if (key === 'bottoms') perPerson = mode === 'once' ? Math.ceil(days / 5) : Math.ceil(days / 4);
+    else perPerson = mode === 'once' ? 1 : 2;
+    return Math.max(1, Math.min(99, perPerson * t));
+  };
 
   PR.packing.perNight = function (ctx, extra) {
     var nights = (ctx && typeof ctx.nights === 'number') ? ctx.nights : 0;
@@ -17634,7 +17712,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (!packingWhen(ctx, t[3])) continue;
       qty = t[2] ? t[2](ctx) : 1;
       if (perTraveler[t[0]]) qty *= travelers;
-      rows.push({ name: t[0], category: t[1], quantity: Math.max(1, qty), notes: t[4], owner: '', itineraryDate: '', isOptional: false, fromTemplate: true });
+      rows.push({ name: t[0], category: t[1], quantity: Math.max(1, qty), notes: t[4], owner: '', itineraryDate: '', isOptional: false, fromTemplate: true, laundryKey: PR.packing.laundryKey({ name: t[0], fromTemplate: true }) });
     }
     return rows;
   };
@@ -17658,6 +17736,8 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         r.owner = previous.owner;
         r.itineraryDate = previous.itineraryDate || '';
         r.isOptional = !!previous.isOptional;
+        r.laundryKey = PR.packing.laundryKey(previous);
+        if (Object.prototype.hasOwnProperty.call(previous, 'laundryKey') && previous.laundryKey === '') r.quantity = previous.quantity;
         if (previous.notes && String(previous.notes).trim()) r.notes = previous.notes;
       }
     }
@@ -20569,9 +20649,11 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         if (qty > 99) { qty = 99; qtyC.n++; } else if (qty < 1) { qty = 1; qtyC.n++; }
       }
       var owner = migMemberOr(memberUidsAll, pk.owner, '');
+      var importedLaundryKey = pk.laundryKey;
+      if (importedLaundryKey === undefined) importedLaundryKey = pk.fromTemplate === true ? PR.packing.laundryKey({ name: pk.name, fromTemplate: true }) : '';
       var pkRes = validatePackingCore(scratchDoc, {
         name: pk.name, category: pk.category, quantity: qty, owner: owner, notes: pk.notes,
-        itineraryDate: pk.itineraryDate, isOptional: pk.isOptional === true
+        itineraryDate: pk.itineraryDate, isOptional: pk.isOptional === true, laundryKey: importedLaundryKey
       }, null);
       clipped.packing += qtyC.n;
       if (!pkRes.ok) { dropped.packing++; continue; }
@@ -20579,6 +20661,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
         id: pk.id, name: pkRes.fields.name, category: pkRes.fields.category, quantity: pkRes.fields.quantity,
         isPacked: !!pk.isPacked, notes: pkRes.fields.notes, owner: pkRes.fields.owner, fromTemplate: !!pk.fromTemplate,
         itineraryDate: pkRes.fields.itineraryDate, isOptional: pkRes.fields.isOptional,
+        laundryKey: pkRes.fields.laundryKey,
         _t: now, _by: by, _rev: 1
       };
       mergedPacking[pk.id] = pkRow;
@@ -22915,7 +22998,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (isOptional === undefined || isOptional === null) isOptional = false;
     if (typeof isOptional !== 'boolean') return { ok: false, code: 'invalid-state' };
 
-    return { ok: true, fields: { name: name, category: category, quantity: quantity, owner: owner, notes: notes, itineraryDate: itineraryDate, isOptional: isOptional } };
+    var laundryKey;
+    if (p.laundryKey !== undefined) laundryKey = p.laundryKey;
+    else if (existing) laundryKey = PR.packing.laundryKey(existing);
+    else laundryKey = '';
+    if (PR.packing.LAUNDRY_KEYS.indexOf(laundryKey) < 0) return { ok: false, code: 'invalid-laundry-key' };
+
+    return { ok: true, fields: { name: name, category: category, quantity: quantity, owner: owner, notes: notes, itineraryDate: itineraryDate, isOptional: isOptional, laundryKey: laundryKey } };
   }
 
   PR.reduce.packing.add = function (doc, p) {
@@ -22930,7 +23019,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     var update = {};
     update['packing.items.' + id] = {
       id: id, name: v.fields.name, category: v.fields.category, quantity: v.fields.quantity, isPacked: false,
-      notes: v.fields.notes, owner: v.fields.owner, itineraryDate: v.fields.itineraryDate, isOptional: v.fields.isOptional,
+      notes: v.fields.notes, owner: v.fields.owner, itineraryDate: v.fields.itineraryDate, isOptional: v.fields.isOptional, laundryKey: v.fields.laundryKey,
       fromTemplate: false, _t: now, _by: by, _rev: 1
     };
     update.updatedAt = now;
@@ -22995,6 +23084,55 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     return { ok: true, update: update };
   };
 
+  function packingPlanScale(doc, fallbackNights) {
+    var finalized = doc && doc.dates && doc.dates.finalized;
+    var nights = (typeof fallbackNights === 'number' && isFinite(fallbackNights)) ? Math.max(0, Math.floor(fallbackNights)) : 0;
+    if (finalized && finalized.reopened !== true) {
+      var finalizedNights = dayDiff(finalized.start, finalized.end);
+      if (finalizedNights !== null && finalizedNights >= 0) nights = finalizedNights;
+    }
+    var travelerCount = Array.isArray(doc && doc.memberUids) ? doc.memberUids.length : 0;
+    travelerCount = Math.max(travelerCount, Object.keys((doc && doc.members) || {}).length);
+    ['flights', 'lodging'].forEach(function (kind) {
+      var group = (doc && doc.bookings && doc.bookings[kind]) || {};
+      Object.keys(group).forEach(function (id) {
+        var row = group[id] || {};
+        if (Array.isArray(row.travelerUids)) travelerCount = Math.max(travelerCount, row.travelerUids.length);
+      });
+    });
+    return { nights: nights, travelerCount: Math.max(1, Math.min(8, travelerCount)) };
+  }
+
+  PR.reduce.packing.setLaundry = function (doc, p) {
+    var by = p.by, now = p.now, mode = p.mode;
+    if (!PR.roleOf(doc, by)) return { ok: false, code: 'not-a-member' };
+    if (!PR.canEdit(doc, by)) return { ok: false, code: 'not-editor' };
+    if (PR.packing.LAUNDRY_MODES.indexOf(mode) < 0) return { ok: false, code: 'invalid-laundry-mode' };
+
+    var packing = doc.packing || {}, items = packing.items || {};
+    var scale = packingPlanScale(doc, p.nights), nights = scale.nights, travelerCount = scale.travelerCount;
+    var update = {}, changed = 0, ids = Object.keys(items), i, item, key, quantity, people;
+    if ((packing.laundryMode || 'none') !== mode) update['packing.laundryMode'] = mode;
+    for (i = 0; i < ids.length; i++) {
+      item = items[ids[i]];
+      key = PR.packing.laundryKey(item);
+      if (!key) continue;
+      people = item.owner ? 1 : travelerCount;
+      quantity = PR.packing.laundryQuantity(key, mode, nights, people);
+      if (item.quantity === quantity && item.laundryKey === key) continue;
+      update['packing.items.' + ids[i] + '.quantity'] = quantity;
+      if (item.laundryKey !== key) update['packing.items.' + ids[i] + '.laundryKey'] = key;
+      update['packing.items.' + ids[i] + '._t'] = now;
+      update['packing.items.' + ids[i] + '._by'] = by;
+      update['packing.items.' + ids[i] + '._rev'] = (item._rev || 0) + 1;
+      changed++;
+    }
+    if (!Object.keys(update).length) return { ok: true, unchanged: true };
+    update.updatedAt = now;
+    update.updatedBy = by;
+    return { ok: true, update: update, changed: changed };
+  };
+
   PR.reduce.packing.seed = function (doc, p) {
     var by = p.by, now = p.now, ctx = p.ctx, ids = p.ids || [];
     if (!PR.roleOf(doc, by)) return { ok: false, code: 'not-a-member' };
@@ -23004,11 +23142,18 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     }
     var itemsMap = (doc.packing && doc.packing.items) || {};
     var existing = PR.packing.ordered(itemsMap);
-    var rebuilt = PR.packing.regenerate(existing, ctx);
+    var scale = packingPlanScale(doc, ctx.nights), mode = (doc.packing && doc.packing.laundryMode === 'once') ? 'once' : 'none';
+    var effectiveCtx = {}, contextKey;
+    for (contextKey in ctx) if (Object.prototype.hasOwnProperty.call(ctx, contextKey)) effectiveCtx[contextKey] = ctx[contextKey];
+    effectiveCtx.nights = scale.nights;
+    effectiveCtx.travelerCount = scale.travelerCount;
+    var rebuilt = PR.packing.regenerate(existing, effectiveCtx);
     var pool = ids.slice(), poolIdx = 0, i, r, byId = {};
     for (i = 0; i < rebuilt.length; i++) {
       r = rebuilt[i];
       if (!r.id) { r.id = pool[poolIdx++]; r.isPacked = false; r.owner = ''; }
+      var laundryKey = PR.packing.laundryKey(r);
+      if (laundryKey) r.quantity = PR.packing.laundryQuantity(laundryKey, mode, scale.nights, r.owner ? 1 : scale.travelerCount);
       byId[r.id] = r;
     }
     if (Object.keys(byId).length > PR.CAPS.packing) return { ok: false, code: 'cap-reached' };
@@ -23021,13 +23166,13 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       full = {
         id: id, name: row.name, category: row.category, quantity: row.quantity, isPacked: !!row.isPacked,
         notes: row.notes || '', owner: row.owner || '', itineraryDate: row.itineraryDate || '', isOptional: !!row.isOptional,
-        fromTemplate: !!row.fromTemplate
+        fromTemplate: !!row.fromTemplate, laundryKey: PR.packing.laundryKey(row)
       };
       if (prevRow) {
         sameShape = prevRow.name === full.name && prevRow.category === full.category && prevRow.quantity === full.quantity
           && prevRow.isPacked === full.isPacked && prevRow.notes === full.notes && prevRow.owner === full.owner
           && (prevRow.itineraryDate || '') === full.itineraryDate && !!prevRow.isOptional === full.isOptional
-          && prevRow.fromTemplate === full.fromTemplate;
+          && prevRow.fromTemplate === full.fromTemplate && PR.packing.laundryKey(prevRow) === full.laundryKey;
         if (sameShape) continue;
         full._t = now; full._by = by; full._rev = (prevRow._rev || 0) + 1;
         update['packing.items.' + id] = full;
@@ -24361,6 +24506,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (f.notes !== undefined) args.notes = f.notes;
     if (f.itineraryDate !== undefined) args.itineraryDate = f.itineraryDate;
     if (f.isOptional !== undefined) args.isOptional = f.isOptional;
+    if (f.laundryKey !== undefined) args.laundryKey = f.laundryKey;
     return runPlanOp(tripId, PR.reduce.packing.add, args).then(function (res) {
       if (res.ok) res.id = id;
       return res;
@@ -24375,7 +24521,12 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     if (p.notes !== undefined) args.notes = p.notes;
     if (p.itineraryDate !== undefined) args.itineraryDate = p.itineraryDate;
     if (p.isOptional !== undefined) args.isOptional = p.isOptional;
+    if (p.laundryKey !== undefined) args.laundryKey = p.laundryKey;
     return runPlanOp(tripId, PR.reduce.packing.edit, args);
+  };
+  PR.packing.setLaundry = function (tripId, mode) {
+    var ctx = PR.prepare.context(tripId);
+    return runPlanOp(tripId, PR.reduce.packing.setLaundry, { mode: mode, nights: ctx && ctx.nights });
   };
   PR.packing.remove = function (tripId, id) {
     return runPlanOp(tripId, PR.reduce.packing.remove, { id: id });
@@ -25994,7 +26145,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (target) {
         if (target.id !== match[2]) return { ok: false, code: 'imported-batch' };
         var allowed = match[1] === 'checklist' ? 'id title category isDone notes dueOffsetDays completedBy completedAt fromTemplate requirement linkRoute importSource _t _by _rev'
-          : match[1] === 'packing' ? 'id name category quantity isPacked notes owner itineraryDate isOptional fromTemplate _t _by _rev'
+          : match[1] === 'packing' ? 'id name category quantity isPacked notes owner itineraryDate isOptional laundryKey fromTemplate _t _by _rev'
           : 'id title kind date startTime endTime endDate location notes confirmation createdBy _t _by _rev';
         if (Object.keys(target).some(function (k) { return allowed.split(' ').indexOf(k) < 0; })) return { ok: false, code: 'imported-batch' };
         var valid = match[1] === 'checklist' ? validateChecklistCore(target, null) : match[1] === 'packing' ? validatePackingCore(working, target, null) : validateItineraryCore(target, null);
@@ -45799,299 +45950,288 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     foot.appendChild(cancel); foot.appendChild(ok);
     T.modal.open({ title: 'Remove this item?', body: body, footer: foot });
   }
-  function buildPackingItem(tripId, item, members, statusLine, drawer) {
-    var li = U.el('li', { class: 'packdash__item', dataset: {
-      id: item.id, packed: item.isPacked ? 'true' : 'false', optional: item.isOptional ? 'true' : 'false', template: item.fromTemplate ? 'true' : 'false'
-    } });
-    var top = U.el('div', { class: 'packdash__itemtop' });
-    var label = U.el('label', { class: 'packdash__checklabel' });
-    var checkbox = U.el('input', { class: 'packdash__check', type: 'checkbox', 'aria-label': (item.isPacked ? 'Mark not packed: ' : 'Mark packed: ') + item.name });
-    checkbox.checked = !!item.isPacked;
-    checkbox.addEventListener('change', function () {
-      var next = checkbox.checked;
-      checkbox.disabled = true;
-      callPacking('toggle', [tripId, item.id, next]).then(function (r) {
-        if (!r || !r.ok) { checkbox.checked = !next; checkbox.disabled = false; setPrepareStatus(statusLine, r && r.code); }
-        else { U.setText(statusLine, ''); repaintNow(); }
+  function packingSession(tripId) {
+    var s = packingFilterSessions[tripId];
+    if (!s) s = packingFilterSessions[tripId] = { search: '', category: '', state: 'all' };
+    ['owner', 'day', 'quickName', 'message'].forEach(function (key) { if (s[key] == null) s[key] = ''; });
+    return s;
+  }
+  function focusPackingControl(key) {
+    window.requestAnimationFrame(function () {
+      var found = false;
+      U.qsa('[data-plan-focus]').some(function (node) {
+        if (node.getAttribute('data-plan-focus') !== key || node.disabled) return false;
+        node.focus({ preventScroll: true }); found = true; return true;
       });
+      if (!found) { var quick = document.getElementById('pack-quick-name'); if (quick) quick.focus({ preventScroll: true }); }
     });
-    label.appendChild(checkbox);
-    label.appendChild(U.el('span', { class: 'packdash__itemname', text: item.name }));
-    top.appendChild(label);
-    var badges = U.el('div', { class: 'packdash__badges' });
-    if (item.quantity > 1) badges.appendChild(U.el('span', { class: 'packdash__badge', text: 'Qty ' + item.quantity }));
-    if (item.owner) badges.appendChild(U.el('span', { class: 'packdash__badge', text: ownerSuffix(item.owner, members) }));
-    if (item.isOptional) badges.appendChild(U.el('span', { class: 'packdash__badge packdash__badge--optional', text: 'Optional' }));
-    if (badges.childNodes.length) top.appendChild(badges);
-    li.appendChild(top);
-    if (item.itineraryDate) li.appendChild(U.el('a', {
-      class: 'packdash__daylink', href: T.router.build('plan', ['itinerary'], { day: item.itineraryDate }),
-      text: 'Itinerary · ' + packingDateLabel(item.itineraryDate)
-    }));
-    if (!U.isBlank(item.notes)) {
-      var notes = U.el('details', { class: 'packdash__notes' });
-      notes.appendChild(U.el('summary', { text: 'Item details' }));
-      notes.appendChild(U.el('p', { text: item.notes }));
-      li.appendChild(notes);
+  }
+  function packingManagedKey(item) {
+    return PR.packing.laundryKey ? PR.packing.laundryKey(item) : '';
+  }
+  function buildPackingDrawer(tripId, members, statusLine, days, routeDay, ctx, session, travelerCount, mode) {
+    function open(item, defaults) {
+      defaults = defaults || {};
+      var editing = !!item, original = item || {}, form = U.el('form', { class: 'packedit__form', novalidate: true });
+      var returnKey = editing ? 'pack-edit-' + item.id : 'pack-quick';
+      var lead = U.el('p', { class: 'packedit__intro', text: 'Start with a name. Add as much detail as you need.' });
+      form.appendChild(lead);
+      function field(label, input, wide) {
+        var row = U.el('div', { class: 'packedit__field' + (wide ? ' packedit__field--wide' : '') });
+        row.appendChild(U.el('label', { for: input.id, text: label })); row.appendChild(input); return row;
+      }
+      var fields = U.el('div', { class: 'packedit__fields' });
+      var name = U.el('input', { id: 'plan-pack-name', class: 'input', type: 'text', maxlength: '80', required: true, autocomplete: 'off', placeholder: 'What are you bringing?' });
+      name.value = original.name || defaults.name || '';
+      fields.appendChild(field('Item name', name, true));
+      var category = U.el('select', { id: 'plan-pack-category', class: 'input' });
+      packingCategories().forEach(function (c) { category.appendChild(U.el('option', { value: c, text: PACKING_CATEGORY_WORDS[c] || c })); });
+      category.value = original.category || defaults.category || 'misc';
+      fields.appendChild(field('Category', category));
+      var qty = U.el('input', { id: 'plan-pack-quantity', class: 'input', type: 'number', min: '1', max: '99', step: '1', inputmode: 'numeric' });
+      qty.value = String(original.quantity || 1);
+      fields.appendChild(field('Total quantity', qty));
+      var owner = U.el('select', { id: 'plan-pack-owner', class: 'input' });
+      owner.appendChild(U.el('option', { value: '', text: 'All travelers · total quantity' }));
+      members.forEach(function (m) { owner.appendChild(U.el('option', { value: m.uid, text: m.label || nameFor(m.uid, members) })); });
+      if (original.owner && !members.some(function (m) { return m.uid === original.owner; })) owner.appendChild(U.el('option', { value: original.owner, text: nameFor(original.owner, members) }));
+      owner.value = original.owner || defaults.owner || '';
+      fields.appendChild(field('For whom', owner));
+      var day = U.el('select', { id: 'plan-pack-day', class: 'input' });
+      day.appendChild(U.el('option', { value: '', text: 'Whole trip' }));
+      var selectedDay = original.itineraryDate || defaults.day || '';
+      (days || []).forEach(function (d) { day.appendChild(U.el('option', { value: d.date, text: packingDateLabel(d.date) })); });
+      if (selectedDay && !days.some(function (d) { return d.date === selectedDay; })) day.appendChild(U.el('option', { value: selectedDay, text: packingDateLabel(selectedDay) }));
+      day.value = selectedDay;
+      fields.appendChild(field('Needed for an itinerary day', day));
+      var autoRow = U.el('div', { class: 'packedit__auto packedit__field--wide' });
+      var autoLabel = U.el('label', { class: 'packedit__checkline' });
+      var auto = U.el('input', { id: 'plan-pack-auto', type: 'checkbox' });
+      var originalKey = packingManagedKey(original);
+      auto.checked = !!originalKey;
+      autoLabel.appendChild(auto); autoLabel.appendChild(document.createTextNode('Adjust quantity with the laundry plan'));
+      autoRow.appendChild(autoLabel);
+      var autoHelp = U.el('p', { class: 'packedit__help', id: 'plan-pack-auto-help' });
+      auto.setAttribute('aria-describedby', 'plan-pack-auto-help'); autoRow.appendChild(autoHelp); fields.appendChild(autoRow);
+      function currentKey() {
+        if (category.value !== 'clothing') return '';
+        return originalKey || packingManagedKey({ name: name.value.trim(), category: 'clothing', fromTemplate: true });
+      }
+      function syncQuantity() {
+        var key = currentKey(); autoRow.hidden = !key;
+        qty.disabled = !!(key && auto.checked);
+        if (qty.disabled && PR.packing.laundryQuantity) qty.value = String(PR.packing.laundryQuantity(key, mode, Number(ctx.nights) || 0, owner.value ? 1 : travelerCount));
+        U.setText(autoHelp, qty.disabled ? (mode === 'once' ? 'One wash' : 'No laundry') + ' · ' + qty.value + ' total' + (owner.value ? ' for this traveler.' : ' for ' + travelerCount + ' travelers.') : 'Your quantity stays fixed when you switch laundry plans.');
+      }
+      [name, category, owner, auto].forEach(function (input) { input.addEventListener('input', syncQuantity); input.addEventListener('change', syncQuantity); });
+      syncQuantity();
+      var notes = U.el('textarea', { id: 'plan-pack-notes', class: 'textarea', rows: '3', maxlength: '300', placeholder: 'Size, which bag it goes in, or a useful reminder…' });
+      notes.value = original.notes || '';
+      fields.appendChild(field('Notes · optional', notes, true));
+      var optionalLabel = U.el('label', { class: 'packedit__checkline packedit__field--wide' });
+      var optional = U.el('input', { id: 'plan-pack-optional', type: 'checkbox' }); optional.checked = !!original.isOptional;
+      optionalLabel.appendChild(optional); optionalLabel.appendChild(document.createTextNode('Optional · bring it only if useful'));
+      fields.appendChild(optionalLabel); form.appendChild(fields);
+      var error = U.el('p', { class: 'packedit__error', role: 'status', 'aria-live': 'polite' }); form.appendChild(error);
+      var actions = U.el('div', { class: 'packedit__actions' });
+      var cancel = U.el('button', { type: 'button', class: 'btn', text: 'Cancel' });
+      var save = U.el('button', { type: 'submit', class: 'btn btn--primary', text: editing ? 'Save changes' : 'Add item' });
+      cancel.addEventListener('click', function () { T.modal.close(); focusPackingControl(returnKey); });
+      actions.appendChild(cancel); actions.appendChild(save); form.appendChild(actions);
+      if (editing) {
+        var removeArea = U.el('details', { class: 'packedit__remove' });
+        removeArea.appendChild(U.el('summary', { text: 'Remove this item' }));
+        removeArea.appendChild(U.el('p', { text: 'Remove “' + item.name + '” from this trip? This cannot be undone.' }));
+        var remove = U.el('button', { class: 'btn btn--danger', type: 'button', text: 'Confirm removal' });
+        remove.addEventListener('click', function () {
+          remove.disabled = true;
+          callPacking('remove', [tripId, item.id]).then(function (r) {
+            if (!r || !r.ok) { remove.disabled = false; setPrepareStatus(error, r && r.code); return; }
+            session.message = 'Item removed.'; T.modal.close(); repaintNow(); focusPackingControl('pack-quick');
+          }).catch(function () { remove.disabled = false; U.setText(error, 'Could not save. Please try again.'); });
+        });
+        removeArea.appendChild(remove); form.appendChild(removeArea);
+      }
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var cleanName = name.value.trim(), quantity = Number(qty.value);
+        if (!cleanName || cleanName.length > 80) { U.setText(error, 'Enter an item name, up to 80 characters.'); name.focus(); return; }
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) { U.setText(error, 'Enter a whole quantity from 1 to 99.'); qty.focus(); return; }
+        var payload = { name: cleanName, category: category.value, quantity: quantity, owner: owner.value, notes: notes.value, itineraryDate: day.value, isOptional: optional.checked, laundryKey: auto.checked ? currentKey() : '' };
+        save.disabled = true; U.setText(error, 'Saving…');
+        callPacking(editing ? 'edit' : 'add', editing ? [tripId, item.id, payload] : [tripId, payload]).then(function (r) {
+          if (!r || !r.ok) { save.disabled = false; setPrepareStatus(error, r && r.code, { capN: capsOf().packing, noun: 'items' }); return; }
+          if (!editing) session.quickName = '';
+          session.message = (editing ? 'Saved ' : 'Added ') + cleanName + '.';
+          T.modal.close(); repaintNow(); focusPackingControl(editing ? returnKey : 'pack-quick');
+        }).catch(function () { save.disabled = false; U.setText(error, 'Could not save. Your details are still here; try again.'); });
+      });
+      var box = T.modal.open({ title: editing ? 'Edit packing item' : 'Add packing item', body: form, onDismiss: function () { focusPackingControl(returnKey); } });
+      if (box) box.classList.add('packedit');
     }
-    var actions = U.el('div', { class: 'packdash__actions' });
-    var editBtn = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Edit' });
-    editBtn.addEventListener('click', function () { if (drawer.openForEdit) drawer.openForEdit(item); });
-    actions.appendChild(editBtn);
-    var removeBtn = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Remove' });
-    removeBtn.addEventListener('click', function () { confirmRemovePacking(tripId, item.id, statusLine); });
-    actions.appendChild(removeBtn);
-    li.appendChild(actions);
+    return { openForEdit: function (item) { open(item); }, openForAdd: function (defaults) { open(null, defaults); } };
+  }
+  function buildPackingItem(tripId, item, members, statusLine, drawer, session) {
+    var li = U.el('li', { class: 'packdash__item', dataset: { id: item.id, packed: String(!!item.isPacked), optional: String(!!item.isOptional) } });
+    var checkLabel = U.el('label', { class: 'packdash__checklabel' });
+    var check = U.el('input', { class: 'packdash__check', type: 'checkbox', 'aria-label': (item.isPacked ? 'Unpack ' : 'Pack ') + item.name, 'data-plan-focus': 'pack-check-' + item.id });
+    check.checked = !!item.isPacked; checkLabel.appendChild(check); li.appendChild(checkLabel);
+    check.addEventListener('change', function () {
+      var packed = check.checked; check.disabled = true;
+      callPacking('toggle', [tripId, item.id, packed]).then(function (r) {
+        if (!r || !r.ok) { check.checked = !packed; check.disabled = false; setPrepareStatus(statusLine, r && r.code); return; }
+        session.message = item.name + (packed ? ' packed.' : ' moved back to pack.'); repaintNow(); focusPackingControl('pack-check-' + item.id);
+      }).catch(function () { check.checked = !packed; check.disabled = false; U.setText(statusLine, 'Could not save. Please try again.'); });
+    });
+    var open = U.el('button', { type: 'button', class: 'packdash__item-open', 'aria-label': 'Edit ' + item.name, 'data-plan-focus': 'pack-edit-' + item.id });
+    open.appendChild(U.el('span', { class: 'packdash__itemname', text: item.name }));
+    var meta = [];
+    if (item.owner) meta.push(nameFor(item.owner, members));
+    if (item.isOptional) meta.push('Optional');
+    if (packingManagedKey(item)) meta.push('Follows laundry plan');
+    if (meta.length) open.appendChild(U.el('span', { class: 'packdash__itemmeta', text: meta.join(' · ') }));
+    if (item.notes) open.appendChild(U.el('span', { class: 'packdash__notepreview', text: item.notes }));
+    open.addEventListener('click', function () { drawer.openForEdit(item); }); li.appendChild(open);
+    var quantity = U.el('span', { class: 'packdash__quantity', 'aria-label': 'Total quantity ' + (item.quantity || 1), text: String(item.quantity || 1) });
+    li.appendChild(quantity);
+    if (item.itineraryDate) li.appendChild(U.el('a', { class: 'packdash__daylink', href: T.router.build('plan', ['itinerary'], { day: item.itineraryDate }), text: dayShort(item.itineraryDate) + ' ↗', 'aria-label': 'Itinerary for ' + packingDateLabel(item.itineraryDate) + ': ' + item.name }));
+    else li.appendChild(U.el('span', { class: 'packdash__dayempty', text: 'Whole trip' }));
     return li;
   }
-  function buildPackingDrawer(tripId, members, statusLine, days, routeDay) {
-    var form = U.el('form', { class: 'packdash__add-form', novalidate: true });
-    var quick = U.el('div', { class: 'packdash__quick' });
-    var nameInput = U.el('input', { class: 'input sync__input', id: 'plan-pack-name', type: 'text', maxlength: '80', autocomplete: 'off', placeholder: 'e.g. Warm walking layer or travel adapter' });
-    quick.appendChild(U.el('label', { class: 'sync__label', for: 'plan-pack-name', text: 'Item name' }));
-    quick.appendChild(nameInput);
-    var submitBtn = U.el('button', { type: 'submit', class: 'btn btn--primary', text: 'Add item' });
-    quick.appendChild(submitBtn);
-    form.appendChild(quick);
-
-    var more = U.el('details', { class: 'packdash__advanced' });
-    more.appendChild(U.el('summary', { text: 'Add details · quantity, traveler, day, notes' }));
-    var fields = U.el('div', { class: 'packdash__fields' });
-    var categorySelect = U.el('select', { class: 'input sync__input', id: 'plan-pack-category' });
-    packingCategories().forEach(function (c) { categorySelect.appendChild(U.el('option', { value: c }, PACKING_CATEGORY_WORDS[c] || c)); });
-    fields.appendChild(U.el('div', { class: 'sync__field' }, [U.el('label', { class: 'sync__label', for: 'plan-pack-category', text: 'Category' }), categorySelect]));
-    var quantityInput = U.el('input', { class: 'input sync__input', id: 'plan-pack-quantity', type: 'number', min: '1', max: '99', step: '1', inputmode: 'numeric' });
-    fields.appendChild(U.el('div', { class: 'sync__field' }, [U.el('label', { class: 'sync__label', for: 'plan-pack-quantity', text: 'Quantity' }), quantityInput]));
-    var ownerSelect = U.el('select', { class: 'input sync__input', id: 'plan-pack-owner' });
-    memberOptions(members, true).forEach(function (o) { ownerSelect.appendChild(o); });
-    fields.appendChild(U.el('div', { class: 'sync__field' }, [U.el('label', { class: 'sync__label', for: 'plan-pack-owner', text: 'For traveler' }), ownerSelect]));
-    var dateSelect = U.el('select', { class: 'input sync__input', id: 'plan-pack-day' });
-    dateSelect.appendChild(U.el('option', { value: '' }, 'Any day · whole trip'));
-    (days || []).forEach(function (day) {
-      dateSelect.appendChild(U.el('option', { value: day.date }, packingDateLabel(day.date)));
-    });
-    if (itineraryValidDay(routeDay) && !(days || []).some(function (day) { return day.date === routeDay; })) {
-      dateSelect.appendChild(U.el('option', { value: routeDay }, packingDateLabel(routeDay)));
-    }
-    fields.appendChild(U.el('div', { class: 'sync__field packdash__datefield' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-pack-day', text: 'Link to itinerary day' }), dateSelect
-    ]));
-    var optionalLabel = U.el('label', { class: 'packdash__optional' });
-    var optionalInput = U.el('input', { id: 'plan-pack-optional', type: 'checkbox' });
-    optionalLabel.appendChild(optionalInput);
-    optionalLabel.appendChild(document.createTextNode(' Optional · pack only if useful'));
-    fields.appendChild(optionalLabel);
-    var notesInput = U.el('textarea', {
-      id: 'plan-pack-notes', class: 'textarea sync__input', rows: '3', maxlength: '300',
-      placeholder: 'Color, size, what it is for, or where to keep it.'
-    });
-    fields.appendChild(U.el('div', { class: 'sync__field packdash__notesfield' }, [
-      U.el('label', { class: 'sync__label', for: 'plan-pack-notes', text: 'Details or reminder' }), notesInput
-    ]));
-    more.appendChild(fields);
-    form.appendChild(more);
-    var errLine = U.el('p', { class: 'field__error', role: 'status', 'aria-live': 'polite' });
-    form.appendChild(errLine);
-    var cancelBtn = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Cancel', hidden: true });
-    var acts = U.el('div', { class: 'packdash__form-actions' });
-    acts.appendChild(cancelBtn);
-    form.appendChild(acts);
-
-    function setFieldVal(input, value) { input.value = value; input.defaultValue = value; }
-    function setSelectVal(select, value) { select.value = value; select.defaultValue = value; select.dataset['default'] = value; }
-    function reset() {
-      form.dataset.editing = '';
-      setFieldVal(nameInput, ''); setSelectVal(categorySelect, 'misc'); setFieldVal(quantityInput, '1');
-      setSelectVal(ownerSelect, ''); setSelectVal(dateSelect, itineraryValidDay(routeDay) ? routeDay : '');
-      setFieldVal(notesInput, ''); optionalInput.checked = false; more.open = false;
-      U.setText(errLine, ''); U.setText(submitBtn, 'Add item'); cancelBtn.hidden = true;
-    }
-    reset();
-    function openForEdit(item) {
-      form.dataset.editing = item.id;
-      setFieldVal(nameInput, item.name || ''); setSelectVal(categorySelect, item.category || 'misc');
-      setFieldVal(quantityInput, String(item.quantity || 1)); setSelectVal(ownerSelect, item.owner || '');
-      setSelectVal(dateSelect, item.itineraryDate || ''); setFieldVal(notesInput, item.notes || '');
-      optionalInput.checked = !!item.isOptional; U.setText(errLine, '');
-      U.setText(submitBtn, 'Save item'); cancelBtn.hidden = false; more.open = true; nameInput.focus();
-    }
-    function openForAdd(date) {
-      reset();
-      if (itineraryValidDay(date)) { setSelectVal(dateSelect, date); more.open = true; }
-      nameInput.focus();
-    }
-    function submit() {
-      var name = String(nameInput.value || '').trim();
-      if (!name || name.length > 80) { setPrepareStatus(errLine, 'invalid-name'); nameInput.focus(); return; }
-      var qty = parseInt(quantityInput.value, 10);
-      if (!qty || qty < 1) qty = 1;
-      if (qty > 99) qty = 99;
-      U.setText(errLine, '');
-      var editingId = form.dataset.editing || '';
-      var payload = {
-        name: name, category: categorySelect.value, quantity: qty, owner: ownerSelect.value || '',
-        notes: notesInput.value || '', itineraryDate: dateSelect.value || '', isOptional: !!optionalInput.checked
-      };
-      submitBtn.disabled = true;
-      var promise = editingId ? callPacking('edit', [tripId, editingId, payload]) : callPacking('add', [tripId, payload]);
-      promise.then(function (r) {
-        submitBtn.disabled = false;
-        if (r && r.ok) { reset(); repaintNow(); return; }
-        setPrepareStatus(errLine, r && r.code, { capN: capsOf().packing, noun: 'items' });
-      });
-    }
-    form.addEventListener('submit', function (event) { event.preventDefault(); submit(); });
-    cancelBtn.addEventListener('click', reset);
-    form.openForEdit = openForEdit; form.openForAdd = openForAdd;
-    return form;
-  }
   function buildPackingTab(tripId, prep, view, ctx, route) {
-    var doc = prep.plan || {}, members = (PR && PR.members && typeof PR.members.list === 'function') ? PR.members.list(tripId) : [];
-    var travelerCount = packingTravelers(doc, members);
-    var wrap = U.el('div', { class: 'packdash' });
-    var statusLine = U.el('p', { class: 'prepare__status packdash__status', role: 'status', 'aria-live': 'polite' });
+    ctx = ctx || {};
+    var doc = prep.plan || {}, members = PR.members && PR.members.list ? PR.members.list(tripId) : [];
+    var travelers = packingTravelers(doc, members), session = packingSession(tripId);
     var items = (view && view.packing) || callPure(packingApi(), 'ordered', [(doc.packing && doc.packing.items) || {}], []);
-    var packedN = items.filter(function (item) { return item.isPacked && !item.isOptional; }).length;
-    var requiredN = items.filter(function (item) { return !item.isOptional; }).length;
-    var optionalN = items.filter(function (item) { return item.isOptional; }).length;
-
-    var intro = U.el('header', { class: 'packdash__hero' });
-    var introCopy = U.el('div', { class: 'packdash__hero-copy' });
-    introCopy.appendChild(U.el('p', { class: 'decisiondash__eyebrow', text: 'THE DETAILS THAT GO WITH YOU' }));
-    introCopy.appendChild(U.el('h2', { class: 'decisiondash__title', text: 'Packing for ' + ((ctx && ctx.winnerName) || 'your trip') }));
-    var tripRange = ctx && ctx.departure && ctx.returnDate ? dayShort(ctx.departure) + '–' + dayShort(ctx.returnDate) : 'Trip dates not set';
-    var stops = [], seenStops = Object.create(null), lodging = doc.bookings && doc.bookings.lodging || {};
-    Object.keys(lodging).forEach(function (id) {
-      var row = lodging[id] || {}, place = String(row.cityLabel || row.propertyName || '').trim();
-      if (place && !seenStops[place.toLowerCase()]) { seenStops[place.toLowerCase()] = true; stops.push(place); }
-    });
-    var scopeLine = tripRange + (ctx && ctx.nights ? ' · ' + ctx.nights + ' nights' : '') +
-      ' · ' + travelerCount + (travelerCount === 1 ? ' traveler' : ' travelers') +
-      (stops.length ? ' · ' + stops.slice(0, 3).join(' → ') : '');
-    introCopy.appendChild(U.el('p', { class: 'decisiondash__copy', text: scopeLine + '. Keep essentials together and link day-specific items to the itinerary.' }));
-    intro.appendChild(introCopy);
-    var introLinks = U.el('div', { class: 'packdash__hero-actions' });
-    introLinks.appendChild(U.el('a', { class: 'btn btn--quiet', href: T.router.build('plan', ['itinerary']), text: 'Open itinerary' }));
-    introLinks.appendChild(U.el('a', { class: 'btn btn--quiet', href: T.router.build('plan', ['prepare'], { tab: 'checklist' }), text: 'Open checklist' }));
-    intro.appendChild(introLinks); wrap.appendChild(intro);
-
-    var progress = U.el('section', { class: 'packdash__progress', 'aria-label': 'Packing progress' });
-    var progressText = U.el('div', { class: 'packdash__progresscopy' });
-    progressText.appendChild(U.el('p', { class: 'plan__h', text: requiredN ? packedN + ' of ' + requiredN + ' essentials packed' : 'Your list is ready to start' }));
-    progressText.appendChild(U.el('p', { class: 'decisiondash__copy', text: optionalN ? optionalN + ' optional item' + (optionalN === 1 ? '' : 's') + ' kept separate' : 'Optional extras stay separate from the essentials.' }));
-    progress.appendChild(progressText);
-    progress.appendChild(U.el('progress', { class: 'packdash__progressbar', max: String(Math.max(1, requiredN)), value: String(packedN), 'aria-label': 'Essentials packed' }));
-    wrap.appendChild(progress);
-
-    var itemsMap = doc.packing && doc.packing.items || {};
-    var hasTemplateRow = Object.keys(itemsMap).some(function (id) { return itemsMap[id] && itemsMap[id].fromTemplate; });
-    var seedCtx = {};
-    Object.keys(ctx || {}).forEach(function (key) { seedCtx[key] = ctx[key]; });
-    seedCtx.travelerCount = travelerCount;
-    var generated = callPure(packingApi(), 'build', [seedCtx], []);
-    var itinerary = itineraryViewOf(tripId), days = itinerary && itinerary.days || [], routeDay = route && route.query && route.query.day || '';
-    var drawer = buildPackingDrawer(tripId, members, statusLine, days, routeDay);
-    var addSection = U.el('section', { class: 'packdash__add' });
-    var addHead = U.el('div', { class: 'packdash__addhead' });
-    addHead.appendChild(U.el('h3', { class: 'plan__h', text: items.length ? 'Add an item' : 'Start your packing list' }));
-    if (!items.length) {
-      var firstSeed = U.el('button', { type: 'button', class: 'btn btn--quiet packdash__seed', text: 'Build a suggested list · ' + generated.length + ' items' });
-      firstSeed.addEventListener('click', function () { runSeed(firstSeed); });
-      addHead.appendChild(firstSeed);
-    }
-    addSection.appendChild(addHead); addSection.appendChild(drawer); wrap.appendChild(addSection);
-
-    function runSeed(button) {
-      button.disabled = true;
-      callPacking('seed', [tripId]).then(function (result) {
-        button.disabled = false;
-        if (!result || !result.ok) { setPrepareStatus(statusLine, result && result.code, { capN: capsOf().packing, noun: 'items' }); return; }
-        U.setText(statusLine, result.unchanged ? 'Your suggested items are up to date.' :
-          'Added ' + (result.added || 0) + ' suggested items. Adjust the list to fit what you actually plan to bring.');
-        repaintNow();
-      });
-    }
-    var seedBtn = U.el('button', { type: 'button', class: 'btn btn--quiet packdash__seed',
-      dataset: { seeded: String(hasTemplateRow) }, text: hasTemplateRow ? 'Update suggested items' : 'Add suggested essentials' });
-    seedBtn.addEventListener('click', function () { runSeed(seedBtn); });
-
-    var session = packingFilterSessions[tripId] || (packingFilterSessions[tripId] = { search: '', category: '', state: 'all' });
-    var controls = U.el('div', { class: 'packdash__filters', role: 'group', 'aria-label': 'Search and filter packing items' });
-    var search = U.el('input', { class: 'input', type: 'search', maxlength: '80', placeholder: 'Find an item', 'aria-label': 'Search packing items' });
-    var stateFilter = U.el('select', { class: 'input', 'aria-label': 'Filter by packing status' });
-    [['all', 'All items'], ['to-pack', 'Still to pack'], ['packed', 'Packed'], ['optional', 'Optional']].forEach(function (entry) {
-      stateFilter.appendChild(U.el('option', { value: entry[0] }, entry[1]));
-    });
-    controls.appendChild(search); controls.appendChild(stateFilter);
-    var categoryNav = U.el('div', { class: 'packdash__category-filters', role: 'group', 'aria-label': 'Filter by category' });
-    var categoryButtons = [];
-    function addCategoryFilter(category, label, count) {
-      var button = U.el('button', {
-        type: 'button', class: 'packdash__category-filter', dataset: { category: category },
-        'aria-pressed': String(session.category === category), 'aria-label': label + ', ' + count + ' items'
-      });
-      button.appendChild(U.el('span', { class: 'packdash__category-filter-name', text: label }));
-      button.appendChild(U.el('span', { class: 'packdash__category-filter-count', 'aria-hidden': 'true', text: String(count) }));
+    var mode = doc.packing && doc.packing.laundryMode === 'once' ? 'once' : 'none';
+    var mainItems = items.filter(function (item) { return !item.isOptional; });
+    var packed = mainItems.filter(function (item) { return item.isPacked; }).length;
+    var optionalN = items.length - mainItems.length;
+    var itinerary = itineraryViewOf(tripId), days = itinerary && itinerary.days || [];
+    var routeDay = route && route.query && route.query.day || '';
+    if (itineraryValidDay(routeDay)) session.day = routeDay;
+    var wrap = U.el('div', { class: 'packdash', dataset: { tripId: tripId } });
+    var statusLine = U.el('p', { class: 'packdash__status', role: 'status', 'aria-live': 'polite', text: session.message });
+    var drawer = buildPackingDrawer(tripId, members, statusLine, days, routeDay, ctx, session, travelers, mode);
+    var head = U.el('header', { class: 'packdash__head' });
+    var title = U.el('div');
+    title.appendChild(U.el('p', { class: 'packdash__eyebrow', text: (prep.trip && prep.trip.name) || 'YOUR TRIP' }));
+    title.appendChild(U.el('h1', { class: 'packdash__title', text: 'Packing' }));
+    var scope = (ctx.departure && ctx.returnDate ? dayShort(ctx.departure) + '–' + dayShort(ctx.returnDate) + ' · ' : '') + travelers + (travelers === 1 ? ' traveler' : ' travelers');
+    title.appendChild(U.el('p', { class: 'packdash__subtitle', text: scope + ' · Quantities are totals for the list.' }));
+    head.appendChild(title);
+    var links = U.el('div', { class: 'packdash__links' });
+    links.appendChild(U.el('a', { href: T.router.build('plan', ['prepare'], { tab: 'checklist' }), text: 'Trip checklist ↗' }));
+    links.appendChild(U.el('a', { href: T.router.build('plan', ['itinerary']), text: 'Itinerary ↗' }));
+    head.appendChild(links); wrap.appendChild(head);
+    var planning = U.el('section', { class: 'packdash__planning', 'aria-label': 'Packing progress and laundry plan' });
+    var progress = U.el('div', { class: 'packdash__progress' });
+    progress.appendChild(U.el('p', { class: 'packdash__progress-title', text: packed + ' / ' + mainItems.length + ' packed' }));
+    progress.appendChild(U.el('progress', { class: 'packdash__progressbar', max: String(Math.max(1, mainItems.length)), value: String(packed), 'aria-label': 'Main list packed' }));
+    progress.appendChild(U.el('p', { class: 'packdash__helper', text: optionalN + ' optional items counted separately.' })); planning.appendChild(progress);
+    var laundry = U.el('div', { class: 'packdash__laundry' });
+    var laundryCopy = U.el('div'); laundryCopy.appendChild(U.el('h2', { text: 'Your laundry plan' }));
+    laundryCopy.appendChild(U.el('p', { class: 'packdash__helper', text: mode === 'once' ? 'One wash halfway through the trip. Custom quantities stay fixed.' : 'Enough clothing for the full trip. Custom quantities stay fixed.' })); laundry.appendChild(laundryCopy);
+    var laundryButtons = U.el('div', { class: 'packdash__switch', role: 'group', 'aria-label': 'Laundry plan' });
+    [['none', 'No laundry'], ['once', 'One wash']].forEach(function (entry) {
+      var button = U.el('button', { type: 'button', text: entry[1], 'aria-pressed': String(mode === entry[0]), 'data-plan-focus': 'pack-laundry-' + entry[0], disabled: !!session.laundrySaving });
       button.addEventListener('click', function () {
-        session.category = category;
-        syncCategoryFilters();
-        renderRows();
-      });
-      categoryButtons.push(button); categoryNav.appendChild(button);
-    }
-    addCategoryFilter('', 'All', items.length);
-    packingCategories().forEach(function (category) {
-      var count = items.filter(function (item) { return (item.category || 'misc') === category; }).length;
-      addCategoryFilter(category, PACKING_CATEGORY_WORDS[category] || category, count);
+        if (mode === entry[0] || session.laundrySaving) return;
+        session.laundrySaving = true; U.qsa('button', laundryButtons).forEach(function (b) { b.disabled = true; }); U.setText(statusLine, 'Updating clothing quantities…');
+        callPacking('setLaundry', [tripId, entry[0]]).then(function (r) {
+          session.laundrySaving = false;
+          if (!r || !r.ok) { U.qsa('button', laundryButtons).forEach(function (b) { b.disabled = false; }); setPrepareStatus(statusLine, r && r.code); return; }
+          session.message = entry[1] + ' selected. Clothing quantities updated.'; repaintNow(); focusPackingControl('pack-laundry-' + entry[0]);
+        }).catch(function () { session.laundrySaving = false; U.qsa('button', laundryButtons).forEach(function (b) { b.disabled = false; }); U.setText(statusLine, 'Could not save the laundry plan. Please try again.'); });
+      }); laundryButtons.appendChild(button);
+    }); laundry.appendChild(laundryButtons); planning.appendChild(laundry); wrap.appendChild(planning);
+    var workspace = U.el('div', { class: 'packdash__workspace' });
+    var rail = U.el('nav', { class: 'packdash__rail', 'aria-label': 'Packing categories' });
+    rail.appendChild(U.el('p', { class: 'packdash__rail-title', text: 'Categories' }));
+    var categoryNav = U.el('div', { class: 'packdash__categories' }), categoryButtons = [];
+    [['', 'All categories']].concat(packingCategories().map(function (c) { return [c, PACKING_CATEGORY_WORDS[c] || c]; })).forEach(function (entry) {
+      var count = entry[0] ? items.filter(function (i) { return (i.category || 'misc') === entry[0]; }).length : items.length;
+      var button = U.el('button', { type: 'button', class: 'packdash__category-filter', dataset: { category: entry[0] }, 'aria-pressed': String(session.category === entry[0]) });
+      button.appendChild(U.el('span', { text: entry[1] })); button.appendChild(U.el('span', { class: 'packdash__category-count', text: String(count) }));
+      button.addEventListener('click', function () { session.category = entry[0]; renderRows(); }); categoryButtons.push(button); categoryNav.appendChild(button);
+    }); rail.appendChild(categoryNav); workspace.appendChild(rail);
+    var board = U.el('section', { class: 'packdash__board', 'aria-label': 'Packing list' });
+    var statusTabs = U.el('div', { class: 'packdash__statuses', role: 'group', 'aria-label': 'Packing status' }), statusButtons = [];
+    function matchesState(item, state) { return state === 'to-pack' ? !item.isPacked && !item.isOptional : state === 'packed' ? !!item.isPacked : state === 'optional' ? !!item.isOptional : true; }
+    [['all', 'All'], ['to-pack', 'To pack'], ['packed', 'Packed'], ['optional', 'Optional']].forEach(function (entry) {
+      var count = items.filter(function (item) { return matchesState(item, entry[0]); }).length;
+      var button = U.el('button', { type: 'button', dataset: { state: entry[0] }, 'aria-pressed': String(session.state === entry[0]), text: entry[1] + ' ' + count });
+      button.addEventListener('click', function () { session.state = entry[0]; renderRows(); }); statusButtons.push(button); statusTabs.appendChild(button);
+    }); board.appendChild(statusTabs);
+    var filters = U.el('div', { class: 'packdash__filters', role: 'group', 'aria-label': 'Find packing items' });
+    var search = U.el('input', { class: 'input', type: 'search', placeholder: 'Search items or notes', maxlength: '80', 'aria-label': 'Search packing items', 'data-plan-focus': 'pack-search' }); search.value = session.search;
+    var ownerFilter = U.el('select', { class: 'input', 'aria-label': 'Filter by traveler', 'data-plan-focus': 'pack-owner' });
+    ownerFilter.appendChild(U.el('option', { value: '', text: 'Everyone' })); ownerFilter.appendChild(U.el('option', { value: 'shared', text: 'All travelers / shared' }));
+    members.forEach(function (m) { ownerFilter.appendChild(U.el('option', { value: m.uid, text: m.label || nameFor(m.uid, members) })); }); ownerFilter.value = session.owner;
+    var dayFilter = U.el('select', { class: 'input', 'aria-label': 'Filter by itinerary day', 'data-plan-focus': 'pack-day' });
+    dayFilter.appendChild(U.el('option', { value: '', text: 'Every day' })); dayFilter.appendChild(U.el('option', { value: 'whole', text: 'Whole-trip items' }));
+    days.forEach(function (d) { dayFilter.appendChild(U.el('option', { value: d.date, text: packingDateLabel(d.date) })); }); dayFilter.value = session.day;
+    filters.appendChild(search); filters.appendChild(ownerFilter); filters.appendChild(dayFilter); board.appendChild(filters);
+    var quick = U.el('form', { class: 'packdash__quick', 'aria-label': 'Quick add packing item' });
+    var quickInput = U.el('input', { class: 'input', id: 'pack-quick-name', 'aria-label': 'New packing item', 'data-plan-focus': 'pack-quick', placeholder: '+ Add an item…', maxlength: '80', autocomplete: 'off' }); quickInput.value = session.quickName;
+    quickInput.addEventListener('input', function () { session.quickName = quickInput.value; });
+    var details = U.el('button', { type: 'button', class: 'btn btn--quiet', text: 'Details' });
+    function quickDefaults() { return { name: quickInput.value.trim(), category: session.category || 'misc', owner: session.owner === 'shared' ? '' : session.owner, day: itineraryValidDay(session.day) ? session.day : '' }; }
+    details.addEventListener('click', function () { drawer.openForAdd(quickDefaults()); });
+    var add = U.el('button', { type: 'submit', class: 'btn btn--primary', text: 'Add' });
+    quick.appendChild(quickInput); quick.appendChild(details); quick.appendChild(add); board.appendChild(quick);
+    quick.addEventListener('submit', function (event) {
+      event.preventDefault(); var defaults = quickDefaults();
+      if (!defaults.name) { U.setText(statusLine, 'Enter the item you want to add.'); quickInput.focus(); return; }
+      add.disabled = true;
+      callPacking('add', [tripId, { name: defaults.name, category: defaults.category, quantity: 1, owner: defaults.owner, itineraryDate: defaults.day, notes: '', isOptional: false, laundryKey: '' }]).then(function (r) {
+        if (!r || !r.ok) { add.disabled = false; setPrepareStatus(statusLine, r && r.code); return; }
+        session.quickName = ''; session.message = 'Added ' + defaults.name + '.'; repaintNow(); focusPackingControl('pack-quick');
+      }).catch(function () { add.disabled = false; U.setText(statusLine, 'Could not add the item. Please try again.'); });
     });
-    function syncCategoryFilters() {
-      categoryButtons.forEach(function (button) {
-        button.setAttribute('aria-pressed', String(button.dataset.category === session.category));
-      });
-    }
-    var results = U.el('p', { class: 'packdash__resultcount', 'aria-live': 'polite' });
-    var listHost = U.el('div', { class: 'packdash__groups' });
-    search.value = session.search; stateFilter.value = session.state;
+    var listHead = U.el('div', { class: 'packdash__listhead' });
+    var result = U.el('p', { class: 'packdash__resultcount', 'aria-live': 'polite' }); listHead.appendChild(result);
+    var clear = U.el('button', { class: 'btn btn--quiet', type: 'button', text: 'Clear filters' });
+    clear.addEventListener('click', function () { session.search = ''; session.category = ''; session.state = 'all'; session.owner = ''; session.day = ''; search.value = ''; ownerFilter.value = ''; dayFilter.value = ''; renderRows(); });
+    listHead.appendChild(clear); board.appendChild(listHead);
+    var listHost = U.el('div', { class: 'packdash__groups' }); board.appendChild(listHost);
+    search.addEventListener('input', function () { session.search = search.value; renderRows(); });
+    ownerFilter.addEventListener('change', function () { session.owner = ownerFilter.value; renderRows(); });
+    dayFilter.addEventListener('change', function () { session.day = dayFilter.value; renderRows(); });
     function renderRows() {
-      session.search = String(search.value || '').trim().toLowerCase(); session.state = stateFilter.value;
-      while (listHost.firstChild) listHost.removeChild(listHost.firstChild);
+      U.clear(listHost);
+      categoryButtons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.category === session.category)); });
+      statusButtons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.state === session.state)); });
+      var query = session.search.trim().toLowerCase();
       var filtered = items.filter(function (item) {
-        if (session.category && item.category !== session.category) return false;
-        if (session.search && String(item.name || '').toLowerCase().indexOf(session.search) < 0 &&
-            String(item.notes || '').toLowerCase().indexOf(session.search) < 0) return false;
-        if (session.state === 'to-pack' && (item.isPacked || item.isOptional)) return false;
-        if (session.state === 'packed' && !item.isPacked) return false;
-        if (session.state === 'optional' && !item.isOptional) return false;
-        return true;
+        return (!session.category || (item.category || 'misc') === session.category) && matchesState(item, session.state) &&
+          (!query || (String(item.name || '') + ' ' + String(item.notes || '')).toLowerCase().indexOf(query) >= 0) &&
+          (!session.owner || (session.owner === 'shared' ? !item.owner : item.owner === session.owner)) &&
+          (!session.day || (session.day === 'whole' ? !item.itineraryDate : item.itineraryDate === session.day));
       });
-      U.setText(results, filtered.length + ' of ' + items.length + ' items');
+      clear.hidden = !(session.search || session.category || session.state !== 'all' || session.owner || session.day);
+      U.setText(result, filtered.length + (filtered.length === 1 ? ' item' : ' items') + (clear.hidden ? '' : ' of ' + items.length) + ' · Select a name to edit.');
       packingCategories().forEach(function (category) {
-        var rows = filtered.filter(function (item) { return (item.category || 'misc') === category; });
-        if (!rows.length) return;
+        var rows = filtered.filter(function (item) { return (item.category || 'misc') === category; }); if (!rows.length) return;
         var group = U.el('section', { class: 'packdash__category', dataset: { category: category } });
-        var heading = U.el('div', { class: 'packdash__category-head' });
-        heading.appendChild(U.el('h3', { class: 'plan__h', text: PACKING_CATEGORY_WORDS[category] || category }));
-        heading.appendChild(U.el('span', { class: 'packdash__category-count', text: String(rows.length) }));
-        group.appendChild(heading);
-        var list = U.el('ul', { class: 'packdash__items' });
-        rows.forEach(function (item) { list.appendChild(buildPackingItem(tripId, item, members, statusLine, drawer)); });
+        var h = U.el('div', { class: 'packdash__category-head' });
+        h.appendChild(U.el('h2', { text: PACKING_CATEGORY_WORDS[category] || category }));
+        h.appendChild(U.el('span', { text: 'Total qty', class: 'packdash__qtyheading' }));
+        h.appendChild(U.el('span', { text: 'Needed for', class: 'packdash__dayheading' })); group.appendChild(h);
+        var list = U.el('ul', { class: 'packdash__items' }); rows.forEach(function (item) { list.appendChild(buildPackingItem(tripId, item, members, statusLine, drawer, session)); });
         group.appendChild(list); listHost.appendChild(group);
       });
-      if (!filtered.length) listHost.appendChild(U.el('p', { class: 'packdash__empty-filter',
-        text: items.length ? 'No items match these filters.' : 'Your list is empty. Add a first item or build the suggested essentials above.' }));
+      if (!filtered.length) {
+        var empty = U.el('div', { class: 'packdash__empty' });
+        empty.appendChild(U.el('h2', { text: items.length ? 'Nothing here yet' : 'Start with what you need' }));
+        empty.appendChild(U.el('p', { text: items.length ? 'Try another category or clear the filters.' : 'Add your first item above, or use a starter list and make it your own.' }));
+        if (!items.length) {
+          var seed = U.el('button', { class: 'btn', type: 'button', text: 'Use a starter list' });
+          seed.addEventListener('click', function () { seed.disabled = true; callPacking('seed', [tripId]).then(function (r) { if (!r || !r.ok) { seed.disabled = false; setPrepareStatus(statusLine, r && r.code); return; } session.message = 'Starter items added. Review quantities and optional items for your trip.'; repaintNow(); }); }); empty.appendChild(seed);
+        } listHost.appendChild(empty);
+      }
     }
-    search.addEventListener('input', renderRows); stateFilter.addEventListener('change', renderRows);
-    syncCategoryFilters();
-    renderRows();
-    var listSection = U.el('section', { class: 'packdash__list', 'aria-label': 'Packing items' });
-    var listHead = U.el('div', { class: 'packdash__listhead' });
-    listHead.appendChild(U.el('h3', { class: 'plan__h', text: 'Packing list' }));
-    if (items.length) listHead.appendChild(seedBtn);
-    listHead.appendChild(results); listSection.appendChild(listHead);
-    listSection.appendChild(controls); listSection.appendChild(categoryNav); listSection.appendChild(listHost); wrap.appendChild(listSection);
-    wrap.appendChild(statusLine);
-    if (itineraryValidDay(routeDay)) drawer.openForAdd(routeDay);
-    return wrap;
+    renderRows(); workspace.appendChild(board); wrap.appendChild(workspace); wrap.appendChild(statusLine); return wrap;
   }
   /* -- documents tab -------------------------------------------------------- */
   function monthsForTraveler(summary) {
@@ -47982,7 +48122,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     } else if (section === 'bookings') {
       wrap.appendChild(buildBookingsSection(tripId, prep));
     } else if (section === 'prepare') {
-      if (currentPrepareTab(route) === 'checklist') header.hidden = true;
+      if (currentPrepareTab(route) === 'checklist' || currentPrepareTab(route) === 'packing') header.hidden = true;
       wrap.appendChild(buildPrepareSection(tripId, prep, route));
     } else if (section === 'itinerary') {
       wrap.appendChild(buildItinerarySection(tripId, prep, route));
