@@ -5109,23 +5109,8 @@ details[open] > .orphan__setasidesum::after,
 .shell__skip:focus { transform: translateY(0); }
 
 /* ─── MASTHEAD ───────────────────────────────────────────────────────────── */
-/* CSS Grid — ONE mechanism at every width, no `display:contents`, no flex
-   `order` (VERIFY 2026-09-09 finding 2: `order` reorders paint only, never
-   Tab sequence, so the old display:contents+order MODE 1/MODE 2 split let a
-   keyboard user's Tab order diverge from what was on screen at >=1280px —
-   wordmark, search, identity, gear, trip chip, nav, when the eye read
-   wordmark, trip chip, nav, search, identity, gear).
-   `header.masthead` IS the grid; its three DOM children sit in that same
-   source order at every width — `.masthead__global` (nameplate), then
-   `.masthead__trip` (trip chip + primary nav), then `.masthead__util`
-   (search, identity, settings) — which is also the >=1280px left-to-right
-   reading order, so Tab now walks the row the way the eye does (see
-   50-shell.js `buildMasthead()` for why DOM order, not a `matchMedia`
-   listener that moves nodes, was picked to encode that). `grid-template-
-   areas` alone decides WHERE each one paints, independent of that source
-   order:
-     <1280   "global util" / "trip trip"   — two rows, util hugs the right
-     >=1280  "global trip util"            — one row (== --page-max)
+/* Two consistent rows keep app controls separate from the current trip.
+   Source order follows the visible order: nameplate, utilities, then trip.
    Doubled selectors: 40-view-home.css cascades LATER than this file and
    carries its own unconditional bare `.masthead`/`.masthead__inner` rules
    (padding:0, min-height:0 — the SAME values this file already used, so no
@@ -5189,14 +5174,15 @@ header.masthead {
 .masthead .masthead__trip {
   grid-area: trip;
   min-width: 0;
-  min-height: 40px;
-  gap: var(--s3);
+  min-height: 64px;
+  gap: var(--s5);
   border-top: var(--hair) solid var(--line-hair);
 }
 /* A `display:none` grid item is dropped from grid box generation entirely —
    its named area's track collapses to zero on its own — so this needs no
    `!important` the way the old `display:contents` mechanism did. */
 .masthead .masthead__trip[hidden] { display: none; }
+.masthead__trip > .navmenu--trip { flex: 1 1 auto; min-width: 0; }
 
 .masthead__nameplate { flex: 0 0 auto; }
 .masthead__nameplate {
@@ -5214,23 +5200,18 @@ header.masthead {
   letter-spacing: var(--tracking-caps);
 }
 
-/* ─── TRIP CHIP (the switcher) ───────────────────────────────────────────────
-   A-hybrid SPEC §4 — a genuine chip now, not a serif headline: hairline on
-   hover/open, never filled. Name + one merged `.tripswitch__meta` dates line,
-   both inside the SAME trigger button (the two used to be split across a
-   button and a separate sibling `.tripbar__facts` span, at two different
-   scales — diagnosis #1/#2). Archivo (`--font-body`), not Fraunces: one
-   serif display element (the wordmark) is the house rule now. */
+/* ─── TRIP SWITCHER ────────────────────────────────────────────────────────
+   Give the trip name its own line; the quieter details sit underneath. */
 .navmenu--trip .tripswitch {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.4em;
+  align-items: center;
+  gap: var(--s3);
   min-height: 36px;
   min-width: 0;
   max-width: 100%;
-  padding: 2px 10px;
+  padding: var(--s1) var(--s2);
   border: var(--hair) solid transparent;
-  border-radius: var(--radius-round);
+  border-radius: var(--radius-md);
   background: none;
   color: var(--ink);
   font-family: var(--font-body);
@@ -5241,10 +5222,13 @@ header.masthead {
 }
 .navmenu--trip .tripswitch .navmenu__label {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.4em;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
   min-width: 0;
   overflow: hidden;
+  text-align: left;
+  line-height: 1.35;
 }
 /* Trap B (handoff-notes §6) — truncation stays on the text span, never on
    `.navmenu` (the positioning wrapper) or any ancestor of `.navmenu__list`
@@ -5253,22 +5237,14 @@ header.masthead {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: min(16rem, 40vw);
+  max-width: 100%;
 }
-/* `overflow:hidden` here (not just `white-space:nowrap`) gives meta its own
-   automatic minimum size of 0, same as the name span two rules up — without
-   it, a flex item with visible overflow refuses to shrink below its own
-   content size at all, so under a real squeeze meta would hold its full
-   width and starve the name down to nothing instead of both giving way
-   together (VERIFY 2026-09-09 finding 1: a `display:none` breakpoint here
-   was the first attempt, but it fired at every trip's 1280-1535px range
-   regardless of name length, zeroing this element's rect for an ordinary
-   short name too — the null-budget "trip bar sits above the headline" check
-   caught it). */
+/* Long details truncate within the button without clipping its dropdown. */
 .tripswitch__meta {
   color: var(--ink-muted);
   font-weight: var(--weight-normal);
   font-size: var(--text-xs);
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5279,22 +5255,21 @@ header.masthead {
 }
 .navmenu--trip .tripswitch[aria-expanded="true"] { border-color: var(--line-strong); color: var(--accent); }
 .navmenu--trip .tripswitch:focus-visible {
-  outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-round);
+  outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-md);
 }
 @media (max-width: 767px) {
   .navmenu--trip .tripswitch { font-size: 0.9375rem; }
-  .tripswitch__name { max-width: 40vw; }
 }
 .navmenu--trip .navmenu__list { min-width: 18.5rem; left: 0; }
 
 /* ─── PRIMARY NAV + the merged More▾ trigger ─────────────────────────────────
-   A-hybrid SPEC §6 — ONE plain-text vocabulary for the whole group (the five
+   A-hybrid SPEC §6 — ONE plain-text vocabulary for the whole group (the three
    links AND the More▾ trigger): no ghost-pill, no fill, ever. Hover = ink
    brightens only. Active (`aria-current="page"`) = ink brightens AND a 2px
    accent underline sits 9px below the text baseline. More▾'s own open state
    gets the hover treatment (brighter ink), never the underline — that stays
    reserved for the actual current route. */
-.tripbar__nav { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; justify-content: center; }
+.tripbar__nav { flex: 0 0 auto; display: flex; align-items: center; margin-left: auto; }
 .masthead__navlist {
   display: flex;
   align-items: center;
@@ -5335,7 +5310,8 @@ header.masthead {
   outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-sm);
 }
 .masthead__link[aria-current="page"] { color: var(--ink); }
-.masthead__link[aria-current="page"]::after {
+.masthead__link[aria-current="page"]::after,
+.navmenu--more .navmenu__button.is-current::after {
   content: "";
   position: absolute;
   left: 1px; right: 1px; bottom: -9px;
@@ -5662,6 +5638,9 @@ header.masthead {
   right: 0;
   width: 440px;
   max-width: calc(100vw - 2 * var(--gutter));
+  max-height: calc(100vh - 9rem);
+  max-height: calc(100dvh - 9rem);
+  overflow-y: auto;
   padding: var(--s3);
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -5669,7 +5648,8 @@ header.masthead {
   border-radius: 10px;
   box-shadow: var(--shadow-sm);
 }
-.navmenu__col { display: flex; flex-direction: column; }
+.navmenu__col { display: flex; flex-direction: column; min-width: 0; list-style: none; }
+.navmenu__sublist { list-style: none; margin: 0; padding: 0; }
 .navmenu__rowlink {
   display: flex; align-items: flex-start; gap: var(--s3);
   width: 100%; min-height: 0; padding: var(--s2) var(--s2);
@@ -5677,6 +5657,9 @@ header.masthead {
   color: var(--ink); text-decoration: none;
 }
 .navmenu__rowlink:hover { background: var(--surface-alt); }
+.navmenu__rowlink[aria-current="page"] { background: var(--accent-soft); }
+.navmenu__rowlink[aria-current="page"] .navmenu__rowtitle { color: var(--accent); font-weight: var(--weight-semi); }
+.navmenu__rowlink[aria-current="page"] .navmenu__rowtitle::after { content: " ✓"; }
 .navmenu__rowlink:focus-visible {
   outline: 2px solid var(--focus); outline-offset: -2px; border-radius: var(--radius-md);
 }
@@ -5937,69 +5920,8 @@ header.masthead {
 .datapane__lede { max-width: var(--measure); color: var(--ink-muted); margin-bottom: var(--s3); }
 
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
-/* A-hybrid SPEC §3 — the four-tier ladder, replacing the old single 1199px
-   search-breakpoint/1023px chip-collapse tiers (both gone: the chips they
-   used to shrink no longer live in row 1 at all, and the identity trigger's
-   name never goes glyph-only — the mock keeps "Solomon" visible at every
-   width down to 390px, freed up by the chips leaving row 1).
-     >=1280      MODE 2 — one row (the block right below)
-     1024-1279   MODE 1, two rows — search stays full (13.75rem)
-     900-1023    MODE 1, two rows — search shrinks to 10rem, ⌘K hint hides
-     768-899     MODE 1, two rows — search collapses to an icon-only magnifier
-     <768        phone — unchanged mechanic from before, new control styling
-   Breakpoint measured empirically (SPEC.md §3): at 1200px the gap between the
-   nav's rendered content and the search field is -10px (real overlap); it
-   only reaches a stable >=24px gap at 1280px, which is also `--page-max`, so
-   the masthead's own max-width caps there too. */
-
-/* ---- MODE 2: single row, >=1280px (== --page-max) --------------------- */
-@media (min-width: 1280px) {
-  header.masthead {
-    grid-template-columns: auto 1fr auto;
-    grid-template-rows: auto;
-    grid-template-areas: "global trip util";
-    column-gap: var(--s5);
-    min-height: 62px;
-  }
-  /* One row now, so the row-2 hairline (a two-row-only divider) goes away. */
-  .masthead .masthead__trip { border-top: 0; }
-  /* VERIFY 2026-09-09 finding 1 — `.tripswitch__name` already ellipsizes
-     internally (Trap B, ~line 159), but the BUTTON around it had no ceiling
-     of its own: a long trip name let it claim whatever width it wanted, so
-     it ate into the room `.tripbar__nav`'s `flex:1 1 auto` (min-width:0,
-     line 190) had to give the primary nav, and the nav's own overflow
-     (nowrap, no ellipsis) painted back over the chip. Capping the button
-     itself gives the nav a share of the "trip" column it can never lose,
-     independent of the trip name's length. min-width:0 already sits on the
-     button (line 140), so this only ever pulls it narrower, never wider.
-     A fixed value, not a `clamp(…, Nvw, …)` — `header.masthead` is capped
-     at `max-width:var(--page-max)` (== 1280px, unconditionally, not just in
-     this media block), so past 1280px of REAL viewport the row's actual
-     budget stops growing at all; a `vw` term keeps growing regardless and
-     first ate visibly into the nav's own ~396px content minimum at 1440px
-     (`.masthead__navlist` has no width ceiling of its own — see 4 lines
-     below for why it can't safely get one — so any width this button takes
-     beyond what leaves the nav's true minimum untouched reappears as the
-     nav's own content bleeding out of its now-too-small box, half to each
-     side of its `justify-content:center`, which is what actually painted
-     back over the chip). 16rem matches `.tripswitch__name`'s own existing
-     ceiling above, so the whole-button case degrades the same way the
-     name-alone case already did. */
-  .navmenu--trip .tripswitch { max-width: 16rem; }
-  /* `.masthead__navlist` (recall: also `.tripbar__navlist`, its only other
-     class) cannot take `overflow:hidden` or a `max-width` of its own to
-     enforce this from its side instead — the More▾ trigger's popover is a
-     DESCENDANT of this list (an `<li>`, per buildTripBar() in 50-shell.js),
-     and clipping or shrink-forcing the list would clip or visually squash
-     that open popover along with it (the exact Trap B this file already
-     warns about for the trip switcher's own list two rules up). So the only
-     lever left is capping what competes with it — this button — generously
-     enough below its own natural minimum that the list is never asked to
-     shrink at all. */
-}
-
-/* ---- 1024-1279: two rows, search stays full width (no override needed —
-   the base rules above already give it 13.75rem and full padding) -------- */
+/* Both rows stay intact on wide screens. Only search changes shape as
+   space narrows; navigation moves to the bottom bar below 768px. */
 
 /* ---- 900-1023: search shrinks -------------------------------------------- */
 @media (max-width: 1023px) and (min-width: 900px) {
@@ -6036,7 +5958,7 @@ header.masthead {
 @media (max-width: 767px) {
   .masthead .masthead__global { min-height: 48px; gap: var(--s2); }
   .masthead .masthead__util { min-height: 48px; gap: var(--s2); }
-  .masthead .masthead__trip { min-height: 36px; gap: var(--s2); }
+  .masthead .masthead__trip { min-height: 60px; gap: var(--s2); }
   /* The nameplate is the flexible track now that the nav has gone downstairs;
      it keeps a REAL minimum so the trailing controls cannot collapse it.
      `minmax(0,1fr)` once let them take everything and squashed it to ~5px,
@@ -6045,9 +5967,8 @@ header.masthead {
   .masthead__nameplate { flex: 1 1 7.5rem; min-width: 7.5rem; }
   .masthead__nameplate .nameplate__title,
   .masthead__title { white-space: nowrap; }
-  /* The trip's sections live in the tab bar and the More sheet down here; the
-     trip bar keeps only the trip chip (name + dates, one line, truncating
-     rather than wrapping — the chip's own `.tripswitch__name` ellipsis). */
+  /* Trip sections live in the tab bar and More sheet; the switcher can use
+     the full width for the trip name and details. */
   .tripbar__nav { display: none; }
 
   .tabbar { display: block; }
@@ -6067,14 +5988,16 @@ header.masthead {
 
 /* A clearer current destination without changing masthead geometry or
    moving keyboard focus order. Existing phone safe-area spacing remains. */
-.masthead__link[aria-current="page"] {
+.masthead__link[aria-current="page"],
+.navmenu--more .navmenu__button.is-current {
   color: var(--accent);
   background: var(--surface-alt);
   box-shadow: 0 0 0 var(--s1) var(--surface-alt);
   border-radius: var(--radius-md);
   font-weight: var(--weight-semi);
 }
-.masthead__link[aria-current="page"]::after { bottom: -7px; border-radius: var(--radius-round); }
+.masthead__link[aria-current="page"]::after,
+.navmenu--more .navmenu__button.is-current::after { bottom: -7px; border-radius: var(--radius-round); }
 .tabbar__tab.is-current, .tabbar__tab[aria-current="page"] { background: var(--surface-alt); color: var(--accent); border-radius: var(--radius-lg); }
 .navmenu__list { border-radius: calc(var(--radius-lg) * 2); box-shadow: var(--shadow-md); }
 @media (max-width: 359px) {
@@ -12770,7 +12693,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
 (function (T) {
   'use strict';
 
-  T.version = '0.28.9';   // Remember browser connections and retry incomplete GitHub sync
+  T.version = '0.28.10';   // Simplify the home page and header navigation
   T.idVersion = 1;          // bump only with a documented re-attachment plan
   T.schemaVersion = 3;      // planning-state schema (2 = multi-trip: records
                             //   carry trips[tripId] + windows[windowKey] subs;
@@ -33366,8 +33289,6 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       head.appendChild(h1);
       head.appendChild(sub);
       el.appendChild(head);
-      var woodlandBanner = T.woodland.banner();
-      if (woodlandBanner) el.appendChild(woodlandBanner);
       painters.push(function () { paintHeadline(h1, sub); });
 
       var locationPanel = panel('home-locations', 'Where do you want to go?', { key: 'locations', class: 'panel--locations' });
@@ -34106,7 +34027,6 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       'Workbook & Settings ›'));
   }
 })(window.TRIP);
-
 /* ==== src/js/21-view-explore.js ==== */
 /* 21-view-explore.js — the Explore screen (S2). OWNER: IMPL-2.
  *
@@ -60112,13 +60032,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
   /* 1. The route table (docs/UX_SPEC.md §1.1/§1.2)                        */
   /* ==================================================================== */
 
-  /* v0.19.0 — `group` places a route in the TRIP BAR's nav (row 2), not the
-     masthead's top row: 'primary' is a plain link, 'labs'/'more' are the two
-     dropdowns, 'none' is reachable some other way. `data` moved to 'none'
-     because Settings is now a permanent row-1 link (it is app-wide, not
-     trip-scoped, and burying it in More made it the hardest thing to find);
-     `map` and `responses` came up into the row because More lost its longest
-     tail and they are two of the trip's real sections. */
+  /* Keep the everyday destinations in the trip bar. Other views and tools
+     share More; menuGroup separates browsing from planning in its panel.
+     Settings stays beside the account control in the top row. */
   SH.ROUTES = [
     { name: 'trips', label: 'All trips', group: 'none', title: 'The Trip List',
       line: 'The trips list is being built right now. Until it lands, the trip you were last on is still the one every screen is about.' },
@@ -60127,14 +60043,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     { name: 'explore', label: 'Explore', group: 'primary', tab: 'Explore', glyph: '▦',
       title: 'Explore every option',
       line: 'The card explorer is being built right now. Every count on Home already points here, so these links come alive the moment it lands.' },
-    { name: 'collections', label: 'Collections', group: 'primary', tab: 'Collections', glyph: '❑',
-      title: 'Collections',
+    { name: 'collections', label: 'Collections', group: 'more', menuGroup: 'browse', tab: 'Collections', glyph: '❑',
+      title: 'Collections', menuDesc: 'Browse options by theme',
       line: 'Editorial collections arrive in a later wave — Islands, Mountain Spa, All Inclusive and the rest are already planned.' },
-    { name: 'map', label: 'Map', group: 'primary',
-      title: 'Map',
+    { name: 'map', label: 'Map', group: 'more', menuGroup: 'browse',
+      title: 'Map', menuDesc: 'See where every option is',
       line: 'Every option where it actually is — the same filters as Explore, on one map.' },
-    { name: 'responses', label: 'Responses', group: 'primary',
-      title: 'Resort responses' },
+    { name: 'responses', label: 'Responses', group: 'more', menuGroup: 'browse',
+      title: 'Resort responses', menuDesc: 'Read replies and follow-ups' },
     { name: 'plan', label: 'Plan', group: 'primary', title: 'Plan', tab: 'Plan', glyph: '☑' },
     { name: 'budget', label: 'Budget Lab', group: 'labs',
       title: 'Budget Lab', menuDesc: 'Model your nights, airfare, budget',
@@ -60142,7 +60058,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     { name: 'decision', label: 'Decision Lab', group: 'labs',
       title: 'Decision Lab', menuDesc: 'Weigh your priorities against the workbook',
       line: 'Your priorities, your weighted ranking, beside the workbook’s.' },
-    { name: 'compare', label: 'Compare', group: 'more', tab: 'Compare', glyph: '⊞',
+    { name: 'compare', label: 'Compare', group: 'more', menuGroup: 'browse', tab: 'Compare', glyph: '⊞',
       title: 'Compare', menuDesc: 'Put two options side by side',
       line: 'Compare arrives in a later wave — your selections are already being kept.' },
     { name: 'changed', label: 'What Changed', group: 'more',
@@ -60275,7 +60191,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
      *  `<li class="navmenu__grouplabel">` (no interactive content, skipped by
      *  the arrow-key walk below since `links()` only collects `a, button`),
      *  and `{col:[...]}` wraps a sub-list of items (grouplabels + rows) in one
-     *  `<div class="navmenu__col">` appended directly into the `<ul>` — two
+     *  `<li class="navmenu__col">` with a nested list inside the `<ul>` — two
      *  columns side by side via CSS grid on `.navmenu__list`. Every real `a`/
      *  `button` inside a column is still found by `U.qsa('a, button', list)`
      *  (it searches all descendants), so Esc/arrow-key/outside-click/mutual
@@ -60288,8 +60204,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       if (item.sep) { host.appendChild(U.el('li', { class: 'navmenu__sep', role: 'separator' })); return; }
       if (item.grouplabel) { host.appendChild(U.el('li', { class: 'navmenu__grouplabel', text: item.grouplabel })); return; }
       if (item.col) {
-        var col = U.el('div', { class: 'navmenu__col' });
-        item.col.forEach(function (sub) { appendItem(col, sub); });
+        var col = U.el('li', { class: 'navmenu__col' });
+        var sublist = U.el('ul', { class: 'navmenu__sublist' });
+        item.col.forEach(function (sub) { appendItem(sublist, sub); });
+        col.appendChild(sublist);
         host.appendChild(col);
         return;
       }
@@ -60460,10 +60378,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     btn.classList.add('tripbar__name', 'tripswitch');
     var labelSpan = U.qs('.navmenu__label', btn);
     U.clear(labelSpan);
-    /* A-hybrid SPEC §4 — the trip chip is ONE line: name + dates, both inside
-       the trigger button (the dates used to live in a separate sibling
-       `.tripbar__facts` element; that element is gone, and its text now
-       lives in `.tripswitch__meta`, right next to the name it qualifies). */
+    /* Name and details share one switcher, with the name on its own line. */
     nodes.tripName = U.el('span', { class: 'tripswitch__name' });
     nodes.tripMeta = U.el('span', { class: 'tripswitch__meta' });
     labelSpan.appendChild(nodes.tripName);
@@ -60497,6 +60412,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
        visible facts text in sync) is served by the `nodes.tripMeta` line
        below instead. */
     if (nodes.tripMeta) U.setText(nodes.tripMeta, factsForShort(active));
+    nodes.tripswitchButton.setAttribute('title', active.name + ' — ' + facts);
     nodes.tripswitchButton.setAttribute('aria-label',
       'Switch trip — currently ' + active.name + '. ' + facts + '.');
     if (nodes.tripMenu && nodes.tripMenu._setItems) nodes.tripMenu._setItems(tripMenuItems());
@@ -60542,32 +60458,10 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
    * glyphs rather than counting columns. */
   function buildMasthead() {
     var head = U.el('header', { class: 'masthead', role: 'banner' });
-    /* VERIFY 2026-09-09 finding 2 — DOM order now equals MODE-2's visual
-       left-to-right order (nameplate, trip chip + nav, search + identity +
-       gear), so `order` in 20-comp-shell.css becomes purely cosmetic instead
-       of load-bearing for Tab sequence: a keyboard user tabbing through now
-       lands on controls in the same order the eye reads them at >=1280px.
-       Previously `.masthead__global` held [nameplate, search, identity,
-       settings] and `.masthead__trip` held [tripswitch, nav] — visually
-       reordered to nameplate/trip/nav/search/identity/settings by `order`,
-       but Tab still walked the OLD DOM order (nameplate -> search ->
-       identity -> settings -> trip -> nav), diverging sharply from what was
-       on screen. Search+identity+settings move into a third wrapper,
-       `.masthead__util`, appended AFTER the trip bar; `.masthead__global`
-       now holds only the nameplate. Below 1280px the two-row VISUAL layout
-       is unchanged (nameplate+search+identity+gear on top, trip+nav below)
-       via CSS Grid `grid-template-areas: "global util" "trip trip"` in
-       20-comp-shell.css — grid areas place a box by name regardless of its
-       source position, so this costs no visual difference at any width, only
-       a DOM reorder. (Tab order below 1280px now runs nameplate -> trip
-       chip+nav -> search/identity/gear — down to row 2, then back up to the
-       rest of row 1 — rather than straight through row 1 then row 2; this
-       trade was made explicitly, per the coordinator's own prescribed fix,
-       to make DOM order the SAME encoding at every width instead of adding a
-       second, matchMedia-driven reordering mechanism.) */
+    /* Source and keyboard order follow the two visual rows at every width. */
     head.appendChild(buildGlobalRow());
-    head.appendChild(buildTripBar());
     head.appendChild(buildUtilRow());
+    head.appendChild(buildTripBar());
     nodes.masthead = head;
     return head;
   }
@@ -60594,11 +60488,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     return inner;
   }
 
-  /** Row 3 in DOM order (`.masthead__util`) — search, identity, settings.
-   *  Split out of the old `.masthead__global` (VERIFY 2026-09-09 finding 2,
-   *  see buildMasthead()'s comment) so DOM order matches MODE-2's visual
-   *  order without a `matchMedia` reordering listener; visually it still
-   *  sits on row 1 below 1280px via `grid-template-areas`. */
+  /** Top-row utilities: search, identity, settings. */
   function buildUtilRow() {
     var inner = U.el('div', { class: 'masthead__inner masthead__util' });
 
@@ -60638,6 +60528,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
      external asset — fact 20 holds). Copied verbatim from the pixel-verified
      mockup (`SCRATCH/design/mock/header-a.html`). */
   var ROUTE_GLYPHS = {
+    collections: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>',
+    map: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m1.5 3 4-1.5 5 1.5 4-1.5V13l-4 1.5-5-1.5-4 1.5zM5.5 1.5V13M10.5 3v11.5"/></svg>',
+    responses: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M13 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2v2l3-2h5a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="M5 5.5h6M5 8.5h4"/></svg>',
     budget: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.2 9.5c.3.6 1 1 1.8 1 1.1 0 2-.6 2-1.5S9.1 7.5 8 7.5s-2-.5-2-1.4c0-.9.9-1.5 2-1.5.8 0 1.5.4 1.8 1"/></svg>',
     decision: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="4" cy="4" r="1.6"/><circle cx="4" cy="12" r="1.6"/><circle cx="12" cy="8" r="1.6"/><path d="M5.4 4.6 10.6 7.4M5.4 11.4 10.6 8.6"/></svg>',
     compare: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2.5" y="3" width="4.5" height="10" rx="1"/><rect x="9" y="3" width="4.5" height="10" rx="1"/></svg>',
@@ -60677,15 +60570,14 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       navList.appendChild(U.el('li', {}, a));
     });
 
-    /* A-hybrid SPEC §6/§7 — Labs and More merge into ONE trigger ("More ▾"),
-       a two-column mega-lite panel (Labs | More), replacing the old separate
-       `dropdown('Labs', …)` trigger. Both groups read straight off SH.ROUTES,
-       so a route added to either group appears here with no further edit. */
-    var labsItems = SH.ROUTES.filter(function (r) { return r.group === 'labs'; }).map(moreRow);
-    var moreItems = SH.ROUTES.filter(function (r) { return r.group === 'more'; }).map(moreRow);
+    /* Secondary destinations stay one click away in two balanced groups. */
+    var browseItems = SH.ROUTES.filter(function (r) { return r.group === 'more' && r.menuGroup === 'browse'; }).map(moreRow);
+    var toolItems = SH.ROUTES.filter(function (r) {
+      return r.group === 'labs' || (r.group === 'more' && r.menuGroup !== 'browse');
+    }).map(moreRow);
     var more = dropdown('More', [
-      { col: [{ grouplabel: 'Labs' }].concat(labsItems) },
-      { col: [{ grouplabel: 'More' }].concat(moreItems) }
+      { col: [{ grouplabel: 'Browse & compare' }].concat(browseItems) },
+      { col: [{ grouplabel: 'Tools & updates' }].concat(toolItems) }
     ], { class: 'navmenu--more' });
     nodes.moreMenuButton = U.qs('.navmenu__button', more);
     nodes.moreMenuDot = U.el('span', { class: 'navmenu__dot', hidden: true, 'aria-hidden': 'true', text: ' •' });
@@ -61272,6 +61164,7 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
       var ul = U.el('ul', { class: 'sheet__list' });
       g.items.forEach(function (item) {
         var a = U.el('a', { class: 'sheet__item', href: href(item.name), dataset: { route: item.name } });
+        if (item.name === T.router.currentName()) a.setAttribute('aria-current', 'page');
         a.appendChild(U.el('span', { class: 'sheet__itemlabel', text: item.label }));
         if (item.name === 'changed') {
           var dot = U.el('span', { class: 'sheet__dot', hidden: !store.getState().ui.changedUnread });
@@ -61376,9 +61269,9 @@ window.TRIP.WOODLAND_BRIEF = {"notes":["Evidence review • 10 September 2026 �
     });
     // "More" marks itself when one of its destinations is the open screen.
     var r = route(name);
-    var inMore = r && r.group === 'more';
+    var inMore = r && (r.group === 'more' || r.group === 'labs');
     if (nodes.moreMenuButton) U.toggleClass(nodes.moreMenuButton, 'is-current', !!inMore);
-    if (nodes.moreButton) U.toggleClass(nodes.moreButton, 'is-current', !!inMore || name === 'budget' || name === 'decision' || name === 'collections');
+    if (nodes.moreButton) U.toggleClass(nodes.moreButton, 'is-current', !!inMore && TABS.indexOf(name) < 0);
 
     paintBarVisibility();
     SH.closeMore();
